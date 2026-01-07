@@ -17,5 +17,15 @@
             GameOver,
             Victory
         }
+
+        /// <summary>
+        /// an Enum representing the different weather states
+        /// </summary>
+        public enum WeatherState
+        {
+            Clear,
+            Rain,
+            Snow,
+        }
     }
 }
