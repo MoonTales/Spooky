@@ -1,6 +1,6 @@
 name: Build project
 
-on: [push, pull_request]
+on: pull_request #[push, pull_request] # if we wanna run on push aswell, I can uncomment this
 
 jobs:
   buildForAllSupportedPlatforms:
@@ -16,7 +16,7 @@ jobs:
           #- StandaloneLinux64 # Build a Linux 64-bit standalone.
           #- iOS # Build an iOS player.
           #- Android # Build an Android .apk standalone app.
-          - WebGL # WebGL.
+          - WebGL # WebGL. For now, we only care about WebGL
     steps:
       - uses: actions/checkout@v4
         with:
