@@ -88,6 +88,18 @@ namespace System
                 return _playerState == PlayerState.Dead;
             }
             
+            public float GetHealthPercentage()
+            {
+                if (_maxHealth <= 0) return 0;
+                return (_currentHealth / _maxHealth) * 100f;
+            }
+            
+            public float GetStaminaPercentage()
+            {
+                if (_maxStamina <= 0) return 0;
+                return (_currentStamina / _maxStamina) * 100f;
+            }
+            
             public void DebugPrintStats(){
                 
                 DebugUtils.Log("Player Stats:" +
