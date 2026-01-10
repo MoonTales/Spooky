@@ -16,16 +16,7 @@ namespace Player
     {
         
         [SerializeField] private string spawnPointID = "DEFAULT_SPAWN_POINT"; public string GetSpawnPointID() { return spawnPointID; }
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
-        {
-        
-        }
 
-        // Update is called once per frame
-        void Update()
-        {
         
-        }
     }
 }
