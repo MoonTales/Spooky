@@ -61,6 +61,7 @@ namespace Player
             if (FirstAnchor)
             {
                 TeleportPlayer(FirstAnchor.gameObject.transform.position);
+                return;
             }
             
             // if we still dont have a player position, we will just spawn at the world origin
@@ -69,9 +70,9 @@ namespace Player
             
         }
         
-        private void OnPlayerStateChanged(Types.PlayerState newState)
+        private void OnPlayerStateChanged(Types.PlayerHealthState newHealthState)
         {
-            DebugUtils.LogSuccess("Player state changed to: " + newState.ToString());
+            DebugUtils.LogSuccess("Player state changed to: " + newHealthState.ToString());
         }
 
         
@@ -99,6 +100,7 @@ namespace Player
             if (_player == null) { return; }
             _player.transform.position = newPosition;
         }
+        
         
         
     }

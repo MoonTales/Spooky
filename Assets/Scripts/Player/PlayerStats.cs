@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Types = System.Types;
 
 namespace Player
@@ -17,7 +18,7 @@ namespace Player
         [SerializeField] private float defaultCurrentStamina = 100f;
         [SerializeField] private float defaultMaxStamina = 100f;
         [SerializeField] private float defaultMovementSpeed = 5f;
-        [SerializeField] private Types.PlayerState defaultPlayerState = Types.PlayerState.Healthy;
+        [FormerlySerializedAs("defaultPlayerState")] [SerializeField] private Types.PlayerHealthState defaultPlayerHealthState = Types.PlayerHealthState.Healthy;
         [Space(10)]
         [SerializeField] private float injuredHealthCutoff = 0.75f; // health percentage cutoffs for the different HealthStates
         [SerializeField] private float criticalHealthCutoff = 0.25f; 
@@ -59,7 +60,7 @@ namespace Player
             _playerStats.SetCurrentStamina(defaultCurrentStamina);
             _playerStats.SetMaxStamina(defaultMaxStamina);
             _playerStats.SetMovementSpeed(defaultMovementSpeed);
-            _playerStats.SetPlayerState(defaultPlayerState, false);
+            _playerStats.SetPlayerState(defaultPlayerHealthState, false);
         }
         
         
@@ -76,19 +77,19 @@ namespace Player
             // If the player health drops to 0, set state to Dead
             if (currentHealth <= 0)
             {
-                _playerStats.SetPlayerState(Types.PlayerState.Dead);
+                _playerStats.SetPlayerState(Types.PlayerHealthState.Dead);
             }
             else if (currentHealth < _playerStats.GetMaxHealth() * criticalHealthCutoff)
             {
-                _playerStats.SetPlayerState(Types.PlayerState.Critical);
+                _playerStats.SetPlayerState(Types.PlayerHealthState.Critical);
             }
             else if (currentHealth < _playerStats.GetMaxHealth() * injuredHealthCutoff)
             {
-                _playerStats.SetPlayerState(Types.PlayerState.Injured);
+                _playerStats.SetPlayerState(Types.PlayerHealthState.Injured);
             }
             else
             {
-                _playerStats.SetPlayerState(Types.PlayerState.Healthy);
+                _playerStats.SetPlayerState(Types.PlayerHealthState.Healthy);
             }
             
         }
