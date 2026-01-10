@@ -11,7 +11,7 @@ namespace Player
     public class PlayerManager : Singleton<PlayerManager>
     {
         private GameObject _player;
-        [SerializeField] private string _defaultSpawnPointID = "DEFAULT_SPAWN_POINT";
+        [SerializeField] private string defaultSpawnPointID = "DEFAULT_SPAWN_POINT";
         
         
         void Start()
@@ -46,7 +46,7 @@ namespace Player
                     FirstAnchor = Anchor;
                 }
                 // Search for the default spawn point ID
-                if (Anchor != null && Anchor.gameObject != null && Anchor.GetSpawnPointID() == _defaultSpawnPointID)
+                if (Anchor != null && Anchor.gameObject != null && Anchor.GetSpawnPointID() == defaultSpawnPointID)
                 {
                     // found the default spawn point, move the player here
                     if (_player != null)
