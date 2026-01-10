@@ -18,6 +18,10 @@ namespace Player
         [SerializeField] private float defaultMaxStamina = 100f;
         [SerializeField] private float defaultMovementSpeed = 5f;
         [SerializeField] private Types.PlayerState defaultPlayerState = Types.PlayerState.Healthy;
+        [Space(10)]
+        [SerializeField] private float injuredHealthCutoff = 0.75f; // health percentage cutoffs for the different HealthStates
+        [SerializeField] private float criticalHealthCutoff = 0.25f; 
+        // cutoffs for the different HealthStates
         
         
         public void Start()
@@ -44,7 +48,7 @@ namespace Player
             if (Input.GetKeyDown(KeyCode.L))
             {
                 // debug print the current player stats
-                Types.DebugPrintStats();
+                _playerStats.DebugPrintStats();
             }
         }
 
@@ -74,11 +78,11 @@ namespace Player
             {
                 _playerStats.SetPlayerState(Types.PlayerState.Dead);
             }
-            else if (currentHealth < _playerStats.GetMaxHealth() * 0.25f)
+            else if (currentHealth < _playerStats.GetMaxHealth() * criticalHealthCutoff)
             {
                 _playerStats.SetPlayerState(Types.PlayerState.Critical);
             }
-            else if (currentHealth < _playerStats.GetMaxHealth() * 0.75f)
+            else if (currentHealth < _playerStats.GetMaxHealth() * injuredHealthCutoff)
             {
                 _playerStats.SetPlayerState(Types.PlayerState.Injured);
             }

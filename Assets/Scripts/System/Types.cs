@@ -81,11 +81,14 @@ namespace System
                     }
                 }
                 _playerState = state;
-            } 
-        }
+            }
 
-        
-            public static void DebugPrintStats(){
+            public bool IsPlayerDead()
+            {
+                return _playerState == PlayerState.Dead;
+            }
+            
+            public void DebugPrintStats(){
                 
                 DebugUtils.Log("Player Stats:" +
                                "\nCurrent Health: " + PlayerStats.Instance.GetPlayerStats().GetCurrentHealth() +
@@ -95,6 +98,10 @@ namespace System
                                "\n Movement Speed: " + PlayerStats.Instance.GetPlayerStats().GetMovementSpeed() +
                                "\n Player State: " + PlayerStats.Instance.GetPlayerStats().GetPlayerState());
             }
+        }
+
+        
+
         
         /* ------------------------ End Player Types ------------------------ */
         
