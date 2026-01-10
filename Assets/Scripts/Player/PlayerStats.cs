@@ -25,10 +25,23 @@ namespace Player
             // Initialize the player stats
             InitializeDefaultStats();
         }
+        
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnPlayerDamaged += OnPlayerDamaged,
+                () => EventBroadcaster.OnPlayerDamaged -= OnPlayerDamaged);
+            
+        }
+        
+        private void OnPlayerDamaged(float damageAmount)
+        {
+            UpdateCurrentHealth(-damageAmount);
+        }
 
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.P))
+            if (Input.GetKeyDown(KeyCode.L))
             {
                 // debug print the current player stats
                 Types.DebugPrintStats();
@@ -45,6 +58,36 @@ namespace Player
             _playerStats.SetPlayerState(defaultPlayerState, false);
         }
         
+        
+        // this is whats called from the FPlayerStats struct to update health
+        public void UpdateCurrentHealth(float delta)
+        {
+            // Update the current health
+            float currentHealth = _playerStats.GetCurrentHealth();
+            // clamp the health between 0 and max health
+            currentHealth = Mathf.Clamp(currentHealth + delta, 0, _playerStats.GetMaxHealth());
+            _playerStats.SetCurrentHealth(currentHealth);
+            
+            // special edge cases for health changes
+            // If the player health drops to 0, set state to Dead
+            if (currentHealth <= 0)
+            {
+                _playerStats.SetPlayerState(Types.PlayerState.Dead);
+            }
+            else if (currentHealth < _playerStats.GetMaxHealth() * 0.25f)
+            {
+                _playerStats.SetPlayerState(Types.PlayerState.Critical);
+            }
+            else if (currentHealth < _playerStats.GetMaxHealth() * 0.75f)
+            {
+                _playerStats.SetPlayerState(Types.PlayerState.Injured);
+            }
+            else
+            {
+                _playerStats.SetPlayerState(Types.PlayerState.Healthy);
+            }
+            
+        }
         
         
         

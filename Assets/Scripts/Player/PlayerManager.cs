@@ -23,18 +23,16 @@ namespace Player
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnPlayerDamaged += OnPlayerDamaged,
-                () => EventBroadcaster.OnPlayerDamaged -= OnPlayerDamaged);
+            TrackSubscription(() => EventBroadcaster.OnPlayerStateChanged += OnPlayerStateChanged,
+                () => EventBroadcaster.OnPlayerStateChanged -= OnPlayerStateChanged);
             
         }
         
-        private void OnPlayerDamaged(float InDamage)
+        private void OnPlayerStateChanged(Types.PlayerState newState)
         {
-            // now, any class in the entire project can call EventBroadcaster.Broadcast_OnPlayerDamaged(damageAmount);
-            // and itll damage the player, without having to know anything about the player class.
-            // all functionality can be handled via the player class itself.
-            DebugUtils.LogSuccess("Player took " + InDamage + " damage! This is from the Broadcast system!!!");
+            DebugUtils.LogSuccess("Player state changed to: " + newState.ToString());
         }
+
         
         
         // Global broadcasts we have access to as a child class
