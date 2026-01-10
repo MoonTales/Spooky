@@ -91,12 +91,17 @@ namespace System
         /// A series of broadcasts that effect or in some way relate to the player.
         ///
         /// DamagePlayer -> Allows anyone to easily apply damage to the player
+        /// OnPlayerStateChanged -> Broadcasts when the player's state has changed (Healthy, Injured, Critical, Dead)
         /// </summary>
         
         public delegate void DamagePlayerHandler(float damageAmount);
         public static event DamagePlayerHandler OnPlayerDamaged;
         public static void Broadcast_OnPlayerDamaged(float damageAmount) { OnPlayerDamaged?.Invoke(damageAmount); }
 
+        
+        public delegate void OnPlayerStateChangedHandler(Types.PlayerState newState);
+        public static event OnPlayerStateChangedHandler OnPlayerStateChanged;
+        public static void Broadcast_OnPlayerStateChanged(Types.PlayerState newState) { OnPlayerStateChanged?.Invoke(newState); }
 
 
 

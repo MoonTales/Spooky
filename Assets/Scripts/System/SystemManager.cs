@@ -1,4 +1,5 @@
 using Managers;
+using Player;
 
 namespace System
 {
@@ -26,6 +27,7 @@ namespace System
             // gameObject.AddComponent<ManagerClassName>();
             gameObject.AddComponent<PlayerManager>();
             gameObject.AddComponent<GameStateManager>();
+            
         
         }
     }
