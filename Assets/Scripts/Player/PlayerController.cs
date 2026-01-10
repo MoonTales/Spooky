@@ -30,11 +30,11 @@ namespace Player
 
         private void HandleGameplayState()
         {
-            
+            // Return to basic player controls
         }
         private void HandleCutsceneState()
         {
-            
+            // Disable player controls for cutscene
         }
     }
 }
