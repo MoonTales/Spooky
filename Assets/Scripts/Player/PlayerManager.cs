@@ -1,9 +1,8 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using Types = System.Types;
 
-namespace Managers
+namespace Player
 {
     /// <summary>
     /// Class used to manager player related functionality
@@ -11,11 +10,13 @@ namespace Managers
     /// </summary>
     public class PlayerManager : Singleton<PlayerManager>
     {
-        private GameObject player;
+        private GameObject _player;
+        
+        
         void Start()
         {
             // Get reference to the player
-            player = GameObject.FindWithTag("Player");
+            _player = GameObject.FindWithTag("Player");
         }
         
         // --- Event connections --- //
@@ -48,17 +49,18 @@ namespace Managers
         /// </summary>
         public GameObject GetPlayer()
         {
-            return player;
+            return _player;
         }
 
         /// <summary>
-        /// Teleports player immediately (optionally with screen fade)
+        /// Teleports player immediately
         /// </summary>
         public void TeleportPlayer(Vector3 newPosition)
         {
-            if (player == null) { return; }
-            player.transform.position = newPosition;
+            if (_player == null) { return; }
+            _player.transform.position = newPosition;
         }
+        
         
     }
 }
