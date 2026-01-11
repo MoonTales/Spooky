@@ -211,7 +211,9 @@ namespace Player
         
         private void OnJump(InputAction.CallbackContext obj)
         {
+            
             if(_lockedInput){ return; }
+            if (_isCrouching) { return;}
             if(_isGrounded)
             {
                 // Apply jump force
