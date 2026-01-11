@@ -41,6 +41,7 @@ namespace Player
         private bool _isGrounded;
         private bool _isCrouching;
         private bool _isSprinting;
+        private bool _cachedSprintState;
         private float _verticalVelocity;
         private float _targetHeight;
         
@@ -68,6 +69,17 @@ namespace Player
         private void Update()
         {
             _isGrounded = _characterController.isGrounded;
+            
+            // check the cached sprint state when we land, incase it changed mid-air
+            if (_isGrounded && !_isSprinting)
+            {
+                _isSprinting = _cachedSprintState;
+            }
+            else if (!_isGrounded)
+            {
+                _isSprinting = false; // cannot sprint in mid-air
+            }
+            
             HandleGravity();
             HandleMovement();
             HandleCrouchTransition();
@@ -101,6 +113,12 @@ namespace Player
 
         private void OnSprint(InputAction.CallbackContext obj)
         {
+            // only allow sprinting to change if we are grounded
+            
+            // regardless of whether we can sprint, we want to cache the sprint state for when we land
+            _cachedSprintState = obj.performed;
+            
+            if (!_isGrounded) { return; }
             _isSprinting = obj.performed;
         }
 
