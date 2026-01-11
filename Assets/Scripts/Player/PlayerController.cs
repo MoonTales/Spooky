@@ -69,7 +69,6 @@ namespace Player
         private void Update()
         {
             _isGrounded = _characterController.isGrounded;
-            
             // check the cached sprint state when we land, incase it changed mid-air
             if (_isGrounded && !_isSprinting)
             {
