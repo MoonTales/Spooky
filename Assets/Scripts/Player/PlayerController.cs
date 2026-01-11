@@ -146,9 +146,7 @@ namespace Player
 
             if (_moveInput.magnitude > 0.1f)
             {
-                float bobSpeed = _isSprinting
-                    ? sprintBobSpeed
-                    : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
+                float bobSpeed = _isSprinting ? sprintBobSpeed : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
 
                 float bobAmount = _isSprinting
                     ? sprintBobAmount
@@ -198,12 +196,12 @@ namespace Player
         private void OnSprint(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
+            if (!_isGrounded) { return; }
+            if (_isCrouching) { return; } // cannot sprint while crouching
             // only allow sprinting to change if we are grounded
-            
             // regardless of whether we can sprint, we want to cache the sprint state for when we land
             _cachedSprintState = obj.performed;
-            
-            if (!_isGrounded) { return; }
+
             _isSprinting = obj.performed;
         }
 
