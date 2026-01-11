@@ -99,9 +99,9 @@ namespace System
         public static void Broadcast_OnPlayerDamaged(float damageAmount) { OnPlayerDamaged?.Invoke(damageAmount); }
 
         
-        public delegate void OnPlayerStateChangedHandler(Types.PlayerState newState);
+        public delegate void OnPlayerStateChangedHandler(Types.PlayerHealthState newHealthState);
         public static event OnPlayerStateChangedHandler OnPlayerStateChanged;
-        public static void Broadcast_OnPlayerStateChanged(Types.PlayerState newState) { OnPlayerStateChanged?.Invoke(newState); }
+        public static void Broadcast_OnPlayerStateChanged(Types.PlayerHealthState newHealthState) { OnPlayerStateChanged?.Invoke(newHealthState); }
 
 
 
