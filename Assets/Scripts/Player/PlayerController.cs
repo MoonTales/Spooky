@@ -29,11 +29,20 @@ namespace Player
         [SerializeField] private float crouchTransitionSpeed = 10.0f;
         [SerializeField] private float cameraCrouchOffset = 0.4f;
         [Space(10)]
+        [Header("Headbob")]
+        [SerializeField] private float walkBobSpeed = 14.0f;
+        [SerializeField] private float walkBobAmount = 0.05f;
+        [SerializeField] private float sprintBobSpeed = 18.0f;
+        [SerializeField] private float sprintBobAmount = 0.1f;
+        [SerializeField] private float crouchBobSpeed = 8.0f;
+        [SerializeField] private float crouchBobAmount = 0.025f;
+        [Space(10)]
         [Header("References")]
         [SerializeField] private InputActionReference moveAction;
         [SerializeField] private InputActionReference jumpAction;
         [SerializeField] private InputActionReference crouchAction;
         [SerializeField] private InputActionReference sprintAction;
+        
         /* Internal variables */
         private Transform _cameraTransform;
         private CharacterController _characterController;
@@ -46,6 +55,11 @@ namespace Player
         private float _targetHeight;
 
         private bool _lockedInput = false;
+        private float time;
+        
+        private float _cameraBaseY;
+        private float _headBobOffset;
+
         
         // Local reference that the controller cares about
         [SerializeField] private Types.PlayerHealthState currentPlayerHealthState;
@@ -66,6 +80,8 @@ namespace Player
                 }
             }
             _targetHeight = standHeight;
+            _cameraBaseY = _cameraTransform.localPosition.y;
+
         }
         
         protected override void RegisterSubscriptions()
@@ -114,9 +130,44 @@ namespace Player
 
             HandleMovement();
             HandleCrouchTransition();
-            
+            HandleHeadBob();
+
 
         }
+
+        
+        private void HandleHeadBob()
+        {
+            if (!_isGrounded)
+            {
+                _headBobOffset = 0f;
+                return;
+            }
+
+            if (_moveInput.magnitude > 0.1f)
+            {
+                float bobSpeed = _isSprinting
+                    ? sprintBobSpeed
+                    : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
+
+                float bobAmount = _isSprinting
+                    ? sprintBobAmount
+                    : (_isCrouching ? crouchBobAmount : walkBobAmount);
+
+                time += Time.deltaTime * bobSpeed;
+                _headBobOffset = Mathf.Sin(time) * bobAmount;
+            }
+            else
+            {
+                time = 0f;
+                _headBobOffset = Mathf.Lerp(_headBobOffset, 0f, Time.deltaTime * 5f);
+            }
+
+            Vector3 cameraPosition = _cameraTransform.localPosition;
+            cameraPosition.y = _cameraBaseY + _headBobOffset;
+            _cameraTransform.localPosition = cameraPosition;
+        }
+
 
         protected override void OnEnable()
         {
@@ -168,6 +219,8 @@ namespace Player
                 _targetHeight = crouchHeight;
             }
             _isCrouching = !_isCrouching;
+            time = 0f;
+
         }
 
         private bool CanStandUp()
@@ -285,9 +338,14 @@ namespace Player
             _characterController.height = newHeight;
             _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
             
-            Vector3 cameraTargetPosition = _cameraTransform.localPosition;
-            cameraTargetPosition.y = _targetHeight - cameraCrouchOffset;
-            _cameraTransform.localPosition = Vector3.Lerp(_cameraTransform.localPosition, cameraTargetPosition, crouchTransitionSpeed * Time.deltaTime);
+            float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
+
+            _cameraBaseY = Mathf.Lerp(
+                _cameraBaseY,
+                targetCameraBaseY,
+                crouchTransitionSpeed * Time.deltaTime
+            );
+
         }
     }
 }
