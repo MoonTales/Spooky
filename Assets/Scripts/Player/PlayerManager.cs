@@ -11,7 +11,7 @@ namespace Player
     public class PlayerManager : Singleton<PlayerManager>
     {
         private GameObject _player;
-        private 
+        [SerializeField] private string defaultSpawnPointID = "DEFAULT_SPAWN_POINT";
         
         
         void Start()
@@ -46,7 +46,7 @@ namespace Player
                     FirstAnchor = Anchor;
                 }
                 // Search for the default spawn point ID
-                if (Anchor != null && Anchor.gameObject != null && Anchor.GetSpawnPointID() == "DEFAULT_SPAWN_POINT")
+                if (Anchor != null && Anchor.gameObject != null && Anchor.GetSpawnPointID() == defaultSpawnPointID)
                 {
                     // found the default spawn point, move the player here
                     if (_player != null)
@@ -61,6 +61,7 @@ namespace Player
             if (FirstAnchor)
             {
                 TeleportPlayer(FirstAnchor.gameObject.transform.position);
+                return;
             }
             
             // if we still dont have a player position, we will just spawn at the world origin
@@ -69,9 +70,9 @@ namespace Player
             
         }
         
-        private void OnPlayerStateChanged(Types.PlayerState newState)
+        private void OnPlayerStateChanged(Types.PlayerHealthState newHealthState)
         {
-            DebugUtils.LogSuccess("Player state changed to: " + newState.ToString());
+            DebugUtils.LogSuccess("Player state changed to: " + newHealthState.ToString());
         }
 
         
@@ -99,6 +100,7 @@ namespace Player
             if (_player == null) { return; }
             _player.transform.position = newPosition;
         }
+        
         
         
     }
