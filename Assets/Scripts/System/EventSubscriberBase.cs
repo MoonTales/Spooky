@@ -94,5 +94,6 @@ namespace System
         protected virtual void OnGameStarted(){}
         protected virtual void OnGameInitialized(){}
         protected virtual void OnGameRestarted(){}
+        protected virtual void OnGameStateChanged(Types.GameState newState) { }
     }
 }
