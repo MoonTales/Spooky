@@ -80,7 +80,7 @@ namespace System
         public static void Broadcast_GameRestarted() {OnGameRestarted?.Invoke();}
 
         public delegate void GameStateChangedHandler(Types.GameState newState);
-        private static event GameStateChangedHandler OnGameStateChanged;
+        public static event GameStateChangedHandler OnGameStateChanged;
         public static void Broadcast_GameStateChanged(Types.GameState newState) { OnGameStateChanged?.Invoke(newState); }
         //---------------------------------------------------------------------------------//
 

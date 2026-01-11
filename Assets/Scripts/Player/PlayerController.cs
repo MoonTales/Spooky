@@ -44,6 +44,8 @@ namespace Player
         private bool _cachedSprintState;
         private float _verticalVelocity;
         private float _targetHeight;
+
+        private bool _lockedInput = false;
         
         // Local reference that the controller cares about
         [SerializeField] private Types.PlayerHealthState currentPlayerHealthState;
@@ -65,9 +67,38 @@ namespace Player
             }
             _targetHeight = standHeight;
         }
+        
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
+                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
+        }
 
         private void Update()
         {
+            
+            // debug print if input is locked
+            if(_lockedInput){
+
+                CinemachineInputAxisController axisController =
+                    _cameraTransform.GetComponent<CinemachineInputAxisController>();
+
+                if (axisController != null)
+                {
+                    axisController.enabled = false;
+                }
+
+            }
+            else
+            {
+                CinemachineInputAxisController axisController =
+                    _cameraTransform.GetComponent<CinemachineInputAxisController>();
+                DebugUtils.Log("PlayerController: Input is unlocked, processing movement");
+                axisController.enabled = true;
+
+            }
+            
             _isGrounded = _characterController.isGrounded;
             // check the cached sprint state when we land, incase it changed mid-air
             if (_isGrounded && !_isSprinting)
@@ -80,8 +111,11 @@ namespace Player
             }
             
             HandleGravity();
+
             HandleMovement();
             HandleCrouchTransition();
+            
+
         }
 
         protected override void OnEnable()
@@ -112,6 +146,7 @@ namespace Player
 
         private void OnSprint(InputAction.CallbackContext obj)
         {
+            if(_lockedInput){ return; }
             // only allow sprinting to change if we are grounded
             
             // regardless of whether we can sprint, we want to cache the sprint state for when we land
@@ -123,6 +158,7 @@ namespace Player
 
         private void OnCrouch(InputAction.CallbackContext obj)
         {
+            if(_lockedInput){ return; }
             if (_isCrouching)
             {
                 if (!CanStandUp()) { return;}
@@ -169,11 +205,13 @@ namespace Player
 
         private void OnMovePerformed(InputAction.CallbackContext obj)
         {
+            if(_lockedInput){ return; }
             _moveInput = obj.ReadValue<Vector2>();
         }
         
         private void OnJump(InputAction.CallbackContext obj)
         {
+            if(_lockedInput){ return; }
             if(_isGrounded)
             {
                 // Apply jump force
@@ -183,6 +221,7 @@ namespace Player
 
         private void HandleMovement()
         {
+            if(_lockedInput){ return; }
             
             Vector3 moveDirection = _cameraTransform.TransformDirection(new Vector3(_moveInput.x, 0, _moveInput.y)).normalized;
             float currentSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
@@ -204,8 +243,9 @@ namespace Player
             _verticalVelocity += gravity * Time.deltaTime;
         }
 
-        protected override void OnGameStateChanged(Types.GameState newState)
+        protected void OnGameStateChanged(Types.GameState newState)
         {
+            DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
             switch (newState)
             {
                 case Types.GameState.Gameplay:
@@ -221,10 +261,13 @@ namespace Player
         private void HandleGameplayState()
         {
             // Return to basic player controls
+            _lockedInput = false;
         }
         private void HandleCutsceneState()
         {
             // Disable player controls for cutscene
+            _lockedInput = true;
+            DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
         }
 
         private void HandleCrouchTransition()
