@@ -23,16 +23,26 @@ namespace Player
         [SerializeField] private float gravity = -12.0f;
         [SerializeField] private float initialFallVelocity = -2.0f;
         [Space(10)]
+        [Header("Crouching")]
+        [SerializeField] private float standHeight = 2.0f;
+        [SerializeField] private float crouchHeight = 1.0f;
+        [SerializeField] private float crouchTransitionSpeed = 10.0f;
+        [SerializeField] private float cameraCrouchOffset = 0.4f;
+        [Space(10)]
         [Header("References")]
         [SerializeField] private InputActionReference moveAction;
         [SerializeField] private InputActionReference jumpAction;
-        
+        [SerializeField] private InputActionReference crouchAction;
+        [SerializeField] private InputActionReference sprintAction;
         /* Internal variables */
         private Transform _cameraTransform;
         private CharacterController _characterController;
         private Vector2 _moveInput;
         private bool _isGrounded;
+        private bool _isCrouching;
+        private bool _isSprinting;
         private float _verticalVelocity;
+        private float _targetHeight;
         
         // Local reference that the controller cares about
         [SerializeField] private Types.PlayerHealthState currentPlayerHealthState;
@@ -52,6 +62,7 @@ namespace Player
                     break;
                 }
             }
+            _targetHeight = standHeight;
         }
 
         private void Update()
@@ -59,6 +70,7 @@ namespace Player
             _isGrounded = _characterController.isGrounded;
             HandleGravity();
             HandleMovement();
+            HandleCrouchTransition();
         }
 
         protected override void OnEnable()
@@ -67,7 +79,11 @@ namespace Player
             
             moveAction.action.performed += OnMovePerformed;
             moveAction.action.canceled += OnMovePerformed;
-            jumpAction.action.performed += Jump;
+            jumpAction.action.performed += OnJump;
+            crouchAction.action.performed += OnCrouch;
+            sprintAction.action.performed += OnSprint;
+            sprintAction.action.canceled += OnSprint;
+            
             
         }
 
@@ -77,15 +93,69 @@ namespace Player
             
             moveAction.action.performed -= OnMovePerformed;
             moveAction.action.canceled -= OnMovePerformed;
-            jumpAction.action.performed -= Jump;
+            jumpAction.action.performed -= OnJump;
+            crouchAction.action.performed -= OnCrouch;
+            sprintAction.action.performed -= OnSprint;
+            sprintAction.action.canceled -= OnSprint;
         }
+
+        private void OnSprint(InputAction.CallbackContext obj)
+        {
+            _isSprinting = obj.performed;
+        }
+
+        private void OnCrouch(InputAction.CallbackContext obj)
+        {
+            if (_isCrouching)
+            {
+                if (!CanStandUp()) { return;}
+                _targetHeight = standHeight;
+            } else
+            {
+                _targetHeight = crouchHeight;
+            }
+            _isCrouching = !_isCrouching;
+        }
+
+        private bool CanStandUp()
+        {
+            float currentHeight = _characterController.height;
+            float radius = _characterController.radius;
+
+            // No need to check if we're already tall enough
+            float growAmount = standHeight - currentHeight;
+            if (growAmount <= 0f)
+                return true;
+
+            // World-space bottom of capsule
+            Vector3 bottom = transform.position +
+                             _characterController.center -
+                             Vector3.up * (currentHeight / 2f - radius);
+
+            // Current top of capsule
+            Vector3 top = bottom + Vector3.up * (currentHeight - radius * 2f);
+
+            // Cast upward only the missing height
+            bool hit = Physics.CapsuleCast(
+                bottom,
+                top,
+                radius,
+                Vector3.up,
+                growAmount,
+                ~0,
+                QueryTriggerInteraction.Ignore
+            );
+
+            return !hit;
+        }
+
 
         private void OnMovePerformed(InputAction.CallbackContext obj)
         {
             _moveInput = obj.ReadValue<Vector2>();
         }
         
-        private void Jump(InputAction.CallbackContext obj)
+        private void OnJump(InputAction.CallbackContext obj)
         {
             if(_isGrounded)
             {
@@ -98,10 +168,14 @@ namespace Player
         {
             
             Vector3 moveDirection = _cameraTransform.TransformDirection(new Vector3(_moveInput.x, 0, _moveInput.y)).normalized;
-            float currentSpeed = walkSpeed;
+            float currentSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
             Vector3 velocity = moveDirection * currentSpeed;
             velocity.y = _verticalVelocity;
-            _characterController.Move(velocity * Time.deltaTime);
+            CollisionFlags collisions = _characterController.Move(velocity * Time.deltaTime);
+            if ((collisions & CollisionFlags.Above) != 0)
+            {
+                _verticalVelocity = initialFallVelocity;
+            }
         }
 
         private void HandleGravity()
@@ -134,6 +208,24 @@ namespace Player
         private void HandleCutsceneState()
         {
             // Disable player controls for cutscene
+        }
+
+        private void HandleCrouchTransition()
+        {
+            float currentHeight = _characterController.height;
+            if (Mathf.Approximately(currentHeight, _targetHeight))
+            {
+                _characterController.height = _targetHeight;
+                return;
+            }
+            // perform the transition
+            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
+            _characterController.height = newHeight;
+            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
+            
+            Vector3 cameraTargetPosition = _cameraTransform.localPosition;
+            cameraTargetPosition.y = _targetHeight - cameraCrouchOffset;
+            _cameraTransform.localPosition = Vector3.Lerp(_cameraTransform.localPosition, cameraTargetPosition, crouchTransitionSpeed * Time.deltaTime);
         }
     }
 }
