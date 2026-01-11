@@ -13,6 +13,7 @@ namespace System
         /// </summary>
         ///
         /* ------------------------ System Types ------------------------ */
+        [Serializable]
         public enum GameState
         {
             MainMenu,
@@ -26,6 +27,7 @@ namespace System
         /// <summary>
         /// an Enum representing the different weather states
         /// </summary>
+        [Serializable]
         public enum WeatherState
         {
             Clear,
@@ -42,6 +44,7 @@ namespace System
         /// </summary>
         
         /* ------------------------ Player Types ------------------------ */
+        [Serializable]
         public enum PlayerHealthState
         {
             Healthy,
@@ -55,6 +58,7 @@ namespace System
         /// Notes:
         /// Player State is hooked to broadcasts when it changes
         /// </summary>
+        /// [System.Serializable]
         public struct FPlayerStats
         {
             // Primary player stats
@@ -116,6 +120,33 @@ namespace System
         }
         
         /* ------------------------ End Player Types ------------------------ */
+        
+        /* ------------------------ Door Related Types ------------------------ */
+
+        /// <summary>
+        /// Struct used to hold the data for a key item (as in, a literal key)
+        /// </summary>
+        [Serializable]
+        public struct FKeyData
+        {
+            private string _keyID;          // Unique identifier for the key
+            private bool _bSingleUse;     // Indicates if the key is single-use
+            private bool _bIsMasterKey;   // Indicates if the key is a master key (can open ANY door)
+            
+        }
+
+        [Serializable]
+        public struct FDoorData
+        {
+            private string _doorID;         // Unique identifier for the door
+            private bool _bIsLocked;       // Indicates if the door is locked
+            private string _requiredKeyID; // The ID of the key required to unlock the door
+            
+        }
+        
+        
+        /* ------------------------ End Door Related Types ------------------------ */
+        
         
     }
 }
