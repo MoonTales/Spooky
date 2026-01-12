@@ -161,8 +161,17 @@ namespace Player
             RaycastHit hitInfo;
             if (targetLean != 0f)
             {
-                if (Physics.Raycast(_cameraTransform.position, peekDirection, out hitInfo, peekOffset + 0.1f, WallLayerMask))
-                {
+                // boxcast, which will be the size of the "head"
+                if (Physics.BoxCast(
+                        head.position,
+                        new Vector3(0.2f, 0.2f, 0.2f),
+                        peekDirection,
+                        out hitInfo,
+                        head.rotation,
+                        peekOffset,
+                        WallLayerMask,
+                        QueryTriggerInteraction.Ignore
+                    )){
                     // we hit a wall, so we cannot peek fully
                     float distanceToWall = hitInfo.distance;
                     float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f); // leave a small buffer
