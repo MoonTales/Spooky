@@ -135,9 +135,8 @@ namespace Player
         private void HandlePeeking()
         {
             float target = 0f;
-            
+    
             Vector3 forward = _cameraTransform.forward;
-            // draw a debug ray to show the forward direction of the camera
             Debug.DrawRay(_cameraTransform.position, forward * 2f, Color.green);
 
             if (Keyboard.current.qKey.isPressed)
@@ -152,21 +151,26 @@ namespace Player
                 Vector3 right = _cameraTransform.right;
                 Debug.DrawRay(_cameraTransform.position, right * 2f, Color.red);
             }
-                
-
+    
+            // Calculate the angle between camera forward and world forward
+            // This determines how much we need to adjust the peek direction
+            float angle = Vector3.SignedAngle(Vector3.forward, forward, Vector3.up);
+    
+            // Normalize the angle to -1 to 1 range based on how far we've rotated
+            // This creates a smooth transition at all angles
+            float rotationFactor = Mathf.Cos(angle * Mathf.Deg2Rad);
+    
+            // Apply the rotation factor to smoothly flip the peek direction
+            target *= rotationFactor;
+    
+    
             _peekAmount = Mathf.Lerp(_peekAmount, target, Time.deltaTime * peekSpeed);
 
             float roll = _peekAmount * peekAngle;
             float offset = _peekAmount * peekOffset;
 
-            cameraLeanPivot.localRotation =
-                Quaternion.AngleAxis(-roll, Vector3.forward);
-
-            cameraLeanPivot.localPosition = new Vector3(
-                offset,
-                cameraLeanPivot.localPosition.y,
-                0f
-            );
+            cameraLeanPivot.localRotation = Quaternion.AngleAxis(-roll, Vector3.forward);
+            cameraLeanPivot.localPosition = new Vector3(offset, cameraLeanPivot.localPosition.y, 0f);
         }
 
 
