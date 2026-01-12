@@ -76,27 +76,9 @@ namespace Player
         
         private float _cameraBaseY;
         private float _headBobOffset;
-
         
         // Local reference that the controller cares about
         [SerializeField] private Types.PlayerHealthState currentPlayerHealthState;
-
-
-        private void Awake()
-        {
-            // set up initial character variables
-            _characterController = GetComponent<CharacterController>();
-            _targetHeight = standHeight;
-            _cameraBaseY = _cameraTransform.localPosition.y;
-
-        }
-        
-        protected override void RegisterSubscriptions()
-        {
-            base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
-                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
-        }
 
         private void Update()
         {
@@ -140,8 +122,170 @@ namespace Player
             HandlePeeking();
             
         }
+        #region Initialization
+        private void Awake()
+        {
+            // set up initial character variables
+            _characterController = GetComponent<CharacterController>();
+            _targetHeight = standHeight;
+            _cameraBaseY = _cameraTransform.localPosition.y;
+
+        }
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
+                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
+        }
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            
+            moveAction.action.performed += OnMovePerformed;
+            moveAction.action.canceled += OnMovePerformed;
+            jumpAction.action.performed += OnJump;
+            crouchAction.action.performed += OnCrouch;
+            sprintAction.action.performed += OnSprint;
+            sprintAction.action.canceled += OnSprint;
+            
+            
+        }
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            
+            moveAction.action.performed -= OnMovePerformed;
+            moveAction.action.canceled -= OnMovePerformed;
+            jumpAction.action.performed -= OnJump;
+            crouchAction.action.performed -= OnCrouch;
+            sprintAction.action.performed -= OnSprint;
+            sprintAction.action.canceled -= OnSprint;
+        }
+        #endregion
+
         
-        private void HandlePeeking()
+        #region Movement Methods
+        private void OnSprint(InputAction.CallbackContext obj)
+        {
+            if(_lockedInput){ return; }
+            if (!_isGrounded) { return; }
+            if (_isCrouching) { return; } // cannot sprint while crouching
+            // only allow sprinting to change if we are grounded
+            // regardless of whether we can sprint, we want to cache the sprint state for when we land
+            _cachedSprintState = obj.performed;
+
+            _isSprinting = obj.performed;
+        }
+        private void OnCrouch(InputAction.CallbackContext obj)
+        {
+            if(_lockedInput){ return; }
+            if (_isCrouching)
+            {
+                if (!CanStandUp()) { return;}
+                _targetHeight = standHeight;
+            } else
+            {
+                _targetHeight = crouchHeight;
+            }
+            _isCrouching = !_isCrouching;
+            time = 0f;
+
+        }
+        private void OnJump(InputAction.CallbackContext obj)
+        {
+            
+            if(_lockedInput){ return; }
+            if (_isCrouching) { return;}
+            if(_isGrounded)
+            {
+                // Apply jump force
+                _verticalVelocity = jumpForce;
+            }
+        }
+        private void HandleGravity()
+        {
+            if (_isGrounded && _verticalVelocity < 0)
+            {
+                _verticalVelocity = initialFallVelocity;
+            }
+            _verticalVelocity += gravity * Time.deltaTime;
+        }
+        private void HandleCrouchTransition()
+        {
+            float currentHeight = _characterController.height;
+            if (Mathf.Approximately(currentHeight, _targetHeight))
+            {
+                _characterController.height = _targetHeight;
+                return;
+            }
+            // perform the transition
+            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
+            _characterController.height = newHeight;
+            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
+            
+            float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
+
+            _cameraBaseY = Mathf.Lerp(
+                _cameraBaseY,
+                targetCameraBaseY,
+                crouchTransitionSpeed * Time.deltaTime
+            );
+
+        }
+        private bool CanStandUp()
+        {
+            float currentHeight = _characterController.height;
+            float radius = _characterController.radius;
+
+            // No need to check if we're already tall enough
+            float growAmount = standHeight - currentHeight;
+            if (growAmount <= 0f)
+                return true;
+
+            // World-space bottom of capsule
+            Vector3 bottom = transform.position +
+                             _characterController.center -
+                             Vector3.up * (currentHeight / 2f - radius);
+
+            // Current top of capsule
+            Vector3 top = bottom + Vector3.up * (currentHeight - radius * 2f);
+
+            // Cast upward only the missing height
+            bool hit = Physics.CapsuleCast(
+                bottom,
+                top,
+                radius,
+                Vector3.up,
+                growAmount,
+                ~0,
+                QueryTriggerInteraction.Ignore
+            );
+
+            return !hit;
+        }
+        private void OnMovePerformed(InputAction.CallbackContext obj)
+        {
+            if(_lockedInput){ return; }
+            _moveInput = obj.ReadValue<Vector2>();
+        }
+        private void HandleMovement()
+        {
+            if(_lockedInput){ return; }
+            
+            Vector3 moveDirection = _cameraTransform.TransformDirection(new Vector3(_moveInput.x, 0, _moveInput.y)).normalized;
+            float currentSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
+            Vector3 velocity = moveDirection * currentSpeed;
+            velocity.y = _verticalVelocity;
+            CollisionFlags collisions = _characterController.Move(velocity * Time.deltaTime);
+            if ((collisions & CollisionFlags.Above) != 0)
+            {
+                _verticalVelocity = initialFallVelocity;
+            }
+        }
+        #endregion
+        
+        #region Headbob and Peaking (refactor to new script soon)
+                private void HandlePeeking()
         {
             
             
@@ -218,10 +362,7 @@ namespace Player
                 _headBobOffset = 0f;
                 return;
             }
-
-            float xBobOffset = 0f;
-            float zBobOffset = 0f;
-
+            
             if (_moveInput.magnitude > 0.1f)
             {
                 float bobSpeed = _isSprinting
@@ -268,139 +409,10 @@ namespace Player
                 _cameraTransform.localPosition = cameraPosition;
             }
         }
+        #endregion
 
-
-
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            
-            moveAction.action.performed += OnMovePerformed;
-            moveAction.action.canceled += OnMovePerformed;
-            jumpAction.action.performed += OnJump;
-            crouchAction.action.performed += OnCrouch;
-            sprintAction.action.performed += OnSprint;
-            sprintAction.action.canceled += OnSprint;
-            
-            
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            
-            moveAction.action.performed -= OnMovePerformed;
-            moveAction.action.canceled -= OnMovePerformed;
-            jumpAction.action.performed -= OnJump;
-            crouchAction.action.performed -= OnCrouch;
-            sprintAction.action.performed -= OnSprint;
-            sprintAction.action.canceled -= OnSprint;
-        }
-
-        private void OnSprint(InputAction.CallbackContext obj)
-        {
-            if(_lockedInput){ return; }
-            if (!_isGrounded) { return; }
-            if (_isCrouching) { return; } // cannot sprint while crouching
-            // only allow sprinting to change if we are grounded
-            // regardless of whether we can sprint, we want to cache the sprint state for when we land
-            _cachedSprintState = obj.performed;
-
-            _isSprinting = obj.performed;
-        }
-
-        private void OnCrouch(InputAction.CallbackContext obj)
-        {
-            if(_lockedInput){ return; }
-            if (_isCrouching)
-            {
-                if (!CanStandUp()) { return;}
-                _targetHeight = standHeight;
-            } else
-            {
-                _targetHeight = crouchHeight;
-            }
-            _isCrouching = !_isCrouching;
-            time = 0f;
-
-        }
-
-        private bool CanStandUp()
-        {
-            float currentHeight = _characterController.height;
-            float radius = _characterController.radius;
-
-            // No need to check if we're already tall enough
-            float growAmount = standHeight - currentHeight;
-            if (growAmount <= 0f)
-                return true;
-
-            // World-space bottom of capsule
-            Vector3 bottom = transform.position +
-                             _characterController.center -
-                             Vector3.up * (currentHeight / 2f - radius);
-
-            // Current top of capsule
-            Vector3 top = bottom + Vector3.up * (currentHeight - radius * 2f);
-
-            // Cast upward only the missing height
-            bool hit = Physics.CapsuleCast(
-                bottom,
-                top,
-                radius,
-                Vector3.up,
-                growAmount,
-                ~0,
-                QueryTriggerInteraction.Ignore
-            );
-
-            return !hit;
-        }
-
-
-        private void OnMovePerformed(InputAction.CallbackContext obj)
-        {
-            if(_lockedInput){ return; }
-            _moveInput = obj.ReadValue<Vector2>();
-        }
         
-        private void OnJump(InputAction.CallbackContext obj)
-        {
-            
-            if(_lockedInput){ return; }
-            if (_isCrouching) { return;}
-            if(_isGrounded)
-            {
-                // Apply jump force
-                _verticalVelocity = jumpForce;
-            }
-        }
-
-        private void HandleMovement()
-        {
-            if(_lockedInput){ return; }
-            
-            Vector3 moveDirection = _cameraTransform.TransformDirection(new Vector3(_moveInput.x, 0, _moveInput.y)).normalized;
-            float currentSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
-            Vector3 velocity = moveDirection * currentSpeed;
-            velocity.y = _verticalVelocity;
-            CollisionFlags collisions = _characterController.Move(velocity * Time.deltaTime);
-            if ((collisions & CollisionFlags.Above) != 0)
-            {
-                _verticalVelocity = initialFallVelocity;
-            }
-        }
-
-        private void HandleGravity()
-        {
-            if (_isGrounded && _verticalVelocity < 0)
-            {
-                _verticalVelocity = initialFallVelocity;
-            }
-            _verticalVelocity += gravity * Time.deltaTime;
-        }
-
+        
         protected void OnGameStateChanged(Types.GameState newState)
         {
             DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
@@ -428,27 +440,6 @@ namespace Player
             DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
         }
 
-        private void HandleCrouchTransition()
-        {
-            float currentHeight = _characterController.height;
-            if (Mathf.Approximately(currentHeight, _targetHeight))
-            {
-                _characterController.height = _targetHeight;
-                return;
-            }
-            // perform the transition
-            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
-            _characterController.height = newHeight;
-            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
-            
-            float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
-
-            _cameraBaseY = Mathf.Lerp(
-                _cameraBaseY,
-                targetCameraBaseY,
-                crouchTransitionSpeed * Time.deltaTime
-            );
-
-        }
+        
     }
 }
