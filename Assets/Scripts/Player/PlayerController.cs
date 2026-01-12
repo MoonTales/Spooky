@@ -269,9 +269,11 @@ namespace Player
             } else
             {
                 _targetHeight = crouchHeight;
+                
             }
             _isCrouching = !_isCrouching;
             time = 0f;
+            
 
         }
         private void OnJump(InputAction.CallbackContext obj)
@@ -444,6 +446,13 @@ namespace Player
             {
                 _headBobOffset = 0f;
                 return;
+            }
+            
+            // edge case
+            // if we happen to be crouching and sprinting at the same time, prioritize crouch headbob
+            if(_isCrouching && _isSprinting)
+            {
+                _isSprinting = false;
             }
             
             if (_moveInput.magnitude > 0.1f)
