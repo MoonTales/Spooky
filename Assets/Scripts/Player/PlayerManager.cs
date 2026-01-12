@@ -21,6 +21,8 @@ namespace Player
             SearchForSpawnAnchor();
         }
         
+
+        
         // --- Event connections --- //
         protected override void RegisterSubscriptions()
         {
@@ -97,9 +99,19 @@ namespace Player
         /// </summary>
         public void TeleportPlayer(Vector3 newPosition)
         {
-            if (_player == null) { return; }
+            if (_player == null) return;
+
+            CharacterController controller = _player.GetComponent<CharacterController>();
+
+            if (controller != null) {controller.enabled = false;}
+
             _player.transform.position = newPosition;
+
+            if (controller != null) {controller.enabled = true;}
+
+            DebugUtils.LogSuccess("Player teleported successfully.");
         }
+
         
         
         
