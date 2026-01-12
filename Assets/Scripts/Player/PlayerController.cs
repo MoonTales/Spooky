@@ -50,6 +50,7 @@ namespace Player
         
         [SerializeField] private Transform _cameraTransform;
         [SerializeField] private Transform cameraLeanPivot;
+        [SerializeField] private Transform head;
         /* Internal variables */
         
         private CharacterController _characterController;
@@ -107,7 +108,6 @@ namespace Player
             {
                 CinemachineInputAxisController axisController =
                     _cameraTransform.GetComponent<CinemachineInputAxisController>();
-                DebugUtils.Log("PlayerController: Input is unlocked, processing movement");
                 axisController.enabled = true;
 
             }
@@ -131,29 +131,54 @@ namespace Player
             HandlePeeking();
 
 
+            // debug print the foreward direction of the camera
+            DebugUtils.Log("Camera Forward: " + _cameraTransform.forward.ToString("F3"));
+            // debug print the foreward direction of the head
+            DebugUtils.Log("Head Forward: " + head.forward.ToString("F3"));
         }
         
         private void HandlePeeking()
         {
             float target = 0f;
+            
+            Vector3 forward = _cameraTransform.forward;
+            // draw a debug ray to show the forward direction of the camera
+            Debug.DrawRay(_cameraTransform.position, forward * 2f, Color.green);
 
             if (Keyboard.current.qKey.isPressed)
+            {
                 target = -1f;
+                Vector3 left = -_cameraTransform.right;
+                Debug.DrawRay(_cameraTransform.position, left * 2f, Color.blue);
+            }
             else if (Keyboard.current.eKey.isPressed)
+            {
                 target = 1f;
+                Vector3 right = _cameraTransform.right;
+                Debug.DrawRay(_cameraTransform.position, right * 2f, Color.red);
+            }
+                
 
             _peekAmount = Mathf.Lerp(_peekAmount, target, Time.deltaTime * peekSpeed);
 
             float roll = _peekAmount * peekAngle;
             float offset = _peekAmount * peekOffset;
 
-            cameraLeanPivot.localRotation = Quaternion.Euler(0f, 0f, -roll);
+            cameraLeanPivot.localRotation =
+                Quaternion.AngleAxis(-roll, Vector3.forward);
+
             cameraLeanPivot.localPosition = new Vector3(
                 offset,
                 cameraLeanPivot.localPosition.y,
                 0f
             );
         }
+
+
+
+
+
+
 
 
         
