@@ -39,6 +39,7 @@ namespace Player
         [SerializeField] private LayerMask WallLayerMask;
         private float _peekAmount;
         private float _peekForwardAmount;
+        private float _peekVerticalAmount;
         [Space(10)]
         [Header("Headbob")]
         [SerializeField] private float walkBobSpeed = 14.0f;
@@ -371,74 +372,97 @@ namespace Player
         
         #region Headbob and Peaking (refactor to new script soon)
                 private void HandlePeeking()
-        {
-            
-            
-            
-            float targetLean = 0f;
+{
+    float targetLean = 0f;
+    float targetVerticalLean = 0f;
 
-            Vector3 forward = _cameraTransform.forward;
-            Debug.DrawRay(_cameraTransform.position, forward * 2f, Color.green);
+    Vector3 forward = _cameraTransform.forward;
+    Debug.DrawRay(_cameraTransform.position, forward * 2f, Color.green);
 
-            if (Keyboard.current.qKey.isPressed)
-            {
-                targetLean = -1f; // World left
-                Vector3 left = -_cameraTransform.right;
-                Debug.DrawRay(_cameraTransform.position, left * 2f, Color.blue);
-            }
-            else if (Keyboard.current.eKey.isPressed)
-            {
-                targetLean = 1f; // World right
-                Vector3 right = _cameraTransform.right;
-                Debug.DrawRay(_cameraTransform.position, right * 2f, Color.red);
-            }
-            // attempt to raycast to a wall in the direction of the peek
-            Vector3 peekDirection = targetLean < 0 ? -_cameraTransform.right : _cameraTransform.right;
-            RaycastHit hitInfo;
-            if (targetLean != 0f)
-            {
-                // boxcast, which will be the size of the "head"
-                if (Physics.BoxCast(
-                        head.position,
-                        new Vector3(0.2f, 0.2f, 0.2f),
-                        peekDirection,
-                        out hitInfo,
-                        head.rotation,
-                        peekOffset,
-                        WallLayerMask,
-                        QueryTriggerInteraction.Ignore
-                    )){
-                    // we hit a wall, so we cannot peek fully
-                    float distanceToWall = hitInfo.distance;
-                    float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f); // leave a small buffer
-                    float peekRatio = allowedPeek / peekOffset;
-                    targetLean *= peekRatio;
-                }
-            }
+    if (Keyboard.current.qKey.isPressed)
+    {
+        targetLean = -1f; // World left
+        Vector3 left = -_cameraTransform.right;
+        Debug.DrawRay(_cameraTransform.position, left * 2f, Color.blue);
+    }
+    else if (Keyboard.current.eKey.isPressed)
+    {
+        targetLean = 1f; // World right
+        Vector3 right = _cameraTransform.right;
+        Debug.DrawRay(_cameraTransform.position, right * 2f, Color.red);
+    }
 
-            // Get the camera's forward vector components in world space
-            float forwardX = forward.x; // A component (east/west)
-            float forwardZ = forward.z; // B component (north/south)
+    if (Keyboard.current.rKey.isPressed)
+    {
+        targetVerticalLean = 1f; // Upward
+        Debug.DrawRay(_cameraTransform.position, Vector3.up * 2f, Color.yellow);
+    }
 
-            // E/Q contributes to both roll and pitch based on camera orientation
-            // Roll: controlled by how much camera faces north/south
-            // Pitch: controlled by how much camera faces east/west
-            float rollContribution = forwardZ * targetLean;
-            float pitchContribution = -forwardX * targetLean; // Negative for correct direction
-
-            _peekAmount = Mathf.Lerp(_peekAmount, rollContribution, Time.deltaTime * peekSpeed);
-            _peekForwardAmount = Mathf.Lerp(_peekForwardAmount, pitchContribution, Time.deltaTime * peekSpeed);
-
-            // Apply roll and pitch
-            float roll = _peekAmount * peekAngle;
-            float pitch = _peekForwardAmount * peekAngle;
-    
-            float offsetX = _peekAmount * peekOffset;
-            float offsetZ = _peekForwardAmount * peekOffset;
-
-            cameraLeanPivot.localRotation = Quaternion.Euler(pitch, 0f, -roll);
-            cameraLeanPivot.localPosition = new Vector3(offsetX, cameraLeanPivot.localPosition.y, offsetZ);
+    // Horizontal peek collision check
+    Vector3 peekDirection = targetLean < 0 ? -_cameraTransform.right : _cameraTransform.right;
+    RaycastHit hitInfo;
+    if (targetLean != 0f)
+    {
+        if (Physics.BoxCast(
+                head.position,
+                new Vector3(0.2f, 0.2f, 0.2f),
+                peekDirection,
+                out hitInfo,
+                head.rotation,
+                peekOffset,
+                WallLayerMask,
+                QueryTriggerInteraction.Ignore
+            )){
+            float distanceToWall = hitInfo.distance;
+            float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f);
+            float peekRatio = allowedPeek / peekOffset;
+            targetLean *= peekRatio;
         }
+    }
+
+    // Vertical peek collision check
+    if (targetVerticalLean != 0f)
+    {
+        if (Physics.BoxCast(
+                head.position,
+                new Vector3(0.2f, 0.2f, 0.2f),
+                Vector3.up,
+                out hitInfo,
+                head.rotation,
+                peekOffset,
+                WallLayerMask,
+                QueryTriggerInteraction.Ignore
+            )){
+            float distanceToWall = hitInfo.distance;
+            float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f);
+            float peekRatio = allowedPeek / peekOffset;
+            targetVerticalLean *= peekRatio;
+        }
+    }
+
+    // Get the camera's forward vector components in world space
+    float forwardX = forward.x;
+    float forwardZ = forward.z;
+
+    // E/Q contributes to both roll and pitch based on camera orientation
+    float rollContribution = forwardZ * targetLean;
+    float pitchContribution = -forwardX * targetLean;
+
+    _peekAmount = Mathf.Lerp(_peekAmount, rollContribution, Time.deltaTime * peekSpeed);
+    _peekForwardAmount = Mathf.Lerp(_peekForwardAmount, pitchContribution, Time.deltaTime * peekSpeed);
+    _peekVerticalAmount = Mathf.Lerp(_peekVerticalAmount, targetVerticalLean, Time.deltaTime * peekSpeed);
+
+    // Apply roll and pitch
+    float roll = _peekAmount * peekAngle;
+    float pitch = _peekForwardAmount * peekAngle;
+
+    float offsetX = _peekAmount * peekOffset;
+    float offsetZ = _peekForwardAmount * peekOffset;
+    float offsetY = _peekVerticalAmount * peekOffset;
+
+    cameraLeanPivot.localRotation = Quaternion.Euler(pitch, 0f, -roll);
+    cameraLeanPivot.localPosition = new Vector3(offsetX, offsetY, offsetZ);
+}
         
         private void HandleHeadBob()
         {
