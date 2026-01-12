@@ -32,6 +32,7 @@ namespace Player
         [SerializeField] private float peekAngle = 15f;
         [SerializeField] private float peekOffset = 0.25f;
         [SerializeField] private float peekSpeed = 10f;
+        [SerializeField] private LayerMask WallLayerMask;
         private float _peekAmount;
         private float _peekForwardAmount;
         [Space(10)]
@@ -135,6 +136,9 @@ namespace Player
         
         private void HandlePeeking()
         {
+            
+            
+            
             float targetLean = 0f;
 
             Vector3 forward = _cameraTransform.forward;
@@ -151,6 +155,20 @@ namespace Player
                 targetLean = 1f; // World right
                 Vector3 right = _cameraTransform.right;
                 Debug.DrawRay(_cameraTransform.position, right * 2f, Color.red);
+            }
+            // attempt to raycast to a wall in the direction of the peek
+            Vector3 peekDirection = targetLean < 0 ? -_cameraTransform.right : _cameraTransform.right;
+            RaycastHit hitInfo;
+            if (targetLean != 0f)
+            {
+                if (Physics.Raycast(_cameraTransform.position, peekDirection, out hitInfo, peekOffset + 0.1f, WallLayerMask))
+                {
+                    // we hit a wall, so we cannot peek fully
+                    float distanceToWall = hitInfo.distance;
+                    float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f); // leave a small buffer
+                    float peekRatio = allowedPeek / peekOffset;
+                    targetLean *= peekRatio;
+                }
             }
 
             // Get the camera's forward vector components in world space
