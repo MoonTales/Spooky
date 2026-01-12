@@ -135,54 +135,42 @@ namespace Player
         
         private void HandlePeeking()
         {
-            float targetSide = 0f;
-            float targetForward = 0f;
+            float targetLean = 0f;
 
             Vector3 forward = _cameraTransform.forward;
             Debug.DrawRay(_cameraTransform.position, forward * 2f, Color.green);
 
             if (Keyboard.current.qKey.isPressed)
             {
-                targetSide = -1f;
+                targetLean = -1f; // World left
                 Vector3 left = -_cameraTransform.right;
                 Debug.DrawRay(_cameraTransform.position, left * 2f, Color.blue);
             }
             else if (Keyboard.current.eKey.isPressed)
             {
-                targetSide = 1f;
+                targetLean = 1f; // World right
                 Vector3 right = _cameraTransform.right;
                 Debug.DrawRay(_cameraTransform.position, right * 2f, Color.red);
             }
 
-            if (Keyboard.current.rKey.isPressed)
-            {
-                targetForward = 1f; // Acts like E but 90° rotated
-            }
-            else if (Keyboard.current.fKey.isPressed)
-            {
-                targetForward = -1f; // Acts like Q but 90° rotated
-            }
+            // Get the camera's forward vector components in world space
+            float forwardX = forward.x; // A component (east/west)
+            float forwardZ = forward.z; // B component (north/south)
 
-            // Calculate the angle between camera forward and world forward
-            float angle = Vector3.SignedAngle(Vector3.forward, forward, Vector3.up);
+            // E/Q contributes to both roll and pitch based on camera orientation
+            // Roll: controlled by how much camera faces north/south
+            // Pitch: controlled by how much camera faces east/west
+            float rollContribution = forwardZ * targetLean;
+            float pitchContribution = -forwardX * targetLean; // Negative for correct direction
 
-            // Side lean: Q/E use cos
-            float sideRotationFactor = Mathf.Cos(angle * Mathf.Deg2Rad);
-            targetSide *= sideRotationFactor;
+            _peekAmount = Mathf.Lerp(_peekAmount, rollContribution, Time.deltaTime * peekSpeed);
+            _peekForwardAmount = Mathf.Lerp(_peekForwardAmount, pitchContribution, Time.deltaTime * peekSpeed);
 
-            // Forward lean: R/F use sin (which is cos shifted by 90°)
-            float forwardRotationFactor = Mathf.Sin(angle * Mathf.Deg2Rad);
-            targetForward *= forwardRotationFactor;
-
-            _peekAmount = Mathf.Lerp(_peekAmount, targetSide, Time.deltaTime * peekSpeed);
-            _peekForwardAmount = Mathf.Lerp(_peekForwardAmount, targetForward, Time.deltaTime * peekSpeed);
-
-            // Side lean (roll + horizontal offset)
+            // Apply roll and pitch
             float roll = _peekAmount * peekAngle;
-            float offsetX = _peekAmount * peekOffset;
-
-            // Forward lean (pitch + depth offset)
             float pitch = _peekForwardAmount * peekAngle;
+    
+            float offsetX = _peekAmount * peekOffset;
             float offsetZ = _peekForwardAmount * peekOffset;
 
             cameraLeanPivot.localRotation = Quaternion.Euler(pitch, 0f, -roll);
