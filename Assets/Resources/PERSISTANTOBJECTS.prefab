@@ -82,6 +82,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2010806536259156751}
+  - {fileID: 1382440422439146961}
   m_Father: {fileID: 5550773558194111928}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4034527893773688492
@@ -162,6 +163,68 @@ Transform:
   - {fileID: 92573364211260194}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4306724039676016816
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1382440422439146961}
+  - component: {fileID: 6263441346631541354}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1382440422439146961
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4306724039676016816}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7015706498318629619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6263441346631541354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4306724039676016816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c2785e918517f24d8e3a453702a4176, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _poolSize: 10
+  soundGrass: []
+  soundWater: []
+  soundConcrete:
+  - {fileID: 8300000, guid: 229c64ed39310624c9aada3d771c7b06, type: 3}
+  - {fileID: 8300000, guid: 1f866668884214b4db7140d25b0def17, type: 3}
+  - {fileID: 8300000, guid: e5ae416f49602c1409e7c0d85ae0215c, type: 3}
+  - {fileID: 8300000, guid: 169f75c2c9f5fae4c9147639256eb0c8, type: 3}
+  - {fileID: 8300000, guid: 375af61fe5c06774084832c408e31683, type: 3}
+  soundGravel: []
+  soundWood: []
+  landingAudioClip: {fileID: 0}
+  jumpingAudioClip: {fileID: 0}
+  muteSFX: 0
+  muteMusic: 0
+  Musicsource: {fileID: 0}
+  sfxValue: 1
+  musicValue: 1
 --- !u!1 &5201031628530533052
 GameObject:
   m_ObjectHideFlags: 0
