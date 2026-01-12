@@ -18,6 +18,7 @@ namespace Managers
         public AudioClip[] soundConcrete;
         public AudioClip[] soundGravel;
         public AudioClip[] soundWood;
+        public AudioClip[] soundMetal;
         public AudioClip landingAudioClip;
         public AudioClip jumpingAudioClip;
         
@@ -146,6 +147,14 @@ namespace Managers
             int stepnumber;
             stepnumber = UnityEngine.Random.Range(0, soundWood.Length);
             AudioClip step = soundWood[stepnumber];
+            PlaySFX(step, volume, deviation);
+        }
+        public void PlayPlayerWalkingMetal(float volume = 1, float deviation = 0.2f)
+        {
+            if (soundMetal.Length == 0) { return; }
+            int stepnumber;
+            stepnumber = UnityEngine.Random.Range(0, soundMetal.Length);
+            AudioClip step = soundMetal[stepnumber];
             PlaySFX(step, volume, deviation);
         }
         #endregion

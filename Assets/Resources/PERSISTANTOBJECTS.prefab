@@ -208,16 +208,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolSize: 10
-  soundGrass: []
-  soundWater: []
+  soundGrass:
+  - {fileID: 8300000, guid: 23f537bc838b6224a8b22680c3ec0477, type: 3}
+  - {fileID: 8300000, guid: 77313b3ac9c75f545a7cce94bdc8c1a3, type: 3}
+  - {fileID: 8300000, guid: fe99b708869596346a35738043ba969f, type: 3}
+  - {fileID: 8300000, guid: 1642d501db459a2408f8b9b45ea7e09f, type: 3}
+  soundWater:
+  - {fileID: 8300000, guid: e0fe87410d2160d46906e152b4bd6f21, type: 3}
+  - {fileID: 8300000, guid: b87dc1a8465327349b2bd94b58666b60, type: 3}
+  - {fileID: 8300000, guid: ce73e51f44d67f3448b78085d8e3a22e, type: 3}
   soundConcrete:
   - {fileID: 8300000, guid: 229c64ed39310624c9aada3d771c7b06, type: 3}
   - {fileID: 8300000, guid: 1f866668884214b4db7140d25b0def17, type: 3}
   - {fileID: 8300000, guid: e5ae416f49602c1409e7c0d85ae0215c, type: 3}
   - {fileID: 8300000, guid: 169f75c2c9f5fae4c9147639256eb0c8, type: 3}
   - {fileID: 8300000, guid: 375af61fe5c06774084832c408e31683, type: 3}
-  soundGravel: []
-  soundWood: []
+  soundGravel:
+  - {fileID: 8300000, guid: 5cbf4dba6e3b40040938560663d850cc, type: 3}
+  - {fileID: 8300000, guid: 36b2a5a7f988c3a49a8dcb97c82f3055, type: 3}
+  - {fileID: 8300000, guid: 061f92917f3344e46a181210cd2be5f8, type: 3}
+  - {fileID: 8300000, guid: e6b69fa3aa7d71543b631e73a8d4edaa, type: 3}
+  - {fileID: 8300000, guid: 325a507d48fda384fa119f766f5c51a7, type: 3}
+  - {fileID: 8300000, guid: 763ef6481f64ff044b076930e3e76ba2, type: 3}
+  soundWood:
+  - {fileID: 8300000, guid: 7cfe8fa2d154f5b48b968c6c2873f0c5, type: 3}
+  - {fileID: 8300000, guid: ae55f2c92e3202b4aaef430dfe971fce, type: 3}
+  - {fileID: 8300000, guid: 04999e5a75ae5eb4d86f476107b81a6d, type: 3}
+  - {fileID: 8300000, guid: a0f7c9da8c6a58649a40f6fb7b4a56df, type: 3}
+  - {fileID: 8300000, guid: 2d064d60ac258d848b3e2dee1a223058, type: 3}
+  soundMetal:
+  - {fileID: 8300000, guid: b39d500728efec2468983e463e16d719, type: 3}
+  - {fileID: 8300000, guid: 819a181928a16d64993eeba8d3b8c651, type: 3}
+  - {fileID: 8300000, guid: b0b8cdcf5e784624990a0d61b230fd3e, type: 3}
+  - {fileID: 8300000, guid: aa4a5fc2bf0743348943776816aa5a68, type: 3}
   landingAudioClip: {fileID: 0}
   jumpingAudioClip: {fileID: 0}
   muteSFX: 0
@@ -297,6 +320,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1536473872276167822}
     m_Modifications:
+    - target: {fileID: 1660176508892394544, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: PanAxis.Value
+      value: -98.07972
+      objectReference: {fileID: 0}
+    - target: {fileID: 1660176508892394544, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: TiltAxis.Value
+      value: 3.0083683
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427465421472302248, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.65530795
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427465421472302248, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.01720773
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427465421472302248, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7549056
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427465421472302248, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.019823063
+      objectReference: {fileID: 0}
+    - target: {fileID: 4423111471801385366, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_ControllerManager.Controllers.Array.data[1].InputValue
+      value: -0
+      objectReference: {fileID: 0}
     - target: {fileID: 7094810660777727507, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
       propertyPath: m_Name
       value: Player
