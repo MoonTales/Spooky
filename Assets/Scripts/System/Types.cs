@@ -53,6 +53,16 @@ namespace System
             Dead
         }
 
+        [Serializable]
+        public enum PlayerMovementState
+        {
+            Idle,
+            Walking,
+            Sprinting,
+            CrouchIdle,
+            CrouchWalking,
+        }
+
         /// <summary>
         /// Struct to hold all of the players primary stats
         /// Notes:
