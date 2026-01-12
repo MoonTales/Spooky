@@ -28,6 +28,11 @@ namespace Player
         [SerializeField] private float crouchHeight = 1.0f;
         [SerializeField] private float crouchTransitionSpeed = 10.0f;
         [SerializeField] private float cameraCrouchOffset = 0.4f;
+        [Header("Peeking")]
+        [SerializeField] private float peekAngle = 15f;
+        [SerializeField] private float peekOffset = 0.25f;
+        [SerializeField] private float peekSpeed = 10f;
+        private float _peekAmount;
         [Space(10)]
         [Header("Headbob")]
         [SerializeField] private float walkBobSpeed = 14.0f;
@@ -43,8 +48,10 @@ namespace Player
         [SerializeField] private InputActionReference crouchAction;
         [SerializeField] private InputActionReference sprintAction;
         
+        [SerializeField] private Transform _cameraTransform;
+        [SerializeField] private Transform cameraLeanPivot;
         /* Internal variables */
-        private Transform _cameraTransform;
+        
         private CharacterController _characterController;
         private Vector2 _moveInput;
         private bool _isGrounded;
@@ -69,16 +76,6 @@ namespace Player
         {
             // set up initial character variables
             _characterController = GetComponent<CharacterController>();
-            // look through all of the children of this player, to find an object with the cinemachine camera component
-            foreach (Transform child in transform)
-            {
-                if (child.GetComponentInChildren<CinemachineCamera>() != null)
-                {
-                    _cameraTransform = child;
-                    DebugUtils.LogSuccess("PlayerController: Found Cinemachine Camera in child object: " + child.name);
-                    break;
-                }
-            }
             _targetHeight = standHeight;
             _cameraBaseY = _cameraTransform.localPosition.y;
 
@@ -131,9 +128,33 @@ namespace Player
             HandleMovement();
             HandleCrouchTransition();
             HandleHeadBob();
+            HandlePeeking();
 
 
         }
+        
+        private void HandlePeeking()
+        {
+            float target = 0f;
+
+            if (Keyboard.current.qKey.isPressed)
+                target = -1f;
+            else if (Keyboard.current.eKey.isPressed)
+                target = 1f;
+
+            _peekAmount = Mathf.Lerp(_peekAmount, target, Time.deltaTime * peekSpeed);
+
+            float roll = _peekAmount * peekAngle;
+            float offset = _peekAmount * peekOffset;
+
+            cameraLeanPivot.localRotation = Quaternion.Euler(0f, 0f, -roll);
+            cameraLeanPivot.localPosition = new Vector3(
+                offset,
+                cameraLeanPivot.localPosition.y,
+                0f
+            );
+        }
+
 
         
         private void HandleHeadBob()
