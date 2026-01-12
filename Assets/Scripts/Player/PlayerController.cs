@@ -129,12 +129,7 @@ namespace Player
             HandleCrouchTransition();
             HandleHeadBob();
             HandlePeeking();
-
-
-            // debug print the foreward direction of the camera
-            DebugUtils.Log("Camera Forward: " + _cameraTransform.forward.ToString("F3"));
-            // debug print the foreward direction of the head
-            DebugUtils.Log("Head Forward: " + head.forward.ToString("F3"));
+            
         }
         
         private void HandlePeeking()
