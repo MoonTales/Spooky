@@ -43,6 +43,13 @@ namespace Player
         [SerializeField] private float sprintBobAmount = 0.1f;
         [SerializeField] private float crouchBobSpeed = 8.0f;
         [SerializeField] private float crouchBobAmount = 0.025f;
+        [SerializeField] private float walkBobZAmount = 0.02f;
+        [SerializeField] private float sprintBobZAmount = 0.04f;
+        [SerializeField] private float crouchBobZAmount = 0.01f;
+        [SerializeField] private float walkBobXAmount = 0.02f;
+        [SerializeField] private float sprintBobXAmount = 0.035f;
+        [SerializeField] private float crouchBobXAmount = 0.01f;
+
         [Space(10)]
         [Header("References")]
         [SerializeField] private InputActionReference moveAction;
@@ -203,14 +210,6 @@ namespace Player
             cameraLeanPivot.localRotation = Quaternion.Euler(pitch, 0f, -roll);
             cameraLeanPivot.localPosition = new Vector3(offsetX, cameraLeanPivot.localPosition.y, offsetZ);
         }
-
-
-
-
-
-
-
-
         
         private void HandleHeadBob()
         {
@@ -220,27 +219,57 @@ namespace Player
                 return;
             }
 
+            float xBobOffset = 0f;
+            float zBobOffset = 0f;
+
             if (_moveInput.magnitude > 0.1f)
             {
-                float bobSpeed = _isSprinting ? sprintBobSpeed : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
+                float bobSpeed = _isSprinting
+                    ? sprintBobSpeed
+                    : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
 
-                float bobAmount = _isSprinting
+                float yBobAmount = _isSprinting
                     ? sprintBobAmount
                     : (_isCrouching ? crouchBobAmount : walkBobAmount);
 
+                float xBobAmount = _isSprinting
+                    ? sprintBobXAmount
+                    : (_isCrouching ? crouchBobXAmount : walkBobXAmount);
+
+                float zBobAmount = _isSprinting
+                    ? sprintBobZAmount
+                    : (_isCrouching ? crouchBobZAmount : walkBobZAmount);
+
                 time += Time.deltaTime * bobSpeed;
-                _headBobOffset = Mathf.Sin(time) * bobAmount;
+
+                // Vertical bob
+                float yOffset = Mathf.Sin(time) * yBobAmount;
+
+                // Left / Right sway (alternates per step)
+                float xOffset = Mathf.Sin(time * 0.5f) * xBobAmount;
+
+                // Forward / Back bob
+                float zOffset = Mathf.Cos(time * 0.5f) * zBobAmount;
+
+                Vector3 cameraPosition = _cameraTransform.localPosition;
+                cameraPosition.y = _cameraBaseY + yOffset;
+                cameraPosition.x = xOffset;
+                cameraPosition.z = zOffset;
+                _cameraTransform.localPosition = cameraPosition;
             }
             else
             {
                 time = 0f;
-                _headBobOffset = Mathf.Lerp(_headBobOffset, 0f, Time.deltaTime * 5f);
-            }
 
-            Vector3 cameraPosition = _cameraTransform.localPosition;
-            cameraPosition.y = _cameraBaseY + _headBobOffset;
-            _cameraTransform.localPosition = cameraPosition;
+                Vector3 cameraPosition = _cameraTransform.localPosition;
+                cameraPosition.y = Mathf.Lerp(cameraPosition.y, _cameraBaseY, Time.deltaTime * 5f);
+                cameraPosition.x = Mathf.Lerp(cameraPosition.x, 0f, Time.deltaTime * 5f);
+                cameraPosition.z = Mathf.Lerp(cameraPosition.z, 0f, Time.deltaTime * 5f);
+                _cameraTransform.localPosition = cameraPosition;
+            }
         }
+
+
 
 
         protected override void OnEnable()
