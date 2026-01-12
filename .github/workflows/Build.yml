@@ -10,8 +10,8 @@ jobs:
       fail-fast: false
       matrix:
         targetPlatform:
-          #- StandaloneWindows64
-          - WebGL
+          - StandaloneWindows64
+          #- WebGL 
 
     steps:
       - uses: actions/checkout@v4
