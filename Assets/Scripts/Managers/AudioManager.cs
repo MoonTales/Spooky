@@ -13,12 +13,12 @@ namespace Managers
         //public float sfxvolumeslider = 1;
         
         [Header("Footstep Sounds")]
-        public AudioClip[] soundGrass;
-        public AudioClip[] soundWater;
-        public AudioClip[] soundConcrete;
-        public AudioClip[] soundGravel;
-        public AudioClip[] soundWood;
-        public AudioClip[] soundMetal;
+        [SerializeField] private AudioClip[] soundGrass;
+        [SerializeField] private AudioClip[] soundWater;
+        [SerializeField] private AudioClip[] soundConcrete;
+        [SerializeField] private AudioClip[] soundGravel;
+        [SerializeField] private AudioClip[] soundWood;
+        [SerializeField] private AudioClip[] soundMetal;
 
         
         [Header("Mutes")]
@@ -26,10 +26,14 @@ namespace Managers
         public bool muteMusic = false;
 
         [Header("Player Sounds")]
-        public AudioClip landingAudioClip;
-        public AudioClip jumpingAudioClip;
-        public AudioClip inCrouchAudioClip;
-        public AudioClip outCrouchAudioClip;
+        [SerializeField] private AudioClip landingAudioClip;
+        [SerializeField] private AudioClip jumpingAudioClip;
+        [SerializeField] private AudioClip inCrouchAudioClip;
+        [SerializeField] private AudioClip outCrouchAudioClip;
+        [SerializeField] private AudioClip inPeakAudioClip;
+        [SerializeField] private AudioClip outPeakAudioClip;
+        [SerializeField] private AudioClip inTippytoeAudioClip;
+        [SerializeField] private AudioClip outTippytoeAudioClip;
         [Header("Enemy Effects")]
         [Header("General Sounds")]
         [Header("UI Audio")]
@@ -84,7 +88,6 @@ namespace Managers
         private void Update()
         {
             Musicsource.volume = musicValue;
-            
         }
 
         private void PlaySFX(AudioClip clip, float volume = 1f, float deviation = 0f, Transform fromTransform = null)
@@ -175,6 +178,26 @@ namespace Managers
             stepnumber = UnityEngine.Random.Range(0, soundMetal.Length);
             AudioClip step = soundMetal[stepnumber];
             PlaySFX(step, volume, deviation, fromTransform);
+        }
+        #endregion
+        #region Peaking
+        public void PlayPlayerPeakIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(inPeakAudioClip, volume, deviation, fromTransform);
+        }
+        public void PlayPlayerPeakOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(outPeakAudioClip, volume, deviation, fromTransform);
+        }
+        #endregion
+        #region Tippytoe
+        public void PlayPlayerTippytoeIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(inTippytoeAudioClip, volume, deviation, fromTransform);
+        }
+        public void PlayPlayerTippytoeOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(outTippytoeAudioClip, volume, deviation, fromTransform);
         }
         #endregion
         #endregion
