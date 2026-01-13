@@ -1,7 +1,11 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using XtremeFPS.FPSController;
+using Random = Unity.Mathematics.Random;
 using Types = System.Types;
 
 namespace Player
@@ -28,6 +32,14 @@ namespace Player
         [SerializeField] private float crouchHeight = 1.0f;
         [SerializeField] private float crouchTransitionSpeed = 10.0f;
         [SerializeField] private float cameraCrouchOffset = 0.4f;
+        [Header("Peeking")]
+        [SerializeField] private float peekAngle = 15f;
+        [SerializeField] private float peekOffset = 0.25f;
+        [SerializeField] private float peekSpeed = 10f;
+        [SerializeField] private LayerMask WallLayerMask;
+        private float _peekAmount;
+        private float _peekForwardAmount;
+        private float _peekVerticalAmount;
         [Space(10)]
         [Header("Headbob")]
         [SerializeField] private float walkBobSpeed = 14.0f;
@@ -36,6 +48,13 @@ namespace Player
         [SerializeField] private float sprintBobAmount = 0.1f;
         [SerializeField] private float crouchBobSpeed = 8.0f;
         [SerializeField] private float crouchBobAmount = 0.025f;
+        [SerializeField] private float walkBobZAmount = 0.02f;
+        [SerializeField] private float sprintBobZAmount = 0.04f;
+        [SerializeField] private float crouchBobZAmount = 0.01f;
+        [SerializeField] private float walkBobXAmount = 0.02f;
+        [SerializeField] private float sprintBobXAmount = 0.035f;
+        [SerializeField] private float crouchBobXAmount = 0.01f;
+
         [Space(10)]
         [Header("References")]
         [SerializeField] private InputActionReference moveAction;
@@ -43,8 +62,11 @@ namespace Player
         [SerializeField] private InputActionReference crouchAction;
         [SerializeField] private InputActionReference sprintAction;
         
+        [SerializeField] private Transform _cameraTransform;
+        [SerializeField] private Transform cameraLeanPivot;
+        [SerializeField] private Transform head;
         /* Internal variables */
-        private Transform _cameraTransform;
+        
         private CharacterController _characterController;
         private Vector2 _moveInput;
         private bool _isGrounded;
@@ -59,38 +81,10 @@ namespace Player
         
         private float _cameraBaseY;
         private float _headBobOffset;
-
         
         // Local reference that the controller cares about
         [SerializeField] private Types.PlayerHealthState currentPlayerHealthState;
-
-
-        private void Awake()
-        {
-            // set up initial character variables
-            _characterController = GetComponent<CharacterController>();
-            // look through all of the children of this player, to find an object with the cinemachine camera component
-            foreach (Transform child in transform)
-            {
-                if (child.GetComponentInChildren<CinemachineCamera>() != null)
-                {
-                    _cameraTransform = child;
-                    DebugUtils.LogSuccess("PlayerController: Found Cinemachine Camera in child object: " + child.name);
-                    break;
-                }
-            }
-            _targetHeight = standHeight;
-            _cameraBaseY = _cameraTransform.localPosition.y;
-
-        }
-        
-        protected override void RegisterSubscriptions()
-        {
-            base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
-                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
-        }
-
+        [SerializeField] private Types.PlayerMovementState PlayerMovementState;
         private void Update()
         {
             
@@ -110,7 +104,6 @@ namespace Player
             {
                 CinemachineInputAxisController axisController =
                     _cameraTransform.GetComponent<CinemachineInputAxisController>();
-                DebugUtils.Log("PlayerController: Input is unlocked, processing movement");
                 axisController.enabled = true;
 
             }
@@ -126,49 +119,108 @@ namespace Player
                 _isSprinting = false; // cannot sprint in mid-air
             }
             
+            HandleStateDetection();
+            DetectSurfaceAndMovement();
+            
             HandleGravity();
-
             HandleMovement();
             HandleCrouchTransition();
             HandleHeadBob();
-
-
+            HandlePeeking();
+            
         }
 
-        
-        private void HandleHeadBob()
+        private void HandleStateDetection()
         {
-            if (!_isGrounded)
+            
+            // each one we will check in order of precedence, as each later one can override the earlier ones
+            Types.PlayerMovementState checkState = Types.PlayerMovementState.Idle; // default state
+            // First check if we are IDLE
+            if (_moveInput.magnitude < 0.1f && _isGrounded)
             {
-                _headBobOffset = 0f;
-                return;
+                checkState = Types.PlayerMovementState.Idle;
             }
-
-            if (_moveInput.magnitude > 0.1f)
+            // Next check if we are CROUCHING_IDLE
+            if (_isCrouching && _moveInput.magnitude < 0.1f && _isGrounded)
             {
-                float bobSpeed = _isSprinting
-                    ? sprintBobSpeed
-                    : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
-
-                float bobAmount = _isSprinting
-                    ? sprintBobAmount
-                    : (_isCrouching ? crouchBobAmount : walkBobAmount);
-
-                time += Time.deltaTime * bobSpeed;
-                _headBobOffset = Mathf.Sin(time) * bobAmount;
+                checkState = Types.PlayerMovementState.CrouchIdle;
             }
-            else
+            // next check if we are CROUCH WALKING
+            if (_isCrouching && _moveInput.magnitude >= 0.1f && _isGrounded)
             {
-                time = 0f;
-                _headBobOffset = Mathf.Lerp(_headBobOffset, 0f, Time.deltaTime * 5f);
+                checkState = Types.PlayerMovementState.CrouchWalking;
             }
-
-            Vector3 cameraPosition = _cameraTransform.localPosition;
-            cameraPosition.y = _cameraBaseY + _headBobOffset;
-            _cameraTransform.localPosition = cameraPosition;
+            // next check if we are we walking (not sprinting or crouching)
+            if (!_isCrouching && !_isSprinting && _moveInput.magnitude >= 0.1f && _isGrounded)
+            {
+                checkState = Types.PlayerMovementState.Walking;
+            }
+            // finally check if we are SPRINTING
+            if (!_isCrouching && _isSprinting && _moveInput.magnitude >= 0.1f && _isGrounded)
+            {
+                checkState = Types.PlayerMovementState.Sprinting;
+            }
+            
+            SwitchMovementState(checkState);
         }
 
+        private void SwitchMovementState(Types.PlayerMovementState movementState)
+        {
+            // if the current state is the same as the new state, do nothing
+            if (PlayerMovementState == movementState) { return; }
+            
+            // set our current state to the new state
+            PlayerMovementState = movementState;
+            
+            // Now we can handle the state switch logic (if there is any)
+            switch (movementState)
+            {
+                case Types.PlayerMovementState.Idle:
+                    // logic for entering idle state
+                    DebugUtils.Log("PlayerController: Entered Idle State");
+                    break;
+                case Types.PlayerMovementState.Walking:
+                    // logic for entering walking state
+                    DebugUtils.Log("PlayerController: Entered Walking State");
+                    break;
+                case Types.PlayerMovementState.Sprinting:
+                    // logic for entering sprinting state
+                    DebugUtils.Log("PlayerController: Entered Sprinting State");
+                    break;
+                case Types.PlayerMovementState.CrouchIdle:
+                    // logic for entering crouch idle state
+                    DebugUtils.Log("PlayerController: Entered Crouch Idle State");
+                    break;
+                case Types.PlayerMovementState.CrouchWalking:
+                    // logic for entering crouch walking state
+                    DebugUtils.Log("PlayerController: Entered Crouch Walking State");
+                    break;
+                default:
+                    // handle other states if any
+                    break;
+            }
+        }
 
+        #region Initialization
+        private void Awake()
+        {
+            // set up initial character variables
+            _characterController = GetComponent<CharacterController>();
+            _targetHeight = standHeight;
+            _cameraBaseY = _cameraTransform.localPosition.y;
+
+        }
+
+        private void Start()
+        {
+            StartCoroutine(PlayFootstepSounds());
+        }
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
+                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
+        }
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -182,7 +234,6 @@ namespace Player
             
             
         }
-
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -194,19 +245,21 @@ namespace Player
             sprintAction.action.performed -= OnSprint;
             sprintAction.action.canceled -= OnSprint;
         }
+        #endregion
 
+        
+        #region Movement Methods
         private void OnSprint(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
+            if (!_isGrounded) { return; }
+            if (_isCrouching) { return; } // cannot sprint while crouching
             // only allow sprinting to change if we are grounded
-            
             // regardless of whether we can sprint, we want to cache the sprint state for when we land
             _cachedSprintState = obj.performed;
-            
-            if (!_isGrounded) { return; }
+
             _isSprinting = obj.performed;
         }
-
         private void OnCrouch(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
@@ -217,12 +270,54 @@ namespace Player
             } else
             {
                 _targetHeight = crouchHeight;
+                
             }
             _isCrouching = !_isCrouching;
             time = 0f;
+            
 
         }
+        private void OnJump(InputAction.CallbackContext obj)
+        {
+            
+            if(_lockedInput){ return; }
+            if (_isCrouching) { return;}
+            if(_isGrounded)
+            {
+                // Apply jump force
+                _verticalVelocity = jumpForce;
+            }
+        }
+        private void HandleGravity()
+        {
+            if (_isGrounded && _verticalVelocity < 0)
+            {
+                _verticalVelocity = initialFallVelocity;
+            }
+            _verticalVelocity += gravity * Time.deltaTime;
+        }
+        private void HandleCrouchTransition()
+        {
+            float currentHeight = _characterController.height;
+            if (Mathf.Approximately(currentHeight, _targetHeight))
+            {
+                _characterController.height = _targetHeight;
+                return;
+            }
+            // perform the transition
+            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
+            _characterController.height = newHeight;
+            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
+            
+            float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
 
+            _cameraBaseY = Mathf.Lerp(
+                _cameraBaseY,
+                targetCameraBaseY,
+                crouchTransitionSpeed * Time.deltaTime
+            );
+
+        }
         private bool CanStandUp()
         {
             float currentHeight = _characterController.height;
@@ -254,26 +349,11 @@ namespace Player
 
             return !hit;
         }
-
-
         private void OnMovePerformed(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
             _moveInput = obj.ReadValue<Vector2>();
         }
-        
-        private void OnJump(InputAction.CallbackContext obj)
-        {
-            
-            if(_lockedInput){ return; }
-            if (_isCrouching) { return;}
-            if(_isGrounded)
-            {
-                // Apply jump force
-                _verticalVelocity = jumpForce;
-            }
-        }
-
         private void HandleMovement()
         {
             if(_lockedInput){ return; }
@@ -288,16 +368,242 @@ namespace Player
                 _verticalVelocity = initialFallVelocity;
             }
         }
+        #endregion
+        
+        #region Headbob and Peaking (refactor to new script soon)
+        private void HandlePeeking() {
+                    float targetLean = 0f;
+                    float targetVerticalLean = 0f;
 
-        private void HandleGravity()
+                    Vector3 forward = _cameraTransform.forward;
+                    Debug.DrawRay(_cameraTransform.position, forward * 2f, Color.green);
+
+                    if (Keyboard.current.qKey.isPressed)
+                    {
+                        targetLean = -1f; // World left
+                        Vector3 left = -_cameraTransform.right;
+                        Debug.DrawRay(_cameraTransform.position, left * 2f, Color.blue);
+                    }
+                    else if (Keyboard.current.eKey.isPressed)
+                    {
+                        targetLean = 1f; // World right
+                        Vector3 right = _cameraTransform.right;
+                        Debug.DrawRay(_cameraTransform.position, right * 2f, Color.red);
+                    }
+
+                    if (Keyboard.current.rKey.isPressed)
+                    {
+                        targetVerticalLean = 1f; // Upward
+                        Debug.DrawRay(_cameraTransform.position, Vector3.up * 2f, Color.yellow);
+                    }
+
+                    // Horizontal peek collision check
+                    Vector3 peekDirection = targetLean < 0 ? -_cameraTransform.right : _cameraTransform.right;
+                    RaycastHit hitInfo;
+                    if (targetLean != 0f)
+                    {
+                        if (Physics.BoxCast(
+                                head.position,
+                                new Vector3(0.2f, 0.2f, 0.2f),
+                                peekDirection,
+                                out hitInfo,
+                                head.rotation,
+                                peekOffset,
+                                WallLayerMask,
+                                QueryTriggerInteraction.Ignore
+                            )){
+                            float distanceToWall = hitInfo.distance;
+                            float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f);
+                            float peekRatio = allowedPeek / peekOffset;
+                            targetLean *= peekRatio;
+                        }
+                    }
+
+                    // Vertical peek collision check
+                    if (targetVerticalLean != 0f)
+                    {
+                        if (Physics.BoxCast(
+                                head.position,
+                                new Vector3(0.2f, 0.2f, 0.2f),
+                                Vector3.up,
+                                out hitInfo,
+                                head.rotation,
+                                peekOffset,
+                                WallLayerMask,
+                                QueryTriggerInteraction.Ignore
+                            )){
+                            float distanceToWall = hitInfo.distance;
+                            float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f);
+                            float peekRatio = allowedPeek / peekOffset;
+                            targetVerticalLean *= peekRatio;
+                        }
+                    }
+
+                    // Get the camera's forward vector components in world space
+                    float forwardX = forward.x;
+                    float forwardZ = forward.z;
+
+                    // E/Q contributes to both roll and pitch based on camera orientation
+                    float rollContribution = forwardZ * targetLean;
+                    float pitchContribution = -forwardX * targetLean;
+
+                    _peekAmount = Mathf.Lerp(_peekAmount, rollContribution, Time.deltaTime * peekSpeed);
+                    _peekForwardAmount = Mathf.Lerp(_peekForwardAmount, pitchContribution, Time.deltaTime * peekSpeed);
+                    _peekVerticalAmount = Mathf.Lerp(_peekVerticalAmount, targetVerticalLean, Time.deltaTime * peekSpeed);
+
+                    // Apply roll and pitch
+                    float roll = _peekAmount * peekAngle;
+                    float pitch = _peekForwardAmount * peekAngle;
+
+                    float offsetX = _peekAmount * peekOffset;
+                    float offsetZ = _peekForwardAmount * peekOffset;
+                    float offsetY = _peekVerticalAmount * peekOffset;
+
+                    cameraLeanPivot.localRotation = Quaternion.Euler(pitch, 0f, -roll);
+                    cameraLeanPivot.localPosition = new Vector3(offsetX, offsetY, offsetZ);
+                }
+        
+        private void HandleHeadBob()
         {
-            if (_isGrounded && _verticalVelocity < 0)
+            if (!_isGrounded)
             {
-                _verticalVelocity = initialFallVelocity;
+                _headBobOffset = 0f;
+                return;
             }
-            _verticalVelocity += gravity * Time.deltaTime;
-        }
+            
+            // edge case
+            // if we happen to be crouching and sprinting at the same time, prioritize crouch headbob
+            if(_isCrouching && _isSprinting)
+            {
+                _isSprinting = false;
+            }
+            
+            if (_moveInput.magnitude > 0.1f)
+            {
+                float bobSpeed = _isSprinting
+                    ? sprintBobSpeed
+                    : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
 
+                float yBobAmount = _isSprinting
+                    ? sprintBobAmount
+                    : (_isCrouching ? crouchBobAmount : walkBobAmount);
+
+                float xBobAmount = _isSprinting
+                    ? sprintBobXAmount
+                    : (_isCrouching ? crouchBobXAmount : walkBobXAmount);
+
+                float zBobAmount = _isSprinting
+                    ? sprintBobZAmount
+                    : (_isCrouching ? crouchBobZAmount : walkBobZAmount);
+
+                time += Time.deltaTime * bobSpeed;
+
+                // Vertical bob
+                float yOffset = Mathf.Sin(time) * yBobAmount;
+
+                // Left / Right sway (alternates per step)
+                float xOffset = Mathf.Sin(time * 0.5f) * xBobAmount;
+
+                // Forward / Back bob
+                float zOffset = Mathf.Cos(time * 0.5f) * zBobAmount;
+
+                Vector3 cameraPosition = _cameraTransform.localPosition;
+                cameraPosition.y = _cameraBaseY + yOffset;
+                cameraPosition.x = xOffset;
+                cameraPosition.z = zOffset;
+                _cameraTransform.localPosition = cameraPosition;
+            }
+            else
+            {
+                time = 0f;
+
+                Vector3 cameraPosition = _cameraTransform.localPosition;
+                cameraPosition.y = Mathf.Lerp(cameraPosition.y, _cameraBaseY, Time.deltaTime * 5f);
+                cameraPosition.x = Mathf.Lerp(cameraPosition.x, 0f, Time.deltaTime * 5f);
+                cameraPosition.z = Mathf.Lerp(cameraPosition.z, 0f, Time.deltaTime * 5f);
+                _cameraTransform.localPosition = cameraPosition;
+            }
+        }
+        #endregion
+
+        
+        #region Sound Management
+        public string SurfaceType { get; private set; }
+        private AudioSource audioSource;
+        public AudioClip[] soundConcrete;
+        /// <summary>
+        ///  Function used to detect the surface type the player is currently on
+        ///
+        /// Works by shooting a raycast downwards and checking the tag of the hit collider
+        /// </summary>
+        private void DetectSurfaceAndMovement()
+        {
+            if (!Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 5f)) return;
+            SurfaceType = hit.collider.tag.ToLower() switch
+            {
+                "grass" => "grass",
+                "metals" => "metal",
+                "gravel" => "gravel",
+                "water" => "water",
+                "concrete" => "concrete",
+                "wood" => "wood",
+                _ => "Unknown",
+            };
+        }
+        private IEnumerator PlayFootstepSounds()
+        {
+            while (true)
+            {
+                if (!_isGrounded )
+                {
+                    yield return null;
+                    continue;
+                }
+
+                switch (SurfaceType)
+                {
+                    case "grass":
+                        //audioSource.clip = soundGrass[Random.Range(0, soundGrass.Length)];
+                        Debug.Log("Playing grass sound");
+                        break;
+                    case "gravel":
+                        //audioSource.clip = soundGravel[Random.Range(0, soundGravel.Length)];
+                        Debug.Log("Playing gravel sound");
+                        break;
+                    case "water":
+                        //audioSource.clip = soundWater[Random.Range(0, soundWater.Length)];
+                        Debug.Log("Playing water sound");
+                        break;
+                    case "metal":
+                        //audioSource.clip = soundMetal[Random.Range(0, soundMetal.Length)];
+                        Debug.Log("Playing metal sound");
+                        break;
+                    case "concrete":
+                        //audioSource.clip = soundConcrete[Random.Range(0, soundConcrete.Length)];
+                        Debug.Log("Playing concrete sound");
+                        break;
+                    case "wood":
+                        //audioSource.clip = soundWood[Random.Range(0, soundWood.Length)];
+                        Debug.Log("Playing wood sound");
+                        break;
+                    default:
+                        yield return null;
+                        break;
+                }
+
+                //if (audioSource.clip != null)
+                //{
+                    //audioSource.PlayOneShot(audioSource.clip);
+                    //yield return new WaitForSeconds(0.5f/*AudioEffectSpeed*/);
+                //}
+                //else yield return null;
+                yield return null;
+            }
+        }
+        
+        #endregion
+        
+        
         protected void OnGameStateChanged(Types.GameState newState)
         {
             DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
@@ -325,27 +631,6 @@ namespace Player
             DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
         }
 
-        private void HandleCrouchTransition()
-        {
-            float currentHeight = _characterController.height;
-            if (Mathf.Approximately(currentHeight, _targetHeight))
-            {
-                _characterController.height = _targetHeight;
-                return;
-            }
-            // perform the transition
-            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
-            _characterController.height = newHeight;
-            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
-            
-            float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
-
-            _cameraBaseY = Mathf.Lerp(
-                _cameraBaseY,
-                targetCameraBaseY,
-                crouchTransitionSpeed * Time.deltaTime
-            );
-
-        }
+        
     }
 }
