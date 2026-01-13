@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Managers;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -182,10 +183,12 @@ namespace Player
                 case Types.PlayerMovementState.Walking:
                     // logic for entering walking state
                     DebugUtils.Log("PlayerController: Entered Walking State");
+                    _AudioEffectSpeed = 0.5f;
                     break;
                 case Types.PlayerMovementState.Sprinting:
                     // logic for entering sprinting state
                     DebugUtils.Log("PlayerController: Entered Sprinting State");
+                    _AudioEffectSpeed = 0.3f;
                     break;
                 case Types.PlayerMovementState.CrouchIdle:
                     // logic for entering crouch idle state
@@ -194,6 +197,7 @@ namespace Player
                 case Types.PlayerMovementState.CrouchWalking:
                     // logic for entering crouch walking state
                     DebugUtils.Log("PlayerController: Entered Crouch Walking State");
+                    _AudioEffectSpeed = 0.7f;
                     break;
                 default:
                     // handle other states if any
@@ -529,8 +533,7 @@ namespace Player
         
         #region Sound Management
         public string SurfaceType { get; private set; }
-        private AudioSource audioSource;
-        public AudioClip[] soundConcrete;
+        private float _AudioEffectSpeed = 0.5f; // time between footstep sounds
         /// <summary>
         ///  Function used to detect the surface type the player is currently on
         ///
@@ -559,45 +562,54 @@ namespace Player
                     yield return null;
                     continue;
                 }
+                
+                // if we are not moving, do not play footstep sounds
+                if (_moveInput.magnitude < 0.1f)
+                {
+                    yield return null;
+                    continue;
+                }
 
                 switch (SurfaceType)
                 {
                     case "grass":
                         //audioSource.clip = soundGrass[Random.Range(0, soundGrass.Length)];
                         Debug.Log("Playing grass sound");
+                        AudioManager.Instance.PlayPlayerWalkingGrass();
                         break;
                     case "gravel":
                         //audioSource.clip = soundGravel[Random.Range(0, soundGravel.Length)];
                         Debug.Log("Playing gravel sound");
+                        AudioManager.Instance.PlayPlayerWalkingGravel();
                         break;
                     case "water":
                         //audioSource.clip = soundWater[Random.Range(0, soundWater.Length)];
                         Debug.Log("Playing water sound");
+                        AudioManager.Instance.PlayPlayerWalkingWater();
                         break;
                     case "metal":
                         //audioSource.clip = soundMetal[Random.Range(0, soundMetal.Length)];
                         Debug.Log("Playing metal sound");
+                        AudioManager.Instance.PlayPlayerWalkingMetal();
                         break;
                     case "concrete":
                         //audioSource.clip = soundConcrete[Random.Range(0, soundConcrete.Length)];
                         Debug.Log("Playing concrete sound");
+                        AudioManager.Instance.PlayPlayerWalkingConcrete();
                         break;
                     case "wood":
                         //audioSource.clip = soundWood[Random.Range(0, soundWood.Length)];
                         Debug.Log("Playing wood sound");
+                        AudioManager.Instance.PlayPlayerWalkingWood();
                         break;
                     default:
                         yield return null;
                         break;
                 }
 
-                //if (audioSource.clip != null)
-                //{
-                    //audioSource.PlayOneShot(audioSource.clip);
-                    //yield return new WaitForSeconds(0.5f/*AudioEffectSpeed*/);
-                //}
-                //else yield return null;
-                yield return null;
+
+                yield return new WaitForSeconds(_AudioEffectSpeed);
+
             }
         }
         
