@@ -19,14 +19,17 @@ namespace Managers
         public AudioClip[] soundGravel;
         public AudioClip[] soundWood;
         public AudioClip[] soundMetal;
-        public AudioClip landingAudioClip;
-        public AudioClip jumpingAudioClip;
+
         
         [Header("Mutes")]
         public bool muteSFX = false;
         public bool muteMusic = false;
 
         [Header("Player Sounds")]
+        public AudioClip landingAudioClip;
+        public AudioClip jumpingAudioClip;
+        public AudioClip inCrouchAudioClip;
+        public AudioClip outCrouchAudioClip;
         [Header("Enemy Effects")]
         [Header("General Sounds")]
         [Header("UI Audio")]
@@ -101,8 +104,28 @@ namespace Managers
             src.Play();
         }
 
-
         
+        #region Player Sounds
+        #region Jumping and Landing
+        public void PlayPlayerJumping(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(jumpingAudioClip, volume, deviation, fromTransform);
+        }
+        public void PlayPlayerLanding(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(landingAudioClip, volume, deviation, fromTransform);
+        }
+        #endregion
+        #region Crouching Sounds
+        public void PlayPlayerCrouchIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(inCrouchAudioClip, volume, deviation, fromTransform);
+        }
+        public void PlayPlayerCrouchOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(outCrouchAudioClip, volume, deviation, fromTransform);
+        }
+        #endregion
         #region Footstep Sounds
         public void PlayPlayerWalkingGrass(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
@@ -153,6 +176,7 @@ namespace Managers
             AudioClip step = soundMetal[stepnumber];
             PlaySFX(step, volume, deviation, fromTransform);
         }
+        #endregion
         #endregion
 
         
