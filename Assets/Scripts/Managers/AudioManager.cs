@@ -82,14 +82,9 @@ namespace Managers
         {
             Musicsource.volume = musicValue;
             
-            // test, when we press T, we will play a concrete footstep sound
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                PlayPlayerWalkingConcrete();
-            }
         }
 
-        private void PlaySFX(AudioClip clip, float volume = 1f, float deviation = 0f, GameObject fromObject = null)
+        private void PlaySFX(AudioClip clip, float volume = 1f, float deviation = 0f, Transform fromTransform = null)
         {
             if (muteSFX) return;
             if (clip == null) return;
@@ -97,65 +92,66 @@ namespace Managers
             AudioSource src = GetFreeSource();
             if (src == null) return;
 
-            src.transform.position = fromObject ? fromObject.transform.position : Camera.main ? Camera.main.transform.position : Vector3.zero;
+            src.transform.position = fromTransform != null ? fromTransform.position : Camera.main != null ? Camera.main.transform.position : Vector3.zero;
 
-            src.spatialBlend = fromObject ? 1f : 0f;
+            src.spatialBlend = fromTransform != null ? 1f : 0f;
             src.volume = (volume * sfxValue);
             src.clip = clip;
             src.pitch = UnityEngine.Random.Range(1 - deviation, 1 + deviation);
             src.Play();
         }
 
+
         
         #region Footstep Sounds
-        public void PlayPlayerWalkingGrass(float volume = 1, float deviation = 0.2f)
+        public void PlayPlayerWalkingGrass(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
             if (soundGrass.Length == 0) { return; }
             int stepnumber;
             stepnumber = UnityEngine.Random.Range(0, soundGrass.Length);
             AudioClip step = soundGrass[stepnumber];
-            PlaySFX(step, volume, deviation);
+            PlaySFX(step, volume, deviation, fromTransform);
         }
-        public void PlayPlayerWalkingWater(float volume = 1, float deviation = 0.2f)
+        public void PlayPlayerWalkingWater(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
             if (soundWater.Length == 0){ return;}
             int stepnumber;
             stepnumber = UnityEngine.Random.Range(0, soundWater.Length);
             AudioClip step = soundWater[stepnumber];
-            PlaySFX(step, volume, deviation);
+            PlaySFX(step, volume, deviation, fromTransform);
         }
-        public void PlayPlayerWalkingConcrete(float volume = 1, float deviation = 0.2f)
+        public void PlayPlayerWalkingConcrete(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
             // ensure we have some sounds to play
             if (soundConcrete.Length == 0) {return; }
             int stepnumber;
             stepnumber = UnityEngine.Random.Range(0, soundConcrete.Length);
             AudioClip step = soundConcrete[stepnumber];
-            PlaySFX(step, volume, deviation);
+            PlaySFX(step, volume, deviation, fromTransform);
         }
-        public void PlayPlayerWalkingGravel(float volume = 1, float deviation = 0.2f)
+        public void PlayPlayerWalkingGravel(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
             if (soundGravel.Length == 0) { return; }
             int stepnumber;
             stepnumber = UnityEngine.Random.Range(0, soundGravel.Length);
             AudioClip step = soundGravel[stepnumber];
-            PlaySFX(step, volume, deviation);
+            PlaySFX(step, volume, deviation, fromTransform);
         }
-        public void PlayPlayerWalkingWood(float volume = 1, float deviation = 0.2f)
+        public void PlayPlayerWalkingWood(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
             if (soundWood.Length == 0) { return; }
             int stepnumber;
             stepnumber = UnityEngine.Random.Range(0, soundWood.Length);
             AudioClip step = soundWood[stepnumber];
-            PlaySFX(step, volume, deviation);
+            PlaySFX(step, volume, deviation, fromTransform);
         }
-        public void PlayPlayerWalkingMetal(float volume = 1, float deviation = 0.2f)
+        public void PlayPlayerWalkingMetal(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
             if (soundMetal.Length == 0) { return; }
             int stepnumber;
             stepnumber = UnityEngine.Random.Range(0, soundMetal.Length);
             AudioClip step = soundMetal[stepnumber];
-            PlaySFX(step, volume, deviation);
+            PlaySFX(step, volume, deviation, fromTransform);
         }
         #endregion
 
