@@ -83,6 +83,11 @@ namespace Player
         private float _cameraBaseY;
         private float _headBobOffset;
         
+        [SerializeField] private float speedChangeRate = 10f;
+
+        private float _currentSpeed;
+
+        
         // Local reference that the controller cares about
         [SerializeField] private Types.PlayerHealthState currentPlayerHealthState;
         [SerializeField] private Types.PlayerMovementState PlayerMovementState;
@@ -139,7 +144,8 @@ namespace Player
             // First check if we are IDLE
             if (_moveInput.magnitude < 0.1f && _isGrounded)
             {
-                checkState = Types.PlayerMovementState.Idle;
+                checkState = Types.PlayerMovementState.Idle;_currentSpeed = walkSpeed;
+
             }
             // Next check if we are CROUCHING_IDLE
             if (_isCrouching && _moveInput.magnitude < 0.1f && _isGrounded)
@@ -218,6 +224,8 @@ namespace Player
         private void Start()
         {
             StartCoroutine(PlayFootstepSounds());
+            _currentSpeed = walkSpeed;
+
         }
         protected override void RegisterSubscriptions()
         {
@@ -360,18 +368,25 @@ namespace Player
         }
         private void HandleMovement()
         {
-            if(_lockedInput){ return; }
-            
+            if (_lockedInput) { return; }
+
             Vector3 moveDirection = _cameraTransform.TransformDirection(new Vector3(_moveInput.x, 0, _moveInput.y)).normalized;
-            float currentSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
-            Vector3 velocity = moveDirection * currentSpeed;
-            velocity.y = _verticalVelocity;
+
+            float targetSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
+
+            // Smoothly interpolate speed
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.deltaTime);
+
+            Vector3 velocity = moveDirection * _currentSpeed; velocity.y = _verticalVelocity;
+
             CollisionFlags collisions = _characterController.Move(velocity * Time.deltaTime);
+
             if ((collisions & CollisionFlags.Above) != 0)
             {
                 _verticalVelocity = initialFallVelocity;
             }
         }
+
         #endregion
         
         #region Headbob and Peaking (refactor to new script soon)
@@ -573,32 +588,26 @@ namespace Player
                 switch (SurfaceType)
                 {
                     case "grass":
-                        //audioSource.clip = soundGrass[Random.Range(0, soundGrass.Length)];
                         Debug.Log("Playing grass sound");
                         AudioManager.Instance.PlayPlayerWalkingGrass();
                         break;
                     case "gravel":
-                        //audioSource.clip = soundGravel[Random.Range(0, soundGravel.Length)];
                         Debug.Log("Playing gravel sound");
                         AudioManager.Instance.PlayPlayerWalkingGravel();
                         break;
                     case "water":
-                        //audioSource.clip = soundWater[Random.Range(0, soundWater.Length)];
                         Debug.Log("Playing water sound");
                         AudioManager.Instance.PlayPlayerWalkingWater();
                         break;
                     case "metal":
-                        //audioSource.clip = soundMetal[Random.Range(0, soundMetal.Length)];
                         Debug.Log("Playing metal sound");
                         AudioManager.Instance.PlayPlayerWalkingMetal();
                         break;
                     case "concrete":
-                        //audioSource.clip = soundConcrete[Random.Range(0, soundConcrete.Length)];
                         Debug.Log("Playing concrete sound");
                         AudioManager.Instance.PlayPlayerWalkingConcrete();
                         break;
                     case "wood":
-                        //audioSource.clip = soundWood[Random.Range(0, soundWood.Length)];
                         Debug.Log("Playing wood sound");
                         AudioManager.Instance.PlayPlayerWalkingWood();
                         break;
@@ -606,8 +615,7 @@ namespace Player
                         yield return null;
                         break;
                 }
-
-
+                
                 yield return new WaitForSeconds(_AudioEffectSpeed);
 
             }
