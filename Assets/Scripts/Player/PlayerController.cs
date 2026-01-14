@@ -142,28 +142,28 @@ namespace Player
             // each one we will check in order of precedence, as each later one can override the earlier ones
             Types.PlayerMovementState checkState = Types.PlayerMovementState.Idle; // default state
             // First check if we are IDLE
-            if (_moveInput.magnitude < 0.1f && _isGrounded)
+            if (!IsPlayerMoving() && _isGrounded)
             {
                 checkState = Types.PlayerMovementState.Idle;_currentSpeed = walkSpeed;
 
             }
             // Next check if we are CROUCHING_IDLE
-            if (_isCrouching && _moveInput.magnitude < 0.1f && _isGrounded)
+            if (_isCrouching && !IsPlayerMoving() && _isGrounded)
             {
                 checkState = Types.PlayerMovementState.CrouchIdle;
             }
             // next check if we are CROUCH WALKING
-            if (_isCrouching && _moveInput.magnitude >= 0.1f && _isGrounded)
+            if (_isCrouching && IsPlayerMoving() && _isGrounded)
             {
                 checkState = Types.PlayerMovementState.CrouchWalking;
             }
             // next check if we are we walking (not sprinting or crouching)
-            if (!_isCrouching && !_isSprinting && _moveInput.magnitude >= 0.1f && _isGrounded)
+            if (!_isCrouching && !_isSprinting && IsPlayerMoving() && _isGrounded)
             {
                 checkState = Types.PlayerMovementState.Walking;
             }
             // finally check if we are SPRINTING
-            if (!_isCrouching && _isSprinting && _moveInput.magnitude >= 0.1f && _isGrounded)
+            if (!_isCrouching && _isSprinting && IsPlayerMoving() && _isGrounded)
             {
                 checkState = Types.PlayerMovementState.Sprinting;
             }
@@ -189,12 +189,12 @@ namespace Player
                 case Types.PlayerMovementState.Walking:
                     // logic for entering walking state
                     DebugUtils.Log("PlayerController: Entered Walking State");
-                    _AudioEffectSpeed = 0.5f;
+                    _audioEffectSpeed = 0.5f;
                     break;
                 case Types.PlayerMovementState.Sprinting:
                     // logic for entering sprinting state
                     DebugUtils.Log("PlayerController: Entered Sprinting State");
-                    _AudioEffectSpeed = 0.3f;
+                    _audioEffectSpeed = 0.3f;
                     break;
                 case Types.PlayerMovementState.CrouchIdle:
                     // logic for entering crouch idle state
@@ -203,7 +203,7 @@ namespace Player
                 case Types.PlayerMovementState.CrouchWalking:
                     // logic for entering crouch walking state
                     DebugUtils.Log("PlayerController: Entered Crouch Walking State");
-                    _AudioEffectSpeed = 0.7f;
+                    _audioEffectSpeed = 0.7f;
                     break;
                 default:
                     // handle other states if any
@@ -497,7 +497,7 @@ namespace Player
                 _isSprinting = false;
             }
             
-            if (_moveInput.magnitude > 0.1f)
+            if (IsPlayerMoving())
             {
                 float bobSpeed = _isSprinting
                     ? sprintBobSpeed
@@ -547,17 +547,17 @@ namespace Player
 
         
         #region Sound Management
-        public string SurfaceType { get; private set; }
-        private float _AudioEffectSpeed = 0.5f; // time between footstep sounds
+        private string _surfaceType;
+        private float _audioEffectSpeed = 0.5f; // time between footstep sounds
         /// <summary>
-        ///  Function used to detect the surface type the player is currently on
+        /// Function used to detect the surface type the player is currently on
         ///
         /// Works by shooting a raycast downwards and checking the tag of the hit collider
         /// </summary>
         private void DetectSurfaceAndMovement()
         {
             if (!Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 5f)) return;
-            SurfaceType = hit.collider.tag.ToLower() switch
+            _surfaceType = hit.collider.tag.ToLower() switch
             {
                 "grass" => "grass",
                 "metals" => "metal",
@@ -579,13 +579,13 @@ namespace Player
                 }
                 
                 // if we are not moving, do not play footstep sounds
-                if (_moveInput.magnitude < 0.1f)
+                if (IsPlayerMoving())
                 {
                     yield return null;
                     continue;
                 }
 
-                switch (SurfaceType)
+                switch (_surfaceType)
                 {
                     case "grass":
                         Debug.Log("Playing grass sound");
@@ -616,7 +616,7 @@ namespace Player
                         break;
                 }
                 
-                yield return new WaitForSeconds(_AudioEffectSpeed);
+                yield return new WaitForSeconds(_audioEffectSpeed);
 
             }
         }
@@ -652,11 +652,15 @@ namespace Player
         }
 
         #region Helper Function
-
-        private bool isPlayerMoving()
+        /// <summary>
+        /// A series of various helpers to determine possible things about the player, mostly generic movement
+        /// </summary>
+        private bool IsPlayerMoving()
         {
-            return true;
+            // Check if the player is moving based on input magnitude (anything higher than 0.05 is considered moving)
+            return _moveInput.magnitude > 0.05f;
         }
+        
         #endregion
         
     }
