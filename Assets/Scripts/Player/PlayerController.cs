@@ -22,6 +22,7 @@ namespace Player
         [SerializeField] private float walkSpeed = 5.0f;
         [SerializeField] private float sprintSpeed = 8.0f;
         [SerializeField] private float crouchSpeed = 2.0f;
+        [SerializeField] private float speedChangeRate = 10f;
         [Space(10)]
         [Header("Jump Settings")]
         [SerializeField] private float jumpForce = 7.0f;
@@ -33,28 +34,6 @@ namespace Player
         [SerializeField] private float crouchHeight = 1.0f;
         [SerializeField] private float crouchTransitionSpeed = 10.0f;
         [SerializeField] private float cameraCrouchOffset = 0.4f;
-        [Header("Peeking")]
-        [SerializeField] private float peekAngle = 15f;
-        [SerializeField] private float peekOffset = 0.25f;
-        [SerializeField] private float peekSpeed = 10f;
-        [SerializeField] private LayerMask WallLayerMask;
-        private float _peekAmount;
-        private float _peekForwardAmount;
-        private float _peekVerticalAmount;
-        [Space(10)]
-        [Header("Headbob")]
-        [SerializeField] private float walkBobSpeed = 14.0f;
-        [SerializeField] private float walkBobAmount = 0.05f;
-        [SerializeField] private float sprintBobSpeed = 18.0f;
-        [SerializeField] private float sprintBobAmount = 0.1f;
-        [SerializeField] private float crouchBobSpeed = 8.0f;
-        [SerializeField] private float crouchBobAmount = 0.025f;
-        [SerializeField] private float walkBobZAmount = 0.02f;
-        [SerializeField] private float sprintBobZAmount = 0.04f;
-        [SerializeField] private float crouchBobZAmount = 0.01f;
-        [SerializeField] private float walkBobXAmount = 0.02f;
-        [SerializeField] private float sprintBobXAmount = 0.035f;
-        [SerializeField] private float crouchBobXAmount = 0.01f;
 
         [Space(10)]
         [Header("References")]
@@ -64,10 +43,11 @@ namespace Player
         [SerializeField] private InputActionReference sprintAction;
         
         [SerializeField] private Transform _cameraTransform;
-        [SerializeField] private Transform cameraLeanPivot;
         [SerializeField] private Transform head;
-        /* Internal variables */
+        [Header("Camera Effects")]
+        [SerializeField] private CameraEffectsSystems cameraEffects;
         
+        /* Internal variables */
         private CharacterController _characterController;
         private Vector2 _moveInput;
         private bool _isGrounded;
@@ -76,21 +56,15 @@ namespace Player
         private bool _cachedSprintState;
         private float _verticalVelocity;
         private float _targetHeight;
-
         private bool _lockedInput = false;
         private float time;
-        
         private float _cameraBaseY;
-        private float _headBobOffset;
-        
-        [SerializeField] private float speedChangeRate = 10f;
-
         private float _currentSpeed;
 
         
         // Local reference that the controller cares about
-        [SerializeField] private Types.PlayerHealthState currentPlayerHealthState;
-        [SerializeField] private Types.PlayerMovementState PlayerMovementState;
+        private Types.PlayerHealthState currentPlayerHealthState;
+        private Types.PlayerMovementState _playerMovementState;
         private void Update()
         {
             
@@ -131,8 +105,10 @@ namespace Player
             HandleGravity();
             HandleMovement();
             HandleCrouchTransition();
-            HandleHeadBob();
-            HandlePeeking();
+            
+            cameraEffects.UpdateEffects(_isGrounded, IsPlayerMoving(), _isSprinting, _isCrouching);
+
+
             
         }
 
@@ -174,10 +150,10 @@ namespace Player
         private void SwitchMovementState(Types.PlayerMovementState movementState)
         {
             // if the current state is the same as the new state, do nothing
-            if (PlayerMovementState == movementState) { return; }
+            if (_playerMovementState == movementState) { return; }
             
             // set our current state to the new state
-            PlayerMovementState = movementState;
+            _playerMovementState = movementState;
             
             // Now we can handle the state switch logic (if there is any)
             switch (movementState)
@@ -328,6 +304,8 @@ namespace Player
                 targetCameraBaseY,
                 crouchTransitionSpeed * Time.deltaTime
             );
+            
+            cameraEffects.UpdateCameraBaseY(_cameraBaseY);
 
         }
         private bool CanStandUp()
@@ -389,163 +367,6 @@ namespace Player
 
         #endregion
         
-        #region Headbob and Peaking (refactor to new script soon)
-        private void HandlePeeking() {
-                    float targetLean = 0f;
-                    float targetVerticalLean = 0f;
-
-                    Vector3 forward = _cameraTransform.forward;
-                    Debug.DrawRay(_cameraTransform.position, forward * 2f, Color.green);
-
-                    if (Keyboard.current.qKey.isPressed)
-                    {
-                        targetLean = -1f; // World left
-                        Vector3 left = -_cameraTransform.right;
-                        Debug.DrawRay(_cameraTransform.position, left * 2f, Color.blue);
-                    }
-                    else if (Keyboard.current.eKey.isPressed)
-                    {
-                        targetLean = 1f; // World right
-                        Vector3 right = _cameraTransform.right;
-                        Debug.DrawRay(_cameraTransform.position, right * 2f, Color.red);
-                    }
-
-                    if (Keyboard.current.rKey.isPressed)
-                    {
-                        targetVerticalLean = 1f; // Upward
-                        Debug.DrawRay(_cameraTransform.position, Vector3.up * 2f, Color.yellow);
-                    }
-
-                    // Horizontal peek collision check
-                    Vector3 peekDirection = targetLean < 0 ? -_cameraTransform.right : _cameraTransform.right;
-                    RaycastHit hitInfo;
-                    if (targetLean != 0f)
-                    {
-                        if (Physics.BoxCast(
-                                head.position,
-                                new Vector3(0.2f, 0.2f, 0.2f),
-                                peekDirection,
-                                out hitInfo,
-                                head.rotation,
-                                peekOffset,
-                                WallLayerMask,
-                                QueryTriggerInteraction.Ignore
-                            )){
-                            float distanceToWall = hitInfo.distance;
-                            float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f);
-                            float peekRatio = allowedPeek / peekOffset;
-                            targetLean *= peekRatio;
-                        }
-                    }
-
-                    // Vertical peek collision check
-                    if (targetVerticalLean != 0f)
-                    {
-                        if (Physics.BoxCast(
-                                head.position,
-                                new Vector3(0.2f, 0.2f, 0.2f),
-                                Vector3.up,
-                                out hitInfo,
-                                head.rotation,
-                                peekOffset,
-                                WallLayerMask,
-                                QueryTriggerInteraction.Ignore
-                            )){
-                            float distanceToWall = hitInfo.distance;
-                            float allowedPeek = Mathf.Max(0f, distanceToWall - 0.1f);
-                            float peekRatio = allowedPeek / peekOffset;
-                            targetVerticalLean *= peekRatio;
-                        }
-                    }
-
-                    // Get the camera's forward vector components in world space
-                    float forwardX = forward.x;
-                    float forwardZ = forward.z;
-
-                    // E/Q contributes to both roll and pitch based on camera orientation
-                    float rollContribution = forwardZ * targetLean;
-                    float pitchContribution = -forwardX * targetLean;
-
-                    _peekAmount = Mathf.Lerp(_peekAmount, rollContribution, Time.deltaTime * peekSpeed);
-                    _peekForwardAmount = Mathf.Lerp(_peekForwardAmount, pitchContribution, Time.deltaTime * peekSpeed);
-                    _peekVerticalAmount = Mathf.Lerp(_peekVerticalAmount, targetVerticalLean, Time.deltaTime * peekSpeed);
-
-                    // Apply roll and pitch
-                    float roll = _peekAmount * peekAngle;
-                    float pitch = _peekForwardAmount * peekAngle;
-
-                    float offsetX = _peekAmount * peekOffset;
-                    float offsetZ = _peekForwardAmount * peekOffset;
-                    float offsetY = _peekVerticalAmount * peekOffset;
-
-                    cameraLeanPivot.localRotation = Quaternion.Euler(pitch, 0f, -roll);
-                    cameraLeanPivot.localPosition = new Vector3(offsetX, offsetY, offsetZ);
-                }
-        
-        private void HandleHeadBob()
-        {
-            if (!_isGrounded)
-            {
-                _headBobOffset = 0f;
-                return;
-            }
-            
-            // edge case
-            // if we happen to be crouching and sprinting at the same time, prioritize crouch headbob
-            if(_isCrouching && _isSprinting)
-            {
-                _isSprinting = false;
-            }
-            
-            if (IsPlayerMoving())
-            {
-                float bobSpeed = _isSprinting
-                    ? sprintBobSpeed
-                    : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
-
-                float yBobAmount = _isSprinting
-                    ? sprintBobAmount
-                    : (_isCrouching ? crouchBobAmount : walkBobAmount);
-
-                float xBobAmount = _isSprinting
-                    ? sprintBobXAmount
-                    : (_isCrouching ? crouchBobXAmount : walkBobXAmount);
-
-                float zBobAmount = _isSprinting
-                    ? sprintBobZAmount
-                    : (_isCrouching ? crouchBobZAmount : walkBobZAmount);
-
-                time += Time.deltaTime * bobSpeed;
-
-                // Vertical bob
-                float yOffset = Mathf.Sin(time) * yBobAmount;
-
-                // Left / Right sway (alternates per step)
-                float xOffset = Mathf.Sin(time * 0.5f) * xBobAmount;
-
-                // Forward / Back bob
-                float zOffset = Mathf.Cos(time * 0.5f) * zBobAmount;
-
-                Vector3 cameraPosition = _cameraTransform.localPosition;
-                cameraPosition.y = _cameraBaseY + yOffset;
-                cameraPosition.x = xOffset;
-                cameraPosition.z = zOffset;
-                _cameraTransform.localPosition = cameraPosition;
-            }
-            else
-            {
-                time = 0f;
-
-                Vector3 cameraPosition = _cameraTransform.localPosition;
-                cameraPosition.y = Mathf.Lerp(cameraPosition.y, _cameraBaseY, Time.deltaTime * 5f);
-                cameraPosition.x = Mathf.Lerp(cameraPosition.x, 0f, Time.deltaTime * 5f);
-                cameraPosition.z = Mathf.Lerp(cameraPosition.z, 0f, Time.deltaTime * 5f);
-                _cameraTransform.localPosition = cameraPosition;
-            }
-        }
-        #endregion
-
-        
         #region Sound Management
         private string _surfaceType;
         private float _audioEffectSpeed = 0.5f; // time between footstep sounds
@@ -579,7 +400,7 @@ namespace Player
                 }
                 
                 // if we are not moving, do not play footstep sounds
-                if (IsPlayerMoving())
+                if (!IsPlayerMoving())
                 {
                     yield return null;
                     continue;
