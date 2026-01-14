@@ -52,9 +52,18 @@ namespace Player
             {
                 _cameraBaseY = _cameraTransform.localPosition.y;
             }
-            
         }
 
+        private void LateUpdate()
+        {
+            // update the head to follow the camera
+            if (_cameraTransform == null){ return;}
+
+            headTransform.SetPositionAndRotation(
+                _cameraTransform.position,
+                _cameraTransform.rotation
+            );
+        }
         /// <summary>
         /// Updates camera base Y position (called when crouching/standing from a player controller)
         /// </summary>
