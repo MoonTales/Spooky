@@ -651,6 +651,13 @@ namespace Player
             DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
         }
 
+        #region Helper Function
+
+        private bool isPlayerMoving()
+        {
+            return true;
+        }
+        #endregion
         
     }
 }
