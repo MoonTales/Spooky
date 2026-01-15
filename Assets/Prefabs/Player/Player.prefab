@@ -235,7 +235,6 @@ GameObject:
   - component: {fileID: 1785507626789316241}
   - component: {fileID: 3760085159255034656}
   - component: {fileID: 8202205456049898850}
-  - component: {fileID: 3939722698235984288}
   m_Layer: 0
   m_Name: HEAD
   m_TagString: Untagged
@@ -335,19 +334,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3939722698235984288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5097885158666946118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55f8b0ba0b5f7294c991665ccb9807ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cinemachineCamera: {fileID: 2427465421472302248}
 --- !u!1 &5695208391225973946
 GameObject:
   m_ObjectHideFlags: 0
@@ -1171,6 +1157,7 @@ GameObject:
   - component: {fileID: 8931856296051820810}
   - component: {fileID: 2530425037171590484}
   - component: {fileID: 5074693414902085144}
+  - component: {fileID: 7827965959660100850}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1209,6 +1196,7 @@ MonoBehaviour:
   walkSpeed: 5
   sprintSpeed: 8
   crouchSpeed: 2
+  speedChangeRate: 10
   jumpForce: 7
   gravity: -12
   initialFallVelocity: -2
@@ -1216,26 +1204,13 @@ MonoBehaviour:
   crouchHeight: 1
   crouchTransitionSpeed: 10
   cameraCrouchOffset: 0.4
-  peekAngle: 15
-  peekOffset: 0.25
-  peekSpeed: 10
-  WallLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  walkBobSpeed: 14
-  walkBobAmount: 0.05
-  sprintBobSpeed: 18
-  sprintBobAmount: 0.1
-  crouchBobSpeed: 8
-  crouchBobAmount: 0.025
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   crouchAction: {fileID: 7040659881675835329, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   sprintAction: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _cameraTransform: {fileID: 2427465421472302248}
-  cameraLeanPivot: {fileID: 2735393184364509575}
   head: {fileID: 1439800706131837371}
-  currentPlayerHealthState: 0
+  cameraEffects: {fileID: 7827965959660100850}
 --- !u!143 &5074693414902085144
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1261,6 +1236,39 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7827965959660100850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7094810660777727507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f24fa2dc12ec21443adcc070a2f72e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkBobSpeed: 14
+  walkBobYAmount: 0.05
+  walkBobZAmount: 0.02
+  walkBobXAmount: 0.02
+  sprintBobSpeed: 18
+  sprintBobYAmount: 0.1
+  sprintBobZAmount: 0.04
+  sprintBobXAmount: 0.035
+  crouchBobSpeed: 8
+  crouchBobYAmount: 0.025
+  crouchBobZAmount: 0.01
+  crouchBobXAmount: 0.01
+  peekAngle: 15
+  peekOffset: 0.25
+  peekSpeed: 10
+  wallLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  cameraLeanPivot: {fileID: 2735393184364509575}
+  headTransform: {fileID: 1439800706131837371}
+  _cameraTransform: {fileID: 2427465421472302248}
 --- !u!1 &7974783582780965627
 GameObject:
   m_ObjectHideFlags: 0
@@ -1640,7 +1648,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8002930530365195001}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.09876325, y: -0.32921925, z: 0.03464786, w: 0.9384349}
+  m_LocalRotation: {x: 0.026875362, y: -0.97229236, z: 0.1425363, w: 0.18332669}
   m_LocalPosition: {x: 0, y: 0.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1707,7 +1715,7 @@ MonoBehaviour:
   ReferenceFrame: 0
   RecenterTarget: 0
   PanAxis:
-    Value: -38.663513
+    Value: -158.64436
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -1717,7 +1725,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   TiltAxis:
-    Value: 12.015673
+    Value: 16.680101
     Center: 0
     Range: {x: -70, y: 70}
     Wrap: 0
