@@ -11,25 +11,20 @@ public class Flashlight : Singleton<Flashlight>
     [Header("Flicker Settings")]
     [SerializeField] private float flickerDuration = 0.5f;
     [SerializeField] private float flickerSpeed = 0.1f;
-    [SerializeField] private float maxFlickerDistance = 10f;
+    [SerializeField] private float maxFlickerDistance = 15f;
     [Header("Special Flicker Settings")]
     // every random on time between the min and max, chance for a FORCED flicker to happen (as long as the flashlight is on)
     [SerializeField] private float minOnTimeToTriggerSpecialFlicker = 10f;
     [SerializeField] private float maxOnTimeToTriggerSpecialFlicker = 30f;
     [SerializeField] [Range(0f, 1f)] private float specialFlickerChance = 0.3f;
     
-    private bool _isOn = false; 
-    public bool IsOn() { return _isOn; }
-    
+    // Internal Variables
+    private bool _isOn = false;
     private bool _isFlickering = false;
-    
     // Since a flashlight may have multiple "Light" components (for different effects), we can store them in an array
     // this will allow us to directly control all light components of the flashlight
     private Light[] _lightComponents;
-    
-    // Cache for raycast
-    [SerializeField] private Camera playerCamera;
-    
+    private Camera _playerCamera;
     // Special flicker timer
     private Coroutine _specialFlickerCoroutine;
     
@@ -39,10 +34,7 @@ public class Flashlight : Singleton<Flashlight>
         _lightComponents = GetComponentsInChildren<Light>();
         
         // Get camera if not assigned
-        if (playerCamera == null)
-        {
-            playerCamera = Camera.main;
-        }
+        if (_playerCamera == null) { _playerCamera = Camera.main; }
         
         // Initialize flashlight state
         OnFlashlightToggled(_isOn);
@@ -58,7 +50,7 @@ public class Flashlight : Singleton<Flashlight>
     
     private void CheckForEnemy()
     {
-        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        Ray ray = new Ray(_playerCamera.transform.position, _playerCamera.transform.forward);
         RaycastHit hit;
         
         if (Physics.Raycast(ray, out hit, maxFlickerDistance))
@@ -98,6 +90,21 @@ public class Flashlight : Singleton<Flashlight>
         _specialFlickerCoroutine = StartCoroutine(SpecialFlickerTimer());
     }
     
+    private void HandleFlashlightOff()
+    {
+        EventBroadcaster.Broadcast_OnFlashlightToggled(false);
+        // play SFX
+        AudioManager.Instance.PlayFlashlightOff();
+        // turn off all light components
+        SetAllLights(false);
+        // Stop special flicker timer
+        if (_specialFlickerCoroutine != null)
+        {
+            StopCoroutine(_specialFlickerCoroutine);
+            _specialFlickerCoroutine = null;
+        }
+    }
+    
     private IEnumerator SpecialFlickerTimer()
     {
         while (_isOn)
@@ -117,21 +124,6 @@ public class Flashlight : Singleton<Flashlight>
         }
     }
     
-    private void HandleFlashlightOff()
-    {
-        EventBroadcaster.Broadcast_OnFlashlightToggled(false);
-        // play SFX
-        AudioManager.Instance.PlayFlashlightOff();
-        // turn off all light components
-        SetAllLights(false);
-        // Stop special flicker timer
-        if (_specialFlickerCoroutine != null)
-        {
-            StopCoroutine(_specialFlickerCoroutine);
-            _specialFlickerCoroutine = null;
-        }
-    }
-    
     public void ToggleFlashlight()
     {
         _isOn = !_isOn;
@@ -148,8 +140,9 @@ public class Flashlight : Singleton<Flashlight>
             // Randomly flicker each light component
             foreach (var light in _lightComponents)
             {
-                // we dont want to flicker the point light
+                // we dont want to flicker the point light (since thats not really a flashlight lol)
                 if (light.type == LightType.Point){ continue;}
+                // 50/50 chance to enable or disable the light
                 light.enabled = UnityEngine.Random.value > 0.5f;
             }
             
@@ -159,21 +152,15 @@ public class Flashlight : Singleton<Flashlight>
         
         // Ensure all lights are back on after flickering
         // if the flashlight is still on, return them to enabled state
-        if (_isOn)
-        {
-            SetAllLights(true);
-        }
-        else {
-            SetAllLights(false);
-        }
+        SetAllLights(_isOn);
 
-        
+
         _isFlickering = false;
     }
     
     private void SetAllLights(bool state)
     {
-        foreach (var light in _lightComponents)
+        foreach (Light light in _lightComponents)
         {
             light.enabled = state;
         }
