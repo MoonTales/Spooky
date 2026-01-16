@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using Managers;
+using Player;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class Flashlight : Singleton<Flashlight>
@@ -28,16 +30,37 @@ public class Flashlight : Singleton<Flashlight>
     // Special flicker timer
     private Coroutine _specialFlickerCoroutine;
     
+    
+    private CinemachineCamera CinemaCamera;
+    private CinemachinePanTilt panTilt;
+    
+    
+    [SerializeField] private float panDrag = 8f;
+    [SerializeField] private float tiltDrag = 8f;
+
+    private float _currentPan;
+    private float _currentTilt;
+
+    
     private void Start()
     {
         // Get all Light components attached to this GameObject and its children
         _lightComponents = GetComponentsInChildren<Light>();
         
         // Get camera if not assigned
-        if (_playerCamera == null) { _playerCamera = Camera.main; }
+        if (_playerCamera == null) {_playerCamera = Camera.main;}
         
         // Initialize flashlight state
         OnFlashlightToggled(_isOn);
+        
+        CinemaCamera = PlayerManager.Instance.GetCinemachineCamera();
+        panTilt = CinemaCamera.GetComponent<CinemachinePanTilt>();
+        // Initialize current values to match starting rotation
+        if (panTilt != null)
+        {
+            _currentPan = panTilt.PanAxis.Value;
+            _currentTilt = panTilt.TiltAxis.Value;
+        }
     }
     
     private void Update()
@@ -46,8 +69,35 @@ public class Flashlight : Singleton<Flashlight>
         {
             CheckForEnemy();
         }
+        DebugUtils.Log("current pan: " + _currentPan + " current tilt: " + _currentTilt);
     }
-    
+
+    private void LateUpdate()
+    {
+        if (CinemaCamera == null)
+        {
+            CinemaCamera = PlayerManager.Instance.GetCinemachineCamera();
+            if (CinemaCamera == null) return;
+        }
+
+        // Get target rotation - try WORLD rotation instead of local
+        Vector3 targetEuler = CinemaCamera.transform.eulerAngles; // Changed from localEulerAngles
+        float targetPan = targetEuler.y;
+        float targetTilt = targetEuler.x;
+
+        // Use LerpAngle to handle wrapping
+        _currentPan = Mathf.LerpAngle(_currentPan, targetPan, Time.deltaTime * panDrag);
+        _currentTilt = Mathf.LerpAngle(_currentTilt, targetTilt, Time.deltaTime * tiltDrag);
+
+        // IMPORTANT: Normalize the angles to prevent infinite growth
+        _currentPan = Mathf.Repeat(_currentPan, 360f);
+        _currentTilt = Mathf.Repeat(_currentTilt, 360f);
+
+        // Apply to flashlight - you might need WORLD rotation here too
+        transform.rotation = Quaternion.Euler(_currentTilt, _currentPan, 0f); // Changed from localRotation
+    }
+
+
     private void CheckForEnemy()
     {
         Ray ray = new Ray(_playerCamera.transform.position, _playerCamera.transform.forward);

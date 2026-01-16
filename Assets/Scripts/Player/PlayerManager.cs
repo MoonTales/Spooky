@@ -1,4 +1,5 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 
@@ -16,9 +17,24 @@ namespace Player
         
         void Start()
         {
+            
+            SearchForSpawnAnchor();
+        }
+        
+        void Awake()
+        {
             // Get reference to the player
             _player = GameObject.FindWithTag("Player");
-            SearchForSpawnAnchor();
+        }
+        
+        public CinemachineCamera GetCinemachineCamera()
+        {
+            CinemachineCamera cineCam = _player.GetComponentInChildren<CinemachineCamera>();
+            if (cineCam == null)
+            {
+                DebugUtils.LogError("CinemachineCamera component not found on player!");
+            }
+            return cineCam;
         }
         
 
