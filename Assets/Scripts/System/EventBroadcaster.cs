@@ -102,6 +102,11 @@ namespace System
         public delegate void OnPlayerStateChangedHandler(Types.PlayerHealthState newHealthState);
         public static event OnPlayerStateChangedHandler OnPlayerStateChanged;
         public static void Broadcast_OnPlayerStateChanged(Types.PlayerHealthState newHealthState) { OnPlayerStateChanged?.Invoke(newHealthState); }
+        
+        
+        public delegate void OnFlashlightToggledHandler(bool isOn);
+        public static event OnFlashlightToggledHandler OnFlashlightToggled;
+        public static void Broadcast_OnFlashlightToggled(bool isOn) { OnFlashlightToggled?.Invoke(isOn); }
         //-------------------------------- End Activity Events --------------------------------//
     }
 }

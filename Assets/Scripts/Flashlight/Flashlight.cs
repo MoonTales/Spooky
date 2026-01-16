@@ -12,6 +12,11 @@ public class Flashlight : Singleton<Flashlight>
     [SerializeField] private float flickerDuration = 0.5f;
     [SerializeField] private float flickerSpeed = 0.1f;
     [SerializeField] private float maxFlickerDistance = 10f;
+    [Header("Special Flicker Settings")]
+    // every random on time between the min and max, chance for a FORCED flicker to happen (as long as the flashlight is on)
+    [SerializeField] private float minOnTimeToTriggerSpecialFlicker = 10f;
+    [SerializeField] private float maxOnTimeToTriggerSpecialFlicker = 30f;
+    [SerializeField] [Range(0f, 1f)] private float specialFlickerChance = 0.3f;
     
     private bool _isOn = false; 
     public bool IsOn() { return _isOn; }
@@ -24,6 +29,9 @@ public class Flashlight : Singleton<Flashlight>
     
     // Cache for raycast
     [SerializeField] private Camera playerCamera;
+    
+    // Special flicker timer
+    private Coroutine _specialFlickerCoroutine;
     
     private void Start()
     {
@@ -77,23 +85,50 @@ public class Flashlight : Singleton<Flashlight>
 
     private void HandleFlashlightOn()
     {
+        EventBroadcaster.Broadcast_OnFlashlightToggled(true);
         // play SFX
         AudioManager.Instance.PlayFlashlightOn();
         // turn on all light components
-        foreach (var light in _lightComponents)
+        SetAllLights(true);
+        // Start special flicker timer
+        if (_specialFlickerCoroutine != null)
         {
-            light.enabled = true;
+            StopCoroutine(_specialFlickerCoroutine);
+        }
+        _specialFlickerCoroutine = StartCoroutine(SpecialFlickerTimer());
+    }
+    
+    private IEnumerator SpecialFlickerTimer()
+    {
+        while (_isOn)
+        {
+            // Wait a random time between min and max
+            float waitTime = UnityEngine.Random.Range(minOnTimeToTriggerSpecialFlicker, maxOnTimeToTriggerSpecialFlicker);
+            yield return new WaitForSeconds(waitTime);
+            
+            // double check again to make sure flashlight is still on
+            if (!_isOn) { yield break; }
+            
+            // Roll for chance to trigger special flicker
+            if (UnityEngine.Random.value <= specialFlickerChance)
+            {
+                StartCoroutine(FlashlightFlicker());
+            }
         }
     }
     
     private void HandleFlashlightOff()
     {
+        EventBroadcaster.Broadcast_OnFlashlightToggled(false);
         // play SFX
         AudioManager.Instance.PlayFlashlightOff();
         // turn off all light components
-        foreach (var light in _lightComponents)
+        SetAllLights(false);
+        // Stop special flicker timer
+        if (_specialFlickerCoroutine != null)
         {
-            light.enabled = false;
+            StopCoroutine(_specialFlickerCoroutine);
+            _specialFlickerCoroutine = null;
         }
     }
     
@@ -123,11 +158,25 @@ public class Flashlight : Singleton<Flashlight>
         }
         
         // Ensure all lights are back on after flickering
-        foreach (var light in _lightComponents)
+        // if the flashlight is still on, return them to enabled state
+        if (_isOn)
         {
-            light.enabled = true;
+            SetAllLights(true);
         }
+        else {
+            SetAllLights(false);
+        }
+
         
         _isFlickering = false;
     }
+    
+    private void SetAllLights(bool state)
+    {
+        foreach (var light in _lightComponents)
+        {
+            light.enabled = state;
+        }
+    }
+    
 }
