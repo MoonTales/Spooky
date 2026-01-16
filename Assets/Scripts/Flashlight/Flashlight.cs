@@ -103,7 +103,17 @@ public class Flashlight : Singleton<Flashlight>
         Ray ray = new Ray(_playerCamera.transform.position, _playerCamera.transform.forward);
         RaycastHit hit;
         
+        // this it to "narrow", we want a "wider" cone of detection for the flashlight
+        /*
         if (Physics.Raycast(ray, out hit, maxFlickerDistance))
+        {
+            if (hit.collider.CompareTag(flickerTag))
+            {
+                StartCoroutine(FlashlightFlicker());
+            }
+        }
+        */
+        if (Physics.SphereCast(ray, 0.5f, out hit, maxFlickerDistance))
         {
             if (hit.collider.CompareTag(flickerTag))
             {
