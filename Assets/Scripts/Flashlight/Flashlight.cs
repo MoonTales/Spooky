@@ -4,6 +4,7 @@ using Managers;
 using Player;
 using Unity.Cinemachine;
 using UnityEngine;
+using Types = System.Types;
 
 public class Flashlight : Singleton<Flashlight>
 {
@@ -14,11 +15,26 @@ public class Flashlight : Singleton<Flashlight>
     [SerializeField] private float flickerDuration = 0.5f;
     [SerializeField] private float flickerSpeed = 0.1f;
     [SerializeField] private float maxFlickerDistance = 15f;
+    [Space(10)]
     [Header("Special Flicker Settings")]
     // every random on time between the min and max, chance for a FORCED flicker to happen (as long as the flashlight is on)
     [SerializeField] private float minOnTimeToTriggerSpecialFlicker = 10f;
     [SerializeField] private float maxOnTimeToTriggerSpecialFlicker = 30f;
     [SerializeField] [Range(0f, 1f)] private float specialFlickerChance = 0.3f;
+    [Space(10)]
+    [Header("battery Settings")]
+    [SerializeField] private float maxBatteryLife = 100f; // Assume this is in seconds for now
+    [SerializeField] private float minBatterylife = 20f; // The lowest battery life we will drop to
+    [SerializeField] private float batteryDrainRate = 1f; // percentage per minute
+    [SerializeField] private float batteryRechargeRate = 0.5f; // percentage per minute
+    // threshold values
+    [SerializeField] private float highBatteryThreshold = 75f; // percentage
+    [SerializeField] private float mediumBatteryThreshold = 50f; // percentage
+    [SerializeField] private float lowBatteryThreshold = 20f; // percentage
+    [SerializeField] private float criticalBatteryThreshold = 5f; // percentage
+    private Types.FlashlightBatteryState _currentBatteryState = Types.FlashlightBatteryState.High;
+    private float _batteryLife = 100f; // percentage
+    
     
     // Internal Variables
     private bool _isOn = false;
@@ -120,6 +136,8 @@ public class Flashlight : Singleton<Flashlight>
                 StartCoroutine(FlashlightFlicker());
             }
         }
+        // draw a debug ray
+        Debug.DrawRay(ray.origin, ray.direction * maxFlickerDistance, Color.yellow);
     }
     
     private void OnFlashlightToggled(bool isOn)
