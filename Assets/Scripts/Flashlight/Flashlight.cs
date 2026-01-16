@@ -31,7 +31,7 @@ public class Flashlight : Singleton<Flashlight>
     [SerializeField] private float highBatteryThreshold = 75f; // percentage
     [SerializeField] private float mediumBatteryThreshold = 50f; // percentage
     [SerializeField] private float lowBatteryThreshold = 20f; // percentage
-    [SerializeField] private float criticalBatteryThreshold = 5f; // percentage
+    [SerializeField] private float criticalBatteryThreshold = 1f; // percentage
     private Types.FlashlightBatteryState _currentBatteryState = Types.FlashlightBatteryState.High;
     private float _batteryLife = 100f; // percentage
     private Coroutine _batteryDrainCoroutine;
@@ -207,78 +207,63 @@ public class Flashlight : Singleton<Flashlight>
     }
 
 
+    private void SetBatteryStateBasedOnBatteryLife()
+    {
+        // Update battery state based on thresholds
+        if (_batteryLife >= highBatteryThreshold)
+        {
+            _currentBatteryState = Types.FlashlightBatteryState.High;
+        }
+        else if (_batteryLife >= mediumBatteryThreshold)
+        {
+            _currentBatteryState = Types.FlashlightBatteryState.Medium;
+        }
+        else if (_batteryLife >= lowBatteryThreshold)
+        {
+            _currentBatteryState = Types.FlashlightBatteryState.Low;
+        }
+        else if (_batteryLife >= criticalBatteryThreshold)
+        {
+            _currentBatteryState = Types.FlashlightBatteryState.Critical;
+        }
+        else
+        {
+            _currentBatteryState = Types.FlashlightBatteryState.Dead;
+            // Automatically turn off flashlight if battery is dead
+        }
+    }
+    
     private IEnumerator FlashlightBatteryRecharge()
     {
-        while (!_isOn && _batteryLife <= maxBatteryLife)
+        while (!_isOn && _batteryLife < maxBatteryLife) 
         {
             // Recharge battery based on recharge rate
             _batteryLife += (batteryRechargeRate / 60f) * Time.deltaTime;
             _batteryLife = Mathf.Clamp(_batteryLife, 0f, maxBatteryLife);
-        
-            // Update battery state based on thresholds
-            if (_batteryLife >= highBatteryThreshold)
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.High;
-            }
-            else if (_batteryLife >= mediumBatteryThreshold)
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.Medium;
-            }
-            else if (_batteryLife >= lowBatteryThreshold)
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.Low;
-            }
-            else if (_batteryLife >= criticalBatteryThreshold)
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.Critical;
-            }
-            else
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.Dead;
-            }
-        
+            SetBatteryStateBasedOnBatteryLife();
             DebugUtils.Log("Flashlight Battery Life: " + _batteryLife + "%, State: " + _currentBatteryState);
-        
-            yield return null; // Wait for next frame
+            yield return null;
         }
     }
     private IEnumerator FlashlightBatteryDrain()
     {
-        // Passively drain battery over time while flashlight is on
         while (_isOn && _batteryLife > 0)
         {
             // Drain battery based on drain rate
             _batteryLife -= (batteryDrainRate / 60f) * Time.deltaTime;
             _batteryLife = Mathf.Clamp(_batteryLife, 0f, maxBatteryLife);
+            SetBatteryStateBasedOnBatteryLife();
         
-            // Update battery state based on thresholds
-            if (_batteryLife >= highBatteryThreshold)
+            // Check if battery died and turn off flashlight
+            if (_currentBatteryState == Types.FlashlightBatteryState.Dead)
             {
-                _currentBatteryState = Types.FlashlightBatteryState.High;
-            }
-            else if (_batteryLife >= mediumBatteryThreshold)
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.Medium;
-            }
-            else if (_batteryLife >= lowBatteryThreshold)
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.Low;
-            }
-            else if (_batteryLife >= criticalBatteryThreshold)
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.Critical;
-            }
-            else
-            {
-                _currentBatteryState = Types.FlashlightBatteryState.Dead;
-                // Automatically turn off flashlight if battery is dead
+                DebugUtils.Log("Battery died! Turning off flashlight.");
                 ToggleFlashlight();
-                yield break; // Exit the coroutine
+                yield break; // Exit coroutine immediately
             }
         
             DebugUtils.Log("Flashlight Battery Life: " + _batteryLife + "%, State: " + _currentBatteryState);
-        
-            yield return null; // Wait for next frame - THIS WAS MISSING!
+            yield return null;
         }
     }
     
