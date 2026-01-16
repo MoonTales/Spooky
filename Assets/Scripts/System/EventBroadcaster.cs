@@ -102,9 +102,6 @@ namespace System
         public delegate void OnPlayerStateChangedHandler(Types.PlayerHealthState newHealthState);
         public static event OnPlayerStateChangedHandler OnPlayerStateChanged;
         public static void Broadcast_OnPlayerStateChanged(Types.PlayerHealthState newHealthState) { OnPlayerStateChanged?.Invoke(newHealthState); }
-
-
-
         //-------------------------------- End Activity Events --------------------------------//
     }
 }
