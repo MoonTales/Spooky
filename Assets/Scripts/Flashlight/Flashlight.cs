@@ -6,30 +6,61 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 
+
+[System.Serializable]
+public class FlickerSettings
+{
+    [Range(0f, 1f)] public float specialFlickerChance = 0.3f;
+    public float minOnTimeToTriggerSpecialFlicker = 10f;
+    public float maxOnTimeToTriggerSpecialFlicker = 40f;
+    public float flickerDuration = 0.5f;
+    public float flickerSpeed = 0.1f;
+}
+
 public class Flashlight : Singleton<Flashlight>
 {
     // Tag used for what should cause the flashlight to Flicker
     [SerializeField] private string flickerTag = "Enemy";
-    
+    [Space(10)]
     [Header("Flicker Settings")]
-    [SerializeField] private float flickerDuration = 0.5f;
-    [SerializeField] private float flickerSpeed = 0.1f;
     [SerializeField] private float maxFlickerDistance = 15f;
     [Space(10)]
-    [Header("Special Flicker Settings")]
-    // every random on time between the min and max, chance for a FORCED flicker to happen (as long as the flashlight is on)
-    [SerializeField] private float minOnTimeToTriggerSpecialFlicker_High = 10f;
-    [SerializeField] private float maxOnTimeToTriggerSpecialFlicker_High = 40f;
-    [SerializeField] [Range(0f, 1f)] private float specialFlickerChance_High = 0.3f;
-    [SerializeField] private float minOnTimeToTriggerSpecialFlicker_Medium = 10f;
-    [SerializeField] private float maxOnTimeToTriggerSpecialFlicker_Medium = 30f;
-    [SerializeField] [Range(0f, 1f)] private float specialFlickerChance_Medium = 0.5f;
-    [SerializeField] private float minOnTimeToTriggerSpecialFlicker_Low = 10f;
-    [SerializeField] private float maxOnTimeToTriggerSpecialFlicker_Low = 20f;
-    [SerializeField] [Range(0f, 1f)] private float specialFlickerChance_Low = 0.7f;
-    [SerializeField] private float minOnTimeToTriggerSpecialFlicker_Critical = 5f;
-    [SerializeField] private float maxOnTimeToTriggerSpecialFlicker_Critcal = 10f;
-    [SerializeField] [Range(0f, 1f)] private float specialFlickerChance_Critcal = 0.9f;
+    [Header("Battery State Flicker Settings")]
+    [SerializeField] private FlickerSettings highBatteryFlicker = new FlickerSettings 
+    { 
+        specialFlickerChance = 0.3f, 
+        minOnTimeToTriggerSpecialFlicker = 10f, 
+        maxOnTimeToTriggerSpecialFlicker = 40f,
+        flickerDuration = 0.5f,
+        flickerSpeed = 0.1f
+    };
+
+    [SerializeField] private FlickerSettings mediumBatteryFlicker = new FlickerSettings 
+    { 
+        specialFlickerChance = 0.5f, 
+        minOnTimeToTriggerSpecialFlicker = 10f, 
+        maxOnTimeToTriggerSpecialFlicker = 30f,
+        flickerDuration = 0.4f,
+        flickerSpeed = 0.08f
+    };
+
+    [SerializeField] private FlickerSettings lowBatteryFlicker = new FlickerSettings 
+    { 
+        specialFlickerChance = 0.7f, 
+        minOnTimeToTriggerSpecialFlicker = 5f, 
+        maxOnTimeToTriggerSpecialFlicker = 10f,
+        flickerDuration = 0.3f,
+        flickerSpeed = 0.05f
+    };
+
+    [SerializeField] private FlickerSettings criticalBatteryFlicker = new FlickerSettings 
+    { 
+        specialFlickerChance = 0.9f, 
+        minOnTimeToTriggerSpecialFlicker = 1f, 
+        maxOnTimeToTriggerSpecialFlicker = 5f,
+        flickerDuration = 0.2f,
+        flickerSpeed = 0.03f
+    };
     
     [Space(10)]
     [Header("battery Settings")]
@@ -282,34 +313,35 @@ public class Flashlight : Singleton<Flashlight>
     {
         while (_isOn)
         {
-            // Wait a random time between min and max
-            float minOnTimeToTriggerSpecialFlicker;
-            if (_currentBatteryState == Types.FlashlightBatteryState.High){minOnTimeToTriggerSpecialFlicker = minOnTimeToTriggerSpecialFlicker_High;}
-            else if (_currentBatteryState == Types.FlashlightBatteryState.Medium){minOnTimeToTriggerSpecialFlicker = minOnTimeToTriggerSpecialFlicker_Medium;}
-            else if (_currentBatteryState == Types.FlashlightBatteryState.Low){minOnTimeToTriggerSpecialFlicker = minOnTimeToTriggerSpecialFlicker_Low;}
-            else {minOnTimeToTriggerSpecialFlicker = minOnTimeToTriggerSpecialFlicker_Critical;}
-            float maxOnTimeToTriggerSpecialFlicker;
-            if (_currentBatteryState == Types.FlashlightBatteryState.High){maxOnTimeToTriggerSpecialFlicker = maxOnTimeToTriggerSpecialFlicker_High;}
-            else if (_currentBatteryState == Types.FlashlightBatteryState.Medium){maxOnTimeToTriggerSpecialFlicker = maxOnTimeToTriggerSpecialFlicker_Medium;}
-            else if (_currentBatteryState == Types.FlashlightBatteryState.Low){maxOnTimeToTriggerSpecialFlicker = maxOnTimeToTriggerSpecialFlicker_Low;}
-            else {maxOnTimeToTriggerSpecialFlicker = maxOnTimeToTriggerSpecialFlicker_Critcal;}
-            float waitTime = UnityEngine.Random.Range(minOnTimeToTriggerSpecialFlicker, maxOnTimeToTriggerSpecialFlicker);
+            FlickerSettings settings = GetCurrentFlickerSettings();
+        
+            float waitTime = UnityEngine.Random.Range(
+                settings.minOnTimeToTriggerSpecialFlicker, 
+                settings.maxOnTimeToTriggerSpecialFlicker
+            );
             yield return new WaitForSeconds(waitTime);
-            
-            // double check again to make sure flashlight is still on
+        
             if (!_isOn) { yield break; }
-            
-            float specialFlickerChance;
-            if (_currentBatteryState == Types.FlashlightBatteryState.High){specialFlickerChance = specialFlickerChance_High;}
-            else if (_currentBatteryState == Types.FlashlightBatteryState.Medium){specialFlickerChance = specialFlickerChance_Medium;}
-            else if (_currentBatteryState == Types.FlashlightBatteryState.Low){specialFlickerChance = specialFlickerChance_Low;}
-            else {specialFlickerChance = specialFlickerChance_Critcal;}
-            
-            // Roll for chance to trigger special flicker
-            if (UnityEngine.Random.value <= specialFlickerChance)
+        
+            if (UnityEngine.Random.value <= settings.specialFlickerChance)
             {
-                StartCoroutine(FlashlightFlicker());
+                StartCoroutine(FlashlightFlicker(settings.flickerDuration, settings.flickerSpeed));
             }
+        }
+    }
+    
+    private FlickerSettings GetCurrentFlickerSettings()
+    {
+        switch (_currentBatteryState)
+        {
+            case Types.FlashlightBatteryState.High:
+                return highBatteryFlicker;
+            case Types.FlashlightBatteryState.Medium:
+                return mediumBatteryFlicker;
+            case Types.FlashlightBatteryState.Low:
+                return lowBatteryFlicker;
+            default:
+                return criticalBatteryFlicker;
         }
     }
     
@@ -319,7 +351,7 @@ public class Flashlight : Singleton<Flashlight>
         OnFlashlightToggled(_isOn);
     }
 
-    private IEnumerator FlashlightFlicker()
+    private IEnumerator FlashlightFlicker(float flickerDuration = 0.5f, float flickerSpeed = 0.1f)
     {
         _isFlickering = true;
         float elapsed = 0f;
