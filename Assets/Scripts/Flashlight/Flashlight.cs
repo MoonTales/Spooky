@@ -282,7 +282,7 @@ public class Flashlight : Singleton<Flashlight>
             _batteryLife += (batteryRechargeRate / 60f) * Time.deltaTime;
             _batteryLife = Mathf.Clamp(_batteryLife, 0f, maxBatteryLife);
             SetBatteryStateBasedOnBatteryLife();
-            DebugUtils.Log("Flashlight Battery Life: " + _batteryLife + "%, State: " + _currentBatteryState);
+            //DebugUtils.Log("Flashlight Battery Life: " + _batteryLife + "%, State: " + _currentBatteryState);
             yield return null;
         }
     }
