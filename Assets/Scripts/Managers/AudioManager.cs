@@ -34,6 +34,11 @@ namespace Managers
         [SerializeField] private AudioClip outPeakAudioClip;
         [SerializeField] private AudioClip inTippytoeAudioClip;
         [SerializeField] private AudioClip outTippytoeAudioClip;
+        
+        [Header("Flashlight")]
+        [SerializeField] private AudioClip flashlightOnAudioClip;
+        [SerializeField] private AudioClip flashlightOffAudioClip;
+        
         [Header("Enemy Effects")]
         [Header("General Sounds")]
         [Header("UI Audio")]
@@ -107,6 +112,15 @@ namespace Managers
             src.Play();
         }
 
+        
+        public void PlayFlashlightOn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(flashlightOnAudioClip, volume, deviation, fromTransform);
+        }
+        public void PlayFlashlightOff(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        {
+            PlaySFX(flashlightOffAudioClip, volume, deviation, fromTransform);
+        }
         
         #region Player Sounds
         #region Jumping and Landing

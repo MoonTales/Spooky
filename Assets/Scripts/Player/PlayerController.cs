@@ -41,6 +41,7 @@ namespace Player
         [SerializeField] private InputActionReference jumpAction;
         [SerializeField] private InputActionReference crouchAction;
         [SerializeField] private InputActionReference sprintAction;
+        [SerializeField] private InputActionReference flashlightToggleAction;
         
         [SerializeField] private Transform _cameraTransform;
         [SerializeField] private Transform head;
@@ -219,9 +220,18 @@ namespace Player
             crouchAction.action.performed += OnCrouch;
             sprintAction.action.performed += OnSprint;
             sprintAction.action.canceled += OnSprint;
+            flashlightToggleAction.action.performed += OnFlashlightToggle;
             
             
         }
+
+        private void OnFlashlightToggle(InputAction.CallbackContext obj)
+        {
+            if(_lockedInput){ return; }
+            // Logic to toggle flashlight
+            Flashlight.Instance.ToggleFlashlight();
+        }
+
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -234,7 +244,6 @@ namespace Player
             sprintAction.action.canceled -= OnSprint;
         }
         #endregion
-
         
         #region Movement Methods
         private void OnSprint(InputAction.CallbackContext obj)
@@ -476,11 +485,27 @@ namespace Player
         /// <summary>
         /// A series of various helpers to determine possible things about the player, mostly generic movement
         /// </summary>
-        private bool IsPlayerMoving()
+        
+        // Determine if the player is moving
+        public bool IsPlayerMoving()
         {
             // Check if the player is moving based on input magnitude (anything higher than 0.05 is considered moving)
             return _moveInput.magnitude > 0.05f;
         }
+        
+        public void LockInput()
+        {
+            _lockedInput = true;
+        }
+        public void UnlockInput()
+        {
+            _lockedInput = false;
+        }
+        public float GetDistanceToPlayer(Vector3 position)
+        {
+            return Vector3.Distance(position, transform.position);
+        }
+        
         
         #endregion
         
