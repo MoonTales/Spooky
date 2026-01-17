@@ -31,7 +31,20 @@ public class AttractorAI : MonoBehaviour
 
 	void Start()
 	{
-		agent = gameObject.GetComponent<NavMeshAgent>();
+		agent = GetComponent<NavMeshAgent>();
+		if (agent != null && defaultState == EnemyState.Wander)
+		{
+			SetNewRandomDestination();
+		}
+	}
+
+	void Update()
+	{
+		// Check if the agent has reached its destination and is not calculating a new path
+		if (defaultState == EnemyState.Wander && !agent.pathPending && agent.remainingDistance < 0.5f)
+		{
+			SetNewRandomDestination();
+		}
 	}
 
 	private void SetNewRandomDestination()
