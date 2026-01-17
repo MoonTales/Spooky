@@ -18,7 +18,7 @@ namespace Player
         void Start()
         {
             
-            SearchForSpawnAnchor();
+            SearchForSpawnAnchor(defaultSpawnPointID);
         }
         
         void Awake()
@@ -47,7 +47,7 @@ namespace Player
                 () => EventBroadcaster.OnPlayerStateChanged -= OnPlayerStateChanged);
         }
         
-        private void SearchForSpawnAnchor()
+        public void SearchForSpawnAnchor(string spawnPointID = "")
         {
             // logic to search for a spawn anchor in the scene
             PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsOfType<PlayerSpawnAnchor>();
@@ -64,7 +64,7 @@ namespace Player
                     FirstAnchor = Anchor;
                 }
                 // Search for the default spawn point ID
-                if (Anchor != null && Anchor.gameObject != null && Anchor.GetSpawnPointID() == defaultSpawnPointID)
+                if (Anchor != null && Anchor.gameObject != null && Anchor.GetSpawnPointID() == spawnPointID)
                 {
                     // found the default spawn point, move the player here
                     if (_player != null)

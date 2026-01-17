@@ -46,6 +46,16 @@ namespace Managers
                 EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
             }
             
+            if(Input.GetKeyDown(KeyCode.B))
+            {
+                SceneSwapper.Instance.SwapScene("Bedroom");
+            }
+
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                SceneSwapper.Instance.SwapScene("Cohen");
+            }
+            
             
         }
         

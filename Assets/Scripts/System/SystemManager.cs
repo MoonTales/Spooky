@@ -28,6 +28,7 @@ namespace System
             // gameObject.AddComponent<ManagerClassName>();
             gameObject.AddComponent<PlayerManager>();
             gameObject.AddComponent<GameStateManager>();
+            gameObject.AddComponent<SceneSwapper>();
             
         
         }
