@@ -158,5 +158,21 @@ namespace System
         /* ------------------------ End Door Related Types ------------------------ */
         
         
+        /* ------------------------ Flashlight Related Types ------------------------ */
+        
+        // Enum to hold the different battery states
+        [Serializable]
+        public enum FlashlightBatteryState
+        {
+            High,
+            Medium,
+            Low,
+            Critical,
+            Dead
+        }
+        
+        
+        /* ------------------------ End Flashlight Related Types ------------------------ */
+        
     }
 }

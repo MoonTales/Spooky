@@ -534,6 +534,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "FlashLight",
+                    "type": "Button",
+                    "id": "60e6d7ee-1498-460f-8b82-c6902493338a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "MiddleClick",
                     "type": "PassThrough",
                     "id": "dad70c86-b58c-4b17-88ad-f5e53adf419e",
@@ -953,6 +962,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "RightClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7ec9ea88-f6fa-4273-97e4-7cd5e07db70d",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "FlashLight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
