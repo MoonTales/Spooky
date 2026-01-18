@@ -99,6 +99,9 @@ public class Flashlight : Singleton<Flashlight>
 
     private float _currentPan;
     private float _currentTilt;
+    
+    private GameObject _cachedFlickerTarget;
+    private GameObject _currentFlickerTarget = null;
 
     
     private void Start()
@@ -156,28 +159,45 @@ public class Flashlight : Singleton<Flashlight>
     }
 
 
+    
     private void CheckForEnemy()
     {
         Ray ray = new Ray(_playerCamera.transform.position, _playerCamera.transform.forward);
         RaycastHit hit;
-        
-        // this it to "narrow", we want a "wider" cone of detection for the flashlight
-        /*
-        if (Physics.Raycast(ray, out hit, maxFlickerDistance))
-        {
-            if (hit.collider.CompareTag(flickerTag))
-            {
-                StartCoroutine(FlashlightFlicker());
-            }
-        }
-        */
+    
         if (Physics.SphereCast(ray, 0.5f, out hit, maxFlickerDistance))
         {
             if (hit.collider.CompareTag(flickerTag))
             {
-                StartCoroutine(FlashlightFlicker());
+                GameObject hitEnemy = hit.collider.gameObject;
+            
+                // Check if this is a new enemy or the same one
+                if (_currentFlickerTarget != hitEnemy)
+                {
+                    // If we were targeting a different enemy, broadcast false for it
+                    if (_currentFlickerTarget != null)
+                    {
+                        EventBroadcaster.Broadcast_OnFlashlightHitEnemy(_currentFlickerTarget, false);
+                    }
+                
+                    // Broadcast true for the new enemy
+                    _currentFlickerTarget = hitEnemy;
+                    EventBroadcaster.Broadcast_OnFlashlightHitEnemy(_currentFlickerTarget, true);
+                
+                    _cachedFlickerTarget = hitEnemy;
+                    StartCoroutine(FlashlightFlicker());
+                }
+                return;
             }
         }
+    
+        // No enemy hit - if we were tracking one, broadcast false
+        if (_currentFlickerTarget != null)
+        {
+            EventBroadcaster.Broadcast_OnFlashlightHitEnemy(_currentFlickerTarget, false);
+            _currentFlickerTarget = null;
+        }
+    
         // draw a debug ray
         Debug.DrawRay(ray.origin, ray.direction * maxFlickerDistance, Color.yellow);
     }
