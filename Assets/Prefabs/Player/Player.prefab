@@ -1634,6 +1634,7 @@ GameObject:
   - component: {fileID: 7525020062721025566}
   - component: {fileID: 1660176508892394544}
   - component: {fileID: 4423111471801385366}
+  - component: {fileID: 1840900198907958763}
   m_Layer: 0
   m_Name: PlayerCamera
   m_TagString: Untagged
@@ -1780,3 +1781,20 @@ MonoBehaviour:
         DecelTime: 0.2
   PlayerIndex: -1
   AutoEnableInputs: 1
+--- !u!114 &1840900198907958763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8002930530365195001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf0f2b1f033b234d808b2d91c298838, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inspectionPoint: {fileID: 0}
+  inspectionDistance: 0.5
+  transitionSpeed: 8
+  rotationSpeed: 100
+  cameraTransform: {fileID: 0}
