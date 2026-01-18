@@ -323,7 +323,7 @@ public class Flashlight : Singleton<Flashlight>
                 yield break; // Exit coroutine immediately
             }
         
-            DebugUtils.Log("Flashlight Battery Life: " + _batteryLife + "%, State: " + _currentBatteryState);
+            //DebugUtils.Log("Flashlight Battery Life: " + _batteryLife + "%, State: " + _currentBatteryState);
             yield return null;
         }
     }
