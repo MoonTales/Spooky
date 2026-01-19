@@ -484,6 +484,9 @@ namespace Player
                 case Types.GameState.MainMenu:
                     HandleMainMenuState();
                     break;
+                case Types.GameState.Inspecting:
+                    HandleInspectionState();
+                    break;
                 // handle other game states as needed
             }
         }
@@ -510,6 +513,17 @@ namespace Player
             // Disable player controls for cutscene
             _lockedInput = true;
             DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
+            // disable the head so its hidden
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
+        }
+
+        private void HandleInspectionState()
+        {
+            // Disable player controls for cutscene
+            _lockedInput = true;
             // disable the head so its hidden
             for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
             {

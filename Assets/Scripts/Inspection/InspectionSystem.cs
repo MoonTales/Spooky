@@ -236,7 +236,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 panTilt.TiltAxis.Value = savedPanTilt.y;
                 panTilt.enabled = true;
             }
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
-        EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
     }
 }
