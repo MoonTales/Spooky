@@ -1,11 +1,35 @@
+using System;
 using UnityEngine;
+using Types = System.Types;
 
-public class CursorController : MonoBehaviour
+public class CursorController : EventSubscriberBase
 {
-
-    private void Awake()
+    
+    protected override void RegisterSubscriptions()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        base.RegisterSubscriptions();
+        TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
+            () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
+    }
+    
+    
+
+    private void OnGameStateChanged(Types.GameState newstate)
+    {
+        switch (newstate)
+        {
+            case Types.GameState.Gameplay:
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                break;
+            case Types.GameState.Cutscene:
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                break;
+            case Types.GameState.MainMenu:
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                break;
+        }
     }
 }
