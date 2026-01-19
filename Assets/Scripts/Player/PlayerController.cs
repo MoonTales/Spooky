@@ -530,6 +530,7 @@ namespace Player
             {
                 Flashlight.Instance.ToggleFlashlight();
             }
+            StopAllPlayerMovement();
         }
 
         private void HandleInspectionState()
@@ -566,6 +567,14 @@ namespace Player
         public float GetDistanceToPlayer(Vector3 position)
         {
             return Vector3.Distance(position, transform.position);
+        }
+
+        private void StopAllPlayerMovement()
+        {
+            _isCrouching = false;
+            _cachedSprintState = false;
+            _isSprinting = false;
+            _moveInput = Vector2.zero;
         }
         
         

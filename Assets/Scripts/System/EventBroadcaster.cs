@@ -97,11 +97,13 @@ namespace System
         public delegate void DamagePlayerHandler(float damageAmount);
         public static event DamagePlayerHandler OnPlayerDamaged;
         public static void Broadcast_OnPlayerDamaged(float damageAmount) { OnPlayerDamaged?.Invoke(damageAmount); }
+        
+        
 
         
-        public delegate void OnPlayerStateChangedHandler(Types.PlayerHealthState newHealthState);
-        public static event OnPlayerStateChangedHandler OnPlayerStateChanged;
-        public static void Broadcast_OnPlayerStateChanged(Types.PlayerHealthState newHealthState) { OnPlayerStateChanged?.Invoke(newHealthState); }
+        public delegate void OnPlayerHealthStateChangedHandler(Types.PlayerHealthState newHealthState);
+        public static event OnPlayerHealthStateChangedHandler OnPlayerHealthStateChanged;
+        public static void Broadcast_OnPlayerHealthStateChanged(Types.PlayerHealthState newHealthState) { OnPlayerHealthStateChanged?.Invoke(newHealthState); }
         
         
         public delegate void OnFlashlightToggledHandler(bool isOn);
