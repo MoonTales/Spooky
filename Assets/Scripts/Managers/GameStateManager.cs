@@ -45,6 +45,11 @@ namespace Managers
                 DebugUtils.Log("Switching to Cutscene State");
                 EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
             }
+            if(Input.GetKeyDown(KeyCode.M))
+            {
+                DebugUtils.Log("Switching to MainMenu State");
+                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
+            }
             
             if(Input.GetKeyDown(KeyCode.O))
             {

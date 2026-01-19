@@ -69,7 +69,7 @@ namespace Player
                     // found the default spawn point, move the player here
                     if (_player != null)
                     {
-                        TeleportPlayer(Anchor.gameObject.transform.position);
+                        TeleportPlayer(Anchor.gameObject.transform.position, Anchor.gameObject.transform.rotation);
                         DebugUtils.LogSuccess("Player spawned at default spawn point: " + Anchor.GetSpawnPointID());
                         return;
                     }
@@ -78,7 +78,8 @@ namespace Player
             // if we reach here, we did not find the default spawn point, so we will just use the first one we found
             if (FirstAnchor)
             {
-                TeleportPlayer(FirstAnchor.gameObject.transform.position);
+                TeleportPlayer(FirstAnchor.gameObject.transform.position, FirstAnchor.gameObject.transform.rotation);
+                
                 return;
             }
             
@@ -113,7 +114,7 @@ namespace Player
         /// <summary>
         /// Teleports player immediately
         /// </summary>
-        public void TeleportPlayer(Vector3 newPosition)
+        public void TeleportPlayer(Vector3 newPosition, Quaternion? rotation = null)
         {
             if (_player == null) return;
 
@@ -122,6 +123,18 @@ namespace Player
             if (controller != null) {controller.enabled = false;}
 
             _player.transform.position = newPosition;
+    
+            if (rotation.HasValue)
+            {
+                float yaw = rotation.Value.eulerAngles.y;
+                var CinemaCamera = GetCinemachineCamera();
+                var panTilt = CinemaCamera.GetComponent<CinemachinePanTilt>();
+    
+                if (panTilt != null)
+                {
+                    panTilt.PanAxis.Value = yaw;
+                }
+            }
 
             if (controller != null) {controller.enabled = true;}
 

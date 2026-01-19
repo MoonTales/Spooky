@@ -495,12 +495,7 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(false);
             }
-            // now we show the cursor and set
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-            
         }
-
         private void HandleGameplayState()
         {
             // Return to basic player controls
@@ -509,8 +504,6 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(true);
             }
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
         }
         private void HandleCutsceneState()
         {
@@ -522,9 +515,6 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(false);
             }
-            // now we show the cursor and set
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
         }
 
         #region Helper Function
