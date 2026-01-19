@@ -21,8 +21,9 @@ namespace Player
             SearchForSpawnAnchor(defaultSpawnPointID);
         }
         
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             // Get reference to the player
             _player = GameObject.FindWithTag("Player");
         }
@@ -53,7 +54,6 @@ namespace Player
             PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsOfType<PlayerSpawnAnchor>();
             
             // debug print the number of spawn anchors found
-            DebugUtils.Log("Number of PlayerSpawnAnchors found in scene: " + spawnAnchors.Length);
             // loop through all of the spawn anchors to find the default one
             PlayerSpawnAnchor FirstAnchor = null;
             foreach (PlayerSpawnAnchor Anchor in spawnAnchors)

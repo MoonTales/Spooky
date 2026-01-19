@@ -39,7 +39,7 @@ namespace UI
     
         private void ShowHUD(bool show)
         {
-            _hudCanvas.enabled = show;
+            if (_hudCanvas != null){_hudCanvas.enabled = show;}
         }
     }
 }
