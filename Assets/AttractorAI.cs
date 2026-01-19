@@ -25,7 +25,7 @@ public class AttractorAI : MonoBehaviour
 	[Header("Behaviours")]
 	public EnemyState defaultState = EnemyState.Stand;
 
-	public enum Attractor
+	public enum AttractorType
 	{
 		visual,
 		audio
@@ -39,9 +39,14 @@ public class AttractorAI : MonoBehaviour
 		public float maxIntensity;
 		public List<EnemyState> stateRestriction;
 		public EnemyState stateChange;
+		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
+			"instead of the Attractor with the highest intensity")]
+		public bool prioritizeDistanceInsteadOfIntensity = false;
+		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
+		public bool invertPriority = false;
 	}
 
-	public List<EnemyReactions> beahaviourHierarchy;
+	public List<EnemyReactions> behaviourHierarchy;
 
 	private Transform currentFocus;
 
@@ -54,11 +59,6 @@ public class AttractorAI : MonoBehaviour
 		public LayerMask targetLayer;
 		public LayerMask obstacleLayer;
 		public Transform[] senseOrgans;
-		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
-			"instead of the Attractor with the highest intensity")]
-		public bool prioritizeDistanceInsteadOfIntensity = false;
-		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
-		public bool invertPriority = false;
 		[Tooltip("Attractors detected by this sense will instead be clasified as not detected, " +
 			"while every Attractor in the targetLayer NOT detected by this sense is considered detected")]
 		public bool invertDetection = false;
@@ -92,8 +92,33 @@ public class AttractorAI : MonoBehaviour
 		patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
 	}
 
-	bool CanDetectTarget(EnemySense currentSense)
+	Dictionary<AttractorType, List<Transform>> DetectedAttractors()
 	{
+		Dictionary<AttractorType, List<Transform>> tempAttractorDictionary = new Dictionary<AttractorType, List<Transform>>();
+		foreach (EnemySense sense in senses)
+		{
+			foreach(Transform attractor in DetectTarget(sense))
+			{
+				AttractorType tempAttractorType = attractor.GetComponent<Attractor>().attractorType;
+				// Try to get the existing value; if it exists, add to it
+				if (tempAttractorDictionary.ContainsKey(tempAttractorType))
+				{
+					tempAttractorDictionary[tempAttractorType].Add(attractor);
+				}
+				// If it doesn't exist, add the new key with the initial value
+				else
+				{
+					tempAttractorDictionary.Add(tempAttractorType, new List<Transform>());
+					tempAttractorDictionary[tempAttractorType].Add(attractor);
+				}
+			}
+		}
+		return tempAttractorDictionary;
+	}
+
+	List<Transform> DetectTarget(EnemySense currentSense)
+	{
+		List<Transform> tempAttractorList = new List<Transform>();
 		// For efficiency, check for all targets in range before fireing any raycasts
 		hitColliders = Physics.OverlapSphere(transform.position, currentSense.detectionRadius, currentSense.targetLayer);
 
@@ -103,10 +128,10 @@ public class AttractorAI : MonoBehaviour
 
 			if (CheckConeVisibility(target, currentSense))
 			{
-				return true;
+				tempAttractorList.Add(target.GetComponent<Transform>());
 			}
 		}
-		return false;
+		return tempAttractorList;
 	}
 
 	bool CheckConeVisibility(Transform target, EnemySense currentSense)
@@ -156,6 +181,13 @@ public class AttractorAI : MonoBehaviour
 	void Update()
 	{
 		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);
+
+		Dictionary<AttractorType, List<Transform>> detectedAttractors = new Dictionary<AttractorType, List<Transform>>();
+
+		foreach (EnemyReactions reaction in behaviourHierarchy)
+		{
+			
+		}
 
 		// Check if the agent has reached its destination and is not calculating a new path
 		if (defaultState == EnemyState.Wander && !agent.pathPending && agent.remainingDistance < 0.5f)
