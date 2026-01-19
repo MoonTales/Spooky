@@ -470,7 +470,7 @@ namespace Player
         #endregion
         
         
-        protected void OnGameStateChanged(Types.GameState newState)
+        private void OnGameStateChanged(Types.GameState newState)
         {
             DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
             switch (newState)
@@ -481,10 +481,21 @@ namespace Player
                 case Types.GameState.Cutscene:
                     HandleCutsceneState();
                     break;
+                case Types.GameState.MainMenu:
+                    HandleMainMenuState();
+                    break;
                 // handle other game states as needed
             }
         }
 
+        private void HandleMainMenuState()
+        {
+            _lockedInput = true;
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
+        }
         private void HandleGameplayState()
         {
             // Return to basic player controls
