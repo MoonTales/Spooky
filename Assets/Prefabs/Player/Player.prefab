@@ -1171,6 +1171,7 @@ GameObject:
   - component: {fileID: 2530425037171590484}
   - component: {fileID: 5074693414902085144}
   - component: {fileID: 7827965959660100850}
+  - component: {fileID: 6909742584566766188}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1286,6 +1287,21 @@ MonoBehaviour:
   cameraLeanPivot: {fileID: 2735393184364509575}
   headTransform: {fileID: 1439800706131837371}
   _cameraTransform: {fileID: 2427465421472302248}
+--- !u!114 &6909742584566766188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7094810660777727507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1556b12d61ee57b449d8674f161d8d86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  castDistance: 5
+  raycastOffset: {x: 0, y: 1, z: 0}
+  interactKey: 101
 --- !u!1 &7974783582780965627
 GameObject:
   m_ObjectHideFlags: 0
