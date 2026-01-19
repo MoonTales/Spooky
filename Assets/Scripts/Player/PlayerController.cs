@@ -498,6 +498,12 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(false);
             }
+            
+            // check if the flashlight is on
+            if (Flashlight.Instance.IsFlashlightOn())
+            {
+                Flashlight.Instance.ToggleFlashlight();
+            }
         }
         private void HandleGameplayState()
         {
@@ -517,6 +523,12 @@ namespace Player
             for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
             {
                 ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
+            
+            // check if the flashlight is on
+            if (Flashlight.Instance.IsFlashlightOn())
+            {
+                Flashlight.Instance.ToggleFlashlight();
             }
         }
 
