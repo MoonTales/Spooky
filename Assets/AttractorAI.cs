@@ -34,11 +34,17 @@ public class AttractorAI : MonoBehaviour
 	[System.Serializable]
 	public class EnemyReactions
 	{
-		public Attractor attractorType;
+		public AttractorType attractorType;
+		[Tooltip("Inclusve")]
 		public float minIntensity;
+		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
 		public List<EnemyState> stateRestriction;
 		public EnemyState stateChange;
+		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
+			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
+			"it will automatically target the player")]
+		public bool targetDetectedObject = false;
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
 		public bool prioritizeDistanceInsteadOfIntensity = false;
@@ -92,12 +98,12 @@ public class AttractorAI : MonoBehaviour
 		patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
 	}
 
-	Dictionary<AttractorType, List<Transform>> DetectedAttractors()
+	Dictionary<AttractorType, List<Attractor>> DetectedAttractors()
 	{
-		Dictionary<AttractorType, List<Transform>> tempAttractorDictionary = new Dictionary<AttractorType, List<Transform>>();
+		Dictionary<AttractorType, List<Attractor>> tempAttractorDictionary = new Dictionary<AttractorType, List<Attractor>>();
 		foreach (EnemySense sense in senses)
 		{
-			foreach(Transform attractor in DetectTarget(sense))
+			foreach(Attractor attractor in DetectTarget(sense))
 			{
 				AttractorType tempAttractorType = attractor.GetComponent<Attractor>().attractorType;
 				// Try to get the existing value; if it exists, add to it
@@ -108,7 +114,7 @@ public class AttractorAI : MonoBehaviour
 				// If it doesn't exist, add the new key with the initial value
 				else
 				{
-					tempAttractorDictionary.Add(tempAttractorType, new List<Transform>());
+					tempAttractorDictionary.Add(tempAttractorType, new List<Attractor>());
 					tempAttractorDictionary[tempAttractorType].Add(attractor);
 				}
 			}
@@ -116,9 +122,9 @@ public class AttractorAI : MonoBehaviour
 		return tempAttractorDictionary;
 	}
 
-	List<Transform> DetectTarget(EnemySense currentSense)
+	List<Attractor> DetectTarget(EnemySense currentSense)
 	{
-		List<Transform> tempAttractorList = new List<Transform>();
+		List<Attractor> tempAttractorList = new List<Attractor>();
 		// For efficiency, check for all targets in range before fireing any raycasts
 		hitColliders = Physics.OverlapSphere(transform.position, currentSense.detectionRadius, currentSense.targetLayer);
 
@@ -128,7 +134,7 @@ public class AttractorAI : MonoBehaviour
 
 			if (CheckConeVisibility(target, currentSense))
 			{
-				tempAttractorList.Add(target.GetComponent<Transform>());
+				tempAttractorList.Add(target.GetComponent<Attractor>());
 			}
 		}
 		return tempAttractorList;
@@ -182,11 +188,24 @@ public class AttractorAI : MonoBehaviour
 	{
 		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);
 
-		Dictionary<AttractorType, List<Transform>> detectedAttractors = new Dictionary<AttractorType, List<Transform>>();
+		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
 
 		foreach (EnemyReactions reaction in behaviourHierarchy)
 		{
-			
+			List<Attractor> tempAttractors = new List<Attractor>();
+			foreach(Attractor attractor in tempDetectedAttractors[reaction.attractorType])
+			{
+				if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity)
+				{
+					tempAttractors.Add(attractor);
+				}
+			}
+
+			if (!reaction.targetDetectedObject && tempAttractors.Count > 0)
+			{
+				// currentFocus = ThePlayer (ask Cohen how to reference player position)
+				defaultState = reaction.stateChange;
+			}
 		}
 
 		// Check if the agent has reached its destination and is not calculating a new path

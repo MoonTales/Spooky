@@ -7049,6 +7049,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61d6b4e7e4444664ca4f350b801e8d78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attractorType: 0
   intensity: 20
 --- !u!1 &697704285
 GameObject:
@@ -9647,7 +9648,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultState: 1
-  behaviourHierarchy: []
+  behaviourHierarchy:
+  - attractorType: 0
+    minIntensity: 0
+    maxIntensity: 0
+    stateRestriction: 
+    stateChange: 0
+    targetDetectedObject: 0
+    prioritizeDistanceInsteadOfIntensity: 0
+    invertPriority: 0
   senses:
   - detectionRadius: 50
     detectionAngle: 45
