@@ -22,6 +22,7 @@ namespace System
             GameOver,
             Victory,
             Cutscene,
+            Inspecting
         }
 
         /// <summary>
