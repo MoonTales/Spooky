@@ -16,6 +16,13 @@ public class AlarmClock : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            InspectionSystem.Instance.StartInspection(gameObject);
+        }
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            InspectionSystem.Instance.EndInspection();
+        }
     }
 }
