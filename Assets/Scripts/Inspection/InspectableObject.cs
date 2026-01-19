@@ -24,5 +24,10 @@ namespace Inspection
             // Placeholder for future interaction system integration!!!
             InspectionSystem.Instance.StartInspection(gameObject);
         }
+        
+        
+        // Getters
+        public string GetObjectName() { return objectName; }
+        public string GetObjectDescription() { return objectDescription; }
     }
 }
