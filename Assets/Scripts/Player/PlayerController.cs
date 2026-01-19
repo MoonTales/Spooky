@@ -470,7 +470,7 @@ namespace Player
         #endregion
         
         
-        protected void OnGameStateChanged(Types.GameState newState)
+        private void OnGameStateChanged(Types.GameState newState)
         {
             DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
             switch (newState)
@@ -481,8 +481,24 @@ namespace Player
                 case Types.GameState.Cutscene:
                     HandleCutsceneState();
                     break;
+                case Types.GameState.MainMenu:
+                    HandleMainMenuState();
+                    break;
                 // handle other game states as needed
             }
+        }
+
+        private void HandleMainMenuState()
+        {
+            _lockedInput = true;
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
+            // now we show the cursor and set
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            
         }
 
         private void HandleGameplayState()
@@ -493,6 +509,8 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(true);
             }
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
         private void HandleCutsceneState()
         {
@@ -504,6 +522,9 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(false);
             }
+            // now we show the cursor and set
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         #region Helper Function
