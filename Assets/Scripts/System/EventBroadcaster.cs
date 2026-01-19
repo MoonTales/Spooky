@@ -107,6 +107,10 @@ namespace System
         public delegate void OnFlashlightToggledHandler(bool isOn);
         public static event OnFlashlightToggledHandler OnFlashlightToggled;
         public static void Broadcast_OnFlashlightToggled(bool isOn) { OnFlashlightToggled?.Invoke(isOn); }
+        
+        public delegate void OnFlashlightHitEnemyHandler(GameObject enemy, bool isOnEnemy);
+        public static event OnFlashlightHitEnemyHandler OnFlashlightHitEnemy;
+        public static void Broadcast_OnFlashlightHitEnemy(GameObject enemy, bool isOnEnemy){ OnFlashlightHitEnemy?.Invoke(enemy, isOnEnemy); }
         //-------------------------------- End Activity Events --------------------------------//
     }
 }

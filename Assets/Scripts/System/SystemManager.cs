@@ -11,13 +11,13 @@ namespace System
     public class SystemManager : Singleton<SystemManager>
     {
         // Start is called before the first frame update
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
             CreateManagers();
             DebugUtils.LogSuccess("All managers built successfully.");
         }
-
-
+        
         /// <summary>
         /// Creates all required singleton managers for the game and attaches them to the SystemManager.
         /// These are primary game managers that do not require any references added via the Unity Editor.
@@ -28,6 +28,7 @@ namespace System
             // gameObject.AddComponent<ManagerClassName>();
             gameObject.AddComponent<PlayerManager>();
             gameObject.AddComponent<GameStateManager>();
+            gameObject.AddComponent<SceneSwapper>();
             
         
         }
