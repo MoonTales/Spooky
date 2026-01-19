@@ -17,6 +17,13 @@ namespace Player
         
         [SerializeField] private string spawnPointID = "DEFAULT_SPAWN_POINT"; public string GetSpawnPointID() { return spawnPointID; }
 
-        
+        private void Start()
+        {
+            // get access to the sprite renderer, and disable it (it is in a child object)
+            SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+            if (sr != null) { sr.enabled = false; }
+            BillboardRenderer br = GetComponent<BillboardRenderer>();
+            if (br != null) { br.enabled = false; }
+        }
     }
 }
