@@ -106,9 +106,8 @@ namespace Player
             HandleGravity();
             HandleMovement();
             HandleCrouchTransition();
-            
             cameraEffects.UpdateEffects(_isGrounded, IsPlayerMoving(), _isSprinting, _isCrouching);
-
+            
 
             
         }
@@ -248,8 +247,24 @@ namespace Player
         #region Movement Methods
         private void OnSprint(InputAction.CallbackContext obj)
         {
+            
+            // edge case, we can STOP sprinting mid-air, but cannot START sprinting mid-air
+            if (!_isGrounded)
+            {
+                // if we are trying to start sprinting mid-air, cache it as true
+                if (obj.performed)
+                {
+                    _cachedSprintState = true;
+                }
+                else
+                {
+                    _cachedSprintState = false;
+                }
+                _isSprinting = false;
+                return;
+            }
+            
             if(_lockedInput){ return; }
-            if (!_isGrounded) { return; }
             if (_isCrouching) { return; } // cannot sprint while crouching
             // only allow sprinting to change if we are grounded
             // regardless of whether we can sprint, we want to cache the sprint state for when we land
