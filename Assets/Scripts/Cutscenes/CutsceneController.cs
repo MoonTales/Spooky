@@ -1,28 +1,33 @@
+using System;
 using UnityEngine;
+using Types = System.Types;
 
-public class CutsceneController : MonoBehaviour
+namespace Cutscenes
 {
-
-    [SerializeField] private GameObject _cutsceneToPlay;
-
-    void Update()
+    public class CutsceneController : MonoBehaviour
     {
-        // Soon hookup to soething else
-        if (Input.GetKeyDown(KeyCode.T))
+
+        [SerializeField] private GameObject _cutsceneToPlay;
+
+        
+        private void Start()
         {
             PlayCutscene();
         }
         
-    }
-
-    private void PlayCutscene()
-    {
-        _cutsceneToPlay.SetActive(true);
         
-    }
+
+        private void PlayCutscene()
+        {
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
+            _cutsceneToPlay.SetActive(true);
+        
+        }
     
-    public void EndCutscene()
-    {
-        _cutsceneToPlay.SetActive(false);
+        public void EndCutscene()
+        {
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            _cutsceneToPlay.SetActive(false);
+        }
     }
 }

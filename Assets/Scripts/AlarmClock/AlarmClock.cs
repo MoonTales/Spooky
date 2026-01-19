@@ -8,8 +8,7 @@ public class AlarmClock : MonoBehaviour
     {
         //InvokeRepeating(nameof(PlayAlarm), 0f, 1f);
     }
-
-
+    
     private void PlayAlarm()
     {
         AudioManager.Instance.PlayPlayerWalkingMetal(1,0.2f,transform);

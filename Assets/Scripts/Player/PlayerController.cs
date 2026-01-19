@@ -42,6 +42,7 @@ namespace Player
         [SerializeField] private InputActionReference crouchAction;
         [SerializeField] private InputActionReference sprintAction;
         [SerializeField] private InputActionReference flashlightToggleAction;
+        [SerializeField] private GameObject[] ObjectsToDisableOnCutscene;
         
         [SerializeField] private Transform _cameraTransform;
         [SerializeField] private Transform head;
@@ -473,12 +474,21 @@ namespace Player
         {
             // Return to basic player controls
             _lockedInput = false;
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(true);
+            }
         }
         private void HandleCutsceneState()
         {
             // Disable player controls for cutscene
             _lockedInput = true;
             DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
+            // disable the head so its hidden
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
         }
 
         #region Helper Function
