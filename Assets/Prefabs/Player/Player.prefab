@@ -1209,6 +1209,9 @@ MonoBehaviour:
   crouchAction: {fileID: 7040659881675835329, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   sprintAction: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   flashlightToggleAction: {fileID: 7983514201798213319, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  ObjectsToDisableOnCutscene:
+  - {fileID: 5097885158666946118}
+  - {fileID: 5695208391225973946}
   _cameraTransform: {fileID: 2427465421472302248}
   head: {fileID: 1439800706131837371}
   cameraEffects: {fileID: 7827965959660100850}
@@ -1649,7 +1652,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8002930530365195001}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.026875362, y: -0.97229236, z: 0.1425363, w: 0.18332669}
+  m_LocalRotation: {x: 0.0046414225, y: -0.9865805, z: 0.028494395, w: 0.16070308}
   m_LocalPosition: {x: 0, y: 0.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1685,7 +1688,7 @@ MonoBehaviour:
     FieldOfView: 60.000004
     OrthographicSize: 5
     NearClipPlane: 0.3
-    FarClipPlane: 1000
+    FarClipPlane: 50
     Dutch: 0
     ModeOverride: 0
     PhysicalProperties:
@@ -1716,7 +1719,7 @@ MonoBehaviour:
   ReferenceFrame: 0
   RecenterTarget: 0
   PanAxis:
-    Value: -158.64436
+    Value: -161.49681
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -1726,7 +1729,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   TiltAxis:
-    Value: 16.680101
+    Value: 3.308711
     Center: 0
     Range: {x: -70, y: 70}
     Wrap: 0
