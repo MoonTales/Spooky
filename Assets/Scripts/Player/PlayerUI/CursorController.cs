@@ -30,6 +30,10 @@ public class CursorController : EventSubscriberBase
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 break;
+            case Types.GameState.Inspecting:
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                break;
         }
     }
 }

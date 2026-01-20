@@ -44,8 +44,8 @@ namespace Player
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnPlayerStateChanged += OnPlayerStateChanged,
-                () => EventBroadcaster.OnPlayerStateChanged -= OnPlayerStateChanged);
+            TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerStateChanged,
+                () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerStateChanged);
         }
         
         public void SearchForSpawnAnchor(string spawnPointID = "")

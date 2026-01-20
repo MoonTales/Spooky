@@ -39,6 +39,11 @@ namespace Player
             
         }
         
+        public void ResetAllStatsToDefault()
+        {
+            InitializeDefaultStats();
+        }
+        
         private void OnPlayerDamaged(float damageAmount)
         {
             UpdateCurrentHealth(-damageAmount);

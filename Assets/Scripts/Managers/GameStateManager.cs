@@ -1,4 +1,5 @@
 using System;
+using Player;
 using UnityEngine;
 using Types = System.Types;
 
@@ -14,7 +15,6 @@ namespace Managers
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
         private Types.GameState _currentGameState = Types.GameState.MainMenu;
-
         public void Start()
         {
             // Initialize the game state
@@ -26,11 +26,30 @@ namespace Managers
             // Broadcast that the game has started
             EventBroadcaster.Broadcast_GameStarted();
         }
+        
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            // Example subscription to player health state changes
+            TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerHealthStateChanged,
+                () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerHealthStateChanged);
+        }
+
+        private void OnPlayerHealthStateChanged(Types.PlayerHealthState newhealthstate)
+        {
+            // check for a player death
+            if (newhealthstate == Types.PlayerHealthState.Dead)
+            {
+                // Handle what should happens when the player Dies
+                PlayerStats.Instance.ResetAllStatsToDefault();
+                SceneSwapper.Instance.SwapScene("Bedroom");
+            }
+        }
 
         protected void Update()
         {
             // small update to show how this would work
-            if(Input.GetKeyDown(KeyCode.P))
+            if(Input.GetKeyDown(KeyCode.X))
             {
                 DebugUtils.Log("Player Damaged Event Broadcasted with 10.0f damage");
                 EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f);

@@ -22,6 +22,7 @@ namespace System
             GameOver,
             Victory,
             Cutscene,
+            Inspecting
         }
 
         /// <summary>
@@ -94,7 +95,7 @@ namespace System
                     // Only broadcast if the state is actually changing (dont broadcast if it "changed" to the same state)
                     if (_playerHealthState != healthState)
                     {
-                        EventBroadcaster.Broadcast_OnPlayerStateChanged(healthState);
+                        EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(healthState);
                     }
                 }
                 _playerHealthState = healthState;
