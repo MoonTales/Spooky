@@ -1,11 +1,18 @@
 using UnityEngine;
+using System;
+using Types = System.Types;
 
 public class MainMenu : MonoBehaviour
 {
     public void Play()
     {
-        // i'm blanking on how to give the script access to sceneswapper cause rn its causing an error
-        //SceneSwapper.Instance.SwapScene("Cohen");
+        EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+        SceneSwapper.Instance.SwapScene("Bedroom");
+    }
+
+    public void Settings()
+    {
+        
     }
 
     public void Quit()
