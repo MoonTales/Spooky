@@ -81,7 +81,7 @@ namespace Managers
             }
             if (Input.GetKeyDown(KeyCode.P))
             {
-                SceneSwapper.Instance.SwapScene("SampleHorror");
+                SceneSwapper.Instance.SwapScene("FirstAiTest");
             }
             
             
