@@ -10,7 +10,7 @@ namespace Inspection
     ///
     
     // WIll soon inherit from the InteractableObject class / Interactable system Interface
-    public class InspectableObject : MonoBehaviour
+    public class InspectableObject : MonoBehaviour, IInteractable
     {
         
         [Header("Inspection Object Settings")]
@@ -19,15 +19,26 @@ namespace Inspection
         [SerializeField, Tooltip("A short description of the object shown during inspection")]
         private string objectDescription = "This is an inspectable object. You can provide a description here.";
         
-        public void OnInteract()
-        {
-            // Placeholder for future interaction system integration!!!
-            InspectionSystem.Instance.StartInspection(gameObject);
-        }
         
         
         // Getters
         public string GetObjectName() { return objectName; }
         public string GetObjectDescription() { return objectDescription; }
+        
+        // Interface Implementation
+        public bool CanInteract(Interactor interactor)
+        {
+            return true;
+        }
+
+        public void Interact(Interactor interactor)
+        {
+            InspectionSystem.Instance.StartInspection(gameObject);
+        }
+        
+        public string Prompt { get; }
+        public AudioClip HoverSfx { get; }
+        public AudioClip InteractSfx { get; }
+        public AudioClip DeniedSfx { get; }
     }
 }
