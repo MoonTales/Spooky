@@ -30,11 +30,13 @@ public class Interactor : MonoBehaviour
         interactable = null;
 
         Ray ray = new Ray(transform.position + raycastOffset, transform.forward);
+        Debug.DrawRay(transform.position + raycastOffset, transform.forward * castDistance, Color.red);
+
 
         if (Physics.Raycast(ray, out RaycastHit hitInfo, castDistance))
         {
-            interactable = hitInfo.collider.GetComponent<IInteractable>();
 
+            interactable = hitInfo.collider.GetComponentInParent<IInteractable>();
             return interactable != null;
         }
 
