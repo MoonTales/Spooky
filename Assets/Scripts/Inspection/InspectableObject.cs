@@ -19,10 +19,15 @@ namespace Inspection
         [SerializeField, Tooltip("A short description of the object shown during inspection")]
         private string objectDescription = "This is an inspectable object. You can provide a description here.";
         
-
         public void OnInteract()
         {
             // Placeholder for future interaction system integration!!!
+            InspectionSystem.Instance.StartInspection(gameObject);
         }
+        
+        
+        // Getters
+        public string GetObjectName() { return objectName; }
+        public string GetObjectDescription() { return objectDescription; }
     }
 }

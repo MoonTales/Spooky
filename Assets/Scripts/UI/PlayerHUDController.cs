@@ -34,6 +34,9 @@ namespace UI
                 case Types.GameState.MainMenu:
                     ShowHUD(false);
                     break;
+                case Types.GameState.Inspecting:
+                    ShowHUD(false);
+                    break;
             }
         }
     
