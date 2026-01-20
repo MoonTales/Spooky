@@ -24,6 +24,7 @@ public class AttractorAI : MonoBehaviour
 	#region InspectorVariables
 	[Header("Behaviours")]
 	public EnemyState defaultState = EnemyState.Stand;
+	private EnemyState currentState = EnemyState.Stand;
 
 	public enum AttractorType
 	{
@@ -66,8 +67,8 @@ public class AttractorAI : MonoBehaviour
 		public LayerMask obstacleLayer;
 		public Transform[] senseOrgans;
 		[Tooltip("Attractors detected by this sense will instead be clasified as not detected, " +
-			"while every Attractor in the targetLayer NOT detected by this sense is considered detected")]
-		public bool invertDetection = false;
+			"while every Attractor in the targetLayer NOT detected by this sense is considered detected (as of right now, this does nothing)")]
+		public bool invertDetection = false;  // finish this later
 	}
 
 	private Collider[] hitColliders;
@@ -94,6 +95,7 @@ public class AttractorAI : MonoBehaviour
 
 	void Start()
 	{
+		currentState = defaultState;
 		agent = GetComponent<NavMeshAgent>();
 		patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
 	}
@@ -103,7 +105,7 @@ public class AttractorAI : MonoBehaviour
 		Dictionary<AttractorType, List<Attractor>> tempAttractorDictionary = new Dictionary<AttractorType, List<Attractor>>();
 		foreach (EnemySense sense in senses)
 		{
-			foreach(Attractor attractor in DetectTarget(sense))
+			foreach(Attractor attractor in DetectTarget(sense, sense.invertDetection))
 			{
 				AttractorType tempAttractorType = attractor.GetComponent<Attractor>().attractorType;
 				// Try to get the existing value; if it exists, add to it
@@ -122,7 +124,7 @@ public class AttractorAI : MonoBehaviour
 		return tempAttractorDictionary;
 	}
 
-	List<Attractor> DetectTarget(EnemySense currentSense)
+	List<Attractor> DetectTarget(EnemySense currentSense, bool inverted)
 	{
 		List<Attractor> tempAttractorList = new List<Attractor>();
 		// For efficiency, check for all targets in range before fireing any raycasts
@@ -172,7 +174,7 @@ public class AttractorAI : MonoBehaviour
 				DrawCone(senseOrgan, sense);
 	}
 
-	void DrawCone(Transform organ, EnemySense sense)
+	void DrawCone(Transform organ, EnemySense sense) // Just for viewing in the inspector
 	{
 		Vector3 forward = organ.forward * sense.detectionRadius;
 		Vector3 right = Quaternion.Euler(0, sense.detectionAngle, 0) * forward;
@@ -186,40 +188,79 @@ public class AttractorAI : MonoBehaviour
 
 	void Update()
 	{
-		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);
+		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);  // this keeps the animation in sync with the enemy speed
 
 		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
 
+		bool tempCheck = false;
 		foreach (EnemyReactions reaction in behaviourHierarchy)
 		{
-			List<Attractor> tempAttractors = new List<Attractor>();
-			foreach(Attractor attractor in tempDetectedAttractors[reaction.attractorType])
+			if (reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState))
 			{
-				if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity)
+				Transform tempFocus = Player.PlayerManager.Instance.GetPlayer().transform; ;
+				float tempValue = -1;
+				List<Attractor> tempAttractors = new List<Attractor>();
+				if (tempDetectedAttractors.ContainsKey(reaction.attractorType))
 				{
-					tempAttractors.Add(attractor);
-				}
-			}
+					foreach (Attractor attractor in tempDetectedAttractors[reaction.attractorType])
+					{
+						if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity)
+						{
+							if (reaction.targetDetectedObject && (tempValue < 0 || (reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority &&
+								Vector3.Distance(transform.position, attractor.transform.position) > tempValue) || (!reaction.invertPriority &&
+								Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) || (!reaction.prioritizeDistanceInsteadOfIntensity
+								&& ((reaction.invertPriority && attractor.intensity < tempValue) || (!reaction.invertPriority && attractor.intensity > tempValue)))))
+							{
+								tempFocus = attractor.transform;
+							}
 
-			if (!reaction.targetDetectedObject && tempAttractors.Count > 0)
-			{
-				// currentFocus = ThePlayer (ask Cohen how to reference player position)
-				defaultState = reaction.stateChange;
+							tempAttractors.Add(attractor);
+						}
+					}
+				}
+
+				if (tempAttractors.Count > 0)
+				{
+					if (!reaction.targetDetectedObject)
+					{
+						currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+						currentState = reaction.stateChange;
+					}
+
+					else
+					{
+						currentFocus = tempFocus;
+						currentState = reaction.stateChange;
+					}
+
+					tempCheck = true;
+					break;
+				}
 			}
 		}
 
-		// Check if the agent has reached its destination and is not calculating a new path
-		if (defaultState == EnemyState.Wander && !agent.pathPending && agent.remainingDistance < 0.5f)
+		if (!tempCheck)
 		{
+			currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+			currentState = defaultState;
+		}
+
+		// Check if the agent has reached its destination and is not calculating a new path
+		if (currentState == EnemyState.Wander)
+		{
+			agent.speed = walkSpeed;
 			patrolTimer -= Time.deltaTime;
 			if (!agent.pathPending && agent.remainingDistance < 0.5f)
 				patrolTimer -= Time.deltaTime;
 			if (patrolTimer <= 0)
 			{
-				agent.speed = walkSpeed;
 				patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
 				SetNewRandomDestination();
 			}
+		}
+		else if (currentState == EnemyState.Stand)
+		{
+			agent.speed = 0;
 		}
 	}
 
