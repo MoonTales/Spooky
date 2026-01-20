@@ -2,21 +2,32 @@ using UnityEngine;
 
 public class Interactor : MonoBehaviour
 {
+    [SerializeField] private Camera playerCamera;
     [SerializeField] private float castDistance = 5f;
     [SerializeField] private Vector3 raycastOffset = new Vector3(0f, 0f, 0f);
     [SerializeField] private KeyCode interactKey = KeyCode.E;
 
+    private void Awake()
+    {
+        if (playerCamera == null)
+            playerCamera = Camera.main;
+    }
+
     private void Update()
     {
-        Vector3 origin = transform.position + raycastOffset;
-        Vector3 dir = transform.forward;
+        if (playerCamera == null) return;
+
+        Vector3 origin = playerCamera.transform.position;
+        Vector3 dir = playerCamera.transform.forward;
+
         Debug.DrawRay(origin, dir * castDistance, Color.red);
 
         if (Input.GetKeyDown(interactKey))
         {
-            if (TryGetInteractable(out IInteractable interactable))
+            if (Physics.Raycast(origin, dir, out RaycastHit hitInfo, castDistance))
             {
-                if (interactable.CanInteract(this))
+                var interactable = hitInfo.collider.GetComponentInParent<IInteractable>();
+                if (interactable != null && interactable.CanInteract(this))
                 {
                     interactable.Interact(this);
                 }
@@ -29,20 +40,4 @@ public class Interactor : MonoBehaviour
         }
     }
 
-    private bool TryGetInteractable(out IInteractable interactable)
-    {
-        interactable = null;
-
-        Ray ray = new Ray(transform.position + raycastOffset, transform.forward);
-
-
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, castDistance))
-        {
-
-            interactable = hitInfo.collider.GetComponentInParent<IInteractable>();
-            return interactable != null;
-        }
-
-        return false;
-    }
 }
