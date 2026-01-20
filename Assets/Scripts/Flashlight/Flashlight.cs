@@ -23,7 +23,7 @@ public class Flashlight : Singleton<Flashlight>
     [SerializeField] private string flickerTag = "Enemy";
     [Space(10)]
     [Header("Flicker Settings")]
-    [SerializeField] private float maxFlickerDistance = 15f;
+    [SerializeField] private float maxFlickerDistance = 45f;
     [Space(10)]
     [Header("Battery State Flicker Settings")]
     [SerializeField] private FlickerSettings highBatteryFlicker = new FlickerSettings 
