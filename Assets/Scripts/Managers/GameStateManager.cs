@@ -14,11 +14,11 @@ namespace Managers
         
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
-        private Types.GameState _currentGameState = Types.GameState.Gameplay;
+        private Types.GameState _currentGameState = Types.GameState.MainMenu;
         public void Start()
         {
             // Initialize the game state
-            _currentGameState = Types.GameState.Gameplay;
+            _currentGameState = Types.GameState.MainMenu;
             DebugUtils.LogSuccess("GameStateManager initialized. Current Game State: " + _currentGameState);
             
             // for now, we will assume the game starts
