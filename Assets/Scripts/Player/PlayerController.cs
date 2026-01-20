@@ -470,7 +470,7 @@ namespace Player
         #endregion
         
         
-        protected void OnGameStateChanged(Types.GameState newState)
+        private void OnGameStateChanged(Types.GameState newState)
         {
             DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
             switch (newState)
@@ -481,10 +481,30 @@ namespace Player
                 case Types.GameState.Cutscene:
                     HandleCutsceneState();
                     break;
+                case Types.GameState.MainMenu:
+                    HandleMainMenuState();
+                    break;
+                case Types.GameState.Inspecting:
+                    HandleInspectionState();
+                    break;
                 // handle other game states as needed
             }
         }
 
+        private void HandleMainMenuState()
+        {
+            _lockedInput = true;
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
+            
+            // check if the flashlight is on
+            if (Flashlight.Instance.IsFlashlightOn())
+            {
+                Flashlight.Instance.ToggleFlashlight();
+            }
+        }
         private void HandleGameplayState()
         {
             // Return to basic player controls
@@ -499,6 +519,24 @@ namespace Player
             // Disable player controls for cutscene
             _lockedInput = true;
             DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
+            // disable the head so its hidden
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
+            
+            // check if the flashlight is on
+            if (Flashlight.Instance.IsFlashlightOn())
+            {
+                Flashlight.Instance.ToggleFlashlight();
+            }
+            StopAllPlayerMovement();
+        }
+
+        private void HandleInspectionState()
+        {
+            // Disable player controls for cutscene
+            _lockedInput = true;
             // disable the head so its hidden
             for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
             {
@@ -529,6 +567,14 @@ namespace Player
         public float GetDistanceToPlayer(Vector3 position)
         {
             return Vector3.Distance(position, transform.position);
+        }
+
+        private void StopAllPlayerMovement()
+        {
+            _isCrouching = false;
+            _cachedSprintState = false;
+            _isSprinting = false;
+            _moveInput = Vector2.zero;
         }
         
         

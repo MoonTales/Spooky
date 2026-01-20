@@ -80,7 +80,7 @@ public class Flashlight : Singleton<Flashlight>
     
     
     // Internal Variables
-    private bool _isOn = false;
+    private bool _isOn = false; public bool IsFlashlightOn() { return _isOn; }
     private bool _isFlickering = false;
     // Since a flashlight may have multiple "Light" components (for different effects), we can store them in an array
     // this will allow us to directly control all light components of the flashlight

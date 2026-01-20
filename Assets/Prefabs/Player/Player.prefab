@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 4359177773572940207}
   - component: {fileID: 8443642557672143164}
   - component: {fileID: 4005487869713009722}
+  - component: {fileID: 7994138583487989620}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: HUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -102,6 +103,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &7994138583487989620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2912863827576420414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33672d98c0eaa314ab519a4dbaebe422, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3121199415946773160
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,7 +248,7 @@ GameObject:
   - component: {fileID: 1785507626789316241}
   - component: {fileID: 3760085159255034656}
   - component: {fileID: 8202205456049898850}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HEAD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -456,7 +469,7 @@ GameObject:
   - component: {fileID: 6782076492783333237}
   - component: {fileID: 7631466250035674179}
   - component: {fileID: 3189051729022828636}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -808,7 +821,7 @@ GameObject:
   - component: {fileID: 7998931715056197034}
   - component: {fileID: 4934242102484780253}
   - component: {fileID: 5390934513662991389}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1287,7 +1300,7 @@ GameObject:
   - component: {fileID: 7306379077085520357}
   - component: {fileID: 8925711710699288881}
   - component: {fileID: 7288442985599638863}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1688,7 +1701,7 @@ MonoBehaviour:
   Lens:
     FieldOfView: 60.000004
     OrthographicSize: 5
-    NearClipPlane: 0.3
+    NearClipPlane: 0.01
     FarClipPlane: 50
     Dutch: 0
     ModeOverride: 0
