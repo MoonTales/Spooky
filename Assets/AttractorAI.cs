@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
@@ -25,11 +26,13 @@ public class AttractorAI : MonoBehaviour
 	[Header("Behaviours")]
 	public EnemyState defaultState = EnemyState.Stand;
 	private EnemyState currentState = EnemyState.Stand;
+	private EnemyState nextState = EnemyState.Stand;
 
 	public enum AttractorType
 	{
 		visual,
-		audio
+		audio,
+		attackRange
 	}
 
 	[System.Serializable]
@@ -42,6 +45,9 @@ public class AttractorAI : MonoBehaviour
 		public float maxIntensity;
 		public List<EnemyState> stateRestriction;
 		public EnemyState stateChange;
+		[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
+			"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
+		public bool immediateStateTransition = true;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the player")]
@@ -56,6 +62,7 @@ public class AttractorAI : MonoBehaviour
 	public List<EnemyReactions> behaviourHierarchy;
 
 	private Transform currentFocus;
+	private Vector3 ghostPosition;
 
 
 	[System.Serializable]
@@ -79,9 +86,10 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private Animator animator;
 	[Tooltip("How fast is navmesh speed per walk animation speed, for syncing up animations")]
 	[SerializeField] private float walkSpdAnimMult;
+	[SerializeField] private float screamTime = 1;
 
 	[Header("WanderState")]
-	[SerializeField] private float walkSpeed;
+	[SerializeField] private float wanderSpeed;
 	[Tooltip("Maximum distance from current position that the enemy can choose to walk to")]
 	[SerializeField] private float patrolRadius;
 	[Tooltip("The shortest amount of time before the enemy decides to move to a new location")]
@@ -90,12 +98,41 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float maxPatrolTimer;
 
 	private float patrolTimer;
-	
+
+	[Header("InvestigateState")]
+	[SerializeField] private float investigateSpeed;
+	[Tooltip("How long does the enemy continue to track the actual object's position while it is not being sensed before it targets its last known location")]
+	[SerializeField] private float permanenceTime = 0;
+	[Tooltip("How long does the enemy continue to stay in the investigate state while it is not sensing any objects")]
+	[SerializeField] private float giveUpTime = 0;
+
+	[Header("RushOverState")]
+	[SerializeField] private float rushOverSpeed;
+	[SerializeField] private float rushPermanenceTime = 0;
+	[SerializeField] private float rushGiveUpTime = 0;
+	[SerializeField] private bool screamBeforeRushOver = false;
+
+	[Header("ChaseState")]
+	[SerializeField] private float chaseSpeed;
+	[SerializeField] private float chasePermanenceTime = 0;
+	[SerializeField] private float chaseGiveUpTime = 0;
+	[SerializeField] private bool screamBeforeChase = false;
+	[SerializeField] private bool onlyScreamOnFirstChase = false;
+
+	private bool aboutToRushScream = true;
+	private bool aboutToChaseScream = true;
+	private bool noMoreChaseScream = false;
+	private bool finishedScream = false;
+
+	private float investigateTimer;
+
+
 	#endregion
 
 	void Start()
 	{
 		currentState = defaultState;
+		nextState = defaultState;
 		agent = GetComponent<NavMeshAgent>();
 		patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
 	}
@@ -190,6 +227,15 @@ public class AttractorAI : MonoBehaviour
 	{
 		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);  // this keeps the animation in sync with the enemy speed
 
+		if (!(currentState == EnemyState.RushOver))
+		{
+			aboutToRushScream = true;
+		}
+		if (!(currentState == EnemyState.Chase) && !onlyScreamOnFirstChase)
+		{
+			aboutToChaseScream = true;
+		}
+
 		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
 
 		bool tempCheck = false;
@@ -224,13 +270,17 @@ public class AttractorAI : MonoBehaviour
 					if (!reaction.targetDetectedObject)
 					{
 						currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
-						currentState = reaction.stateChange;
+						nextState = reaction.stateChange;
+						if (reaction.immediateStateTransition)
+							currentState = reaction.stateChange;
 					}
 
 					else
 					{
 						currentFocus = tempFocus;
-						currentState = reaction.stateChange;
+						nextState = reaction.stateChange;
+						if (reaction.immediateStateTransition)
+							currentState = reaction.stateChange;
 					}
 
 					tempCheck = true;
@@ -242,13 +292,14 @@ public class AttractorAI : MonoBehaviour
 		if (!tempCheck)
 		{
 			currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
-			currentState = defaultState;
+			nextState = defaultState;
 		}
 
 		// Check if the agent has reached its destination and is not calculating a new path
 		if (currentState == EnemyState.Wander)
 		{
-			agent.speed = walkSpeed;
+			currentState = nextState;
+			agent.speed = wanderSpeed;
 			patrolTimer -= Time.deltaTime;
 			if (!agent.pathPending && agent.remainingDistance < 0.5f)
 				patrolTimer -= Time.deltaTime;
@@ -260,8 +311,110 @@ public class AttractorAI : MonoBehaviour
 		}
 		else if (currentState == EnemyState.Stand)
 		{
+			currentState = nextState;
 			agent.speed = 0;
 		}
+		else if (currentState == EnemyState.Investigate)
+		{
+			if (currentState == nextState)
+			{
+				investigateTimer = 0;
+			}
+			else
+			{
+				investigateTimer += Time.deltaTime;
+			}
+
+			if (investigateTimer >= giveUpTime)
+			{
+				currentState = nextState;
+			}
+
+			if (investigateTimer <= permanenceTime)
+			{
+				ghostPosition = currentFocus.position;
+			}
+
+			agent.speed = investigateSpeed;
+			agent.SetDestination(ghostPosition);
+		}
+		else if (currentState == EnemyState.RushOver)
+		{
+			if (screamBeforeRushOver && aboutToRushScream)
+			{
+				aboutToRushScream = false;
+				finishedScream = false;
+				StartCoroutine(ScreamRoutine());
+			}
+
+			if (currentState == nextState)
+			{
+				investigateTimer = 0;
+			}
+			else
+			{
+				investigateTimer += Time.deltaTime;
+			}
+
+			if (investigateTimer >= rushGiveUpTime)
+			{
+				currentState = nextState;
+			}
+
+			if (investigateTimer <= rushPermanenceTime)
+			{
+				ghostPosition = currentFocus.position;
+			}
+
+			if (finishedScream)
+			{
+				agent.speed = rushOverSpeed;
+				agent.SetDestination(ghostPosition);
+			}
+		}
+		else if (currentState == EnemyState.Chase)
+		{
+			if (screamBeforeChase && aboutToChaseScream)
+			{
+				aboutToChaseScream = false;
+				finishedScream = false;
+				StartCoroutine(ScreamRoutine());
+			}
+
+			if (currentState == nextState)
+			{
+				investigateTimer = 0;
+			}
+			else
+			{
+				investigateTimer += Time.deltaTime;
+			}
+
+			if (investigateTimer >= chaseGiveUpTime)
+			{
+				currentState = nextState;
+			}
+
+			if (investigateTimer <= chasePermanenceTime)
+			{
+				ghostPosition = currentFocus.position;
+			}
+
+			if (finishedScream)
+			{
+				agent.speed = chaseSpeed;
+				agent.SetDestination(ghostPosition);
+			}
+		}
+	}
+
+	IEnumerator ScreamRoutine()
+	{
+		animator.SetBool("Screaming", true);
+		agent.speed = 0;
+		yield return new WaitForSeconds(screamTime);
+		animator.SetBool("Screaming", false);
+		finishedScream = true;
 	}
 
 	private void SetNewRandomDestination()
