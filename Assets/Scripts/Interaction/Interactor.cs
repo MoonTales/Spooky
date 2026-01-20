@@ -4,7 +4,6 @@ public class Interactor : MonoBehaviour
 {
     [SerializeField] private Camera playerCamera;
     [SerializeField] private float castDistance = 5f;
-    [SerializeField] private Vector3 raycastOffset = new Vector3(0f, 0f, 0f);
     [SerializeField] private KeyCode interactKey = KeyCode.E;
 
     private void Awake()
