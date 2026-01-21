@@ -212,12 +212,6 @@ namespace Player
             _currentSpeed = walkSpeed;
 
         }
-        protected override void RegisterSubscriptions()
-        {
-            base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
-                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
-        }
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -478,7 +472,7 @@ namespace Player
         #endregion
         
         
-        private void OnGameStateChanged(Types.GameState newState)
+        protected override void OnGameStateChanged(Types.GameState newState)
         {
             DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
             switch (newState)

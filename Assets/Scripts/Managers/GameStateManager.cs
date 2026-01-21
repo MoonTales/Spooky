@@ -15,6 +15,7 @@ namespace Managers
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
         private Types.GameState _currentGameState = Types.GameState.MainMenu;
+        private int _currentWorldClockHour = 0;
         public void Start()
         {
             // Initialize the game state
@@ -84,10 +85,27 @@ namespace Managers
                 SceneSwapper.Instance.SwapScene("FirstAiTest");
             }
             
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour += 1);
+            }
+            
             
         }
-        
-        
-        
+
+
+        protected override void OnGameStateChanged(Types.GameState newState)
+        {
+            
+            // we need to watch for a few edge cases
+            //1. If we go from MainMenu -> Gameplay, we know the game has started
+            if (_currentGameState == Types.GameState.MainMenu && newState == Types.GameState.Gameplay)
+            {
+                EventBroadcaster.Broadcast_GameStarted();
+            }
+            
+            
+            _currentGameState = newState;
+        }
     }
 }

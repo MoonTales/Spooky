@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Inspection
@@ -10,7 +11,7 @@ namespace Inspection
     ///
     
     // WIll soon inherit from the InteractableObject class / Interactable system Interface
-    public class InspectableObject : MonoBehaviour, IInteractable
+    public class InspectableObject : EventSubscriberBase, IInteractable
     {
         
         [Header("Inspection Object Settings")]
@@ -35,7 +36,13 @@ namespace Inspection
         {
             InspectionSystem.Instance.StartInspection(gameObject);
         }
-        
+
+        protected override void OnWorldClockTicked(int newHour)
+        {
+            base.OnWorldClockTicked(newHour);
+            DebugUtils.Log($"InspectableObject '{objectName}' received World Clock Tick: {newHour}");
+        }
+
         public string Prompt { get; }
         public AudioClip HoverSfx { get; }
         public AudioClip InteractSfx { get; }

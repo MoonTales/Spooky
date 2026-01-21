@@ -5,16 +5,8 @@ using Types = System.Types;
 public class CursorController : EventSubscriberBase
 {
     
-    protected override void RegisterSubscriptions()
-    {
-        base.RegisterSubscriptions();
-        TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
-            () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
-    }
     
-    
-
-    private void OnGameStateChanged(Types.GameState newstate)
+    protected override void OnGameStateChanged(Types.GameState newstate)
     {
         switch (newstate)
         {
