@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Managers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -45,6 +46,8 @@ namespace System
             DebugUtils.LogSuccess($"[SceneSwapper] Scene loaded: {scene.name}");
             // after the scene has been loaded, we need to ensure the player is teleported to the correct location
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
+            // This is when we want to broadcast the world clock
+            EventBroadcaster.Broadcast_OnWorldClockHourChanged(GameStateManager.Instance.GetCurrentWorldClockHour());
         }
     }
 }
