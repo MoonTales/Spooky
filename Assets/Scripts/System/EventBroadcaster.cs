@@ -99,8 +99,6 @@ namespace System
         public static void Broadcast_OnPlayerDamaged(float damageAmount) { OnPlayerDamaged?.Invoke(damageAmount); }
         
         
-
-        
         public delegate void OnPlayerHealthStateChangedHandler(Types.PlayerHealthState newHealthState);
         public static event OnPlayerHealthStateChangedHandler OnPlayerHealthStateChanged;
         public static void Broadcast_OnPlayerHealthStateChanged(Types.PlayerHealthState newHealthState) { OnPlayerHealthStateChanged?.Invoke(newHealthState); }
@@ -114,5 +112,14 @@ namespace System
         public static event OnFlashlightHitEnemyHandler OnFlashlightHitEnemy;
         public static void Broadcast_OnFlashlightHitEnemy(GameObject enemy, bool isOnEnemy){ OnFlashlightHitEnemy?.Invoke(enemy, isOnEnemy); }
         //-------------------------------- End Activity Events --------------------------------//
+        
+        
+        
+        ///<summary>
+        /// World Clock Events
+        /// </summary>
+        public delegate void OnWorldClockHandler(int clockHour);
+        public static event OnWorldClockHandler OnWorldClockHourChanged;
+        public static void Broadcast_OnWorldClockHourChanged(int clockHour) { OnWorldClockHourChanged?.Invoke(clockHour);}
     }
 }

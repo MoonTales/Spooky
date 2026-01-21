@@ -115,6 +115,12 @@ namespace Player
 
             
         }
+        
+        // TESTING
+        protected override void OnGameStarted()
+        {
+            DebugUtils.LogSuccess("The game started!!");
+        }
 
         private void HandleStateDetection()
         {
@@ -211,12 +217,6 @@ namespace Player
             StartCoroutine(PlayFootstepSounds());
             _currentSpeed = walkSpeed;
 
-        }
-        protected override void RegisterSubscriptions()
-        {
-            base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
-                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
         }
         protected override void OnEnable()
         {
@@ -478,9 +478,8 @@ namespace Player
         #endregion
         
         
-        private void OnGameStateChanged(Types.GameState newState)
+        protected override void OnGameStateChanged(Types.GameState newState)
         {
-            DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
             switch (newState)
             {
                 case Types.GameState.Gameplay:
@@ -526,7 +525,6 @@ namespace Player
         {
             // Disable player controls for cutscene
             _lockedInput = true;
-            DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
             // disable the head so its hidden
             for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
             {
