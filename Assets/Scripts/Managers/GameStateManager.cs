@@ -15,7 +15,7 @@ namespace Managers
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
         private Types.GameState _currentGameState = Types.GameState.MainMenu;
-        private int _currentWorldClockHour = 0;
+        private int _currentWorldClockHour = 1; public int GetCurrentWorldClockHour() { return _currentWorldClockHour; }
         public void Start()
         {
             // Initialize the game state
@@ -98,6 +98,10 @@ namespace Managers
             if (_currentGameState == Types.GameState.MainMenu && newState == Types.GameState.Gameplay)
             {
                 EventBroadcaster.Broadcast_GameStarted();
+                // this also means we can broadcast the first WorldClock tick
+                DebugUtils.Log("Broadcasting Initial World Clock Hour Change: " + _currentWorldClockHour);
+                EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
+                
             }
             
             //2. If we EVER return to the main menu, we can consider that a game restart

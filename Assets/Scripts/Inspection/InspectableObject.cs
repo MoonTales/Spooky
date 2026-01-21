@@ -20,7 +20,11 @@ namespace Inspection
         [SerializeField, Tooltip("A short description of the object shown during inspection")]
         private string objectDescription = "This is an inspectable object. You can provide a description here.";
         
+        [SerializeField] private int requiredHour = -1; // -1 means no time restriction
         
+        // internal 
+        private MeshRenderer[] _meshRenderers;
+        private Collider[] _objColliders;
         
         // Getters
         public string GetObjectName() { return objectName; }
@@ -37,10 +41,39 @@ namespace Inspection
             InspectionSystem.Instance.StartInspection(gameObject);
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            
+            _meshRenderers = GetComponentsInChildren<MeshRenderer>();
+            _objColliders = GetComponentsInChildren<Collider>();
+        }
+
         protected override void OnWorldClockTicked(int newHour)
         {
-            base.OnWorldClockTicked(newHour);
             DebugUtils.Log($"InspectableObject '{objectName}' received World Clock Tick: {newHour}");
+
+            if (newHour >= requiredHour)
+            {
+                for (int i = 0; i < _meshRenderers.Length; i++)
+                {
+                    _meshRenderers[i].enabled = true;
+                }
+                for (int i = 0; i < _objColliders.Length; i++)
+                {
+                    _objColliders[i].enabled = true;
+                }
+            } else
+            {
+                for (int i = 0; i < _meshRenderers.Length; i++)
+                {
+                    _meshRenderers[i].enabled = false;
+                }
+                for (int i = 0; i < _objColliders.Length; i++)
+                {
+                    _objColliders[i].enabled = false;
+                }
+            }
         }
 
         public string Prompt { get; }
