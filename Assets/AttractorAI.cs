@@ -43,11 +43,13 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
-		public List<EnemyState> stateRestriction;
+		public List<EnemyState> stateRestriction = new List<EnemyState>();
 		public EnemyState stateChange;
 		[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
 			"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
 		public bool immediateStateTransition = true;
+		[Tooltip("Forces the new state to finish its buffer before changing to any other states")]
+		public bool forceStateBuffer = false;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the player")]
@@ -60,6 +62,7 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	public List<EnemyReactions> behaviourHierarchy;
+	private bool forceCurrentStateBuffer = false;
 
 	private Transform currentFocus;
 	private Vector3 ghostPosition;
@@ -121,11 +124,18 @@ public class AttractorAI : MonoBehaviour
 
 	private bool aboutToRushScream = true;
 	private bool aboutToChaseScream = true;
-	private bool noMoreChaseScream = false;
 	private bool finishedScream = false;
 
 	private float investigateTimer;
 
+	[Header("AttackState")]
+	[SerializeField] private float attackBufferTime = 0;
+	[SerializeField] private float attackSpeed = 0;
+	[SerializeField] private float attackTime = 0;
+	[SerializeField] private float attackCooldownTime = 0;
+
+	private bool aboutToAttack = true;
+	private bool finishedAttack = false;
 
 	#endregion
 
@@ -406,6 +416,14 @@ public class AttractorAI : MonoBehaviour
 				agent.SetDestination(ghostPosition);
 			}
 		}
+		else if (currentState == EnemyState.Attack)
+		{
+			// all this unfinished or whatever
+			if (aboutToAttack)
+			{
+				aboutToAttack = false;
+			}
+		}
 	}
 
 	IEnumerator ScreamRoutine()
@@ -414,6 +432,19 @@ public class AttractorAI : MonoBehaviour
 		agent.speed = 0;
 		yield return new WaitForSeconds(screamTime);
 		animator.SetBool("Screaming", false);
+		finishedScream = true;
+	}
+
+	IEnumerator AttackRoutine()
+	{
+		animator.SetBool("Attacking", true);
+		agent.speed = 0;
+		yield return new WaitForSeconds(attackBufferTime);
+		agent.speed = attackSpeed;
+		yield return new WaitForSeconds(attackTime);
+		agent.speed = 0;
+		yield return new WaitForSeconds(attackCooldownTime);
+		animator.SetBool("Attacking", false);
 		finishedScream = true;
 	}
 
