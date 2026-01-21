@@ -7,21 +7,16 @@ namespace UI
     public class PlayerHUDController : Singleton<PlayerHUDController>
     {
     
+        // Internal References to the HUD
         private Canvas _hudCanvas;
 
-        protected override void RegisterSubscriptions()
-        {
-            base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
-                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
-        }
-    
+        
         private void Start()
         {
             _hudCanvas = GetComponent<Canvas>();
         }
 
-        private void OnGameStateChanged(Types.GameState newstate)
+        protected override void OnGameStateChanged(Types.GameState newstate)
         {
             switch (newstate)
             {
@@ -46,3 +41,5 @@ namespace UI
         }
     }
 }
+
+

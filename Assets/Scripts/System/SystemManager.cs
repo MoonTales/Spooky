@@ -15,7 +15,6 @@ namespace System
         {
             base.Awake();
             CreateManagers();
-            DebugUtils.LogSuccess("All managers built successfully.");
         }
         
         /// <summary>
