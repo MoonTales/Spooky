@@ -20,12 +20,8 @@ namespace Managers
         {
             // Initialize the game state
             _currentGameState = Types.GameState.MainMenu;
-            DebugUtils.LogSuccess("GameStateManager initialized. Current Game State: " + _currentGameState);
-            
             // for now, we will assume the game starts
             EventBroadcaster.Broadcast_GameStateChanged(_currentGameState);
-            // Broadcast that the game has started
-            EventBroadcaster.Broadcast_GameStarted();
         }
         
         protected override void RegisterSubscriptions()
@@ -102,6 +98,12 @@ namespace Managers
             if (_currentGameState == Types.GameState.MainMenu && newState == Types.GameState.Gameplay)
             {
                 EventBroadcaster.Broadcast_GameStarted();
+            }
+            
+            //2. If we EVER return to the main menu, we can consider that a game restart
+            if (_currentGameState != Types.GameState.MainMenu && newState == Types.GameState.MainMenu)
+            {
+                EventBroadcaster.Broadcast_GameRestarted();
             }
             
             

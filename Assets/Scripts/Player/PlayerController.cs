@@ -115,6 +115,12 @@ namespace Player
 
             
         }
+        
+        // TESTING
+        protected override void OnGameStarted()
+        {
+            DebugUtils.LogSuccess("The game started!!");
+        }
 
         private void HandleStateDetection()
         {
@@ -474,7 +480,6 @@ namespace Player
         
         protected override void OnGameStateChanged(Types.GameState newState)
         {
-            DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
             switch (newState)
             {
                 case Types.GameState.Gameplay:
@@ -520,7 +525,6 @@ namespace Player
         {
             // Disable player controls for cutscene
             _lockedInput = true;
-            DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
             // disable the head so its hidden
             for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
             {

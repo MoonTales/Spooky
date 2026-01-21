@@ -70,7 +70,6 @@ namespace Player
                     if (_player != null)
                     {
                         TeleportPlayer(Anchor.gameObject.transform.position, Anchor.gameObject.transform.rotation);
-                        DebugUtils.LogSuccess("Player spawned at default spawn point: " + Anchor.GetSpawnPointID());
                         return;
                     }
                 }
@@ -138,7 +137,6 @@ namespace Player
 
             if (controller != null) {controller.enabled = true;}
 
-            DebugUtils.LogSuccess("Player teleported successfully.");
         }
 
         
