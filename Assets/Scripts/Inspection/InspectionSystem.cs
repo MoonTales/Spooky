@@ -32,6 +32,8 @@ public class InspectionSystem : Singleton<InspectionSystem>
     private bool isZooming = false;
     private Vector3 targetZoomPosition = Vector3.zero;
     
+    private LayerMask _cachedLayerMask;
+    
     void Start()
     {
         // Get the pan/tilt component from the Cinemachine camera (which is on the player)
@@ -97,7 +99,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
         // Parent to inspection point so it follows camera
         _currentInspectedObject.transform.SetParent(inspectionPoint);
         
-        // Initialize target rotation to current rotation
+        //TODO: Initialize target zoom rotation to current rotation
         
         // Set inspecting flag
         _isInspecting = true;
@@ -109,7 +111,12 @@ public class InspectionSystem : Singleton<InspectionSystem>
             panTilt.enabled = false;
         }
         EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Inspecting);
+        
+        // we need to do this to all child layers as well
+        _cachedLayerMask = _currentInspectedObject.layer;
+        SetLayerRecursively(_currentInspectedObject, LayerMask.NameToLayer("Inspection"));
     }
+    
     
     public void EndInspection()
     {
@@ -119,9 +126,11 @@ public class InspectionSystem : Singleton<InspectionSystem>
         // Start the exit transition
         _isExitingInspection = true;
     
-        // Lock and hide cursor again
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        _isExitingInspection = true;
+        SetLayerRecursively(_currentInspectedObject, _cachedLayerMask);
+        
+        // reset the target zoom position
+        targetZoomPosition = _currentInspectedObject.transform.localPosition;
     }
     
     private void HandleInspection()
@@ -237,6 +246,17 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 panTilt.enabled = true;
             }
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+        }
+    }
+    
+    // This dosent actually work correctly for some reason!! :)
+    // some stuff just isnt visible
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
         }
     }
 }

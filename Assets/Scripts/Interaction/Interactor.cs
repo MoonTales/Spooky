@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 
 public class Interactor : MonoBehaviour
 {
     [SerializeField] private Camera playerCamera;
-    [SerializeField] private float castDistance = 5f;
-    [SerializeField] private KeyCode interactKey = KeyCode.E;
+    [SerializeField] private float castDistance = 2f;
+    [SerializeField] private KeyCode interactKey = KeyCode.F;
 
     private void Awake()
     {
@@ -12,6 +13,7 @@ public class Interactor : MonoBehaviour
             playerCamera = Camera.main;
     }
 
+    
     private void Update()
     {
         if (playerCamera == null) return;
