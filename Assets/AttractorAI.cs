@@ -43,11 +43,15 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
-		public List<EnemyState> stateRestriction;
+		public List<EnemyState> stateRestriction = new List<EnemyState>();
 		public EnemyState stateChange;
 		[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
 			"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
 		public bool immediateStateTransition = true;
+		[Tooltip("Forces the new state to finish its buffer before changing to any other states")]
+		public bool forceStateBuffer = false;
+		[Tooltip("Forces the new state to skip its buffer when changing to any other states")]
+		public bool forceSkipStateBuffer = false;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the player")]
@@ -60,8 +64,13 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	public List<EnemyReactions> behaviourHierarchy;
+	private bool forceCurrentStateBuffer = false;
+	private bool awaitingStateWithForcedBuffer = false;
+	private bool forceSkipCurrentStateBuffer = false;
+	private bool awaitingStateWithSkippedBuffer = false;
 
 	private Transform currentFocus;
+	private Transform nextFocus;
 	private Vector3 ghostPosition;
 
 
@@ -87,6 +96,7 @@ public class AttractorAI : MonoBehaviour
 	[Tooltip("How fast is navmesh speed per walk animation speed, for syncing up animations")]
 	[SerializeField] private float walkSpdAnimMult;
 	[SerializeField] private float screamTime = 1;
+	[SerializeField] private Collider attackBox;
 
 	[Header("WanderState")]
 	[SerializeField] private float wanderSpeed;
@@ -121,16 +131,24 @@ public class AttractorAI : MonoBehaviour
 
 	private bool aboutToRushScream = true;
 	private bool aboutToChaseScream = true;
-	private bool noMoreChaseScream = false;
 	private bool finishedScream = false;
 
 	private float investigateTimer;
 
+	[Header("AttackState")]
+	[SerializeField] private float attackBufferTime = 0;
+	[SerializeField] private float attackSpeed = 0;
+	[SerializeField] private float attackTime = 0;
+	[SerializeField] private float attackCooldownTime = 0;
+
+	private bool aboutToAttack = true;
+	private bool finishedAttack = false;
 
 	#endregion
 
 	void Start()
 	{
+		currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
 		currentState = defaultState;
 		nextState = defaultState;
 		agent = GetComponent<NavMeshAgent>();
@@ -269,19 +287,38 @@ public class AttractorAI : MonoBehaviour
 				{
 					if (!reaction.targetDetectedObject)
 					{
-						currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
-						nextState = reaction.stateChange;
-						if (reaction.immediateStateTransition)
-							currentState = reaction.stateChange;
+						nextFocus = Player.PlayerManager.Instance.GetPlayer().transform;
 					}
-
 					else
 					{
-						currentFocus = tempFocus;
-						nextState = reaction.stateChange;
-						if (reaction.immediateStateTransition)
-							currentState = reaction.stateChange;
+						nextFocus = tempFocus;
 					}
+
+					nextState = reaction.stateChange;
+					if ((reaction.immediateStateTransition || forceSkipCurrentStateBuffer) && !forceCurrentStateBuffer)
+					{
+						if (awaitingStateWithForcedBuffer)
+							forceCurrentStateBuffer = true;
+						else
+							forceCurrentStateBuffer = false;
+
+						if (awaitingStateWithSkippedBuffer)
+							forceSkipCurrentStateBuffer = true;
+						else
+							forceSkipCurrentStateBuffer = false;
+
+						currentFocus = nextFocus;
+						currentState = reaction.stateChange;
+					}
+					if (reaction.forceStateBuffer)
+						awaitingStateWithForcedBuffer = true;
+					else
+						awaitingStateWithForcedBuffer = false;
+
+					if (reaction.forceSkipStateBuffer)
+						awaitingStateWithSkippedBuffer = true;
+					else
+						awaitingStateWithSkippedBuffer = false;
 
 					tempCheck = true;
 					break;
@@ -291,13 +328,25 @@ public class AttractorAI : MonoBehaviour
 
 		if (!tempCheck)
 		{
-			currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+			nextFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+			awaitingStateWithForcedBuffer = false;
+			awaitingStateWithSkippedBuffer = false;
 			nextState = defaultState;
 		}
 
 		// Check if the agent has reached its destination and is not calculating a new path
 		if (currentState == EnemyState.Wander)
 		{
+			if (awaitingStateWithForcedBuffer)
+				forceCurrentStateBuffer = true;
+			else
+				forceCurrentStateBuffer = false;
+
+			if (awaitingStateWithSkippedBuffer)
+				forceSkipCurrentStateBuffer = true;
+			else
+				forceSkipCurrentStateBuffer = false;
+			currentFocus = nextFocus;
 			currentState = nextState;
 			agent.speed = wanderSpeed;
 			patrolTimer -= Time.deltaTime;
@@ -311,6 +360,16 @@ public class AttractorAI : MonoBehaviour
 		}
 		else if (currentState == EnemyState.Stand)
 		{
+			if (awaitingStateWithForcedBuffer)
+				forceCurrentStateBuffer = true;
+			else
+				forceCurrentStateBuffer = false;
+
+			if (awaitingStateWithSkippedBuffer)
+				forceSkipCurrentStateBuffer = true;
+			else
+				forceSkipCurrentStateBuffer = false;
+			currentFocus = nextFocus;
 			currentState = nextState;
 			agent.speed = 0;
 		}
@@ -327,6 +386,16 @@ public class AttractorAI : MonoBehaviour
 
 			if (investigateTimer >= giveUpTime)
 			{
+				if (awaitingStateWithForcedBuffer)
+					forceCurrentStateBuffer = true;
+				else
+					forceCurrentStateBuffer = false;
+
+				if (awaitingStateWithSkippedBuffer)
+					forceSkipCurrentStateBuffer = true;
+				else
+					forceSkipCurrentStateBuffer = false;
+				currentFocus = nextFocus;
 				currentState = nextState;
 			}
 
@@ -358,6 +427,16 @@ public class AttractorAI : MonoBehaviour
 
 			if (investigateTimer >= rushGiveUpTime)
 			{
+				if (awaitingStateWithForcedBuffer)
+					forceCurrentStateBuffer = true;
+				else
+					forceCurrentStateBuffer = false;
+
+				if (awaitingStateWithSkippedBuffer)
+					forceSkipCurrentStateBuffer = true;
+				else
+					forceSkipCurrentStateBuffer = false;
+				currentFocus = nextFocus;
 				currentState = nextState;
 			}
 
@@ -392,6 +471,16 @@ public class AttractorAI : MonoBehaviour
 
 			if (investigateTimer >= chaseGiveUpTime)
 			{
+				if (awaitingStateWithForcedBuffer)
+					forceCurrentStateBuffer = true;
+				else
+					forceCurrentStateBuffer = false;
+
+				if (awaitingStateWithSkippedBuffer)
+					forceSkipCurrentStateBuffer = true;
+				else
+					forceSkipCurrentStateBuffer = false;
+				currentFocus = nextFocus;
 				currentState = nextState;
 			}
 
@@ -406,6 +495,41 @@ public class AttractorAI : MonoBehaviour
 				agent.SetDestination(ghostPosition);
 			}
 		}
+		else if (currentState == EnemyState.Attack)
+		{
+			// all this unfinished or whatever
+			if (aboutToAttack)
+			{
+				aboutToAttack = false;
+				finishedAttack = false;
+				StartCoroutine(AttackRoutine());
+			}
+
+			if (finishedAttack)
+			{
+				if (awaitingStateWithForcedBuffer)
+					forceCurrentStateBuffer = true;
+				else
+					forceCurrentStateBuffer = false;
+
+				if (awaitingStateWithSkippedBuffer)
+					forceSkipCurrentStateBuffer = true;
+				else
+					forceSkipCurrentStateBuffer = false;
+
+				aboutToAttack = true;
+				if (!(nextState == EnemyState.Attack || nextState == EnemyState.Chase))
+				{
+					awaitingStateWithForcedBuffer = false;
+					forceCurrentStateBuffer = false;
+					awaitingStateWithSkippedBuffer = false;
+					forceSkipCurrentStateBuffer = false;
+					currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+					nextState = EnemyState.Chase;
+				}
+				currentState = nextState;
+			}
+		}
 	}
 
 	IEnumerator ScreamRoutine()
@@ -415,6 +539,20 @@ public class AttractorAI : MonoBehaviour
 		yield return new WaitForSeconds(screamTime);
 		animator.SetBool("Screaming", false);
 		finishedScream = true;
+	}
+
+	IEnumerator AttackRoutine()
+	{
+		attackBox.enabled = true;
+		animator.SetBool("Attacking", true);
+		agent.speed = 0;
+		yield return new WaitForSeconds(attackBufferTime);
+		agent.speed = attackSpeed;
+		yield return new WaitForSeconds(attackTime);
+		agent.speed = 0;
+		yield return new WaitForSeconds(attackCooldownTime);
+		animator.SetBool("Attacking", false);
+		finishedAttack = true;
 	}
 
 	private void SetNewRandomDestination()
