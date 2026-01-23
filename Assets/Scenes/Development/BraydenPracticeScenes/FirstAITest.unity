@@ -4512,7 +4512,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &409075971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8126,7 +8126,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 757001241}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -9695,7 +9695,7 @@ NavMeshAgent:
   m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 200
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 0
   m_AutoRepath: 1
@@ -9722,9 +9722,6 @@ MonoBehaviour:
     maxIntensity: 10
     stateRestriction: 04000000
     stateChange: 5
-    immediateStateTransition: 1
-    forceStateBuffer: 1
-    forceSkipStateBuffer: 0
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
@@ -9733,9 +9730,6 @@ MonoBehaviour:
     maxIntensity: 25
     stateRestriction: 
     stateChange: 4
-    immediateStateTransition: 1
-    forceStateBuffer: 0
-    forceSkipStateBuffer: 0
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
@@ -9744,9 +9738,6 @@ MonoBehaviour:
     maxIntensity: 12
     stateRestriction: 
     stateChange: 3
-    immediateStateTransition: 0
-    forceStateBuffer: 0
-    forceSkipStateBuffer: 0
     targetDetectedObject: 1
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
@@ -9755,9 +9746,6 @@ MonoBehaviour:
     maxIntensity: 15
     stateRestriction: 
     stateChange: 3
-    immediateStateTransition: 0
-    forceStateBuffer: 0
-    forceSkipStateBuffer: 0
     targetDetectedObject: 1
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
@@ -9766,9 +9754,6 @@ MonoBehaviour:
     maxIntensity: 4
     stateRestriction: 
     stateChange: 2
-    immediateStateTransition: 0
-    forceStateBuffer: 0
-    forceSkipStateBuffer: 1
     targetDetectedObject: 1
     prioritizeDistanceInsteadOfIntensity: 1
     invertPriority: 0
@@ -9777,9 +9762,6 @@ MonoBehaviour:
     maxIntensity: 6
     stateRestriction: 
     stateChange: 2
-    immediateStateTransition: 0
-    forceStateBuffer: 0
-    forceSkipStateBuffer: 1
     targetDetectedObject: 1
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
@@ -9841,6 +9823,9 @@ MonoBehaviour:
   attackSpeed: 5
   attackTime: 0.57
   attackCooldownTime: 0.5
+  attackRevertState: 4
+  attackRevertFocus: {fileID: 0}
+  attackRevertPriority: 1
 --- !u!4 &980615169 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9075323661051627761, guid: e0e4a5936d8d4974da797f37df1dc764, type: 3}
@@ -10038,7 +10023,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1068887588}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -11026,7 +11011,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ecd5fc681cf3fd4db28d5a7a28d4b31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageAmount: 45
+  damageAmount: 10
 --- !u!54 &1291163960
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -13754,7 +13739,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1461769440}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -18527,7 +18512,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1866482250}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}

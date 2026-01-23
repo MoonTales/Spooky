@@ -45,13 +45,13 @@ public class AttractorAI : MonoBehaviour
 		public float maxIntensity;
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 		public EnemyState stateChange;
-		[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
-			"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
-		public bool immediateStateTransition = true;
-		[Tooltip("Forces the new state to finish its buffer before changing to any other states")]
-		public bool forceStateBuffer = false;
-		[Tooltip("Forces the new state to skip its buffer when changing to any other states")]
-		public bool forceSkipStateBuffer = false;
+		//[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
+			//"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
+		//public bool immediateStateTransition = true;
+		//[Tooltip("Forces the new state to finish its buffer before changing to any other states")]
+		//public bool forceStateBuffer = false;
+		//[Tooltip("Forces the new state to skip its buffer when changing to any other states")]
+		//public bool forceSkipStateBuffer = false;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the player")]
@@ -72,7 +72,9 @@ public class AttractorAI : MonoBehaviour
 	private Transform currentFocus;
 	private Transform nextFocus;
 	private Vector3 ghostPosition;
-
+	private int currentStatePriority;
+	private int nextStatePriority;
+	private int lowestPriority;
 
 	[System.Serializable]
 	public class EnemySense
@@ -141,6 +143,10 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float attackTime = 0;
 	[SerializeField] private float attackCooldownTime = 0;
 
+	public EnemyState attackRevertState;
+	public Transform attackRevertFocus;
+	public int attackRevertPriority;
+
 	private bool aboutToAttack = true;
 	private bool finishedAttack = false;
 
@@ -151,6 +157,8 @@ public class AttractorAI : MonoBehaviour
 		currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
 		currentState = defaultState;
 		nextState = defaultState;
+		lowestPriority = behaviourHierarchy.Count;
+		currentStatePriority = lowestPriority;
 		agent = GetComponent<NavMeshAgent>();
 		patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
 	}
@@ -257,6 +265,7 @@ public class AttractorAI : MonoBehaviour
 		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
 
 		bool tempCheck = false;
+		int tempPriority = 0;
 		foreach (EnemyReactions reaction in behaviourHierarchy)
 		{
 			if (reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState))
@@ -294,60 +303,35 @@ public class AttractorAI : MonoBehaviour
 						nextFocus = tempFocus;
 					}
 
+					nextStatePriority = tempPriority;
 					nextState = reaction.stateChange;
-					if ((reaction.immediateStateTransition || forceSkipCurrentStateBuffer) && !forceCurrentStateBuffer)
+					if (nextStatePriority < currentStatePriority)
 					{
-						if (awaitingStateWithForcedBuffer)
-							forceCurrentStateBuffer = true;
-						else
-							forceCurrentStateBuffer = false;
-
-						if (awaitingStateWithSkippedBuffer)
-							forceSkipCurrentStateBuffer = true;
-						else
-							forceSkipCurrentStateBuffer = false;
-
 						currentFocus = nextFocus;
-						currentState = reaction.stateChange;
+						currentState = nextState;
+						currentStatePriority = nextStatePriority;
 					}
-					if (reaction.forceStateBuffer)
-						awaitingStateWithForcedBuffer = true;
-					else
-						awaitingStateWithForcedBuffer = false;
-
-					if (reaction.forceSkipStateBuffer)
-						awaitingStateWithSkippedBuffer = true;
-					else
-						awaitingStateWithSkippedBuffer = false;
 
 					tempCheck = true;
 					break;
 				}
 			}
+			tempPriority++;
 		}
 
 		if (!tempCheck)
 		{
 			nextFocus = Player.PlayerManager.Instance.GetPlayer().transform;
-			awaitingStateWithForcedBuffer = false;
-			awaitingStateWithSkippedBuffer = false;
+			nextStatePriority = lowestPriority;
 			nextState = defaultState;
 		}
 
 		// Check if the agent has reached its destination and is not calculating a new path
 		if (currentState == EnemyState.Wander)
 		{
-			if (awaitingStateWithForcedBuffer)
-				forceCurrentStateBuffer = true;
-			else
-				forceCurrentStateBuffer = false;
-
-			if (awaitingStateWithSkippedBuffer)
-				forceSkipCurrentStateBuffer = true;
-			else
-				forceSkipCurrentStateBuffer = false;
 			currentFocus = nextFocus;
 			currentState = nextState;
+			currentStatePriority = nextStatePriority;
 			agent.speed = wanderSpeed;
 			patrolTimer -= Time.deltaTime;
 			if (!agent.pathPending && agent.remainingDistance < 0.5f)
@@ -360,17 +344,9 @@ public class AttractorAI : MonoBehaviour
 		}
 		else if (currentState == EnemyState.Stand)
 		{
-			if (awaitingStateWithForcedBuffer)
-				forceCurrentStateBuffer = true;
-			else
-				forceCurrentStateBuffer = false;
-
-			if (awaitingStateWithSkippedBuffer)
-				forceSkipCurrentStateBuffer = true;
-			else
-				forceSkipCurrentStateBuffer = false;
 			currentFocus = nextFocus;
 			currentState = nextState;
+			currentStatePriority = nextStatePriority;
 			agent.speed = 0;
 		}
 		else if (currentState == EnemyState.Investigate)
@@ -386,17 +362,9 @@ public class AttractorAI : MonoBehaviour
 
 			if (investigateTimer >= giveUpTime)
 			{
-				if (awaitingStateWithForcedBuffer)
-					forceCurrentStateBuffer = true;
-				else
-					forceCurrentStateBuffer = false;
-
-				if (awaitingStateWithSkippedBuffer)
-					forceSkipCurrentStateBuffer = true;
-				else
-					forceSkipCurrentStateBuffer = false;
 				currentFocus = nextFocus;
 				currentState = nextState;
+				currentStatePriority = nextStatePriority;
 			}
 
 			if (investigateTimer <= permanenceTime)
@@ -404,8 +372,10 @@ public class AttractorAI : MonoBehaviour
 				ghostPosition = currentFocus.position;
 			}
 
+			
 			agent.speed = investigateSpeed;
-			agent.SetDestination(ghostPosition);
+			if (Vector3.Distance(transform.position, ghostPosition) > 1)
+				agent.SetDestination(ghostPosition);
 		}
 		else if (currentState == EnemyState.RushOver)
 		{
@@ -427,17 +397,9 @@ public class AttractorAI : MonoBehaviour
 
 			if (investigateTimer >= rushGiveUpTime)
 			{
-				if (awaitingStateWithForcedBuffer)
-					forceCurrentStateBuffer = true;
-				else
-					forceCurrentStateBuffer = false;
-
-				if (awaitingStateWithSkippedBuffer)
-					forceSkipCurrentStateBuffer = true;
-				else
-					forceSkipCurrentStateBuffer = false;
 				currentFocus = nextFocus;
 				currentState = nextState;
+				currentStatePriority = nextStatePriority;
 			}
 
 			if (investigateTimer <= rushPermanenceTime)
@@ -448,7 +410,8 @@ public class AttractorAI : MonoBehaviour
 			if (finishedScream)
 			{
 				agent.speed = rushOverSpeed;
-				agent.SetDestination(ghostPosition);
+				if (Vector3.Distance(transform.position, ghostPosition) > 1)
+					agent.SetDestination(ghostPosition);
 			}
 		}
 		else if (currentState == EnemyState.Chase)
@@ -471,17 +434,9 @@ public class AttractorAI : MonoBehaviour
 
 			if (investigateTimer >= chaseGiveUpTime)
 			{
-				if (awaitingStateWithForcedBuffer)
-					forceCurrentStateBuffer = true;
-				else
-					forceCurrentStateBuffer = false;
-
-				if (awaitingStateWithSkippedBuffer)
-					forceSkipCurrentStateBuffer = true;
-				else
-					forceSkipCurrentStateBuffer = false;
 				currentFocus = nextFocus;
 				currentState = nextState;
+				currentStatePriority = nextStatePriority;
 			}
 
 			if (investigateTimer <= chasePermanenceTime)
@@ -492,7 +447,8 @@ public class AttractorAI : MonoBehaviour
 			if (finishedScream)
 			{
 				agent.speed = chaseSpeed;
-				agent.SetDestination(ghostPosition);
+				if (Vector3.Distance(transform.position, ghostPosition) > 1)
+					agent.SetDestination(ghostPosition);
 			}
 		}
 		else if (currentState == EnemyState.Attack)
@@ -507,27 +463,16 @@ public class AttractorAI : MonoBehaviour
 
 			if (finishedAttack)
 			{
-				if (awaitingStateWithForcedBuffer)
-					forceCurrentStateBuffer = true;
-				else
-					forceCurrentStateBuffer = false;
-
-				if (awaitingStateWithSkippedBuffer)
-					forceSkipCurrentStateBuffer = true;
-				else
-					forceSkipCurrentStateBuffer = false;
-
 				aboutToAttack = true;
-				if (!(nextState == EnemyState.Attack || nextState == EnemyState.Chase))
+				if (!(nextState == EnemyState.Attack))
 				{
-					awaitingStateWithForcedBuffer = false;
-					forceCurrentStateBuffer = false;
-					awaitingStateWithSkippedBuffer = false;
-					forceSkipCurrentStateBuffer = false;
-					currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
-					nextState = EnemyState.Chase;
+					nextFocus = attackRevertFocus == null ? Player.PlayerManager.Instance.GetPlayer().transform : attackRevertFocus;
+					nextState = attackRevertState;
+					nextStatePriority = attackRevertPriority;
 				}
+				currentFocus = nextFocus;
 				currentState = nextState;
+				currentStatePriority = nextStatePriority;
 			}
 		}
 	}
