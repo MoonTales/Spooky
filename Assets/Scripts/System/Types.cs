@@ -29,11 +29,10 @@ namespace System
         /// an Enum representing the different weather states
         /// </summary>
         [Serializable]
-        public enum WeatherState
+        public enum WorldLocation
         {
-            Clear,
-            Rain,
-            Snow,
+            Bedroom,
+            Nightmare
         }
         
         /* ------------------------ System Types ------------------------ */

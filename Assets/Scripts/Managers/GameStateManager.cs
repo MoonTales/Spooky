@@ -71,11 +71,6 @@ namespace Managers
             {
                 SceneSwapper.Instance.SwapScene("Bedroom");
             }
-
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                SceneSwapper.Instance.SwapScene("Cohen");
-            }
             if (Input.GetKeyDown(KeyCode.P))
             {
                 SceneSwapper.Instance.SwapScene("FirstAiTest");
