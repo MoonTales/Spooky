@@ -37,7 +37,7 @@ namespace System
     {
         // List of subscription actions
         private readonly List<Action> unsubscribeActions = new();
-        protected bool BConnectToGlobalEvents = false;
+        protected bool BConnectToGlobalEvents = true;
 
         // virtual function used by child classes to track their subscriptions
         // these should be called exclusively within the RegisterSubscriptions method
@@ -52,14 +52,24 @@ namespace System
         protected virtual void RegisterSubscriptions()
         {
             if (!BConnectToGlobalEvents) { return; }
+            // Core system functions
             TrackSubscription(() => EventBroadcaster.OnGameStarted += OnGameStarted,
                 () => EventBroadcaster.OnGameStarted -= OnGameStarted);
             TrackSubscription(() => EventBroadcaster.OnGameInitialized += OnGameInitialized,
                 () => EventBroadcaster.OnGameInitialized -= OnGameInitialized);
             TrackSubscription(() => EventBroadcaster.OnGameRestarted += OnGameRestarted,
                 () => EventBroadcaster.OnGameRestarted -= OnGameRestarted);
+            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
+                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
+            
+            // World Clock
+            TrackSubscription(() => EventBroadcaster.OnWorldClockHourChanged += OnWorldClockTicked,
+                () => EventBroadcaster.OnWorldClockHourChanged -= OnWorldClockTicked);
 
         }
+
+
+        
 
         protected virtual void OnEnable()
         {
@@ -94,6 +104,8 @@ namespace System
         protected virtual void OnGameStarted(){}
         protected virtual void OnGameInitialized(){}
         protected virtual void OnGameRestarted(){}
+        protected virtual void OnGameStateChanged(Types.GameState newState){}
+        protected virtual void OnWorldClockTicked(int newHour) { }
         
     }
 }

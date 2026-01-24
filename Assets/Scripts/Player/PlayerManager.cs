@@ -1,4 +1,5 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 
@@ -16,9 +17,25 @@ namespace Player
         
         void Start()
         {
+            
+            SearchForSpawnAnchor(defaultSpawnPointID);
+        }
+        
+        protected override void Awake()
+        {
+            base.Awake();
             // Get reference to the player
             _player = GameObject.FindWithTag("Player");
-            SearchForSpawnAnchor();
+        }
+        
+        public CinemachineCamera GetCinemachineCamera()
+        {
+            CinemachineCamera cineCam = _player.GetComponentInChildren<CinemachineCamera>();
+            if (cineCam == null)
+            {
+                DebugUtils.LogError("CinemachineCamera component not found on player!");
+            }
+            return cineCam;
         }
         
 
@@ -27,17 +44,16 @@ namespace Player
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnPlayerStateChanged += OnPlayerStateChanged,
-                () => EventBroadcaster.OnPlayerStateChanged -= OnPlayerStateChanged);
+            TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerStateChanged,
+                () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerStateChanged);
         }
         
-        private void SearchForSpawnAnchor()
+        public void SearchForSpawnAnchor(string spawnPointID = "")
         {
             // logic to search for a spawn anchor in the scene
             PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsOfType<PlayerSpawnAnchor>();
             
             // debug print the number of spawn anchors found
-            DebugUtils.Log("Number of PlayerSpawnAnchors found in scene: " + spawnAnchors.Length);
             // loop through all of the spawn anchors to find the default one
             PlayerSpawnAnchor FirstAnchor = null;
             foreach (PlayerSpawnAnchor Anchor in spawnAnchors)
@@ -48,13 +64,12 @@ namespace Player
                     FirstAnchor = Anchor;
                 }
                 // Search for the default spawn point ID
-                if (Anchor != null && Anchor.gameObject != null && Anchor.GetSpawnPointID() == defaultSpawnPointID)
+                if (Anchor != null && Anchor.gameObject != null && Anchor.GetSpawnPointID() == spawnPointID)
                 {
                     // found the default spawn point, move the player here
                     if (_player != null)
                     {
-                        TeleportPlayer(Anchor.gameObject.transform.position);
-                        DebugUtils.LogSuccess("Player spawned at default spawn point: " + Anchor.GetSpawnPointID());
+                        TeleportPlayer(Anchor.gameObject.transform.position, Anchor.gameObject.transform.rotation);
                         return;
                     }
                 }
@@ -62,7 +77,8 @@ namespace Player
             // if we reach here, we did not find the default spawn point, so we will just use the first one we found
             if (FirstAnchor)
             {
-                TeleportPlayer(FirstAnchor.gameObject.transform.position);
+                TeleportPlayer(FirstAnchor.gameObject.transform.position, FirstAnchor.gameObject.transform.rotation);
+                
                 return;
             }
             
@@ -97,7 +113,7 @@ namespace Player
         /// <summary>
         /// Teleports player immediately
         /// </summary>
-        public void TeleportPlayer(Vector3 newPosition)
+        public void TeleportPlayer(Vector3 newPosition, Quaternion? rotation = null)
         {
             if (_player == null) return;
 
@@ -106,10 +122,21 @@ namespace Player
             if (controller != null) {controller.enabled = false;}
 
             _player.transform.position = newPosition;
+    
+            if (rotation.HasValue)
+            {
+                float yaw = rotation.Value.eulerAngles.y;
+                var CinemaCamera = GetCinemachineCamera();
+                var panTilt = CinemaCamera.GetComponent<CinemachinePanTilt>();
+    
+                if (panTilt != null)
+                {
+                    panTilt.PanAxis.Value = yaw;
+                }
+            }
 
             if (controller != null) {controller.enabled = true;}
 
-            DebugUtils.LogSuccess("Player teleported successfully.");
         }
 
         

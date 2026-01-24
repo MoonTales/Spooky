@@ -1,7 +1,12 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using Managers;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using XtremeFPS.FPSController;
+using Random = Unity.Mathematics.Random;
 using Types = System.Types;
 
 namespace Player
@@ -12,11 +17,15 @@ namespace Player
     /// </summary>
     public class PlayerController : EventSubscriberBase
     {
-        
+
+        // I'm so sorry that the changes I'm about to make are so sloppy :(
+        [SerializeField] private Attractor stepSoundsAI;
+
         [Header("Movement Settings")]
         [SerializeField] private float walkSpeed = 5.0f;
         [SerializeField] private float sprintSpeed = 8.0f;
         [SerializeField] private float crouchSpeed = 2.0f;
+        [SerializeField] private float speedChangeRate = 10f;
         [Space(10)]
         [Header("Jump Settings")]
         [SerializeField] private float jumpForce = 7.0f;
@@ -28,23 +37,22 @@ namespace Player
         [SerializeField] private float crouchHeight = 1.0f;
         [SerializeField] private float crouchTransitionSpeed = 10.0f;
         [SerializeField] private float cameraCrouchOffset = 0.4f;
-        [Space(10)]
-        [Header("Headbob")]
-        [SerializeField] private float walkBobSpeed = 14.0f;
-        [SerializeField] private float walkBobAmount = 0.05f;
-        [SerializeField] private float sprintBobSpeed = 18.0f;
-        [SerializeField] private float sprintBobAmount = 0.1f;
-        [SerializeField] private float crouchBobSpeed = 8.0f;
-        [SerializeField] private float crouchBobAmount = 0.025f;
+
         [Space(10)]
         [Header("References")]
         [SerializeField] private InputActionReference moveAction;
         [SerializeField] private InputActionReference jumpAction;
         [SerializeField] private InputActionReference crouchAction;
         [SerializeField] private InputActionReference sprintAction;
+        [SerializeField] private InputActionReference flashlightToggleAction;
+        [SerializeField] private GameObject[] ObjectsToDisableOnCutscene;
+        
+        [SerializeField] private Transform _cameraTransform;
+        [SerializeField] private Transform head;
+        [Header("Camera Effects")]
+        [SerializeField] private CameraEffectsSystems cameraEffects;
         
         /* Internal variables */
-        private Transform _cameraTransform;
         private CharacterController _characterController;
         private Vector2 _moveInput;
         private bool _isGrounded;
@@ -53,44 +61,15 @@ namespace Player
         private bool _cachedSprintState;
         private float _verticalVelocity;
         private float _targetHeight;
-
         private bool _lockedInput = false;
         private float time;
-        
         private float _cameraBaseY;
-        private float _headBobOffset;
+        private float _currentSpeed;
 
         
         // Local reference that the controller cares about
-        [SerializeField] private Types.PlayerHealthState currentPlayerHealthState;
-
-
-        private void Awake()
-        {
-            // set up initial character variables
-            _characterController = GetComponent<CharacterController>();
-            // look through all of the children of this player, to find an object with the cinemachine camera component
-            foreach (Transform child in transform)
-            {
-                if (child.GetComponentInChildren<CinemachineCamera>() != null)
-                {
-                    _cameraTransform = child;
-                    DebugUtils.LogSuccess("PlayerController: Found Cinemachine Camera in child object: " + child.name);
-                    break;
-                }
-            }
-            _targetHeight = standHeight;
-            _cameraBaseY = _cameraTransform.localPosition.y;
-
-        }
-        
-        protected override void RegisterSubscriptions()
-        {
-            base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnGameStateChanged += OnGameStateChanged,
-                () => EventBroadcaster.OnGameStateChanged -= OnGameStateChanged);
-        }
-
+        private Types.PlayerHealthState currentPlayerHealthState;
+        private Types.PlayerMovementState _playerMovementState;
         private void Update()
         {
             
@@ -110,7 +89,6 @@ namespace Player
             {
                 CinemachineInputAxisController axisController =
                     _cameraTransform.GetComponent<CinemachineInputAxisController>();
-                DebugUtils.Log("PlayerController: Input is unlocked, processing movement");
                 axisController.enabled = true;
 
             }
@@ -126,49 +104,120 @@ namespace Player
                 _isSprinting = false; // cannot sprint in mid-air
             }
             
+            HandleStateDetection();
+            DetectSurfaceAndMovement();
+            
             HandleGravity();
-
             HandleMovement();
             HandleCrouchTransition();
-            HandleHeadBob();
+            cameraEffects.UpdateEffects(_isGrounded, IsPlayerMoving(), _isSprinting, _isCrouching);
+            
 
-
+            
         }
-
         
-        private void HandleHeadBob()
+        // TESTING
+        protected override void OnGameStarted()
         {
-            if (!_isGrounded)
-            {
-                _headBobOffset = 0f;
-                return;
-            }
-
-            if (_moveInput.magnitude > 0.1f)
-            {
-                float bobSpeed = _isSprinting
-                    ? sprintBobSpeed
-                    : (_isCrouching ? crouchBobSpeed : walkBobSpeed);
-
-                float bobAmount = _isSprinting
-                    ? sprintBobAmount
-                    : (_isCrouching ? crouchBobAmount : walkBobAmount);
-
-                time += Time.deltaTime * bobSpeed;
-                _headBobOffset = Mathf.Sin(time) * bobAmount;
-            }
-            else
-            {
-                time = 0f;
-                _headBobOffset = Mathf.Lerp(_headBobOffset, 0f, Time.deltaTime * 5f);
-            }
-
-            Vector3 cameraPosition = _cameraTransform.localPosition;
-            cameraPosition.y = _cameraBaseY + _headBobOffset;
-            _cameraTransform.localPosition = cameraPosition;
+            DebugUtils.LogSuccess("The game started!!");
         }
 
+        private void HandleStateDetection()
+        {
+            
+            // each one we will check in order of precedence, as each later one can override the earlier ones
+            Types.PlayerMovementState checkState = Types.PlayerMovementState.Idle; // default state
+            // First check if we are IDLE
+            if (!IsPlayerMoving() && _isGrounded)
+            {
+                checkState = Types.PlayerMovementState.Idle;_currentSpeed = walkSpeed;
 
+            }
+            // Next check if we are CROUCHING_IDLE
+            if (_isCrouching && !IsPlayerMoving() && _isGrounded)
+            {
+                checkState = Types.PlayerMovementState.CrouchIdle;
+            }
+            // next check if we are CROUCH WALKING
+            if (_isCrouching && IsPlayerMoving() && _isGrounded)
+            {
+                checkState = Types.PlayerMovementState.CrouchWalking;
+            }
+            // next check if we are we walking (not sprinting or crouching)
+            if (!_isCrouching && !_isSprinting && IsPlayerMoving() && _isGrounded)
+            {
+                checkState = Types.PlayerMovementState.Walking;
+            }
+            // finally check if we are SPRINTING
+            if (!_isCrouching && _isSprinting && IsPlayerMoving() && _isGrounded)
+            {
+                checkState = Types.PlayerMovementState.Sprinting;
+            }
+            
+            SwitchMovementState(checkState);
+        }
+
+        private void SwitchMovementState(Types.PlayerMovementState movementState)
+        {
+            // if the current state is the same as the new state, do nothing
+            if (_playerMovementState == movementState) { return; }
+            
+            // set our current state to the new state
+            _playerMovementState = movementState;
+            
+            // Now we can handle the state switch logic (if there is any)
+            switch (movementState)
+            {
+                case Types.PlayerMovementState.Idle:
+                    // logic for entering idle state
+                    DebugUtils.Log("PlayerController: Entered Idle State");
+                    stepSoundsAI.intensity = 0;
+                    break;
+                case Types.PlayerMovementState.Walking:
+                    // logic for entering walking state
+                    DebugUtils.Log("PlayerController: Entered Walking State");
+                    stepSoundsAI.intensity = 5;
+                    _audioEffectSpeed = 0.5f;
+                    break;
+                case Types.PlayerMovementState.Sprinting:
+                    // logic for entering sprinting state
+                    DebugUtils.Log("PlayerController: Entered Sprinting State");
+                    stepSoundsAI.intensity = 7;
+                    _audioEffectSpeed = 0.3f;
+                    break;
+                case Types.PlayerMovementState.CrouchIdle:
+                    // logic for entering crouch idle state
+                    DebugUtils.Log("PlayerController: Entered Crouch Idle State");
+                    stepSoundsAI.intensity = 0;
+                    break;
+                case Types.PlayerMovementState.CrouchWalking:
+                    // logic for entering crouch walking state
+                    DebugUtils.Log("PlayerController: Entered Crouch Walking State");
+                    stepSoundsAI.intensity = 3;
+                    _audioEffectSpeed = 0.7f;
+                    break;
+                default:
+                    // handle other states if any
+                    break;
+            }
+        }
+
+        #region Initialization
+        private void Awake()
+        {
+            // set up initial character variables
+            _characterController = GetComponent<CharacterController>();
+            _targetHeight = standHeight;
+            _cameraBaseY = _cameraTransform.localPosition.y;
+
+        }
+
+        private void Start()
+        {
+            StartCoroutine(PlayFootstepSounds());
+            _currentSpeed = walkSpeed;
+
+        }
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -179,8 +228,16 @@ namespace Player
             crouchAction.action.performed += OnCrouch;
             sprintAction.action.performed += OnSprint;
             sprintAction.action.canceled += OnSprint;
+            flashlightToggleAction.action.performed += OnFlashlightToggle;
             
             
+        }
+
+        private void OnFlashlightToggle(InputAction.CallbackContext obj)
+        {
+            if(_lockedInput){ return; }
+            // Logic to toggle flashlight
+            Flashlight.Instance.ToggleFlashlight();
         }
 
         protected override void OnDisable()
@@ -194,19 +251,36 @@ namespace Player
             sprintAction.action.performed -= OnSprint;
             sprintAction.action.canceled -= OnSprint;
         }
-
+        #endregion
+        
+        #region Movement Methods
         private void OnSprint(InputAction.CallbackContext obj)
         {
-            if(_lockedInput){ return; }
-            // only allow sprinting to change if we are grounded
             
+            // edge case, we can STOP sprinting mid-air, but cannot START sprinting mid-air
+            if (!_isGrounded)
+            {
+                // if we are trying to start sprinting mid-air, cache it as true
+                if (obj.performed)
+                {
+                    _cachedSprintState = true;
+                }
+                else
+                {
+                    _cachedSprintState = false;
+                }
+                _isSprinting = false;
+                return;
+            }
+            
+            if(_lockedInput){ return; }
+            if (_isCrouching) { return; } // cannot sprint while crouching
+            // only allow sprinting to change if we are grounded
             // regardless of whether we can sprint, we want to cache the sprint state for when we land
             _cachedSprintState = obj.performed;
-            
-            if (!_isGrounded) { return; }
+
             _isSprinting = obj.performed;
         }
-
         private void OnCrouch(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
@@ -217,12 +291,56 @@ namespace Player
             } else
             {
                 _targetHeight = crouchHeight;
+                
             }
             _isCrouching = !_isCrouching;
             time = 0f;
+            
 
         }
+        private void OnJump(InputAction.CallbackContext obj)
+        {
+            
+            if(_lockedInput){ return; }
+            if (_isCrouching) { return;}
+            if(_isGrounded)
+            {
+                // Apply jump force
+                _verticalVelocity = jumpForce;
+            }
+        }
+        private void HandleGravity()
+        {
+            if (_isGrounded && _verticalVelocity < 0)
+            {
+                _verticalVelocity = initialFallVelocity;
+            }
+            _verticalVelocity += gravity * Time.deltaTime;
+        }
+        private void HandleCrouchTransition()
+        {
+            float currentHeight = _characterController.height;
+            if (Mathf.Approximately(currentHeight, _targetHeight))
+            {
+                _characterController.height = _targetHeight;
+                return;
+            }
+            // perform the transition
+            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
+            _characterController.height = newHeight;
+            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
+            
+            float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
 
+            _cameraBaseY = Mathf.Lerp(
+                _cameraBaseY,
+                targetCameraBaseY,
+                crouchTransitionSpeed * Time.deltaTime
+            );
+            
+            cameraEffects.UpdateCameraBaseY(_cameraBaseY);
+
+        }
         private bool CanStandUp()
         {
             float currentHeight = _characterController.height;
@@ -254,53 +372,114 @@ namespace Player
 
             return !hit;
         }
-
-
         private void OnMovePerformed(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
             _moveInput = obj.ReadValue<Vector2>();
         }
-        
-        private void OnJump(InputAction.CallbackContext obj)
-        {
-            
-            if(_lockedInput){ return; }
-            if (_isCrouching) { return;}
-            if(_isGrounded)
-            {
-                // Apply jump force
-                _verticalVelocity = jumpForce;
-            }
-        }
-
         private void HandleMovement()
         {
-            if(_lockedInput){ return; }
-            
+            if (_lockedInput) { return; }
+
             Vector3 moveDirection = _cameraTransform.TransformDirection(new Vector3(_moveInput.x, 0, _moveInput.y)).normalized;
-            float currentSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
-            Vector3 velocity = moveDirection * currentSpeed;
-            velocity.y = _verticalVelocity;
+
+            float targetSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
+
+            // Smoothly interpolate speed
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.deltaTime);
+
+            Vector3 velocity = moveDirection * _currentSpeed; velocity.y = _verticalVelocity;
+
             CollisionFlags collisions = _characterController.Move(velocity * Time.deltaTime);
+
             if ((collisions & CollisionFlags.Above) != 0)
             {
                 _verticalVelocity = initialFallVelocity;
             }
         }
 
-        private void HandleGravity()
+        #endregion
+        
+        #region Sound Management
+        private string _surfaceType;
+        private float _audioEffectSpeed = 0.5f; // time between footstep sounds
+        /// <summary>
+        /// Function used to detect the surface type the player is currently on
+        ///
+        /// Works by shooting a raycast downwards and checking the tag of the hit collider
+        /// </summary>
+        private void DetectSurfaceAndMovement()
         {
-            if (_isGrounded && _verticalVelocity < 0)
+            if (!Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 5f)) return;
+            _surfaceType = hit.collider.tag.ToLower() switch
             {
-                _verticalVelocity = initialFallVelocity;
-            }
-            _verticalVelocity += gravity * Time.deltaTime;
+                "grass" => "grass",
+                "metals" => "metal",
+                "gravel" => "gravel",
+                "water" => "water",
+                "concrete" => "concrete",
+                "wood" => "wood",
+                _ => "Unknown",
+            };
         }
-
-        protected void OnGameStateChanged(Types.GameState newState)
+        private IEnumerator PlayFootstepSounds()
         {
-            DebugUtils.Log("PlayerController: Game state changed to: " + newState.ToString());
+            while (true)
+            {
+                if (!_isGrounded )
+                {
+                    yield return null;
+                    continue;
+                }
+                
+                // if we are not moving, do not play footstep sounds
+                if (!IsPlayerMoving())
+                {
+                    yield return null;
+                    continue;
+                }
+
+                switch (_surfaceType)
+                {
+                    case "grass":
+                        Debug.Log("Playing grass sound");
+                        AudioManager.Instance.PlayPlayerWalkingGrass();
+                        break;
+                    case "gravel":
+                        Debug.Log("Playing gravel sound");
+                        AudioManager.Instance.PlayPlayerWalkingGravel();
+                        break;
+                    case "water":
+                        Debug.Log("Playing water sound");
+                        AudioManager.Instance.PlayPlayerWalkingWater();
+                        break;
+                    case "metal":
+                        Debug.Log("Playing metal sound");
+                        AudioManager.Instance.PlayPlayerWalkingMetal();
+                        break;
+                    case "concrete":
+                        Debug.Log("Playing concrete sound");
+                        AudioManager.Instance.PlayPlayerWalkingConcrete();
+                        break;
+                    case "wood":
+                        Debug.Log("Playing wood sound");
+                        AudioManager.Instance.PlayPlayerWalkingWood();
+                        break;
+                    default:
+                        yield return null;
+                        break;
+                }
+                
+                yield return new WaitForSeconds(_audioEffectSpeed);
+
+            }
+        }
+        
+        #endregion
+        
+        
+        protected override void OnGameStateChanged(Types.GameState newState)
+        {
             switch (newState)
             {
                 case Types.GameState.Gameplay:
@@ -309,43 +488,103 @@ namespace Player
                 case Types.GameState.Cutscene:
                     HandleCutsceneState();
                     break;
+                case Types.GameState.MainMenu:
+                    HandleMainMenuState();
+                    break;
+                case Types.GameState.Inspecting:
+                    HandleInspectionState();
+                    break;
                 // handle other game states as needed
             }
         }
 
+        private void HandleMainMenuState()
+        {
+            _lockedInput = true;
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
+            
+            // check if the flashlight is on
+            if (Flashlight.Instance.IsFlashlightOn())
+            {
+                Flashlight.Instance.ToggleFlashlight();
+            }
+        }
         private void HandleGameplayState()
         {
             // Return to basic player controls
             _lockedInput = false;
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(true);
+            }
         }
         private void HandleCutsceneState()
         {
             // Disable player controls for cutscene
             _lockedInput = true;
-            DebugUtils.LogError("PlayerController: Input locked due to Cutscene state!!!!");
-        }
-
-        private void HandleCrouchTransition()
-        {
-            float currentHeight = _characterController.height;
-            if (Mathf.Approximately(currentHeight, _targetHeight))
+            // disable the head so its hidden
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
             {
-                _characterController.height = _targetHeight;
-                return;
+                ObjectsToDisableOnCutscene[i].SetActive(false);
             }
-            // perform the transition
-            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
-            _characterController.height = newHeight;
-            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
             
-            float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
-
-            _cameraBaseY = Mathf.Lerp(
-                _cameraBaseY,
-                targetCameraBaseY,
-                crouchTransitionSpeed * Time.deltaTime
-            );
-
+            // check if the flashlight is on
+            if (Flashlight.Instance.IsFlashlightOn())
+            {
+                Flashlight.Instance.ToggleFlashlight();
+            }
+            StopAllPlayerMovement();
         }
+
+        private void HandleInspectionState()
+        {
+            // Disable player controls for cutscene
+            _lockedInput = true;
+            // disable the head so its hidden
+            for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
+            {
+                ObjectsToDisableOnCutscene[i].SetActive(false);
+            }
+        }
+
+        #region Helper Function
+        /// <summary>
+        /// A series of various helpers to determine possible things about the player, mostly generic movement
+        /// </summary>
+        
+        // Determine if the player is moving
+        public bool IsPlayerMoving()
+        {
+            // Check if the player is moving based on input magnitude (anything higher than 0.05 is considered moving)
+            return _moveInput.magnitude > 0.05f;
+        }
+        
+        public void LockInput()
+        {
+            _lockedInput = true;
+        }
+        public void UnlockInput()
+        {
+            _lockedInput = false;
+        }
+        public float GetDistanceToPlayer(Vector3 position)
+        {
+            return Vector3.Distance(position, transform.position);
+        }
+
+        private void StopAllPlayerMovement()
+        {
+            _isCrouching = false;
+            _cachedSprintState = false;
+            _isSprinting = false;
+            _moveInput = Vector2.zero;
+        }
+        
+        
+        #endregion
+        
     }
 }
