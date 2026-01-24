@@ -138,6 +138,22 @@ namespace Player
             if (controller != null) {controller.enabled = true;}
 
         }
+        
+        public Transform GetPlayerHandTransform()
+        {
+            if (_player == null) {return null;}
+            
+            // look through all child transforms to find the one named "HAND"
+            Transform[] childTransforms = _player.GetComponentsInChildren<Transform>();
+            foreach (Transform child in childTransforms)
+            {
+                if (child.name == "HAND")
+                {
+                    return child;
+                }
+            }
+            return null;
+        }
 
         
         
