@@ -34,7 +34,8 @@ public class AttractorAI : MonoBehaviour
 	{
 		visual,
 		audio,
-		attackRange
+		attackRange,
+		self
 	}
 
 	[System.Serializable]
