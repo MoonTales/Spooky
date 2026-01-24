@@ -27,6 +27,8 @@ public class AttractorAI : MonoBehaviour
 	public EnemyState defaultState = EnemyState.Stand;
 	private EnemyState currentState = EnemyState.Stand;
 	private EnemyState nextState = EnemyState.Stand;
+	[Tooltip("Leave blank to default focus on player")]
+	public Transform defaultFocus;
 
 	public enum AttractorType
 	{
@@ -54,7 +56,7 @@ public class AttractorAI : MonoBehaviour
 		//public bool forceSkipStateBuffer = false;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
-			"it will automatically target the player")]
+			"it will automatically target the defaultFocus/Player")]
 		public bool targetDetectedObject = false;
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
@@ -154,7 +156,9 @@ public class AttractorAI : MonoBehaviour
 
 	void Start()
 	{
-		currentFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+		if (defaultFocus == null)
+			defaultFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+		currentFocus = defaultFocus;
 		currentState = defaultState;
 		nextState = defaultState;
 		lowestPriority = behaviourHierarchy.Count;
@@ -270,7 +274,7 @@ public class AttractorAI : MonoBehaviour
 		{
 			if (reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState))
 			{
-				Transform tempFocus = Player.PlayerManager.Instance.GetPlayer().transform; ;
+				Transform tempFocus = defaultFocus; ;
 				float tempValue = -1;
 				List<Attractor> tempAttractors = new List<Attractor>();
 				if (tempDetectedAttractors.ContainsKey(reaction.attractorType))
@@ -296,7 +300,7 @@ public class AttractorAI : MonoBehaviour
 				{
 					if (!reaction.targetDetectedObject)
 					{
-						nextFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+						nextFocus = defaultFocus;
 					}
 					else
 					{
@@ -321,7 +325,7 @@ public class AttractorAI : MonoBehaviour
 
 		if (!tempCheck)
 		{
-			nextFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+			nextFocus = defaultFocus;
 			nextStatePriority = lowestPriority;
 			nextState = defaultState;
 		}
@@ -466,7 +470,7 @@ public class AttractorAI : MonoBehaviour
 				aboutToAttack = true;
 				if (!(nextState == EnemyState.Attack))
 				{
-					nextFocus = attackRevertFocus == null ? Player.PlayerManager.Instance.GetPlayer().transform : attackRevertFocus;
+					nextFocus = attackRevertFocus == null ? defaultFocus : attackRevertFocus;
 					nextState = attackRevertState;
 					nextStatePriority = attackRevertPriority;
 				}
