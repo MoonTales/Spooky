@@ -66,7 +66,7 @@ public class Drawing : MonoBehaviour, IInteractable
         // if we already have it in the inventory, we don't need to add it again
         if (PlayerInventory.Instance.HasDrawing(drawingID))
         {
-            DebugUtils.LogWarning($"Player already has Drawing ID {drawingID} in inventory, not adding again.");
+            PickupDrawing();
             return;
         }
         else
@@ -76,6 +76,14 @@ public class Drawing : MonoBehaviour, IInteractable
             gameObject.SetActive(false);
         }
 
+    }
+
+
+    private void PickupDrawing()
+    {
+        // Logic to "pickup" the drawing, and hold it in your physical hands  
+        DebugUtils.Log($"Player picked up Drawing ID {drawingID} to examine it.");
+        
     }
 
 
