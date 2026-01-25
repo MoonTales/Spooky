@@ -14,6 +14,7 @@ public class Drawing : MonoBehaviour, IInteractable
     
     [Header("Pickup Settings")]
     [SerializeField] private float pickupTransitionSpeed = 8f;
+    [SerializeField] private float returnTransitionSpeed = 8f;
     [SerializeField] private Vector3 handOffset = new Vector3(0, 0, 0.3f);
     
     // Pickup state
@@ -49,8 +50,8 @@ public class Drawing : MonoBehaviour, IInteractable
     
     public bool CanInteract(Interactor interactor)
     {
-        // Can't interact with yourself if you're being held
-        if (_isPickedUp) return false;
+        // Can't interact with yourself if you're being held or returning
+        if (_isPickedUp || _isReturningToPosition) return false;
     
         // Empty slots can only be interacted with if holding a drawing
         if (IsEmptySlot())
@@ -82,6 +83,10 @@ public class Drawing : MonoBehaviour, IInteractable
         else if (_isPickedUp)
         {
             HandleHoldingDrawing();
+        }
+        else if (_isReturningToPosition)
+        {
+            HandleReturnTransition();
         }
     }
 
@@ -126,27 +131,23 @@ public class Drawing : MonoBehaviour, IInteractable
     {
         DebugUtils.Log($"Placing Drawing ID {heldDrawing.drawingID} into empty slot");
 
-        // Update the held drawing's transform to match this slot
+        // Setup return transition for the held drawing
+        heldDrawing._returnTargetPosition = this.transform.position;
+        heldDrawing._returnTargetRotation = this.transform.rotation;
+        heldDrawing._returnTargetScale = this.transform.localScale;
+        heldDrawing._returnTargetParent = this.transform.parent;
+
+        // Update the held drawing's original transform to this slot
         heldDrawing._originalPosition = this.transform.position;
         heldDrawing._originalRotation = this.transform.rotation;
         heldDrawing._originalScale = this.transform.localScale;
         heldDrawing._originalParent = this.transform.parent;
 
-        // Position the held drawing at this location
-        heldDrawing.transform.SetParent(this.transform.parent);
-        heldDrawing.transform.position = this.transform.position;
-        heldDrawing.transform.rotation = this.transform.rotation;
-        heldDrawing.transform.localScale = this.transform.localScale;
-        
-        SceneManager.MoveGameObjectToScene(heldDrawing.gameObject, SceneManager.GetActiveScene());
-
-
-        // Clean up the held drawing's state
-        heldDrawing.ForceDropWithoutReturning();
+        // Start smooth return transition
+        heldDrawing.StartReturnTransition();
         heldDrawing.gameObject.SetActive(true);
 
         // Only disable colliders if THIS is an empty slot (-1)
-        // This makes the -1 slot "invisible" to raycasts after placement
         if (IsEmptySlot() && _colliders != null)
         {
             foreach (var col in _colliders)
@@ -165,71 +166,131 @@ public class Drawing : MonoBehaviour, IInteractable
     }
     
     private void SwapDrawings(Drawing heldDrawing)
-{
-    DebugUtils.Log($"Swapping Drawing ID {heldDrawing.drawingID} with Drawing ID {drawingID}");
-
-    // Store the location where the held drawing came from
-    Vector3 heldOriginalPos = heldDrawing._originalPosition;
-    Quaternion heldOriginalRot = heldDrawing._originalRotation;
-    Vector3 heldOriginalScale = heldDrawing._originalScale;
-    Transform heldOriginalParent = heldDrawing._originalParent;
-
-    // Store this drawing's ID
-    int tempID = drawingID;
-
-    // Swap IDs
-    drawingID = heldDrawing.drawingID;
-    heldDrawing.drawingID = tempID;
-
-    // Place the held drawing at THIS slot's location
-    heldDrawing.transform.SetParent(this.transform.parent);
-    heldDrawing.transform.position = this.transform.position;
-    heldDrawing.transform.rotation = this.transform.rotation;
-    heldDrawing.transform.localScale = this.transform.localScale;
-
-    // Update held drawing's original to THIS location
-    heldDrawing._originalPosition = this.transform.position;
-    heldDrawing._originalRotation = this.transform.rotation;
-    heldDrawing._originalScale = this.transform.localScale;
-    heldDrawing._originalParent = this.transform.parent;
-
-    SceneManager.MoveGameObjectToScene(heldDrawing.gameObject, SceneManager.GetActiveScene());
-    
-    // Clean up the held drawing
-    heldDrawing.ForceDropWithoutReturning();
-    heldDrawing.gameObject.SetActive(true);
-
-    // Clear the held reference before picking up new one
-    _currentlyHeldDrawing = null;
-
-    // Get the hand transform
-    _handTransform = PlayerManager.Instance.GetPlayerHandTransform();
-    
-    if (_handTransform == null)
     {
-        DebugUtils.LogWarning("HAND transform not found on player!");
-        return;
+        DebugUtils.Log($"Swapping Drawing ID {heldDrawing.drawingID} with Drawing ID {drawingID}");
+
+        // Store the location where the held drawing came from
+        Vector3 heldOriginalPos = heldDrawing._originalPosition;
+        Quaternion heldOriginalRot = heldDrawing._originalRotation;
+        Vector3 heldOriginalScale = heldDrawing._originalScale;
+        Transform heldOriginalParent = heldDrawing._originalParent;
+
+        // Store this drawing's ID
+        int tempID = drawingID;
+
+        // Swap IDs
+        drawingID = heldDrawing.drawingID;
+        heldDrawing.drawingID = tempID;
+
+        // Setup return transition for held drawing to THIS slot
+        heldDrawing._returnTargetPosition = this.transform.position;
+        heldDrawing._returnTargetRotation = this.transform.rotation;
+        heldDrawing._returnTargetScale = this.transform.localScale;
+        heldDrawing._returnTargetParent = this.transform.parent;
+
+        // Update held drawing's original to THIS location
+        heldDrawing._originalPosition = this.transform.position;
+        heldDrawing._originalRotation = this.transform.rotation;
+        heldDrawing._originalScale = this.transform.localScale;
+        heldDrawing._originalParent = this.transform.parent;
+
+        // Start smooth return for held drawing
+        heldDrawing.StartReturnTransition();
+        heldDrawing.gameObject.SetActive(true);
+
+        // Clear the held reference before picking up new one
+        _currentlyHeldDrawing = null;
+
+        // Get the hand transform
+        _handTransform = PlayerManager.Instance.GetPlayerHandTransform();
+        
+        if (_handTransform == null)
+        {
+            DebugUtils.LogWarning("HAND transform not found on player!");
+            return;
+        }
+
+        // Set where THIS drawing should return to if dropped
+        _originalPosition = heldOriginalPos;
+        _originalRotation = heldOriginalRot;
+        _originalScale = heldOriginalScale;
+        _originalParent = heldOriginalParent;
+
+        // Pickup this drawing
+        SetPhysicsState(true);
+        ParentToHand();
+        StartPickupTransition();
+        _currentlyHeldDrawing = this;
     }
-
-    // IMPORTANT: Set the original position BEFORE parenting
-    // This is where THIS drawing should return to if dropped
-    _originalPosition = heldOriginalPos;
-    _originalRotation = heldOriginalRot;
-    _originalScale = heldOriginalScale;
-    _originalParent = heldOriginalParent;
-
-    // Now manually do the pickup without calling StoreOriginalTransform()
-    SetPhysicsState(true); // Disable physics
-    ParentToHand();
-    StartPickupTransition();
-    _currentlyHeldDrawing = this;
-}
     
-    private void ForceDropWithoutReturning()
+    private void StartReturnTransition()
     {
-        // Used when placing/swapping - doesn't return to original position
-        SetPhysicsState(false);
-        ResetPickupState();
+        // Unparent from hand first
+        transform.SetParent(_returnTargetParent);
+        
+        // Move to active scene
+        SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
+        
+        // Disable physics during transition
+        SetPhysicsState(true);
+        
+        // Start the return animation
+        _isReturningToPosition = true;
+        _isPickedUp = false;
+        _isTransitioningToHand = false;
+    }
+    
+    private void HandleReturnTransition()
+    {
+        // Smoothly move to target position
+        transform.position = Vector3.Lerp(
+            transform.position,
+            _returnTargetPosition,
+            Time.deltaTime * returnTransitionSpeed
+        );
+        
+        // Smoothly rotate to target rotation
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            _returnTargetRotation,
+            Time.deltaTime * returnTransitionSpeed
+        );
+        
+        // Smoothly scale to target scale
+        transform.localScale = Vector3.Lerp(
+            transform.localScale,
+            _returnTargetScale,
+            Time.deltaTime * returnTransitionSpeed
+        );
+        
+        // Check if transition is complete
+        if (IsReturnTransitionComplete())
+        {
+            SnapToReturnPosition();
+            CompleteReturnTransition();
+        }
+    }
+    
+    private bool IsReturnTransitionComplete()
+    {
+        float positionDistance = Vector3.Distance(transform.position, _returnTargetPosition);
+        float rotationDistance = Quaternion.Angle(transform.rotation, _returnTargetRotation);
+        float scaleDistance = Vector3.Distance(transform.localScale, _returnTargetScale);
+        
+        return positionDistance < 0.01f && rotationDistance < 1f && scaleDistance < 0.01f;
+    }
+    
+    private void SnapToReturnPosition()
+    {
+        transform.position = _returnTargetPosition;
+        transform.rotation = _returnTargetRotation;
+        transform.localScale = _returnTargetScale;
+    }
+    
+    private void CompleteReturnTransition()
+    {
+        _isReturningToPosition = false;
+        SetPhysicsState(false); // Re-enable physics
     }
     
     #region Initialization
@@ -308,8 +369,6 @@ public class Drawing : MonoBehaviour, IInteractable
     {
         DebugUtils.Log($"Player picked up Drawing ID {drawingID} to examine it.");
         
-        // Get the hand transform from the player
-        
         _handTransform = PlayerManager.Instance.GetPlayerHandTransform();
         
         if (_handTransform == null)
@@ -319,12 +378,10 @@ public class Drawing : MonoBehaviour, IInteractable
         }
         
         StoreOriginalTransform();
-        SetPhysicsState(false);
+        SetPhysicsState(true);
         ParentToHand();
         StartPickupTransition();
         _currentlyHeldDrawing = this;
-        
-        //EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Inspecting);
     }
     
     private void StoreOriginalTransform()
@@ -356,13 +413,8 @@ public class Drawing : MonoBehaviour, IInteractable
     
     private void ParentToHand()
     {
-        // Store the world scale
         Vector3 worldScale = transform.lossyScale;
-    
-        // Parent to hand (worldPositionStays: true keeps world position/rotation)
         transform.SetParent(_handTransform, true);
-    
-        // Force the scale to stay the same
         transform.localScale = worldScale;
     }
     
@@ -374,21 +426,18 @@ public class Drawing : MonoBehaviour, IInteractable
     
     private void HandlePickupTransition()
     {
-        // Smoothly move to hand position
         transform.localPosition = Vector3.Lerp(
             transform.localPosition, 
             handOffset, 
             Time.deltaTime * pickupTransitionSpeed
         );
         
-        // Smoothly rotate to hand orientation
         transform.localRotation = Quaternion.Slerp(
             transform.localRotation, 
             Quaternion.identity, 
             Time.deltaTime * pickupTransitionSpeed
         );
         
-        // Check if transition is complete
         if (IsTransitionComplete())
         {
             SnapToFinalPosition();
@@ -412,44 +461,27 @@ public class Drawing : MonoBehaviour, IInteractable
     
     private void HandleHoldingDrawing()
     {
-        // Drop drawing with right click or ESC (returns to original position)
         if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
         {
             DropDrawing();
         }
     }
     
-
-    
     private void DropDrawing()
     {
         DebugUtils.Log($"Player dropped Drawing ID {drawingID}");
     
-        ReturnToOriginalTransform();
+        // Setup return transition
+        _returnTargetPosition = _originalPosition;
+        _returnTargetRotation = _originalRotation;
+        _returnTargetScale = _originalScale;
+        _returnTargetParent = _originalParent;
         
-        SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
-
-        
-        SetPhysicsState(false);
-        ResetPickupState();
-        _currentlyHeldDrawing = null; // Add this line
+        // Start smooth return
+        StartReturnTransition();
+        _currentlyHeldDrawing = null;
     
         EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-    }
-    
-    private void ReturnToOriginalTransform()
-    {
-        transform.SetParent(_originalParent);
-        transform.position = _originalPosition;
-        transform.rotation = _originalRotation;
-        transform.localScale = _originalScale;
-    }
-    
-    
-    private void ResetPickupState()
-    {
-        _isPickedUp = false;
-        _isTransitioningToHand = false;
     }
     
     #endregion
@@ -470,6 +502,7 @@ public class Drawing : MonoBehaviour, IInteractable
     {
         return location == Types.WorldLocation.Nightmare;
     }
+    
     private bool IsEmptySlot()
     {
         return drawingID == -1;
