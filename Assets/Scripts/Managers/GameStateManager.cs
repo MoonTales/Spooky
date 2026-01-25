@@ -37,10 +37,27 @@ namespace Managers
             // check for a player death
             if (newhealthstate == Types.PlayerMentalState.Breakdown)
             {
-                // Handle what should happens when the player Dies
+                // check the core state of the player
+                Types.PlayerMentalCoreState coreState = PlayerStats.Instance.GetPlayerStats().GetPlayerMentalCoreState();
+                if (coreState == Types.PlayerMentalCoreState.Anxious)
+                {
+                    // this means the player was anxious death (they were in the nightmare, and need to reset to bedroom)
+                    SceneSwapper.Instance.SwapScene("Bedroom");
+                    // swap the core state to sleep deprived
+                    PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+                    
+                }
+                else if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
+                {
+                    // this means the player fell asleep while in the bedroom, and should be sent to the nightmare
+                    SceneSwapper.Instance.SwapScene("FirstAiTest");
+                    // swap the core state to anxious
+                    PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+                }
                 PlayerStats.Instance.ResetAllStatsToDefault();
-                SceneSwapper.Instance.SwapScene("Bedroom");
+                
             }
+            
         }
 
         protected void Update()

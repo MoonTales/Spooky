@@ -152,7 +152,8 @@ namespace System
                                "\n Current Stamina: " + PlayerStats.Instance.GetPlayerStats().GetCurrentStamina() +
                                "\n Max Stamina: " + PlayerStats.Instance.GetPlayerStats().GetMaxStamina() +
                                "\n Movement Speed: " + PlayerStats.Instance.GetPlayerStats().GetMovementSpeed() +
-                               "\n Player State: " + PlayerStats.Instance.GetPlayerStats().GetPlayerMentalState());
+                               "\n Player State: " + PlayerStats.Instance.GetPlayerStats().GetPlayerMentalState() +
+                               "\n Player Core State: " + PlayerStats.Instance.GetPlayerStats().GetPlayerMentalCoreState());
             }
         }
         

@@ -19,6 +19,7 @@ namespace Player
         [SerializeField] private float defaultMaxStamina = 100f;
         [SerializeField] private float defaultMovementSpeed = 5f;
         [SerializeField] private Types.PlayerMentalState defaultPlayerMentalState = Types.PlayerMentalState.Normal;
+        [SerializeField] private Types.PlayerMentalCoreState defaultPlayerMentalCoreState = Types.PlayerMentalCoreState.None;
         [Space(10)]
         [Header("Cutoffs for each Mental Health State")]
         [SerializeField] private float NormalMentalHealthCutoff = 1.0f; 
@@ -39,6 +40,16 @@ namespace Player
         {
             // Initialize the player stats
             InitializeDefaultStats();
+            // only set once on the start
+            
+            
+        }
+
+        protected override void OnGameStarted()
+        {
+            // whenever we load from the main menu, we reset the player stats (like setting us to sleep deprived)
+            DebugUtils.LogSuccess("PlayerStats: OnGameStarted - Resetting Player Stats to Default");
+            _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
         }
         
         protected override void RegisterSubscriptions()
@@ -66,6 +77,7 @@ namespace Player
                 // debug print the current player stats
                 _playerStats.DebugPrintStats();
             }
+            
         }
 
         private void InitializeDefaultStats()
@@ -76,7 +88,13 @@ namespace Player
             _playerStats.SetMaxStamina(defaultMaxStamina);
             _playerStats.SetMovementSpeed(defaultMovementSpeed);
             _playerStats.SetPlayerMentalState(defaultPlayerMentalState, false);
+            //_playerStats.SetPlayerMentalCoreState(defaultPlayerMentalCoreState);
             
+        }
+        
+        public void SetMentalCoreState(Types.PlayerMentalCoreState coreState)
+        {
+            _playerStats.SetPlayerMentalCoreState(coreState);
         }
         
         
