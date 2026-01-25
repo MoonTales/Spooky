@@ -40,39 +40,27 @@ public class Drawing : MonoBehaviour, IInteractable
     { 
         get 
         {
-            if (IsEmptySlot())
-            {
-                return _currentlyHeldDrawing != null ? "Place Drawing" : "Empty Frame";
-            }
             return "Examine Drawing";
         }
+    }
+    
+    private void Start()
+    {
+        // setup references
+        _rigidbody = GetComponent<Rigidbody>();
+        _colliders = GetComponentsInChildren<Collider>();
+        InitializeDrawingState();
     }
     
     public bool CanInteract(Interactor interactor)
     {
         // Can't interact with yourself if you're being held or returning
         if (_isPickedUp || _isReturningToPosition) return false;
-    
-        // Empty slots can only be interacted with if holding a drawing
-        if (IsEmptySlot())
-        {
-            return _currentlyHeldDrawing != null;
-        }
-    
         return true;
     }
 
-    private void Start()
-    {
-        CachePhysicsComponents();
-        InitializeDrawingState();
-    }
+
     
-    private void CachePhysicsComponents()
-    {
-        _rigidbody = GetComponent<Rigidbody>();
-        _colliders = GetComponentsInChildren<Collider>();
-    }
     
     private void Update()
     {
@@ -92,24 +80,10 @@ public class Drawing : MonoBehaviour, IInteractable
 
     public void Interact(Interactor interactor)
     {
-        // If this is an empty slot and player is holding a drawing, place it
-        if (IsEmptySlot() && _currentlyHeldDrawing != null)
-        {
-            PlaceDrawingHere(_currentlyHeldDrawing);
-            return;
-        }
-    
         // If player is holding a drawing and this slot has a drawing, swap them
-        if (_currentlyHeldDrawing != null && !IsEmptySlot())
+        if (_currentlyHeldDrawing != null)
         {
             SwapDrawings(_currentlyHeldDrawing);
-            return;
-        }
-    
-        // Can't interact with empty slots when not holding anything
-        if (IsEmptySlot())
-        {
-            DebugUtils.LogWarning("This is an empty frame slot.");
             return;
         }
     
@@ -124,45 +98,6 @@ public class Drawing : MonoBehaviour, IInteractable
         {
             CollectDrawing();
         }
-    }
-
-    
-    private void PlaceDrawingHere(Drawing heldDrawing)
-    {
-        DebugUtils.Log($"Placing Drawing ID {heldDrawing.drawingID} into empty slot");
-
-        // Setup return transition for the held drawing
-        heldDrawing._returnTargetPosition = this.transform.position;
-        heldDrawing._returnTargetRotation = this.transform.rotation;
-        heldDrawing._returnTargetScale = this.transform.localScale;
-        heldDrawing._returnTargetParent = this.transform.parent;
-
-        // Update the held drawing's original transform to this slot
-        heldDrawing._originalPosition = this.transform.position;
-        heldDrawing._originalRotation = this.transform.rotation;
-        heldDrawing._originalScale = this.transform.localScale;
-        heldDrawing._originalParent = this.transform.parent;
-
-        // Start smooth return transition
-        heldDrawing.StartReturnTransition();
-        heldDrawing.gameObject.SetActive(true);
-
-        // Only disable colliders if THIS is an empty slot (-1)
-        if (IsEmptySlot() && _colliders != null)
-        {
-            foreach (var col in _colliders)
-            {
-                if (col != null)
-                {
-                    col.enabled = false;
-                }
-            }
-        }
-
-        // Clear the static reference
-        _currentlyHeldDrawing = null;
-
-        EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
     }
     
     private void SwapDrawings(Drawing heldDrawing)
@@ -297,57 +232,29 @@ public class Drawing : MonoBehaviour, IInteractable
     
     private void InitializeDrawingState()
     {
-        // Empty slots are always visible in bedroom
-        if (IsEmptySlot())
-        {
-            if (!IsInBedroom())
-            {
-                DebugUtils.LogWarning($"Empty slot (ID -1) found in {location}. Empty slots should only be in Bedroom!");
-            }
-            gameObject.SetActive(true);
-            return;
-        }
+        // check if we have the drawing currently in our inventory
         bool hasDrawing = IsDrawingInInventory();
         
+        // if we do, we need to adjust the visibility based on our location (well.. the location the drawing exists in)
         if (hasDrawing)
         {
-            HandleAlreadyCollectedDrawing();
+            HandleDrawingVisibility(bedroomVisible: true, nightmareVisible: false);
         }
         else
         {
-            HandleUnCollectedDrawing();
+            HandleDrawingVisibility(bedroomVisible: false, nightmareVisible: true);
         }
     }
     
-    private void HandleAlreadyCollectedDrawing()
+    private void HandleDrawingVisibility(bool bedroomVisible, bool nightmareVisible)
     {
         if (IsInBedroom())
         {
-            // In bedroom, keep it visible for examination
-            DebugUtils.Log($"Drawing ID {drawingID} already collected. Keeping visible in Bedroom for examination.");
-            gameObject.SetActive(true);
+            gameObject.SetActive(bedroomVisible);
         }
         else if (IsInNightmare())
         {
-            // In nightmare, hide it since it's collected
-            DebugUtils.Log($"Drawing ID {drawingID} already collected. Hiding in Nightmare.");
-            gameObject.SetActive(false);
-        }
-    }
-    
-    private void HandleUnCollectedDrawing()
-    {
-        if (IsInBedroom())
-        {
-            // In bedroom, hide until collected in nightmare
-            DebugUtils.Log($"Drawing ID {drawingID} not yet collected. Hiding in Bedroom.");
-            gameObject.SetActive(false);
-        }
-        else if (IsInNightmare())
-        {
-            // In nightmare, show for collection
-            DebugUtils.Log($"Drawing ID {drawingID} not yet collected. Showing in Nightmare.");
-            gameObject.SetActive(true);
+            gameObject.SetActive(nightmareVisible);
         }
     }
     
@@ -501,11 +408,6 @@ public class Drawing : MonoBehaviour, IInteractable
     private bool IsInNightmare()
     {
         return location == Types.WorldLocation.Nightmare;
-    }
-    
-    private bool IsEmptySlot()
-    {
-        return drawingID == -1;
     }
     
     #endregion
