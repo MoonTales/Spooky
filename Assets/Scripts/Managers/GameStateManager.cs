@@ -32,10 +32,10 @@ namespace Managers
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerHealthStateChanged);
         }
 
-        private void OnPlayerHealthStateChanged(Types.PlayerHealthState newhealthstate)
+        private void OnPlayerHealthStateChanged(Types.PlayerMentalState newhealthstate)
         {
             // check for a player death
-            if (newhealthstate == Types.PlayerHealthState.Dead)
+            if (newhealthstate == Types.PlayerMentalState.Breakdown)
             {
                 // Handle what should happens when the player Dies
                 PlayerStats.Instance.ResetAllStatsToDefault();

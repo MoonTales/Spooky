@@ -45,14 +45,34 @@ namespace System
         /// </summary>
         
         /* ------------------------ Player Types ------------------------ */
+        
         [Serializable]
-        public enum PlayerHealthState
+        public enum PlayerMentalCoreState
         {
-            Healthy,
-            Injured,
-            Critical,
-            Dead
+            None, 
+            Anxious, // whenever we are in an anxiety related area (the nightmare)
+            SleepDeprived, // whenever we are in the real world (the bedroom)
+            Both
         }
+        
+        [Serializable]
+        public enum PlayerMentalState
+        {
+            // for the anxiety side:
+            Normal, // 100% - 80%
+            MildlyAnxious, // 79% - 59%
+            ModeratelyAnxious, // 58% - 29%
+            SeverelyAnxious, // 28% - 10%
+            Panic, // 9% - 1%
+            // for the sleep deprivation side:
+            MildlySleepDeprived, // 100% - 80%
+            ModeratelySleepDeprived, // 60% - 25%
+            SeverelySleepDeprived, // 25% - 10%
+            Exhausted, // 10% - 1%
+            // Common states:
+            Breakdown, // when both anxiety and sleep deprivation are at their worst
+        }
+        
 
         [Serializable]
         public enum PlayerMovementState
@@ -73,43 +93,49 @@ namespace System
         public struct FPlayerStats
         {
             // Primary player stats
-            private float _currentHealth;  // the current health of the player
-            private float _maxHealth;      // the maximum health of the player
+            private float _currentMentalHealth;  // the current health of the player
+            private float _maxMentalHealth;      // the maximum health of the player
             private float _currentStamina; // the current stamina of the player
             private float _maxStamina;     // the maximum stamina of the player
             private float _movementSpeed;  // the movement speed of the player
-            private PlayerHealthState _playerHealthState; // the current state of the player
+            private PlayerMentalState _playerMentalState; // the current state of the player
+            private PlayerMentalCoreState _playerMentalCoreState; // the current core mental state of the player (anxiety, sleep deprivation, both, none)
             
             // Getter, Setter, and Updater methods
-            public float GetCurrentHealth() { return _currentHealth; } public void SetCurrentHealth(float value) { _currentHealth = value; } public void UpdateCurrentHealth(float delta) { PlayerStats.Instance.UpdateCurrentHealth(delta);}
-            public float GetMaxHealth() { return _maxHealth; } public void SetMaxHealth(float value) { _maxHealth = value; } public float UpdateMaxHealth(float delta) { _maxHealth += delta; return _maxHealth; }
+            public float GetCurrentMentalHealth() { return _currentMentalHealth; } public void SetCurrentMentalHealth(float value) { _currentMentalHealth = value; } public void UpdateCurrentMentalHealth(float delta) { PlayerStats.Instance.UpdateCurrentMentalHealth(delta);}
+            public float GetMaxMentalHealth() { return _maxMentalHealth; } public void SetMaxMentalHealth(float value) { _maxMentalHealth = value; } public float UpdateMaxMentalHealth(float delta) { _maxMentalHealth += delta; return _maxMentalHealth; }
             public float GetCurrentStamina() { return _currentStamina; } public void SetCurrentStamina(float value) { _currentStamina = value; } public float UpdateCurrentStamina(float delta) { _currentStamina += delta; return _currentStamina; }
             public float GetMaxStamina() { return _maxStamina; } public void SetMaxStamina(float value) { _maxStamina = value; } public float UpdateMaxStamina(float delta) { _maxStamina += delta; return _maxStamina; }
             public float GetMovementSpeed() { return _movementSpeed; } public void SetMovementSpeed(float value) { _movementSpeed = value; } public float UpdateMovementSpeed(float delta) { _movementSpeed += delta; return _movementSpeed; }
-            public PlayerHealthState GetPlayerState() { return _playerHealthState; }
+            public PlayerMentalState GetPlayerMentalState() { return _playerMentalState; }
+            
+            public PlayerMentalCoreState GetPlayerMentalCoreState() { return _playerMentalCoreState; } public void SetPlayerMentalCoreState(PlayerMentalCoreState coreState) { _playerMentalCoreState = coreState; }
+            
 
-            public void SetPlayerState(PlayerHealthState healthState, bool bShouldBroadcast = true)
+            public void SetPlayerMentalState(PlayerMentalState mentalState, bool bShouldBroadcast = true)
             {
                 if (bShouldBroadcast)
                 {
                     // Only broadcast if the state is actually changing (dont broadcast if it "changed" to the same state)
-                    if (_playerHealthState != healthState)
+                    if (_playerMentalState != mentalState)
                     {
-                        EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(healthState);
+                        EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(mentalState);
                     }
                 }
-                _playerHealthState = healthState;
+                _playerMentalState = mentalState;
             }
+            
+     
 
             public bool IsPlayerDead()
             {
-                return _playerHealthState == PlayerHealthState.Dead;
+                return _playerMentalState == PlayerMentalState.Breakdown;
             }
             
-            public float GetHealthPercentage()
+            public float GetMentalHealthPercentage()
             {
-                if (_maxHealth <= 0) return 0;
-                return (_currentHealth / _maxHealth) * 100f;
+                if (_maxMentalHealth <= 0) return 0;
+                return (_currentMentalHealth / _maxMentalHealth) * 100f;
             }
             
             public float GetStaminaPercentage()
@@ -121,12 +147,12 @@ namespace System
             public void DebugPrintStats(){
                 
                 DebugUtils.Log("Player Stats:" +
-                               "\nCurrent Health: " + PlayerStats.Instance.GetPlayerStats().GetCurrentHealth() +
-                               "\n Max Health: " + PlayerStats.Instance.GetPlayerStats().GetMaxHealth() +
+                               "\nCurrent Mental Health: " + PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth() +
+                               "\n Max Mental Health: " + PlayerStats.Instance.GetPlayerStats().GetMaxMentalHealth() +
                                "\n Current Stamina: " + PlayerStats.Instance.GetPlayerStats().GetCurrentStamina() +
                                "\n Max Stamina: " + PlayerStats.Instance.GetPlayerStats().GetMaxStamina() +
                                "\n Movement Speed: " + PlayerStats.Instance.GetPlayerStats().GetMovementSpeed() +
-                               "\n Player State: " + PlayerStats.Instance.GetPlayerStats().GetPlayerState());
+                               "\n Player State: " + PlayerStats.Instance.GetPlayerStats().GetPlayerMentalState());
             }
         }
         

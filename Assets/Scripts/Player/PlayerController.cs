@@ -68,7 +68,7 @@ namespace Player
 
         
         // Local reference that the controller cares about
-        private Types.PlayerHealthState currentPlayerHealthState;
+        private Types.PlayerMentalState _currentPlayerMentalState;
         private Types.PlayerMovementState _playerMovementState;
         private void Update()
         {

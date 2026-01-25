@@ -88,9 +88,9 @@ namespace Player
             
         }
         
-        private void OnPlayerStateChanged(Types.PlayerHealthState newHealthState)
+        private void OnPlayerStateChanged(Types.PlayerMentalState newMentalState)
         {
-            DebugUtils.LogSuccess("Player state changed to: " + newHealthState.ToString());
+            DebugUtils.LogSuccess("Player state changed to: " + newMentalState.ToString());
         }
 
         
