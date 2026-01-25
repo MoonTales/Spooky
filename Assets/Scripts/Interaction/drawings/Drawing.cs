@@ -2,6 +2,7 @@ using System;
 using Managers;
 using Player;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Types = System.Types;
 
 public class Drawing : MonoBehaviour, IInteractable
@@ -26,6 +27,12 @@ public class Drawing : MonoBehaviour, IInteractable
     private Rigidbody _rigidbody;
     private Collider[] _colliders;
     private static Drawing _currentlyHeldDrawing = null;
+    
+    private bool _isReturningToPosition = false;
+    private Vector3 _returnTargetPosition;
+    private Quaternion _returnTargetRotation;
+    private Vector3 _returnTargetScale;
+    private Transform _returnTargetParent;
     
     // Interface Properties
     public string Prompt 
@@ -130,6 +137,9 @@ public class Drawing : MonoBehaviour, IInteractable
         heldDrawing.transform.position = this.transform.position;
         heldDrawing.transform.rotation = this.transform.rotation;
         heldDrawing.transform.localScale = this.transform.localScale;
+        
+        SceneManager.MoveGameObjectToScene(heldDrawing.gameObject, SceneManager.GetActiveScene());
+
 
         // Clean up the held drawing's state
         heldDrawing.ForceDropWithoutReturning();
@@ -183,6 +193,8 @@ public class Drawing : MonoBehaviour, IInteractable
     heldDrawing._originalScale = this.transform.localScale;
     heldDrawing._originalParent = this.transform.parent;
 
+    SceneManager.MoveGameObjectToScene(heldDrawing.gameObject, SceneManager.GetActiveScene());
+    
     // Clean up the held drawing
     heldDrawing.ForceDropWithoutReturning();
     heldDrawing.gameObject.SetActive(true);
@@ -414,6 +426,10 @@ public class Drawing : MonoBehaviour, IInteractable
         DebugUtils.Log($"Player dropped Drawing ID {drawingID}");
     
         ReturnToOriginalTransform();
+        
+        SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
+
+        
         SetPhysicsState(false);
         ResetPickupState();
         _currentlyHeldDrawing = null; // Add this line
