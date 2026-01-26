@@ -127,8 +127,6 @@ namespace Player
                 _playerStats.DebugPrintStats();
             }
             
-            DebugUtils.Log("Current Mental Health: " + _playerStats.GetCurrentMentalHealth());
-            
         }
 
         private void InitializeDefaultStats()
