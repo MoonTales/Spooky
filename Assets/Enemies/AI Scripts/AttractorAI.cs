@@ -90,6 +90,8 @@ public class AttractorAI : MonoBehaviour
 		[Tooltip("Attractors detected by this sense will instead be clasified as not detected, " +
 			"while every Attractor in the targetLayer NOT detected by this sense is considered detected (as of right now, this does nothing)")]
 		public bool invertDetection = false;  // finish this later
+		[Tooltip("Setting this to true makes this sense only work when in a space that is lit up, or if a light is nearby")]
+		public bool lightSensitive = false;
 	}
 
 	private Collider[] hitColliders;
@@ -173,19 +175,22 @@ public class AttractorAI : MonoBehaviour
 		Dictionary<AttractorType, List<Attractor>> tempAttractorDictionary = new Dictionary<AttractorType, List<Attractor>>();
 		foreach (EnemySense sense in senses)
 		{
-			foreach(Attractor attractor in DetectTarget(sense, sense.invertDetection))
+			if (!sense.lightSensitive || Flashlight.Instance.IsFlashlightOn())
 			{
-				AttractorType tempAttractorType = attractor.GetComponent<Attractor>().attractorType;
-				// Try to get the existing value; if it exists, add to it
-				if (tempAttractorDictionary.ContainsKey(tempAttractorType))
+				foreach (Attractor attractor in DetectTarget(sense, sense.invertDetection))
 				{
-					tempAttractorDictionary[tempAttractorType].Add(attractor);
-				}
-				// If it doesn't exist, add the new key with the initial value
-				else
-				{
-					tempAttractorDictionary.Add(tempAttractorType, new List<Attractor>());
-					tempAttractorDictionary[tempAttractorType].Add(attractor);
+					AttractorType tempAttractorType = attractor.GetComponent<Attractor>().attractorType;
+					// Try to get the existing value; if it exists, add to it
+					if (tempAttractorDictionary.ContainsKey(tempAttractorType))
+					{
+						tempAttractorDictionary[tempAttractorType].Add(attractor);
+					}
+					// If it doesn't exist, add the new key with the initial value
+					else
+					{
+						tempAttractorDictionary.Add(tempAttractorType, new List<Attractor>());
+						tempAttractorDictionary[tempAttractorType].Add(attractor);
+					}
 				}
 			}
 		}
