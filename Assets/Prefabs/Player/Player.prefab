@@ -238,6 +238,114 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33672d98c0eaa314ab519a4dbaebe422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &3116418875828397516
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8484300311427848272}
+  - component: {fileID: 2377413478640318880}
+  - component: {fileID: 8213477644634194449}
+  - component: {fileID: 8143558652210124043}
+  m_Layer: 2
+  m_Name: HAND
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8484300311427848272
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3116418875828397516}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.4955253, y: 0.493293, z: -0.50443506, w: 0.50661826}
+  m_LocalPosition: {x: 0.2, y: -0.2, z: 1.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2427465421472302248}
+  m_LocalEulerAnglesHint: {x: -0.253, y: 88.726, z: -90}
+--- !u!33 &2377413478640318880
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3116418875828397516}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &8213477644634194449
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3116418875828397516}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: cd9069b2cad126a4ca679d65a9b1eab1, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &8143558652210124043
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3116418875828397516}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3121199415946773160
 GameObject:
   m_ObjectHideFlags: 0
@@ -498,7 +606,7 @@ Transform:
   m_GameObject: {fileID: 5695208391225973946}
   serializedVersion: 2
   m_LocalRotation: {x: -0.070020944, y: 0.6956862, z: -0.06845114, w: 0.71164054}
-  m_LocalPosition: {x: 0.665107, y: -0.45034832, z: 0.8121478}
+  m_LocalPosition: {x: 0.668, y: -0.479, z: 0.667}
   m_LocalScale: {x: 1, y: 0.17389, z: 0.25667}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1352,6 +1460,7 @@ MonoBehaviour:
   ObjectsToDisableOnCutscene:
   - {fileID: 5097885158666946118}
   - {fileID: 5695208391225973946}
+  - {fileID: 3116418875828397516}
   _cameraTransform: {fileID: 2427465421472302248}
   head: {fileID: 1439800706131837371}
   cameraEffects: {fileID: 7827965959660100850}
@@ -1827,6 +1936,7 @@ Transform:
   m_Children:
   - {fileID: 8424685589740072978}
   - {fileID: 6677003288566845101}
+  - {fileID: 8484300311427848272}
   m_Father: {fileID: 2735393184364509575}
   m_LocalEulerAnglesHint: {x: 12.016, y: 0, z: 0}
 --- !u!114 &7525020062721025566
