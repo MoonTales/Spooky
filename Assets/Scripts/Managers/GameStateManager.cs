@@ -15,6 +15,7 @@ namespace Managers
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
         private Types.GameState _currentGameState = Types.GameState.MainMenu;
+        private Types.WorldLocation _currentWorldLocation = new Types.WorldLocation();
         private int _currentWorldClockHour = 1; public int GetCurrentWorldClockHour() { return _currentWorldClockHour; }
         public void Start()
         {
@@ -30,6 +31,13 @@ namespace Managers
             // Example subscription to player health state changes
             TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerHealthStateChanged,
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerHealthStateChanged);
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
+        {
+            _currentWorldLocation = worldLocation;
         }
 
         private void OnPlayerHealthStateChanged(Types.PlayerMentalState newhealthstate)
@@ -37,24 +45,35 @@ namespace Managers
             // check for a player death
             if (newhealthstate == Types.PlayerMentalState.Breakdown)
             {
+                
+                PlayerStats.Instance.ResetAllStatsToDefault();
+                
                 // check the core state of the player
                 Types.PlayerMentalCoreState coreState = PlayerStats.Instance.GetPlayerStats().GetPlayerMentalCoreState();
                 if (coreState == Types.PlayerMentalCoreState.Anxious)
                 {
                     // this means the player was anxious death (they were in the nightmare, and need to reset to bedroom)
+
                     SceneSwapper.Instance.SwapScene("Bedroom");
                     // swap the core state to sleep deprived
                     PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+                    PlayerStats.Instance.SetMentalState(Types.PlayerMentalState.Normal);
                     
+                    EventBroadcaster.Broadcast_OnPlayerDamaged(0);
                 }
                 else if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
                 {
                     // this means the player fell asleep while in the bedroom, and should be sent to the nightmare
+
                     SceneSwapper.Instance.SwapScene("FirstAiTest");
                     // swap the core state to anxious
                     PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+                    //PlayerStats.Instance.SetMentalState(Types.PlayerMentalState.Normal);
+                    
+                    // bruh idk why I should need this but ok
+
                 }
-                PlayerStats.Instance.ResetAllStatsToDefault();
+                
                 
             }
             
@@ -72,25 +91,6 @@ namespace Managers
             {
                 DebugUtils.Log("Switching to Gameplay State");
                 EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            }
-            if(Input.GetKeyDown(KeyCode.K))
-            {
-                DebugUtils.Log("Switching to Cutscene State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
-            }
-            if(Input.GetKeyDown(KeyCode.M))
-            {
-                DebugUtils.Log("Switching to MainMenu State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
-            }
-            
-            if(Input.GetKeyDown(KeyCode.O))
-            {
-                SceneSwapper.Instance.SwapScene("Bedroom");
-            }
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                SceneSwapper.Instance.SwapScene("FirstAiTest");
             }
             
             if (Input.GetKeyDown(KeyCode.Y))
@@ -121,7 +121,6 @@ namespace Managers
             {
                 EventBroadcaster.Broadcast_GameRestarted();
             }
-            
             
             _currentGameState = newState;
         }

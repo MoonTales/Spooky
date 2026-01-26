@@ -121,5 +121,10 @@ namespace System
         public delegate void OnWorldClockHandler(int clockHour);
         public static event OnWorldClockHandler OnWorldClockHourChanged;
         public static void Broadcast_OnWorldClockHourChanged(int clockHour) { OnWorldClockHourChanged?.Invoke(clockHour);}
+        
+        public delegate void OnWorldLocationChanged(Types.WorldLocation newLocation);
+
+        public static event OnWorldLocationChanged OnWorldLocationChangedEvent;
+        public static void Broadcast_OnWorldLocationChanged(Types.WorldLocation newLocation) { OnWorldLocationChangedEvent?.Invoke(newLocation); }
     }
 }

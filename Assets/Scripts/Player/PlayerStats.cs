@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Types = System.Types;
@@ -12,9 +13,10 @@ namespace Player
     {
         private Types.FPlayerStats _playerStats; public Types.FPlayerStats GetPlayerStats() { return _playerStats; }
         
+        
         [Header("Default Player Stats")]
-        [SerializeField] private float defaultCurrentHealth = 100f;
-        [SerializeField] private float defaultMaxHealth = 100f;
+        [SerializeField] private float defaultCurrentMentalHealth = 100f;
+        [SerializeField] private float defaultMaxMentalHealth = 100f;
         [SerializeField] private float defaultCurrentStamina = 100f;
         [SerializeField] private float defaultMaxStamina = 100f;
         [SerializeField] private float defaultMovementSpeed = 5f;
@@ -35,7 +37,54 @@ namespace Player
         [SerializeField] private float ExhaustedMentalHealthCutoff = 0.1f;
         
         
+        // Internal field used for the Sanity draining
+        private Coroutine _sanityDrainCoroutine;
         
+        protected override void OnGameStateChanged(Types.GameState newGameState)
+        {
+            // based on the gamestate, we need to do specific things to the sanity drain
+            if (newGameState == Types.GameState.Gameplay)
+            {
+                // start sanity drain
+                if (_sanityDrainCoroutine == null)
+                {
+                    _sanityDrainCoroutine = StartCoroutine(StartSanityDrain());
+                }
+            }
+            else
+            {
+                // stop sanity drain
+                if (_sanityDrainCoroutine != null)
+                {
+                    StopCoroutine(_sanityDrainCoroutine);
+                    _sanityDrainCoroutine = null;
+                }
+            }
+        }
+
+        private IEnumerator StartSanityDrain()
+        {
+            while (_playerStats.GetCurrentMentalHealth() > 0)
+            {
+                // Drain sanity over time based on core state
+                Types.PlayerMentalCoreState coreState = _playerStats.GetPlayerMentalCoreState();
+                float drainAmount = 0f;
+                if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
+                {
+                    drainAmount = 1f; // Drain 1 mental health per interval
+                }
+                else if (coreState == Types.PlayerMentalCoreState.Anxious)
+                {
+                    drainAmount = 2f; // Drain 2 mental health per interval
+                }
+
+                UpdateCurrentMentalHealth(-drainAmount);
+
+                // Wait for a set interval before draining again
+                yield return new WaitForSeconds(5f); // Adjust the interval as needed
+            }
+        }
+
         public void Start()
         {
             // Initialize the player stats
@@ -57,7 +106,24 @@ namespace Player
             base.RegisterSubscriptions();
             TrackSubscription(() => EventBroadcaster.OnPlayerDamaged += OnPlayerDamaged,
                 () => EventBroadcaster.OnPlayerDamaged -= OnPlayerDamaged);
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
             
+        }
+        
+        private void OnWorldLocationChanged(Types.WorldLocation newLocation)
+        {
+            // regardless, whenever we change locations, we wanna reset sanity
+            InitializeDefaultStats();
+            // but also set the core state based on location
+            if (newLocation == Types.WorldLocation.Bedroom)
+            {
+                _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+            }
+            else if (newLocation == Types.WorldLocation.Nightmare)
+            {
+                _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+            }
         }
         
         public void ResetAllStatsToDefault()
@@ -82,19 +148,24 @@ namespace Player
 
         private void InitializeDefaultStats()
         {
-            _playerStats.SetCurrentMentalHealth(defaultCurrentHealth);
-            _playerStats.SetMaxMentalHealth(defaultMaxHealth);
+            _playerStats.SetCurrentMentalHealth(defaultCurrentMentalHealth);
+            _playerStats.SetMaxMentalHealth(defaultMaxMentalHealth);
             _playerStats.SetCurrentStamina(defaultCurrentStamina);
             _playerStats.SetMaxStamina(defaultMaxStamina);
             _playerStats.SetMovementSpeed(defaultMovementSpeed);
             _playerStats.SetPlayerMentalState(defaultPlayerMentalState, false);
-            //_playerStats.SetPlayerMentalCoreState(defaultPlayerMentalCoreState);
+            UpdateCurrentMentalHealth(0); // to ensure mental state is set correctly based on current health
             
         }
         
         public void SetMentalCoreState(Types.PlayerMentalCoreState coreState)
         {
             _playerStats.SetPlayerMentalCoreState(coreState);
+        }
+        
+        public void SetMentalState(Types.PlayerMentalState mentalState)
+        {
+            _playerStats.SetPlayerMentalState(mentalState);
         }
         
         
