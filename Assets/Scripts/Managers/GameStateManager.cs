@@ -15,6 +15,7 @@ namespace Managers
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
         private Types.GameState _currentGameState = Types.GameState.MainMenu;
+        private Types.WorldLocation _currentWorldLocation = new Types.WorldLocation();
         private int _currentWorldClockHour = 1; public int GetCurrentWorldClockHour() { return _currentWorldClockHour; }
         public void Start()
         {
@@ -30,6 +31,13 @@ namespace Managers
             // Example subscription to player health state changes
             TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerHealthStateChanged,
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerHealthStateChanged);
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
+        {
+            _currentWorldLocation = worldLocation;
         }
 
         private void OnPlayerHealthStateChanged(Types.PlayerMentalState newhealthstate)
@@ -84,16 +92,6 @@ namespace Managers
                 DebugUtils.Log("Switching to Gameplay State");
                 EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
             }
-            if(Input.GetKeyDown(KeyCode.K))
-            {
-                DebugUtils.Log("Switching to Cutscene State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
-            }
-            if(Input.GetKeyDown(KeyCode.M))
-            {
-                DebugUtils.Log("Switching to MainMenu State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
-            }
             
             if (Input.GetKeyDown(KeyCode.Y))
             {
@@ -123,7 +121,6 @@ namespace Managers
             {
                 EventBroadcaster.Broadcast_GameRestarted();
             }
-            
             
             _currentGameState = newState;
         }

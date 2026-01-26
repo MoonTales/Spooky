@@ -50,8 +50,18 @@ namespace System
             // This is when we want to broadcast the world clock
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(GameStateManager.Instance.GetCurrentWorldClockHour());
             
-            // can i put this here?
-            PlayerStats.Instance.SetMentalState(Types.PlayerMentalState.Normal);
+            // for now we will hardcode this
+            if (scene.name.ToLower() == "bedroom")
+            {
+                DebugUtils.Log("Broadcasting world location change to Bedroom");
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Bedroom);
+            }
+            if (scene.name.ToLower() == "firstaitest")
+            {
+                DebugUtils.Log("Broadcasting world location change to Nightmare");
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
+            }
+            
         }
     }
 }

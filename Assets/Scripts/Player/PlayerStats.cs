@@ -106,7 +106,24 @@ namespace Player
             base.RegisterSubscriptions();
             TrackSubscription(() => EventBroadcaster.OnPlayerDamaged += OnPlayerDamaged,
                 () => EventBroadcaster.OnPlayerDamaged -= OnPlayerDamaged);
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
             
+        }
+        
+        private void OnWorldLocationChanged(Types.WorldLocation newLocation)
+        {
+            // regardless, whenever we change locations, we wanna reset sanity
+            InitializeDefaultStats();
+            // but also set the core state based on location
+            if (newLocation == Types.WorldLocation.Bedroom)
+            {
+                _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+            }
+            else if (newLocation == Types.WorldLocation.Nightmare)
+            {
+                _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+            }
         }
         
         public void ResetAllStatsToDefault()
