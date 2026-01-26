@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Types = System.Types;
@@ -47,7 +48,7 @@ namespace Player
                 // start sanity drain
                 if (_sanityDrainCoroutine == null)
                 {
-                    //_sanityDrainCoroutine = StartCoroutine();
+                    _sanityDrainCoroutine = StartCoroutine(StartSanityDrain());
                 }
             }
             else
@@ -60,7 +61,30 @@ namespace Player
                 }
             }
         }
-        
+
+        private IEnumerator StartSanityDrain()
+        {
+            while (_playerStats.GetCurrentMentalHealth() > 0)
+            {
+                // Drain sanity over time based on core state
+                Types.PlayerMentalCoreState coreState = _playerStats.GetPlayerMentalCoreState();
+                float drainAmount = 0f;
+                if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
+                {
+                    drainAmount = 1f; // Drain 1 mental health per interval
+                }
+                else if (coreState == Types.PlayerMentalCoreState.Anxious)
+                {
+                    drainAmount = 2f; // Drain 2 mental health per interval
+                }
+
+                UpdateCurrentMentalHealth(-drainAmount);
+
+                // Wait for a set interval before draining again
+                yield return new WaitForSeconds(5f); // Adjust the interval as needed
+            }
+        }
+
         public void Start()
         {
             // Initialize the player stats
@@ -102,6 +126,8 @@ namespace Player
                 // debug print the current player stats
                 _playerStats.DebugPrintStats();
             }
+            
+            DebugUtils.Log("Current Mental Health: " + _playerStats.GetCurrentMentalHealth());
             
         }
 
