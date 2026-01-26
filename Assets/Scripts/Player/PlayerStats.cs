@@ -12,9 +12,10 @@ namespace Player
     {
         private Types.FPlayerStats _playerStats; public Types.FPlayerStats GetPlayerStats() { return _playerStats; }
         
+        
         [Header("Default Player Stats")]
-        [SerializeField] private float defaultCurrentHealth = 100f;
-        [SerializeField] private float defaultMaxHealth = 100f;
+        [SerializeField] private float defaultCurrentMentalHealth = 100f;
+        [SerializeField] private float defaultMaxMentalHealth = 100f;
         [SerializeField] private float defaultCurrentStamina = 100f;
         [SerializeField] private float defaultMaxStamina = 100f;
         [SerializeField] private float defaultMovementSpeed = 5f;
@@ -35,6 +36,30 @@ namespace Player
         [SerializeField] private float ExhaustedMentalHealthCutoff = 0.1f;
         
         
+        // Internal field used for the Sanity draining
+        private Coroutine _sanityDrainCoroutine;
+        
+        protected override void OnGameStateChanged(Types.GameState newGameState)
+        {
+            // based on the gamestate, we need to do specific things to the sanity drain
+            if (newGameState == Types.GameState.Gameplay)
+            {
+                // start sanity drain
+                if (_sanityDrainCoroutine == null)
+                {
+                    //_sanityDrainCoroutine = StartCoroutine();
+                }
+            }
+            else
+            {
+                // stop sanity drain
+                if (_sanityDrainCoroutine != null)
+                {
+                    StopCoroutine(_sanityDrainCoroutine);
+                    _sanityDrainCoroutine = null;
+                }
+            }
+        }
         
         public void Start()
         {
@@ -82,8 +107,8 @@ namespace Player
 
         private void InitializeDefaultStats()
         {
-            _playerStats.SetCurrentMentalHealth(defaultCurrentHealth);
-            _playerStats.SetMaxMentalHealth(defaultMaxHealth);
+            _playerStats.SetCurrentMentalHealth(defaultCurrentMentalHealth);
+            _playerStats.SetMaxMentalHealth(defaultMaxMentalHealth);
             _playerStats.SetCurrentStamina(defaultCurrentStamina);
             _playerStats.SetMaxStamina(defaultMaxStamina);
             _playerStats.SetMovementSpeed(defaultMovementSpeed);
