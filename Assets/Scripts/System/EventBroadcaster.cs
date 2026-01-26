@@ -99,9 +99,9 @@ namespace System
         public static void Broadcast_OnPlayerDamaged(float damageAmount) { OnPlayerDamaged?.Invoke(damageAmount); }
         
         
-        public delegate void OnPlayerHealthStateChangedHandler(Types.PlayerHealthState newHealthState);
+        public delegate void OnPlayerHealthStateChangedHandler(Types.PlayerMentalState newMentalState);
         public static event OnPlayerHealthStateChangedHandler OnPlayerHealthStateChanged;
-        public static void Broadcast_OnPlayerHealthStateChanged(Types.PlayerHealthState newHealthState) { OnPlayerHealthStateChanged?.Invoke(newHealthState); }
+        public static void Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState newMentalState) { OnPlayerHealthStateChanged?.Invoke(newMentalState); }
         
         
         public delegate void OnFlashlightToggledHandler(bool isOn);
