@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Managers;
+using Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -48,6 +49,19 @@ namespace System
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
             // This is when we want to broadcast the world clock
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(GameStateManager.Instance.GetCurrentWorldClockHour());
+            
+            // for now we will hardcode this
+            if (scene.name.ToLower() == "bedroom")
+            {
+                DebugUtils.Log("Broadcasting world location change to Bedroom");
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Bedroom);
+            }
+            if (scene.name.ToLower() == "firstaitest")
+            {
+                DebugUtils.Log("Broadcasting world location change to Nightmare");
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
+            }
+            
         }
     }
 }
