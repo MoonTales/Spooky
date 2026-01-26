@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Managers;
+using Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -48,6 +49,9 @@ namespace System
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
             // This is when we want to broadcast the world clock
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(GameStateManager.Instance.GetCurrentWorldClockHour());
+            
+            // can i put this here?
+            PlayerStats.Instance.SetMentalState(Types.PlayerMentalState.Normal);
         }
     }
 }

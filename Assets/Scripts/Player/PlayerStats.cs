@@ -137,7 +137,7 @@ namespace Player
             _playerStats.SetMaxStamina(defaultMaxStamina);
             _playerStats.SetMovementSpeed(defaultMovementSpeed);
             _playerStats.SetPlayerMentalState(defaultPlayerMentalState, false);
-            //_playerStats.SetPlayerMentalCoreState(defaultPlayerMentalCoreState);
+            UpdateCurrentMentalHealth(0); // to ensure mental state is set correctly based on current health
             
         }
         
