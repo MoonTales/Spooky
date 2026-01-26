@@ -45,6 +45,7 @@ namespace Managers
                     SceneSwapper.Instance.SwapScene("Bedroom");
                     // swap the core state to sleep deprived
                     PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+                    PlayerStats.Instance.SetMentalState(Types.PlayerMentalState.Normal);
                     
                 }
                 else if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
@@ -53,6 +54,7 @@ namespace Managers
                     SceneSwapper.Instance.SwapScene("FirstAiTest");
                     // swap the core state to anxious
                     PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+                    PlayerStats.Instance.SetMentalState(Types.PlayerMentalState.Normal);
                 }
                 PlayerStats.Instance.ResetAllStatsToDefault();
                 

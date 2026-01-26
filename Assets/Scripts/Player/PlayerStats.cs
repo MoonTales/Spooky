@@ -146,6 +146,11 @@ namespace Player
             _playerStats.SetPlayerMentalCoreState(coreState);
         }
         
+        public void SetMentalState(Types.PlayerMentalState mentalState)
+        {
+            _playerStats.SetPlayerMentalState(mentalState);
+        }
+        
         
         // this is whats called from the FPlayerStats struct to update health
         public void UpdateCurrentMentalHealth(float delta)
