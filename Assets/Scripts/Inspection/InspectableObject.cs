@@ -77,8 +77,5 @@ namespace Inspection
         }
 
         public string Prompt { get; }
-        public AudioClip HoverSfx { get; }
-        public AudioClip InteractSfx { get; }
-        public AudioClip DeniedSfx { get; }
     }
 }

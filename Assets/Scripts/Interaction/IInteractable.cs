@@ -15,7 +15,7 @@ public interface IInteractable
 
 
     // optional common audio (can be null)
-    AudioClip HoverSfx { get; }
-    AudioClip InteractSfx { get; }
-    AudioClip DeniedSfx { get; }
+    //AudioClip HoverSfx { get; }
+    //AudioClip InteractSfx { get; }
+    //AudioClip DeniedSfx { get; }
 }
