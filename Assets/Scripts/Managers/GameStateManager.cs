@@ -95,15 +95,6 @@ namespace Managers
                 EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
             }
             
-            if(Input.GetKeyDown(KeyCode.O))
-            {
-                SceneSwapper.Instance.SwapScene("Bedroom");
-            }
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                SceneSwapper.Instance.SwapScene("FirstAiTest");
-            }
-            
             if (Input.GetKeyDown(KeyCode.Y))
             {
                 EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour += 1);
