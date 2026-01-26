@@ -11,7 +11,7 @@ namespace Interaction.drawings
         [Header("Drawing Settings")]
         [SerializeField, Tooltip("What area does this item exist within?")] 
         private Types.WorldLocation location = Types.WorldLocation.Bedroom;
-        [SerializeField] private int drawingID;
+        [SerializeField] private int drawingID; public int GetDrawingID() { return drawingID; }
     
         [Header("Pickup Settings")]
         [SerializeField] private float pickupTransitionSpeed = 8f;
