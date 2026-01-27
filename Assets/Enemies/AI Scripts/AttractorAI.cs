@@ -138,7 +138,7 @@ public class AttractorAI : MonoBehaviour
 
 	private bool aboutToRushScream = true;
 	private bool aboutToChaseScream = true;
-	private bool finishedScream = false;
+	private bool finishedScream = true;
 
 	private float investigateTimer;
 
