@@ -229,9 +229,22 @@ namespace Player
             sprintAction.action.performed += OnSprint;
             sprintAction.action.canceled += OnSprint;
             flashlightToggleAction.action.performed += OnFlashlightToggle;
-            
-            
         }
+
+        protected override void RegisterSubscriptions()
+        {
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
+        {
+            if (_isCrouching)
+            {
+                ForceCrouch();
+            }
+        }
+        
 
         private void OnFlashlightToggle(InputAction.CallbackContext obj)
         {
@@ -297,7 +310,7 @@ namespace Player
             time = 0f;
         }
 
-        private void ForceCrouch()
+        public void ForceCrouch()
         {
             if(_lockedInput){ return; }
             if (_isCrouching)
