@@ -295,8 +295,22 @@ namespace Player
             }
             _isCrouching = !_isCrouching;
             time = 0f;
-            
+        }
 
+        private void ForceCrouch()
+        {
+            if(_lockedInput){ return; }
+            if (_isCrouching)
+            {
+                if (!CanStandUp()) { return;}
+                _targetHeight = standHeight;
+            } else
+            {
+                _targetHeight = crouchHeight;
+                
+            }
+            _isCrouching = !_isCrouching;
+            time = 0f;
         }
         private void OnJump(InputAction.CallbackContext obj)
         {
@@ -548,8 +562,11 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(false);
             }
+            // if the player is currently moving (or has any input at all, we want to disable it)
+            StopAllPlayerMovement();
         }
 
+        
         #region Helper Function
         /// <summary>
         /// A series of various helpers to determine possible things about the player, mostly generic movement
@@ -577,7 +594,6 @@ namespace Player
 
         private void StopAllPlayerMovement()
         {
-            _isCrouching = false;
             _cachedSprintState = false;
             _isSprinting = false;
             _moveInput = Vector2.zero;
