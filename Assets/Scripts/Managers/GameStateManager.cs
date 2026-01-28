@@ -98,6 +98,12 @@ namespace Managers
                 EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour += 1);
             }
             
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                EventBroadcaster.Broadcast_GameRestarted();
+            }
+            
+            
             
         }
 
