@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Interaction.drawings;
 using UnityEngine;
+using Types = System.Types;
 
 namespace Managers
 {
@@ -13,6 +14,11 @@ namespace Managers
         public UnityEngine.Vector3 Position;  // Use UnityEngine.Vector3
         public UnityEngine.Quaternion Rotation;  // Use UnityEngine.Quaternion
         public UnityEngine.Vector3 Scale;
+        
+        public override string ToString()
+        {
+            return $"DrawingTransformData(ID: {DrawingID}, Position: {Position}, Rotation: {Rotation}, Scale: {Scale})";
+        }
     }
     
     /// <summary>
@@ -26,80 +32,124 @@ namespace Managers
         
         // Cache of drawings in the current scene
         private List<Drawing> _drawingsInScene = new List<Drawing>();
-
-
-        protected override void OnGameStarted()
+        
+        protected override void RegisterSubscriptions()
         {
-            // Save every 5 seconds
-            //InvokeRepeating(nameof(UpdateDrawingTransformData), 5f, 5f);
-            
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
         }
 
+        protected override void OnGameRestarted()
+        {
+            // since this is emulating a full reset, we will clear all drawing data
+            _drawingTransformDataList.Clear();
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
+        {
+            if (worldLocation == Types.WorldLocation.Bedroom)
+            {
+                RestoreDrawingsToTransform();
+            }
+        }
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.O))
             {
                 UpdateDrawingTransformData();
             }
-            if (Input.GetKeyDown(KeyCode.P))
+            if (Input.GetKeyDown(KeyCode.K))
             {
-                RestoreDrawingTransformData();
+                // debug print all of the drawing transform data
+                foreach (DrawingTransformData data in _drawingTransformDataList)
+                {
+                    Debug.Log(data.ToString());
+                }
+                if (_drawingTransformDataList.Count == 0)
+                {
+                    Debug.Log("No drawing transform data saved.");
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.X))
+            {
+                RestoreDrawingsToTransform();
             }
         }
         
         
 
         // Collect all drawings in the scene and update their transform data
-        private void UpdateDrawingTransformData()
+        public void UpdateDrawingTransformData()
         {
             DebugUtils.LogSuccess("Saving drawing transform data...");
             
-            // If first time, collect all drawings in the scene
-            if (_drawingsInScene.Count == 0)
+            // Dont worry about optimization for now
+            _drawingsInScene.Clear();
+            Drawing[] allDrawings = FindObjectsOfType<Drawing>();
+
+            foreach (Drawing drawing in allDrawings)
             {
-                _drawingsInScene.Clear();
-                Drawing[] drawingsInScene = GameObject.FindObjectsOfType<Drawing>();
-                _drawingsInScene.AddRange(drawingsInScene);
+                if (drawing.GetLocation() == Types.WorldLocation.Bedroom)
+                {
+                    _drawingsInScene.Add(drawing);
+                }
             }
+            
             
             // Update transform data for all drawings
             foreach (Drawing drawing in _drawingsInScene)
             {
-                if (drawing == null) continue; // Skip if drawing was destroyed
+                if (drawing == null){ continue;}
                 
                 UpdateOrAddDrawingTransform(drawing);
             }
         }
 
-        private void RestoreDrawingTransformData()
+        private void RestoreDrawingsToTransform()
         {
-            DebugUtils.LogSuccess("Restoring drawing transform data...");
-            // find all drawings in the scene
-            Drawing[] drawingsInScene = GameObject.FindObjectsOfType<Drawing>();
-            foreach (Drawing drawing in drawingsInScene)
+            // Dont worry about optimization for now
+            _drawingsInScene.Clear();
+            Drawing[] allDrawings = FindObjectsOfType<Drawing>();
+
+            foreach (Drawing drawing in allDrawings)
             {
-                // find the corresponding transform data
-                DrawingTransformData? data = _drawingTransformDataList.Find(d => d.DrawingID == drawing.GetDrawingID());
-                if (data.HasValue)
+                if (drawing.GetLocation() == Types.WorldLocation.Bedroom)
                 {
-                    // restore the transform
-                    drawing.transform.position = data.Value.Position;
-                    drawing.transform.rotation = data.Value.Rotation;
-                    drawing.transform.localScale = data.Value.Scale;
+                    _drawingsInScene.Add(drawing);
+                }
+            }
+            
+            // Restore transform data for all drawings
+            foreach (Drawing drawing in _drawingsInScene)
+            {
+                if (drawing == null){ continue;}
+                
+                // Find if this drawing exists in our data list
+                int existingIndex = _drawingTransformDataList.FindIndex(d => d.DrawingID == drawing.GetUniqueDrawingID());
+                if (existingIndex >= 0)
+                {
+                    DebugUtils.LogSuccess($"Restoring Transform for Drawing ID: {drawing.GetUniqueDrawingID()}");
+                    DebugUtils.LogSuccess($"Current Transform: {drawing.transform.position}, Rotation: {drawing.transform.rotation}, Scale: {drawing.transform.localScale}");
+                    DebugUtils.LogSuccess($"Saved Transform: {_drawingTransformDataList[existingIndex].Position}, Rotation: {_drawingTransformDataList[existingIndex].Rotation}, Scale: {_drawingTransformDataList[existingIndex].Scale}");
+                    DrawingTransformData data = _drawingTransformDataList[existingIndex];
+                    drawing.transform.position = data.Position;
+                    drawing.transform.rotation = data.Rotation;
+                    drawing.transform.localScale = data.Scale;
                 }
             }
         }
-
-
+        
+        
         private void UpdateOrAddDrawingTransform(Drawing drawing)
         {
             // Find if this drawing already exists in our data list
-            int existingIndex = _drawingTransformDataList.FindIndex(d => d.DrawingID == drawing.GetDrawingID());
+            int existingIndex = _drawingTransformDataList.FindIndex(d => d.DrawingID == drawing.GetUniqueDrawingID());
             
             // Create the transform data
             DrawingTransformData data = new DrawingTransformData
             {
-                DrawingID = drawing.GetDrawingID(),
+                DrawingID = drawing.GetUniqueDrawingID(),
                 Position = drawing.transform.position,
                 Rotation = drawing.transform.rotation,
                 Scale = drawing.transform.localScale
@@ -117,5 +167,18 @@ namespace Managers
             }
         }
 
+        public bool IsAnyDrawingCurrentlyHeld()
+        {
+            
+            // we will access GetCurrentlyHeldDrawing, which returns a Drawing if one is being held, or null if none are being held
+            foreach (Drawing drawing in _drawingsInScene)
+            {
+                if (drawing.GetCurrentlyHeldDrawing())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
