@@ -40,7 +40,6 @@ namespace Player
         
 
         // Internal state
-        private bool _isAllowedToHeadBob = false;
         private float _bobTimer;
         private float _cameraBaseY;
         private float _peekAmount;
@@ -59,7 +58,7 @@ namespace Player
         private void LateUpdate()
         {
             // update the head to follow the camera
-            if (_cameraTransform == null || !_isAllowedToHeadBob){ return;}
+            if (_cameraTransform == null){ return;}
 
             headTransform.SetPositionAndRotation(
                 _cameraTransform.position,
@@ -67,16 +66,7 @@ namespace Player
             );
         }
 
-        protected override void OnGameStateChanged(Types.GameState newState)
-        {
-            if (newState == Types.GameState.Cutscene)
-            {
-                _isAllowedToHeadBob = false;
-                ResetHeadBob();
-                return;
-            }
-            _isAllowedToHeadBob = true;
-        }
+
         /// <summary>
         /// Updates camera base Y position (called when crouching/standing from a player controller)
         /// </summary>
@@ -142,7 +132,7 @@ namespace Player
             _cameraTransform.localPosition = cameraPosition;
         }
 
-        public void ResetHeadBob()
+        private void ResetHeadBob()
         {
             // Reset everything back to defaults
             _bobTimer = 0f;

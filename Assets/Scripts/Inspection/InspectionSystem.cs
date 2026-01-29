@@ -186,7 +186,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
 
     // Exit inspection with right click or ESC
-    if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.H))
+    if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
     {
         EndInspection();
     }

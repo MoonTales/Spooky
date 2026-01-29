@@ -233,6 +233,7 @@ namespace Player
 
         protected override void RegisterSubscriptions()
         {
+            base.RegisterSubscriptions();
             TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
                 () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
         }
