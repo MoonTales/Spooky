@@ -229,9 +229,23 @@ namespace Player
             sprintAction.action.performed += OnSprint;
             sprintAction.action.canceled += OnSprint;
             flashlightToggleAction.action.performed += OnFlashlightToggle;
-            
-            
         }
+
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
+        {
+            if (_isCrouching)
+            {
+                ForceCrouch();
+            }
+        }
+        
 
         private void OnFlashlightToggle(InputAction.CallbackContext obj)
         {
@@ -295,8 +309,22 @@ namespace Player
             }
             _isCrouching = !_isCrouching;
             time = 0f;
-            
+        }
 
+        public void ForceCrouch()
+        {
+            if(_lockedInput){ return; }
+            if (_isCrouching)
+            {
+                if (!CanStandUp()) { return;}
+                _targetHeight = standHeight;
+            } else
+            {
+                _targetHeight = crouchHeight;
+                
+            }
+            _isCrouching = !_isCrouching;
+            time = 0f;
         }
         private void OnJump(InputAction.CallbackContext obj)
         {
@@ -548,8 +576,11 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(false);
             }
+            // if the player is currently moving (or has any input at all, we want to disable it)
+            StopAllPlayerMovement();
         }
 
+        
         #region Helper Function
         /// <summary>
         /// A series of various helpers to determine possible things about the player, mostly generic movement
@@ -577,7 +608,6 @@ namespace Player
 
         private void StopAllPlayerMovement()
         {
-            _isCrouching = false;
             _cachedSprintState = false;
             _isSprinting = false;
             _moveInput = Vector2.zero;
