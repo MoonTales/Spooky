@@ -31,14 +31,12 @@ public class Interactor : MonoBehaviour
             var interactable = hitInfo.collider.GetComponentInParent<IInteractable>();
             if (interactable == null)
             {
-                Debug.Log("Y");
                 EventBroadcaster.Broadcast_OnEndedHoverInteractable();
                 return;
             }
             // handle updating any HUD options
             if (interactable.CanInteract(this))
             {
-                Debug.Log("X");
                 EventBroadcaster.Broadcast_OnBeganHoverInteractable(interactable);
             }
             if (Input.GetKeyDown(interactKey))
