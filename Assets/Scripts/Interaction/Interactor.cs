@@ -1,4 +1,5 @@
 using System;
+using Player;
 using UnityEngine;
 
 public class Interactor : MonoBehaviour
@@ -39,9 +40,9 @@ public class Interactor : MonoBehaviour
             {
                 EventBroadcaster.Broadcast_OnBeganHoverInteractable(interactable);
             }
-            if (Input.GetKeyDown(interactKey))
+            if (Input.GetKeyDown(interactKey) )
             {
-                if (interactable.CanInteract(this))
+                if (interactable.CanInteract(this) && IsAllowedToInteract())
                 {
                     interactable.Interact(this);
                 }
@@ -54,4 +55,9 @@ public class Interactor : MonoBehaviour
         }
     }
 
+    private bool IsAllowedToInteract()
+    {
+        // for now, we are assuming its always the player who is an interactor
+        return PlayerController.Instance.IsGrounded();
+    }
 }
