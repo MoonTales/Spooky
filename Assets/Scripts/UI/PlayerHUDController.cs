@@ -14,13 +14,37 @@ namespace UI
         // textmeshpro Text ui
         private TMP_Text _hudSanityStateText;
         private TMP_Text _hudSanityValueText;
-
         
+        private TMP_Text _hudInteractionPromptText;
+
+
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnBeganHoverInteractable += OnInteractHoverStarted,
+                () => EventBroadcaster.OnBeganHoverInteractable -= OnInteractHoverStarted);
+            TrackSubscription(() => EventBroadcaster.OnEndedHoverInteractable += OnInteractHoverEnded,
+                () => EventBroadcaster.OnEndedHoverInteractable -= OnInteractHoverEnded);
+        }
+        
+        private void OnInteractHoverStarted(IInteractable interactable)
+        {
+            // Show interaction prompt on HUD
+            Debug.Log("Show interaction prompt for: " + interactable.Prompt);
+            _hudInteractionPromptText.text = "[F] " + interactable.Prompt;
+        }
+        private void OnInteractHoverEnded()
+        {
+            // Hide interaction prompt on HUD
+            Debug.Log("Hide interaction prompt");
+            _hudInteractionPromptText.text = "";
+        }
         private void Start()
         {
             _hudCanvas = GetComponent<Canvas>();
             _hudSanityStateText = transform.Find("SanityState").GetComponent<TMP_Text>();
             _hudSanityValueText = transform.Find("SanityValue").GetComponent<TMP_Text>();
+            _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
         }
 
         protected override void OnGameStateChanged(Types.GameState newstate)

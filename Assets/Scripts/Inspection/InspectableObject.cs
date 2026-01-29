@@ -76,6 +76,6 @@ namespace Inspection
             }
         }
 
-        public string Prompt { get; }
+        public string Prompt { get; } = "Inspect Object";
     }
 }
