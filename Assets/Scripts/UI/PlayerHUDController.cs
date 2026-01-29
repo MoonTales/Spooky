@@ -14,7 +14,6 @@ namespace UI
         // textmeshpro Text ui
         private TMP_Text _hudSanityStateText;
         private TMP_Text _hudSanityValueText;
-        
         private TMP_Text _hudInteractionPromptText;
 
 
@@ -46,6 +45,7 @@ namespace UI
             _hudSanityValueText = transform.Find("SanityValue").GetComponent<TMP_Text>();
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
         }
+        
 
         protected override void OnGameStateChanged(Types.GameState newstate)
         {
@@ -61,9 +61,15 @@ namespace UI
                     ShowHUD(false);
                     break;
                 case Types.GameState.Inspecting:
-                    ShowHUD(false);
+                    HandleInspection();
                     break;
             }
+        }
+
+        private void HandleInspection()
+        {
+            //For momo: custom logic here, since this automatically gets called the second we start inspection
+            ShowHUD(false);
         }
     
         private void ShowHUD(bool show)
