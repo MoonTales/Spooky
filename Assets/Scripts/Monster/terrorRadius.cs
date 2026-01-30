@@ -6,6 +6,10 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 
+
+// EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f); damage
+//_hudSanityValueText.text = Mathf.RoundToInt(PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth()).ToString(); check damage
+
 public class terrorRadius : MonoBehaviour
 {
 
