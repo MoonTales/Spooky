@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using Types = System.Types;
 using Inspection;
+using UnityEngine.UI;
 
 namespace UI
 {
@@ -12,14 +13,15 @@ namespace UI
     
         // Internal References to the HUD
         private Canvas _hudCanvas;
-        // textmeshpro Text ui
+        // Crosshair
+        private Image _hudCrosshair;
+        // Textmeshpro Text ui
         private TMP_Text _hudSanityStateText;
         private TMP_Text _hudSanityValueText;
         private TMP_Text _hudInteractionPromptText;
         private TMP_Text _hudItemNameText;
         private TMP_Text _hudItemDescriptionText;
-
-        // object
+        // Object
         private InspectableObject obj;
 
 
@@ -45,6 +47,7 @@ namespace UI
         private void Start()
         {
             _hudCanvas = GetComponent<Canvas>();
+            _hudCrosshair = transform.Find("CrossHair").GetComponent<Image>();
             _hudSanityStateText = transform.Find("SanityState").GetComponent<TMP_Text>();
             _hudSanityValueText = transform.Find("SanityValue").GetComponent<TMP_Text>();
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
@@ -60,6 +63,7 @@ namespace UI
                 case Types.GameState.Gameplay:
                     _hudItemNameText.text = "";
                     _hudItemDescriptionText.text = "";
+                    if (_hudCrosshair != null){_hudCrosshair.enabled = true;}
                     ShowHUD(true);
                     break;
                 case Types.GameState.Cutscene:
@@ -79,11 +83,11 @@ namespace UI
             InspectableObject obj = InspectionSystem.Instance.GetCurrentInspectedObject();
             DebugUtils.Log($"PlayerHUDController: Handling inspection of object '{obj.GetObjectName()}'");
 
-            //For momo: custom logic here, since this automatically gets called the second we start inspection
             _hudItemNameText.text = obj.GetObjectName();
-            //InspectableObject.GetObjectName()
             _hudItemDescriptionText.text = obj.GetObjectDescription();
-            ShowHUD(true);
+
+            if (_hudCrosshair != null){_hudCrosshair.enabled = false;}
+
         }
     
         private void ShowHUD(bool show)
