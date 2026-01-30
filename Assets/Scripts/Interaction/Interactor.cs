@@ -28,6 +28,14 @@ public class Interactor : MonoBehaviour
         
         if (Physics.Raycast(origin, dir, out RaycastHit hitInfo, castDistance))
         {
+            
+            // if we currently have an object we are inspecting, we should not allow any of this to happen
+            if (InspectionSystem.Instance.GetCurrentInspectedObject() != null)
+            {
+                EventBroadcaster.Broadcast_OnEndedHoverInteractable();
+                return;
+            }
+            
             // determine if the object is interactable
             var interactable = hitInfo.collider.GetComponentInParent<IInteractable>();
             if (interactable == null)
