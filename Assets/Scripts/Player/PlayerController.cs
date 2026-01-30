@@ -307,6 +307,7 @@ namespace Player
             {
                 // Apply jump force
                 _verticalVelocity = jumpForce;
+                AudioManager.Instance.PlaySfx(AudioManager.SfxId.Jump, transform);
             }
         }
         private void HandleGravity()

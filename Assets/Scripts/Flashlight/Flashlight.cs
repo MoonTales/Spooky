@@ -219,7 +219,7 @@ public class Flashlight : Singleton<Flashlight>
     {
         EventBroadcaster.Broadcast_OnFlashlightToggled(true);
         // play SFX
-        AudioManager.Instance.PlayFlashlightOn();
+        AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
         // turn on all light components
         SetAllLights(true);
         // Start special flicker timer
@@ -245,7 +245,7 @@ public class Flashlight : Singleton<Flashlight>
     {
         EventBroadcaster.Broadcast_OnFlashlightToggled(false);
         // play SFX
-        AudioManager.Instance.PlayFlashlightOff();
+        AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
         // turn off all light components
         SetAllLights(false);
         // Stop special flicker timer
