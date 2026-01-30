@@ -15,6 +15,8 @@ namespace UI
         private TMP_Text _hudSanityStateText;
         private TMP_Text _hudSanityValueText;
         private TMP_Text _hudInteractionPromptText;
+        private TMP_Text _hudItemNameText;
+        private TMP_Text _hudItemDescriptionText;
 
 
         protected override void RegisterSubscriptions()
@@ -42,6 +44,8 @@ namespace UI
             _hudSanityStateText = transform.Find("SanityState").GetComponent<TMP_Text>();
             _hudSanityValueText = transform.Find("SanityValue").GetComponent<TMP_Text>();
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
+            _hudItemNameText = transform.Find("ItemName").GetComponent<TMP_Text>();
+            _hudItemDescriptionText = transform.Find("ItemDescription").GetComponent<TMP_Text>();
         }
         
 
@@ -50,6 +54,8 @@ namespace UI
             switch (newstate)
             {
                 case Types.GameState.Gameplay:
+                    _hudItemNameText.text = "";
+                    _hudItemDescriptionText.text = "";
                     ShowHUD(true);
                     break;
                 case Types.GameState.Cutscene:
@@ -67,7 +73,10 @@ namespace UI
         private void HandleInspection()
         {
             //For momo: custom logic here, since this automatically gets called the second we start inspection
-            ShowHUD(false);
+            _hudItemNameText.text = "Test";
+            //InspectableObject.GetObjectName()
+            _hudItemDescriptionText.text = "Test";
+            ShowHUD(true);
         }
     
         private void ShowHUD(bool show)
