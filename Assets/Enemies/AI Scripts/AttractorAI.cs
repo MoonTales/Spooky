@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using System.Reflection;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
 
@@ -38,6 +39,29 @@ public class AttractorAI : MonoBehaviour
 		self
 	}
 
+	public enum FunctionType
+	{
+		TestFunction_floatF_boolB
+	}
+
+	[System.Serializable]
+	public class FunctionPicker
+	{
+		public FunctionType function;
+		public List<string> arguments;
+	}
+
+	public void TestFunction(List<string> arguments)
+	{
+		float F = float.Parse(arguments[0]);
+		bool B = bool.Parse(arguments[1]);
+
+		if (B)
+		{
+			Debug.Log($"Oh wow {F}");
+		}
+	}
+
 	[System.Serializable]
 	public class EnemyReactions
 	{
@@ -47,6 +71,7 @@ public class AttractorAI : MonoBehaviour
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
+		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		public EnemyState stateChange;
 		//[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
 			//"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
@@ -105,6 +130,9 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float screamTime = 1;
 	[SerializeField] private Collider attackBox;
 
+	[Header("Jump Settings")]
+	
+
 	[Header("WanderState")]
 	[SerializeField] private float wanderSpeed;
 	[Tooltip("Maximum distance from current position that the enemy can choose to walk to")]
@@ -156,6 +184,13 @@ public class AttractorAI : MonoBehaviour
 	private bool finishedAttack = false;
 
 	#endregion
+
+
+	
+	public void Test2()
+	{
+		Debug.Log("yah");
+	}
 
 	void Start()
 	{
@@ -259,6 +294,16 @@ public class AttractorAI : MonoBehaviour
 		Gizmos.DrawLine(organ.position + right, organ.position + left);
 	}
 
+	void HandleFunctionCalling(FunctionPicker function)
+	{
+		switch (function.function)
+		{
+			case FunctionType.TestFunction_floatF_boolB:
+				TestFunction(function.arguments);
+				break;
+		}
+	}
+
 	void Update()
 	{
 		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);  // this keeps the animation in sync with the enemy speed
@@ -319,6 +364,10 @@ public class AttractorAI : MonoBehaviour
 					{
 						currentFocus = nextFocus;
 						currentState = nextState;
+						foreach (FunctionPicker function in reaction.functionExecutions)
+						{
+							HandleFunctionCalling(function);
+						}
 						currentStatePriority = nextStatePriority;
 					}
 
