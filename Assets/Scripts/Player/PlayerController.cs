@@ -15,7 +15,7 @@ namespace Player
     /// Class used to handle player input and control the player character
     /// Also will listen to player state changes and adjust controls accordingly
     /// </summary>
-    public class PlayerController : EventSubscriberBase
+    public class PlayerController : Singleton<PlayerController>
     {
 
         // I'm so sorry that the changes I'm about to make are so sloppy :(
@@ -55,7 +55,7 @@ namespace Player
         /* Internal variables */
         private CharacterController _characterController;
         private Vector2 _moveInput;
-        private bool _isGrounded;
+        private bool _isGrounded; public bool IsGrounded() { return _isGrounded; }
         private bool _isCrouching;
         private bool _isSprinting;
         private bool _cachedSprintState;

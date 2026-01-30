@@ -1,4 +1,5 @@
 using System;
+using Player;
 using UnityEngine;
 
 public class Interactor : MonoBehaviour
@@ -23,22 +24,40 @@ public class Interactor : MonoBehaviour
 
         Debug.DrawRay(origin, dir * castDistance, Color.red);
 
-        if (Input.GetKeyDown(interactKey))
+        
+        
+        if (Physics.Raycast(origin, dir, out RaycastHit hitInfo, castDistance))
         {
-            if (Physics.Raycast(origin, dir, out RaycastHit hitInfo, castDistance))
+            // determine if the object is interactable
+            var interactable = hitInfo.collider.GetComponentInParent<IInteractable>();
+            if (interactable == null)
             {
-                var interactable = hitInfo.collider.GetComponentInParent<IInteractable>();
-                if (interactable != null && interactable.CanInteract(this))
+                EventBroadcaster.Broadcast_OnEndedHoverInteractable();
+                return;
+            }
+            // handle updating any HUD options
+            if (interactable.CanInteract(this))
+            {
+                EventBroadcaster.Broadcast_OnBeganHoverInteractable(interactable);
+            }
+            if (Input.GetKeyDown(interactKey) )
+            {
+                if (interactable.CanInteract(this) && IsAllowedToInteract())
                 {
                     interactable.Interact(this);
                 }
-                else
-                {
-                    // play "denied" sound or show "locked" UI here.
-                    // Debug.Log("Can't interact.");
-                }
             }
+
+        }
+        else
+        {
+            EventBroadcaster.Broadcast_OnEndedHoverInteractable();
         }
     }
 
+    private bool IsAllowedToInteract()
+    {
+        // for now, we are assuming its always the player who is an interactor
+        return PlayerController.Instance.IsGrounded();
+    }
 }
