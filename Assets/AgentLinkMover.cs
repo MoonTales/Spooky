@@ -77,6 +77,7 @@ public class AgentLinkMover : MonoBehaviour
         Vector3 startPos = agent.transform.position;
         Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
         float jumpDistance = Vector3.Distance(startPos, endPos);
+        float heightDistance = endPos.y - startPos.y;
         float previousRotationSpeed = agent.angularSpeed;
         agent.angularSpeed = 999;
         if (jumpDistance > distanceThreshold + agent.velocity.magnitude)
@@ -110,6 +111,10 @@ public class AgentLinkMover : MonoBehaviour
             agent.transform.position = Vector3.Lerp(startPos, endPos, normalizedTime) + yOffset * Vector3.up;
             normalizedTime += Time.deltaTime / duration;
             yield return null;
+        }
+        if (heightDistance > heightThreshold)
+		{
+            yield return new WaitForSeconds((Mathf.Min((heightDistance - heightThreshold) / 2, maxPrepareTime / 2f)) / 2f);
         }
         agent.updateRotation = true;
         agent.angularSpeed = previousRotationSpeed;
