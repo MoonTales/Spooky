@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
+using FMODUnity;
+using FMOD.Studio;
+
 
 namespace Managers
 {
@@ -13,12 +16,7 @@ namespace Managers
         //public float sfxvolumeslider = 1;
         
         [Header("Footstep Sounds")]
-        [SerializeField] private AudioClip[] soundGrass;
-        [SerializeField] private AudioClip[] soundWater;
-        [SerializeField] private AudioClip[] soundConcrete;
-        [SerializeField] private AudioClip[] soundGravel;
-        [SerializeField] private AudioClip[] soundWood;
-        [SerializeField] private AudioClip[] soundMetal;
+        [SerializeField] private EventReference footstepPlayer;
 
         
         [Header("Mutes")]
@@ -112,6 +110,26 @@ namespace Managers
             src.Play();
         }
 
+        public void PlayFootstep(string surfaceLabel, Transform fromTransform = null)
+        {
+            if (muteSFX) return;
+            if (footstepPlayer.IsNull) return;
+
+            EventInstance instance = RuntimeManager.CreateInstance(footstepPlayer);
+
+            Vector3 position = fromTransform != null
+                ? fromTransform.position
+                : Camera.main != null
+                    ? Camera.main.transform.position
+                    : Vector3.zero;
+
+            instance.set3DAttributes(RuntimeUtils.To3DAttributes(position));
+            instance.setParameterByNameWithLabel("Surface", surfaceLabel);
+
+            instance.start();
+            instance.release();
+        }
+
         
         public void PlayFlashlightOn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
@@ -144,55 +162,6 @@ namespace Managers
         }
         #endregion
         #region Footstep Sounds
-        public void PlayPlayerWalkingGrass(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            if (soundGrass.Length == 0) { return; }
-            int stepnumber;
-            stepnumber = UnityEngine.Random.Range(0, soundGrass.Length);
-            AudioClip step = soundGrass[stepnumber];
-            PlaySFX(step, volume, deviation, fromTransform);
-        }
-        public void PlayPlayerWalkingWater(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            if (soundWater.Length == 0){ return;}
-            int stepnumber;
-            stepnumber = UnityEngine.Random.Range(0, soundWater.Length);
-            AudioClip step = soundWater[stepnumber];
-            PlaySFX(step, volume, deviation, fromTransform);
-        }
-        public void PlayPlayerWalkingConcrete(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            // ensure we have some sounds to play
-            if (soundConcrete.Length == 0) {return; }
-            int stepnumber;
-            stepnumber = UnityEngine.Random.Range(0, soundConcrete.Length);
-            AudioClip step = soundConcrete[stepnumber];
-            PlaySFX(step, volume, deviation, fromTransform);
-        }
-        public void PlayPlayerWalkingGravel(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            if (soundGravel.Length == 0) { return; }
-            int stepnumber;
-            stepnumber = UnityEngine.Random.Range(0, soundGravel.Length);
-            AudioClip step = soundGravel[stepnumber];
-            PlaySFX(step, volume, deviation, fromTransform);
-        }
-        public void PlayPlayerWalkingWood(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            if (soundWood.Length == 0) { return; }
-            int stepnumber;
-            stepnumber = UnityEngine.Random.Range(0, soundWood.Length);
-            AudioClip step = soundWood[stepnumber];
-            PlaySFX(step, volume, deviation, fromTransform);
-        }
-        public void PlayPlayerWalkingMetal(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            if (soundMetal.Length == 0) { return; }
-            int stepnumber;
-            stepnumber = UnityEngine.Random.Range(0, soundMetal.Length);
-            AudioClip step = soundMetal[stepnumber];
-            PlaySFX(step, volume, deviation, fromTransform);
-        }
         #endregion
         #region Peaking
         public void PlayPlayerPeakIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)

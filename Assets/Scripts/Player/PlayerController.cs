@@ -439,36 +439,14 @@ namespace Player
                     continue;
                 }
 
-                switch (_surfaceType)
+                if (_surfaceType == "Unknown")
                 {
-                    case "grass":
-                        Debug.Log("Playing grass sound");
-                        AudioManager.Instance.PlayPlayerWalkingGrass();
-                        break;
-                    case "gravel":
-                        Debug.Log("Playing gravel sound");
-                        AudioManager.Instance.PlayPlayerWalkingGravel();
-                        break;
-                    case "water":
-                        Debug.Log("Playing water sound");
-                        AudioManager.Instance.PlayPlayerWalkingWater();
-                        break;
-                    case "metal":
-                        Debug.Log("Playing metal sound");
-                        AudioManager.Instance.PlayPlayerWalkingMetal();
-                        break;
-                    case "concrete":
-                        Debug.Log("Playing concrete sound");
-                        AudioManager.Instance.PlayPlayerWalkingConcrete();
-                        break;
-                    case "wood":
-                        Debug.Log("Playing wood sound");
-                        AudioManager.Instance.PlayPlayerWalkingWood();
-                        break;
-                    default:
-                        yield return null;
-                        break;
+                    yield return null;
+                    continue;
                 }
+
+                Debug.Log($"Playing {_surfaceType} sound");
+                AudioManager.Instance.PlayFootstep(_surfaceType, transform);
                 
                 yield return new WaitForSeconds(_audioEffectSpeed);
 
