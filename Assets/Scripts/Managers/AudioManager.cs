@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
 using FMODUnity;
 using FMOD.Studio;
 
@@ -10,33 +9,48 @@ namespace Managers
 {
     public class AudioManager : Singleton<AudioManager>
     {
-        [SerializeField] private int _poolSize = 10;
-        private List<AudioSource> _sources;
+        // IDs for unparameterized events
+        public enum SfxId
+        {
+            // Player
+            Jump, Landing, Flashlight, CrouchIn, CrouchOut, PeekIn, PeekOut, TippytoeIn, TippytoeOut,
+        }
 
-        //public float sfxvolumeslider = 1;
-        
-        [Header("Footstep Sounds")]
-        [SerializeField] private EventReference footstepPlayer;
+        // Inspector-configured entry mapping a SfxId to an FMOD event.
+        [Serializable]
+        public struct SfxEntry
+        {
+            public SfxId id;
+            public EventReference eventRef;
+        }
+
+        [SerializeField] private SfxEntry[] sfxEvents; // Inspector-assigned map of SfxId -> FMOD EventReference.
+        // TODO(FMOD): Populate this list in the AudioManager prefab for all migrated SFX.
+
+        // Per-call parameter payload for FMOD events.
+        public readonly struct SfxParam
+        {
+            public readonly string name;
+            public readonly float value;
+
+            public SfxParam(string name, float value)
+            {
+                this.name = name;
+                this.value = value;
+            }
+        }
+
+        private Dictionary<SfxId, EventReference> _sfxMap; // Runtime lookup built from sfxEvents for fast access.
+
+        // Parameterized Events
+        [Header("Player Sounds")]
+        [SerializeField] private EventReference footstepPlayer; // Parameterized footstep event with Surface label parameter.
 
         
         [Header("Mutes")]
         public bool muteSFX = false;
         public bool muteMusic = false;
 
-        [Header("Player Sounds")]
-        [SerializeField] private AudioClip landingAudioClip;
-        [SerializeField] private AudioClip jumpingAudioClip;
-        [SerializeField] private AudioClip inCrouchAudioClip;
-        [SerializeField] private AudioClip outCrouchAudioClip;
-        [SerializeField] private AudioClip inPeakAudioClip;
-        [SerializeField] private AudioClip outPeakAudioClip;
-        [SerializeField] private AudioClip inTippytoeAudioClip;
-        [SerializeField] private AudioClip outTippytoeAudioClip;
-        
-        [Header("Flashlight")]
-        [SerializeField] private AudioClip flashlightOnAudioClip;
-        [SerializeField] private AudioClip flashlightOffAudioClip;
-        
         [Header("Enemy Effects")]
         [Header("General Sounds")]
         [Header("UI Audio")]
@@ -57,15 +71,7 @@ namespace Managers
         {
             base.Awake();
 
-            // Create a pool of AudioSources we can reuse
-            _sources = new List<AudioSource>();
-            for (int i = 0; i < _poolSize; i++)
-            {
-                AudioSource src = gameObject.AddComponent<AudioSource>();
-                src.playOnAwake = false;
-                src.spatialBlend = 0f; // 2D by default
-                _sources.Add(src);
-            }
+            BuildSfxMap();
 
             AudioSource mus = gameObject.AddComponent<AudioSource>();
             Musicsource = mus;
@@ -93,29 +99,55 @@ namespace Managers
             Musicsource.volume = musicValue;
         }
 
-        private void PlaySFX(AudioClip clip, float volume = 1f, float deviation = 0f, Transform fromTransform = null)
-        {
-            if (muteSFX) return;
-            if (clip == null) return;
-
-            AudioSource src = GetFreeSource();
-            if (src == null) return;
-
-            src.transform.position = fromTransform != null ? fromTransform.position : Camera.main != null ? Camera.main.transform.position : Vector3.zero;
-
-            src.spatialBlend = fromTransform != null ? 1f : 0f;
-            src.volume = (volume * sfxValue);
-            src.clip = clip;
-            src.pitch = UnityEngine.Random.Range(1 - deviation, 1 + deviation);
-            src.Play();
-        }
-
         public void PlayFootstep(string surfaceLabel, Transform fromTransform = null)
         {
             if (muteSFX) return;
             if (footstepPlayer.IsNull) return;
 
-            EventInstance instance = RuntimeManager.CreateInstance(footstepPlayer);
+            // Use a labeled parameter to select the correct surface variation.
+            EventInstance instance = CreateEventInstance(footstepPlayer, fromTransform);
+            instance.setParameterByNameWithLabel("Surface", surfaceLabel);
+            instance.start();
+            instance.release();
+        }
+
+        public void PlayParamSfx(SfxId sfxId, Transform fromTransform = null, params SfxParam[] parameters)
+        {
+            if (muteSFX) return;
+
+            // Parameterized play path for events that need per-call data.
+            EventReference eventReference = GetSfxEvent(sfxId);
+            if (eventReference.IsNull)
+            {
+                return;
+            }
+
+            EventInstance instance = CreateEventInstance(eventReference, fromTransform);
+            if (parameters != null)
+            {
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    instance.setParameterByName(parameters[i].name, parameters[i].value);
+                }
+            }
+            instance.start();
+            instance.release();
+        }
+
+        private void PlayEvent(EventReference eventReference, Transform fromTransform)
+        {
+            if (muteSFX) return;
+            if (eventReference.IsNull) return;
+
+            EventInstance instance = CreateEventInstance(eventReference, fromTransform);
+            instance.start();
+            instance.release();
+        }
+
+        private EventInstance CreateEventInstance(EventReference eventReference, Transform fromTransform)
+        {
+            // Use RuntimeManager to ensure correct FMOD instance tracking and virtualization.
+            EventInstance instance = RuntimeManager.CreateInstance(eventReference);
 
             Vector3 position = fromTransform != null
                 ? fromTransform.position
@@ -124,41 +156,41 @@ namespace Managers
                     : Vector3.zero;
 
             instance.set3DAttributes(RuntimeUtils.To3DAttributes(position));
-            instance.setParameterByNameWithLabel("Surface", surfaceLabel);
-
-            instance.start();
-            instance.release();
+            return instance;
         }
 
         
-        public void PlayFlashlightOn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
+        public void PlaySfx(SfxId sfxId, Transform fromTransform = null)
         {
-            PlaySFX(flashlightOnAudioClip, volume, deviation, fromTransform);
-        }
-        public void PlayFlashlightOff(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            PlaySFX(flashlightOffAudioClip, volume, deviation, fromTransform);
+            if (muteSFX) return;
+
+            // Unparameterized SFX play path using the SfxId mapping.
+            EventReference eventReference = GetSfxEvent(sfxId);
+            if (!eventReference.IsNull)
+            {
+                PlayEvent(eventReference, fromTransform);
+            }
         }
         
         #region Player Sounds
         #region Jumping and Landing
         public void PlayPlayerJumping(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
-            PlaySFX(jumpingAudioClip, volume, deviation, fromTransform);
+            PlaySfx(SfxId.Jump, fromTransform);
         }
         public void PlayPlayerLanding(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
-            PlaySFX(landingAudioClip, volume, deviation, fromTransform);
+            PlaySfx(SfxId.Landing, fromTransform);
         }
         #endregion
         #region Crouching Sounds
         public void PlayPlayerCrouchIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
-            PlaySFX(inCrouchAudioClip, volume, deviation, fromTransform);
+            PlaySfx(SfxId.CrouchIn, fromTransform);
         }
         public void PlayPlayerCrouchOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
-            PlaySFX(outCrouchAudioClip, volume, deviation, fromTransform);
+            PlaySfx(SfxId.CrouchOut, fromTransform);
         }
         #endregion
         #region Footstep Sounds
@@ -166,35 +198,51 @@ namespace Managers
         #region Peaking
         public void PlayPlayerPeakIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
-            PlaySFX(inPeakAudioClip, volume, deviation, fromTransform);
+            PlaySfx(SfxId.PeekIn, fromTransform);
         }
         public void PlayPlayerPeakOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
-            PlaySFX(outPeakAudioClip, volume, deviation, fromTransform);
+            PlaySfx(SfxId.PeekOut, fromTransform);
         }
         #endregion
         #region Tippytoe
         public void PlayPlayerTippytoeIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
-            PlaySFX(inTippytoeAudioClip, volume, deviation, fromTransform);
+            PlaySfx(SfxId.TippytoeIn, fromTransform);
         }
         public void PlayPlayerTippytoeOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
-            PlaySFX(outTippytoeAudioClip, volume, deviation, fromTransform);
+            PlaySfx(SfxId.TippytoeOut, fromTransform);
         }
         #endregion
         #endregion
 
-        
-        private AudioSource GetFreeSource()
+        private EventReference GetSfxEvent(SfxId sfxId)
         {
-            foreach (var src in _sources)
+            // Lazy rebuild in case the inspector list changes at runtime.
+            if (_sfxMap == null || _sfxMap.Count == 0)
             {
-                if (!src.isPlaying)
-                    return src;
+                BuildSfxMap();
             }
-            // If none are free, just reuse the first
-            return _sources[0];
+
+            return _sfxMap != null && _sfxMap.TryGetValue(sfxId, out EventReference evt) ? evt : default;
         }
+
+        private void BuildSfxMap()
+        {
+            // Build the lookup table once from serialized entries.
+            _sfxMap = new Dictionary<SfxId, EventReference>();
+            if (sfxEvents == null)
+            {
+                return;
+            }
+
+            foreach (var entry in sfxEvents)
+            {
+                _sfxMap[entry.id] = entry.eventRef;
+            }
+        }
+
+        
     }
 }

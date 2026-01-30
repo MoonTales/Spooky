@@ -44,7 +44,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c2785e918517f24d8e3a453702a4176, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _poolSize: 10
+  sfxEvents:
+  - id: 2
+    eventRef:
+      Guid:
+        Data1: 739701894
+        Data2: 1274669532
+        Data3: 316999592
+        Data4: 2026019272
+      Path: event:/sfx/player/flashlight
+  - id: 0
+    eventRef:
+      Guid:
+        Data1: 400017232
+        Data2: 1086536650
+        Data3: 357605298
+        Data4: -920795188
+      Path: event:/sfx/player/jump
   footstepPlayer:
     Guid:
       Data1: 1793541463
@@ -54,16 +70,6 @@ MonoBehaviour:
     Path: event:/sfx/player/footstep
   muteSFX: 0
   muteMusic: 0
-  landingAudioClip: {fileID: 0}
-  jumpingAudioClip: {fileID: 8300000, guid: 56d2ae87641afd04ab7327adc39cb823, type: 3}
-  inCrouchAudioClip: {fileID: 0}
-  outCrouchAudioClip: {fileID: 0}
-  inPeakAudioClip: {fileID: 0}
-  outPeakAudioClip: {fileID: 0}
-  inTippytoeAudioClip: {fileID: 0}
-  outTippytoeAudioClip: {fileID: 0}
-  flashlightOnAudioClip: {fileID: 0}
-  flashlightOffAudioClip: {fileID: 0}
   Musicsource: {fileID: 0}
   sfxValue: 1
   musicValue: 1
