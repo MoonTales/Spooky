@@ -105,6 +105,9 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float screamTime = 1;
 	[SerializeField] private Collider attackBox;
 
+	[Header("Jump Settings")]
+	
+
 	[Header("WanderState")]
 	[SerializeField] private float wanderSpeed;
 	[Tooltip("Maximum distance from current position that the enemy can choose to walk to")]
