@@ -3,6 +3,7 @@ using Player;
 using TMPro;
 using UnityEngine;
 using Types = System.Types;
+using Inspection;
 
 namespace UI
 {
@@ -17,6 +18,9 @@ namespace UI
         private TMP_Text _hudInteractionPromptText;
         private TMP_Text _hudItemNameText;
         private TMP_Text _hudItemDescriptionText;
+
+        // object
+        private InspectableObject obj;
 
 
         protected override void RegisterSubscriptions()
@@ -72,10 +76,13 @@ namespace UI
 
         private void HandleInspection()
         {
+            InspectableObject obj = InspectionSystem.Instance.GetCurrentInspectedObject();
+            DebugUtils.Log($"PlayerHUDController: Handling inspection of object '{obj.GetObjectName()}'");
+
             //For momo: custom logic here, since this automatically gets called the second we start inspection
-            _hudItemNameText.text = "Test";
+            _hudItemNameText.text = obj.GetObjectName();
             //InspectableObject.GetObjectName()
-            _hudItemDescriptionText.text = "Test";
+            _hudItemDescriptionText.text = obj.GetObjectDescription();
             ShowHUD(true);
         }
     
