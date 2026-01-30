@@ -11353,6 +11353,7 @@ MonoBehaviour:
     minIntensity: 1
     maxIntensity: 4
     stateRestriction: 
+    functionExecutions: []
     stateChange: 3
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
@@ -13512,6 +13513,7 @@ MonoBehaviour:
     minIntensity: 1
     maxIntensity: 10
     stateRestriction: 04000000
+    functionExecutions: []
     stateChange: 5
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
@@ -13520,6 +13522,11 @@ MonoBehaviour:
     minIntensity: 15
     maxIntensity: 25
     stateRestriction: 
+    functionExecutions:
+    - function: 0
+      arguments:
+      - 17
+      - true
     stateChange: 4
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
@@ -13528,6 +13535,7 @@ MonoBehaviour:
     minIntensity: 5
     maxIntensity: 12
     stateRestriction: 
+    functionExecutions: []
     stateChange: 3
     targetDetectedObject: 1
     prioritizeDistanceInsteadOfIntensity: 0
@@ -13536,6 +13544,7 @@ MonoBehaviour:
     minIntensity: 6
     maxIntensity: 15
     stateRestriction: 
+    functionExecutions: []
     stateChange: 3
     targetDetectedObject: 1
     prioritizeDistanceInsteadOfIntensity: 0
@@ -13544,6 +13553,7 @@ MonoBehaviour:
     minIntensity: 1
     maxIntensity: 4
     stateRestriction: 
+    functionExecutions: []
     stateChange: 2
     targetDetectedObject: 1
     prioritizeDistanceInsteadOfIntensity: 1
@@ -13552,6 +13562,7 @@ MonoBehaviour:
     minIntensity: 4
     maxIntensity: 6
     stateRestriction: 
+    functionExecutions: []
     stateChange: 2
     targetDetectedObject: 1
     prioritizeDistanceInsteadOfIntensity: 0
