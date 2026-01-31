@@ -100,5 +100,8 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
-# FMOD Unity integration cache
-Assets/Plugins/FMOD/Cache
+# Ignore the Cache folder since it is updated locally.
+/[Aa]ssets/Plugins/FMOD/Cache/*
+
+# FMOD Studio project local cache
+/Audio/FMODProject/Spooky/.cache/
