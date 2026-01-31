@@ -56,6 +56,7 @@ namespace Player
         private CharacterController _characterController;
         private Vector2 _moveInput;
         private bool _isGrounded;
+        private bool _wasGrounded;
         private bool _isCrouching;
         private bool _isSprinting;
         private bool _cachedSprintState;
@@ -94,6 +95,10 @@ namespace Player
             }
             
             _isGrounded = _characterController.isGrounded;
+            if (_isGrounded && !_wasGrounded)
+            {
+                AudioManager.Instance.PlaySfx(AudioManager.SfxId.Landing, transform);
+            }
             // check the cached sprint state when we land, incase it changed mid-air
             if (_isGrounded && !_isSprinting)
             {
@@ -112,7 +117,7 @@ namespace Player
             HandleCrouchTransition();
             cameraEffects.UpdateEffects(_isGrounded, IsPlayerMoving(), _isSprinting, _isCrouching);
             
-
+            _wasGrounded = _isGrounded;
             
         }
         
@@ -216,6 +221,7 @@ namespace Player
         {
             StartCoroutine(PlayFootstepSounds());
             _currentSpeed = walkSpeed;
+            _wasGrounded = _characterController.isGrounded;
 
         }
         protected override void OnEnable()
@@ -307,7 +313,7 @@ namespace Player
             {
                 // Apply jump force
                 _verticalVelocity = jumpForce;
-                AudioManager.Instance.PlaySfx(AudioManager.SfxId.Jump, transform);
+                AudioManager.Instance.PlayPlayerJumping(fromTransform: transform);
             }
         }
         private void HandleGravity()

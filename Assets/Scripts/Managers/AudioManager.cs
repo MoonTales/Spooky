@@ -9,6 +9,7 @@ namespace Managers
 {
     public class AudioManager : Singleton<AudioManager>
     {
+        #region SFX
         // IDs for unparameterized events
         public enum SfxId
         {
@@ -24,9 +25,11 @@ namespace Managers
             public EventReference eventRef;
         }
 
-        [SerializeField] private SfxEntry[] sfxEvents; // Inspector-assigned map of SfxId -> FMOD EventReference.
-        // TODO(FMOD): Populate this list in the AudioManager prefab for all migrated SFX.
+        [SerializeField] private SfxEntry[] sfxEvents;      // Inspector-assigned map of SfxId -> FMOD EventReference.
+        private Dictionary<SfxId, EventReference> _sfxMap;  // Runtime lookup built from sfxEvents for fast access.
+        private Bus _playerMovementBus;
 
+        #region Parameterized Sfx
         // Per-call parameter payload for FMOD events.
         public readonly struct SfxParam
         {
@@ -40,12 +43,10 @@ namespace Managers
             }
         }
 
-        private Dictionary<SfxId, EventReference> _sfxMap; // Runtime lookup built from sfxEvents for fast access.
-
         // Parameterized Events
         [Header("Player Sounds")]
-        [SerializeField] private EventReference footstepPlayer; // Parameterized footstep event with Surface label parameter.
-
+        [SerializeField] private EventReference footstepPlayer;     // Parameterized footstep event with Surface label parameter.
+        [SerializeField] private string playerMovementBusPath = "bus:/SFX/Player/Movement"; // Bus containing player movement events for quick stops.
         
         [Header("Mutes")]
         public bool muteSFX = false;
@@ -55,6 +56,8 @@ namespace Managers
         [Header("General Sounds")]
         [Header("UI Audio")]
         [Header("Soundtracks")]
+        #endregion
+        #endregion
         private AudioClip NullClip = null;
 
 
@@ -72,6 +75,7 @@ namespace Managers
             base.Awake();
 
             BuildSfxMap();
+            CacheplayerMovementBus();
 
             AudioSource mus = gameObject.AddComponent<AudioSource>();
             Musicsource = mus;
@@ -109,6 +113,14 @@ namespace Managers
             instance.setParameterByNameWithLabel("Surface", surfaceLabel);
             instance.start();
             instance.release();
+        }
+
+        public void StopFootstepsImmediate()
+        {
+            if (_playerMovementBus.isValid())
+            {
+                _playerMovementBus.stopAllEvents(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            }
         }
 
         public void PlayParamSfx(SfxId sfxId, Transform fromTransform = null, params SfxParam[] parameters)
@@ -170,12 +182,17 @@ namespace Managers
             {
                 PlayEvent(eventReference, fromTransform);
             }
+            else
+            {
+                Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{sfxId}'.");
+            }
         }
         
         #region Player Sounds
         #region Jumping and Landing
         public void PlayPlayerJumping(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
+            StopFootstepsImmediate();
             PlaySfx(SfxId.Jump, fromTransform);
         }
         public void PlayPlayerLanding(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
@@ -241,6 +258,16 @@ namespace Managers
             {
                 _sfxMap[entry.id] = entry.eventRef;
             }
+        }
+
+        private void CacheplayerMovementBus()
+        {
+            if (string.IsNullOrWhiteSpace(playerMovementBusPath))
+            {
+                return;
+            }
+
+            _playerMovementBus = RuntimeManager.GetBus(playerMovementBusPath);
         }
 
         
