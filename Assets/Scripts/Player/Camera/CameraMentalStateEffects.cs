@@ -14,10 +14,12 @@ namespace Player.Camera
         private CinemachinePanTilt _panTilt;
         private Volume _postProcessVolume;
         private DepthOfField _depthOfField;
+        private ChromaticAberration _chromaticAberration;
         
         // Track current mental state and active coroutine
         private Types.PlayerMentalState _currentMentalState;
         private Coroutine _activeSwayCoroutine;
+        
 
         protected override void RegisterSubscriptions()
         {
@@ -43,6 +45,7 @@ namespace Player.Camera
             }
             
             RemoveBlurEffect();
+            RemoveChromaticAberrationEffect();
             _currentMentalState = newMentalState;
             
             switch (newMentalState)
@@ -103,7 +106,9 @@ namespace Player.Camera
                 horizontalFrequency: 0.75f
             ));
             // Add blur effect
-            ApplyBlurEffect(blurIntensity: 10f, focusDistance: 5f);        }
+            ApplyBlurEffect(blurIntensity: 10f, focusDistance: 3f);
+            SetChromaticAberrationIntensity(1);
+        }
 
         private void HandleModeratelySleepDeprivedEffects()
         {
@@ -117,6 +122,7 @@ namespace Player.Camera
                 horizontalFrequency: 0.85f
             ));
             ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);  
+            SetChromaticAberrationIntensity(2);
         }
 
         private void HandleSeverelySleepDeprivedEffects()
@@ -131,6 +137,7 @@ namespace Player.Camera
                 horizontalFrequency: 0.9f
             ));
             ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);  
+            SetChromaticAberrationIntensity(3);
         }
 
         
@@ -145,7 +152,8 @@ namespace Player.Camera
                 verticalFrequency: 0.9f,
                 horizontalFrequency: 1f
             ));
-            ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);  
+            ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);
+            SetChromaticAberrationIntensity(4);
         }
         private void HandleBreakdownEffects() { }
 
@@ -218,6 +226,39 @@ namespace Player.Camera
             _depthOfField.aperture.value = Mathf.Lerp(32f, 0.1f, blurIntensity); // Higher aperture = more blur (I think 32 is the max value)
             _depthOfField.focalLength.value = 50f;
             _depthOfField.active = true;
+            // chromatic aberration
+            
+        }
+        
+        public void SetChromaticAberrationIntensity(float amount)
+        {
+            // if we dont have a _chromaticAberration effect, try to get it
+            if (_chromaticAberration == null)
+            {
+                if (_postProcessVolume == null)
+                {
+                    _postProcessVolume = GetComponent<Volume>();
+        
+                    if (_postProcessVolume == null)
+                    {
+                        _postProcessVolume = gameObject.AddComponent<Volume>();
+                        _postProcessVolume.isGlobal = true;
+                        _postProcessVolume.priority = 1;
+                        _postProcessVolume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                    }
+                }
+                
+                if (!_postProcessVolume.profile.TryGet(out _chromaticAberration))
+                {
+                    _chromaticAberration = _postProcessVolume.profile.Add<ChromaticAberration>(true);
+                }
+            }
+            
+            if (_chromaticAberration != null)
+            {
+                // 'amount' is a float between 0 and 1
+                _chromaticAberration.intensity.Override(amount);
+            }
         }
         
         private void RemoveBlurEffect()
@@ -225,6 +266,14 @@ namespace Player.Camera
             if (_depthOfField != null)
             {
                 _depthOfField.active = false;
+            }
+        }
+        
+        private void RemoveChromaticAberrationEffect()
+        {
+            if (_chromaticAberration != null)
+            {
+                _chromaticAberration.intensity.Override(0f);
             }
         }
     }
