@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Unity.Cinemachine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using Types = System.Types;
 
 namespace Player.Camera
@@ -10,6 +12,8 @@ namespace Player.Camera
     {
         private CinemachineCamera _cinemachineCamera;
         private CinemachinePanTilt _panTilt;
+        private Volume _postProcessVolume;
+        private DepthOfField _depthOfField;
         
         // Track current mental state and active coroutine
         private Types.PlayerMentalState _currentMentalState;
@@ -38,6 +42,7 @@ namespace Player.Camera
                 _activeSwayCoroutine = null;
             }
             
+            RemoveBlurEffect();
             _currentMentalState = newMentalState;
             
             switch (newMentalState)
@@ -77,7 +82,10 @@ namespace Player.Camera
             }
         }
 
-        private void HandleNormalStateEffects() { }
+        private void HandleNormalStateEffects()
+        {
+            RemoveBlurEffect(); // Add this!
+        }
         private void HandleMildlyAnxiousEffects() { }
         private void HandleModeratelyAnxiousEffects() { }
         private void HandleSeverelyAnxiousEffects() { }
@@ -94,7 +102,8 @@ namespace Player.Camera
                 verticalFrequency: 0.25f,
                 horizontalFrequency: 0.75f
             ));
-        }
+            // Add blur effect
+            ApplyBlurEffect(blurIntensity: 10f, focusDistance: 5f);        }
 
         private void HandleModeratelySleepDeprivedEffects()
         {
@@ -107,6 +116,7 @@ namespace Player.Camera
                 verticalFrequency: 0.5f,
                 horizontalFrequency: 0.85f
             ));
+            ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);  
         }
 
         private void HandleSeverelySleepDeprivedEffects()
@@ -120,19 +130,22 @@ namespace Player.Camera
                 verticalFrequency: 0.7f,
                 horizontalFrequency: 0.9f
             ));
+            ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);  
         }
 
+        
         private void HandleExhaustedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 10.3f, 
-                speed: 0.60f, 
+                intensity: 12.3f, 
+                speed: 0.75f, 
                 verticalBias: 0.75f,
                 verticalSin: false,
                 horizontalSin: true,
                 verticalFrequency: 0.9f,
                 horizontalFrequency: 1f
             ));
+            ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);  
         }
         private void HandleBreakdownEffects() { }
 
@@ -169,14 +182,49 @@ namespace Player.Camera
                     // possitive.. cause it just is lol
                     _panTilt.TiltAxis.Value += verticalSway;
                 }
-                
-                
-
-                // Apply to pan/tilt as offset
-                
-                
-
                 yield return null;
+            }
+        }
+        
+        
+
+
+        private void ApplyBlurEffect(float blurIntensity, float focusDistance)
+        {
+            
+            // either find or create post-process volume
+            if (_postProcessVolume == null)
+            {
+                _postProcessVolume = GetComponent<Volume>();
+        
+                if (_postProcessVolume == null)
+                {
+                    _postProcessVolume = gameObject.AddComponent<Volume>();
+                    _postProcessVolume.isGlobal = true;
+                    _postProcessVolume.priority = 1;
+                    _postProcessVolume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                }
+            }
+    
+            // Get our Depth of Field effect modifier
+            if (!_postProcessVolume.profile.TryGet(out _depthOfField))
+            {
+                _depthOfField = _postProcessVolume.profile.Add<DepthOfField>(true);
+            }
+    
+            // Configure blur settings
+            _depthOfField.mode.value = DepthOfFieldMode.Bokeh; // Might try gaussian soon
+            _depthOfField.focusDistance.value = focusDistance; // things close to this distance are in focus, anything else is blurred
+            _depthOfField.aperture.value = Mathf.Lerp(32f, 0.1f, blurIntensity); // Higher aperture = more blur (I think 32 is the max value)
+            _depthOfField.focalLength.value = 50f;
+            _depthOfField.active = true;
+        }
+        
+        private void RemoveBlurEffect()
+        {
+            if (_depthOfField != null)
+            {
+                _depthOfField.active = false;
             }
         }
     }
