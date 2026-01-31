@@ -55,7 +55,7 @@ namespace Player
         /* Internal variables */
         private CharacterController _characterController;
         private Vector2 _moveInput;
-        private bool _isGrounded;
+        private bool _isGrounded; public bool IsGrounded() { return _isGrounded; }
         private bool _wasGrounded;
         private bool _isCrouching;
         private bool _isSprinting;
@@ -573,3 +573,4 @@ namespace Player
         
     }
 }
+
