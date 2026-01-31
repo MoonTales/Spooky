@@ -267,7 +267,7 @@ namespace Managers
                 return;
             }
 
-            _playerMovementBus = RuntimeManager.GetBus(playerMovementBusPath);
+            if(_playerMovementBus.isValid()){_playerMovementBus = RuntimeManager.GetBus(playerMovementBusPath);}
         }
 
         
