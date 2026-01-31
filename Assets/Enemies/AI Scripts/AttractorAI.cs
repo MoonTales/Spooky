@@ -45,10 +45,38 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	[System.Serializable]
+	public class EnemyReactionReprogram
+	{
+		public AttractorType[] possibleAttractorTypeChanges;
+		[Tooltip("Inclusve")]
+		public float[] possibleMinIntensityChanges;
+		[Tooltip("Non-inclusve")]
+		public float[] possibleMaxIntensityChanges;
+		public List<EnemyState>[] possibleStateRestrictionChanges;
+		[SerializeField] public List<FunctionPicker>[] possibleFunctionExecutionsChanges;
+		public EnemyState[] possibleStateChangeChanges;
+		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
+			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
+			"it will automatically target the defaultFocus/Player")]
+		public bool[] possibleTargetDetectedObjectChanges;
+		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
+			"instead of the Attractor with the highest intensity")]
+		public bool[] possiblePrioritizeDistanceInsteadOfIntensityChanges;
+		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
+		public bool[] possibleInvertPriorityChanges;
+	}
+
+	[System.Serializable]
 	public class FunctionPicker
 	{
 		public FunctionType function;
 		public List<string> arguments;
+		public bool reprogram = false;
+		[Tooltip("This is only for functions that reprogram reactions in the behaviour hierarchy, and will only work if reprogram is true. The array contains" +
+			"possible reactions to reprogram  based on their index in the list")]
+		public int[] possiblePriorityReprograms;
+		[Tooltip("Only useful for functions that reprogram a reaction. reprogram must be true")]
+		public EnemyReactionReprogram reprogramParameters;
 	}
 
 	public void TestFunction(List<string> arguments)
