@@ -11,7 +11,7 @@ public class AlarmClock : MonoBehaviour
     
     private void PlayAlarm()
     {
-        AudioManager.Instance.PlayPlayerWalkingMetal(1,0.2f,transform);
+        AudioManager.Instance.PlayFootstep("metal", transform);
     }
     // Update is called once per frame
     void Update()

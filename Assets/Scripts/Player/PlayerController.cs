@@ -56,6 +56,7 @@ namespace Player
         private CharacterController _characterController;
         private Vector2 _moveInput;
         private bool _isGrounded; public bool IsGrounded() { return _isGrounded; }
+        private bool _wasGrounded;
         private bool _isCrouching;
         private bool _isSprinting;
         private bool _cachedSprintState;
@@ -94,6 +95,10 @@ namespace Player
             }
             
             _isGrounded = _characterController.isGrounded;
+            if (_isGrounded && !_wasGrounded)
+            {
+                AudioManager.Instance.PlaySfx(AudioManager.SfxId.Landing, transform);
+            }
             // check the cached sprint state when we land, incase it changed mid-air
             if (_isGrounded && !_isSprinting)
             {
@@ -112,7 +117,7 @@ namespace Player
             HandleCrouchTransition();
             cameraEffects.UpdateEffects(_isGrounded, IsPlayerMoving(), _isSprinting, _isCrouching);
             
-
+            _wasGrounded = _isGrounded;
             
         }
         
@@ -216,6 +221,7 @@ namespace Player
         {
             StartCoroutine(PlayFootstepSounds());
             _currentSpeed = walkSpeed;
+            _wasGrounded = _characterController.isGrounded;
 
         }
         protected override void OnEnable()
@@ -335,6 +341,7 @@ namespace Player
             {
                 // Apply jump force
                 _verticalVelocity = jumpForce;
+                AudioManager.Instance.PlayPlayerJumping(fromTransform: transform);
             }
         }
         private void HandleGravity()
@@ -467,36 +474,14 @@ namespace Player
                     continue;
                 }
 
-                switch (_surfaceType)
+                if (_surfaceType == "Unknown")
                 {
-                    case "grass":
-                        Debug.Log("Playing grass sound");
-                        AudioManager.Instance.PlayPlayerWalkingGrass();
-                        break;
-                    case "gravel":
-                        Debug.Log("Playing gravel sound");
-                        AudioManager.Instance.PlayPlayerWalkingGravel();
-                        break;
-                    case "water":
-                        Debug.Log("Playing water sound");
-                        AudioManager.Instance.PlayPlayerWalkingWater();
-                        break;
-                    case "metal":
-                        Debug.Log("Playing metal sound");
-                        AudioManager.Instance.PlayPlayerWalkingMetal();
-                        break;
-                    case "concrete":
-                        Debug.Log("Playing concrete sound");
-                        AudioManager.Instance.PlayPlayerWalkingConcrete();
-                        break;
-                    case "wood":
-                        Debug.Log("Playing wood sound");
-                        AudioManager.Instance.PlayPlayerWalkingWood();
-                        break;
-                    default:
-                        yield return null;
-                        break;
+                    yield return null;
+                    continue;
                 }
+
+                Debug.Log($"Playing {_surfaceType} sound");
+                AudioManager.Instance.PlayFootstep(_surfaceType, transform);
                 
                 yield return new WaitForSeconds(_audioEffectSpeed);
 
@@ -618,3 +603,4 @@ namespace Player
         
     }
 }
+

@@ -71,9 +71,9 @@ MonoBehaviour:
   displaySortOrder: 0
   childIdentifiers:
   - 46fbfdf3fc43db0458918377fd40293e
-  - 2c5177b11d81d824dbb064f9ac8527da
-  - b7716510a1f36934c87976f3a81dbf3d
   - 52eb9df5db46521439908db3a29a1bbb
+  - b7716510a1f36934c87976f3a81dbf3d
+  - 2c5177b11d81d824dbb064f9ac8527da
   codecChannels:
     Value: []
     HasValue: 0
@@ -188,8 +188,13 @@ MonoBehaviour:
   VirtualChannelSettings: []
   RealChannelSettings: []
   Plugins: []
-  MasterBanks: []
-  Banks: []
+  MasterBanks:
+  - Master
+  Banks:
+  - Ambience
+  - Music
+  - SFX_Gameplay
+  - SFX_UI
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
@@ -205,12 +210,12 @@ MonoBehaviour:
   HideSetupWizard: 1
   LastEventReferenceScanVersion: 131858
   Platforms:
+  - {fileID: 8250266200735774702}
   - {fileID: -6077041620610896173}
   - {fileID: -3202018063249710725}
-  - {fileID: 3945724281536634630}
-  - {fileID: 4191082089376841630}
   - {fileID: 4917593530744480594}
-  - {fileID: 8250266200735774702}
+  - {fileID: 4191082089376841630}
+  - {fileID: 3945724281536634630}
   MigratedPlatforms: 080000000a00000009000000150000000200000001000000
 --- !u!114 &3945724281536634630
 MonoBehaviour:
