@@ -1,12 +1,14 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Types = System.Types;
 
 namespace Player
 {
     /// <summary>
     /// Handles camera effects including headbob and peeking/leaning mechanics
     /// </summary>
-    public class CameraEffectsSystems : MonoBehaviour
+    public class CameraEffectsSystems : EventSubscriberBase
     {
         [Header("Headbob Settings")]
         [Header("Walking")]
@@ -36,7 +38,6 @@ namespace Player
         [SerializeField] private Transform cameraLeanPivot;
         [SerializeField] private Transform headTransform;
         
-        
 
         // Internal state
         private float _bobTimer;
@@ -64,6 +65,8 @@ namespace Player
                 _cameraTransform.rotation
             );
         }
+
+
         /// <summary>
         /// Updates camera base Y position (called when crouching/standing from a player controller)
         /// </summary>

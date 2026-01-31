@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,9 +11,11 @@ namespace Interaction.drawings
     {
         [Header("Drawing Settings")]
         [SerializeField, Tooltip("What area does this item exist within?")] 
-        private Types.WorldLocation location = Types.WorldLocation.Bedroom;
-        [SerializeField] private int drawingID;
+        private Types.WorldLocation location = Types.WorldLocation.Bedroom; public Types.WorldLocation GetLocation() { return location; }
+        [SerializeField] private int drawingID; public int GetDrawingID() { return drawingID; } //note, this swaps around when we swap drawings
     
+        [SerializeField] private int uniqueDrawingID = -1; public int GetUniqueDrawingID() { return uniqueDrawingID; } // this ID never changes, used for tracking purposes only
+        
         [Header("Pickup Settings")]
         [SerializeField] private float pickupTransitionSpeed = 8f;
         [SerializeField] private float returnTransitionSpeed = 8f;
@@ -31,7 +34,7 @@ namespace Interaction.drawings
         private Transform _originalParent;
         private Rigidbody _rigidbody;
         private Collider[] _colliders;
-        private static Drawing _currentlyHeldDrawing = null;
+        private static Drawing _currentlyHeldDrawing = null; public Drawing GetCurrentlyHeldDrawing() { return _currentlyHeldDrawing; }
         // internal variables required to track return transition
         private bool _isReturningToPosition = false;
         private Vector3 _returnTargetPosition;
@@ -241,6 +244,15 @@ namespace Interaction.drawings
         {
             _isReturningToPosition = false;
             SetPhysicsState(false); // Re-enable physics
+            
+            // we need to save the drawings state 
+            //TODO: there is error if we move drawings to fast
+            // we also need to ensure that we never save if any drawing is being held
+            if (!DrawingStateManager.Instance.IsAnyDrawingCurrentlyHeld())
+            {
+                DrawingStateManager.Instance.UpdateDrawingTransformData();
+            }
+            
         }
     
         #region Initialization

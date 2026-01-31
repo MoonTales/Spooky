@@ -3,6 +3,7 @@ using Player;
 using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
+using Inspection;
 
 public class InspectionSystem : Singleton<InspectionSystem>
 {
@@ -186,9 +187,14 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
 
     // Exit inspection with right click or ESC
-    if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+    //TODO: fix this so that we can use F
+    if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
     {
-        EndInspection();
+        // only allow exit once the object is close enough to the inspection point (so we dont have weird snapping)
+        if (Vector3.Distance(_currentInspectedObject.transform.localPosition, targetZoomPosition) < 0.1f)
+        {
+            EndInspection();
+        }
     }
 }
     
@@ -258,5 +264,15 @@ public class InspectionSystem : Singleton<InspectionSystem>
         {
             SetLayerRecursively(child.gameObject, layer);
         }
+    }
+
+    // Get inspected object thank u Cohen :D
+    public InspectableObject GetCurrentInspectedObject()
+    {
+        if (_currentInspectedObject != null)
+        {
+            return _currentInspectedObject.GetComponent<InspectableObject>();
+        }
+        return null;
     }
 }

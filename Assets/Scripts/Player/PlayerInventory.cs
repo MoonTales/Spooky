@@ -9,6 +9,14 @@ namespace Player
         // Store only the IDs of collected drawings
         private readonly HashSet<int> _collectedDrawingIDs = new HashSet<int>();
     
+        
+        
+        protected override void OnGameRestarted()
+        {
+            // Since we are emulating a full reset, clear the inventory
+            ClearInventory();
+        }
+        
         // Public methods
         public bool HasDrawing(int drawingID)
         {

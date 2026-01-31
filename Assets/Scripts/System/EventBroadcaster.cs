@@ -114,6 +114,15 @@ namespace System
         //-------------------------------- End Activity Events --------------------------------//
         
         
+        // broadcast to show when we started hovering our cursor ro interact with an interactable object
+        public delegate void OnBeganHoverInteractableHandler(IInteractable interactable);
+        public static event OnBeganHoverInteractableHandler OnBeganHoverInteractable;
+        public static void Broadcast_OnBeganHoverInteractable(IInteractable interactable) { OnBeganHoverInteractable?.Invoke(interactable); }
+        // broadcast to show when we stopped hovering our cursor ro interact with an interactable object
+        // we dont need any references here
+        public delegate void OnEndedHoverInteractableHandler();
+        public static event OnEndedHoverInteractableHandler OnEndedHoverInteractable;
+        public static void Broadcast_OnEndedHoverInteractable() { OnEndedHoverInteractable?.Invoke(); }
         
         ///<summary>
         /// World Clock Events
@@ -121,5 +130,10 @@ namespace System
         public delegate void OnWorldClockHandler(int clockHour);
         public static event OnWorldClockHandler OnWorldClockHourChanged;
         public static void Broadcast_OnWorldClockHourChanged(int clockHour) { OnWorldClockHourChanged?.Invoke(clockHour);}
+        
+        public delegate void OnWorldLocationChanged(Types.WorldLocation newLocation);
+
+        public static event OnWorldLocationChanged OnWorldLocationChangedEvent;
+        public static void Broadcast_OnWorldLocationChanged(Types.WorldLocation newLocation) { OnWorldLocationChangedEvent?.Invoke(newLocation); }
     }
 }
