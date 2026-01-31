@@ -8,8 +8,21 @@ using Types = System.Types;
 
 namespace Player.Camera
 {
+    
     public class CameraMentalStateEffects : EventSubscriberBase
     {
+        // Setting up structs (these can be private, since I know no other class will need these)
+        [Serializable]
+        private struct TiredSwaySettings
+        {
+            public float intensity;
+            public float speed;
+            public float verticalBias;
+            public bool verticalSin;
+            public bool horizontalSin;
+            public float verticalFrequency;
+            public float horizontalFrequency;
+        }
         private CinemachineCamera _cinemachineCamera;
         private CinemachinePanTilt _panTilt;
         private Volume _postProcessVolume;
@@ -20,6 +33,7 @@ namespace Player.Camera
         private Types.PlayerMentalState _currentMentalState;
         private Coroutine _activeSwayCoroutine;
 
+        
 
         protected override void RegisterSubscriptions()
         {
@@ -33,6 +47,7 @@ namespace Player.Camera
             _cinemachineCamera = PlayerManager.Instance.GetCinemachineCamera();
             _panTilt = _cinemachineCamera.GetComponent<CinemachinePanTilt>();
             _currentMentalState = Types.PlayerMentalState.Normal;
+            OnPlayerMentalStateChanged(_currentMentalState); // sets our initial state, incase we have "normal" logic
             InitializePostProcessing();
         }
 
