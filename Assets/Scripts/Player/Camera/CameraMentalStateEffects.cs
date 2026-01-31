@@ -32,6 +32,54 @@ namespace Player.Camera
         // Track current mental state and active coroutine
         private Types.PlayerMentalState _currentMentalState;
         private Coroutine _activeSwayCoroutine;
+        
+        
+        // Now we are gonna have our serialized fields that we can tweak in the inspector
+        [SerializeField]
+        TiredSwaySettings mildlyTiredSwaySettings = new TiredSwaySettings
+        {
+            intensity = 5.3f,
+            speed = 0.25f,
+            verticalBias = 0.7f,
+            verticalSin = false,
+            horizontalSin = true,
+            verticalFrequency = 0.25f,
+            horizontalFrequency = 0.75f
+        };
+        [SerializeField]
+        TiredSwaySettings moderatelyTiredSwaySettings = new TiredSwaySettings
+        {
+            intensity = 6.3f,
+            speed = 0.30f,
+            verticalBias = 0.7f,
+            verticalSin = false,
+            horizontalSin = true,
+            verticalFrequency = 0.5f,
+            horizontalFrequency = 0.85f
+        };
+        [SerializeField]
+        TiredSwaySettings severelyTiredSwaySettings = new TiredSwaySettings
+        {
+            intensity = 8.3f,
+            speed = 0.50f,
+            verticalBias = 0.7f,
+            verticalSin = false,
+            horizontalSin = true,
+            verticalFrequency = 0.7f,
+            horizontalFrequency = 0.9f
+        };
+        [SerializeField]
+        TiredSwaySettings exhaustedTiredSwaySettings = new TiredSwaySettings
+        {
+            intensity = 12.3f,
+            speed = 0.75f,
+            verticalBias = 0.75f,
+            verticalSin = false,
+            horizontalSin = true,
+            verticalFrequency = 0.9f,
+            horizontalFrequency = 1f
+        };
+        
 
         
 
@@ -108,31 +156,27 @@ namespace Player.Camera
 
         private void HandleMildlyAnxiousEffects()
         {
+            // unique effects
         }
 
         private void HandleModeratelyAnxiousEffects()
         {
+            // unique effects
         }
 
         private void HandleSeverelyAnxiousEffects()
         {
+            // unique effects
         }
 
         private void HandlePanicEffects()
         {
+            // unique effects
         }
 
         private void HandleMildlySleepDeprivedEffects()
         {
-            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 5.3f,
-                speed: 0.25f,
-                verticalBias: 0.7f,
-                verticalSin: false,
-                horizontalSin: true,
-                verticalFrequency: 0.25f,
-                horizontalFrequency: 0.75f
-            ));
+            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(moderatelyTiredSwaySettings));
             // Add blur effect
             ApplyBlurEffect(blurIntensity: 10f, focusDistance: 3f);
             SetChromaticAberrationIntensity(1);
@@ -140,30 +184,14 @@ namespace Player.Camera
 
         private void HandleModeratelySleepDeprivedEffects()
         {
-            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 6.3f,
-                speed: 0.30f,
-                verticalBias: 0.7f,
-                verticalSin: false,
-                horizontalSin: true,
-                verticalFrequency: 0.5f,
-                horizontalFrequency: 0.85f
-            ));
+            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(moderatelyTiredSwaySettings));
             ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);
             SetChromaticAberrationIntensity(2);
         }
 
         private void HandleSeverelySleepDeprivedEffects()
         {
-            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 8.3f,
-                speed: 0.50f,
-                verticalBias: 0.7f,
-                verticalSin: false,
-                horizontalSin: true,
-                verticalFrequency: 0.7f,
-                horizontalFrequency: 0.9f
-            ));
+            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(severelyTiredSwaySettings));
             ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);
             SetChromaticAberrationIntensity(3);
         }
@@ -171,15 +199,7 @@ namespace Player.Camera
 
         private void HandleExhaustedEffects()
         {
-            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 12.3f,
-                speed: 0.75f,
-                verticalBias: 0.75f,
-                verticalSin: false,
-                horizontalSin: true,
-                verticalFrequency: 0.9f,
-                horizontalFrequency: 1f
-            ));
+            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(exhaustedTiredSwaySettings));
             ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);
             SetChromaticAberrationIntensity(4);
         }
@@ -188,38 +208,38 @@ namespace Player.Camera
         {
         }
 
-        private IEnumerator TiredSwayCoroutine(float intensity, float speed, float verticalBias, bool verticalSin,
-            bool horizontalSin, float verticalFrequency = 0.7f, float horizontalFrequency = 1f)
+        private IEnumerator TiredSwayCoroutine(TiredSwaySettings settings)
         {
+            
             float time = 0f;
 
             while (_currentMentalState != Types.PlayerMentalState.Normal)
             {
-                time += Time.deltaTime * speed;
+                time += Time.deltaTime * settings.speed;
                 float verticalSway = 0f;
                 float horizontalSway = 0f;
 
                 // Slow, smooth sine wave for tired swaying
-                if (horizontalSin)
+                if (settings.horizontalSin)
                 {
-                    horizontalSway = Mathf.Sin(time * horizontalFrequency) * intensity * (1f - verticalBias);
+                    horizontalSway = Mathf.Sin(time * settings.horizontalFrequency) * settings.intensity * (1f - settings.verticalBias);
                     _panTilt.PanAxis.Value += horizontalSway * Time.deltaTime;
                 }
                 else
                 {
-                    horizontalSway = intensity * (1f - verticalBias) * speed * Time.deltaTime;
+                    horizontalSway = settings.intensity * (1f - settings.verticalBias) * settings.speed * Time.deltaTime;
                     _panTilt.PanAxis.Value += horizontalSway;
                 }
 
                 // we either sin it, or treat it as a constant downward pull
-                if (verticalSin)
+                if (settings.verticalSin)
                 {
-                    verticalSway = Mathf.Sin(time * verticalFrequency) * intensity * verticalBias;
+                    verticalSway = Mathf.Sin(time * settings.verticalFrequency) * settings.intensity * settings.verticalBias;
                     _panTilt.TiltAxis.Value += verticalSway * Time.deltaTime;
                 }
                 else
                 {
-                    verticalSway = intensity * verticalBias * speed * Time.deltaTime;
+                    verticalSway = settings.intensity * settings.verticalBias * settings.speed * Time.deltaTime;
                     // possitive.. cause it just is lol
                     _panTilt.TiltAxis.Value += verticalSway;
                 }
