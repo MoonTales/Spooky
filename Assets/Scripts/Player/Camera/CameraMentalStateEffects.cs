@@ -15,11 +15,11 @@ namespace Player.Camera
         private Volume _postProcessVolume;
         private DepthOfField _depthOfField;
         private ChromaticAberration _chromaticAberration;
-        
+
         // Track current mental state and active coroutine
         private Types.PlayerMentalState _currentMentalState;
         private Coroutine _activeSwayCoroutine;
-        
+
 
         protected override void RegisterSubscriptions()
         {
@@ -33,6 +33,7 @@ namespace Player.Camera
             _cinemachineCamera = PlayerManager.Instance.GetCinemachineCamera();
             _panTilt = _cinemachineCamera.GetComponent<CinemachinePanTilt>();
             _currentMentalState = Types.PlayerMentalState.Normal;
+            InitializePostProcessing();
         }
 
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
@@ -43,7 +44,7 @@ namespace Player.Camera
                 StopCoroutine(_activeSwayCoroutine);
                 _activeSwayCoroutine = null;
             }
-            
+
             RemoveBlurEffect();
             RemoveChromaticAberrationEffect();
             _currentMentalState = newMentalState;
@@ -89,16 +90,28 @@ namespace Player.Camera
         {
             RemoveBlurEffect(); // Add this!
         }
-        private void HandleMildlyAnxiousEffects() { }
-        private void HandleModeratelyAnxiousEffects() { }
-        private void HandleSeverelyAnxiousEffects() { }
-        private void HandlePanicEffects() { }
+
+        private void HandleMildlyAnxiousEffects()
+        {
+        }
+
+        private void HandleModeratelyAnxiousEffects()
+        {
+        }
+
+        private void HandleSeverelyAnxiousEffects()
+        {
+        }
+
+        private void HandlePanicEffects()
+        {
+        }
 
         private void HandleMildlySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 5.3f, 
-                speed: 0.25f, 
+                intensity: 5.3f,
+                speed: 0.25f,
                 verticalBias: 0.7f,
                 verticalSin: false,
                 horizontalSin: true,
@@ -113,39 +126,39 @@ namespace Player.Camera
         private void HandleModeratelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 6.3f, 
-                speed: 0.30f, 
+                intensity: 6.3f,
+                speed: 0.30f,
                 verticalBias: 0.7f,
                 verticalSin: false,
                 horizontalSin: true,
                 verticalFrequency: 0.5f,
                 horizontalFrequency: 0.85f
             ));
-            ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);  
+            ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);
             SetChromaticAberrationIntensity(2);
         }
 
         private void HandleSeverelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 8.3f, 
-                speed: 0.50f, 
+                intensity: 8.3f,
+                speed: 0.50f,
                 verticalBias: 0.7f,
                 verticalSin: false,
                 horizontalSin: true,
                 verticalFrequency: 0.7f,
                 horizontalFrequency: 0.9f
             ));
-            ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);  
+            ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);
             SetChromaticAberrationIntensity(3);
         }
 
-        
+
         private void HandleExhaustedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(
-                intensity: 12.3f, 
-                speed: 0.75f, 
+                intensity: 12.3f,
+                speed: 0.75f,
                 verticalBias: 0.75f,
                 verticalSin: false,
                 horizontalSin: true,
@@ -155,9 +168,13 @@ namespace Player.Camera
             ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);
             SetChromaticAberrationIntensity(4);
         }
-        private void HandleBreakdownEffects() { }
 
-        private IEnumerator TiredSwayCoroutine(float intensity, float speed, float verticalBias, bool verticalSin, bool horizontalSin, float verticalFrequency = 0.7f, float horizontalFrequency = 1f)
+        private void HandleBreakdownEffects()
+        {
+        }
+
+        private IEnumerator TiredSwayCoroutine(float intensity, float speed, float verticalBias, bool verticalSin,
+            bool horizontalSin, float verticalFrequency = 0.7f, float horizontalFrequency = 1f)
         {
             float time = 0f;
 
@@ -172,7 +189,8 @@ namespace Player.Camera
                 {
                     horizontalSway = Mathf.Sin(time * horizontalFrequency) * intensity * (1f - verticalBias);
                     _panTilt.PanAxis.Value += horizontalSway * Time.deltaTime;
-                } else
+                }
+                else
                 {
                     horizontalSway = intensity * (1f - verticalBias) * speed * Time.deltaTime;
                     _panTilt.PanAxis.Value += horizontalSway;
@@ -190,21 +208,60 @@ namespace Player.Camera
                     // possitive.. cause it just is lol
                     _panTilt.TiltAxis.Value += verticalSway;
                 }
+
                 yield return null;
             }
         }
-        
-        
+
+
 
 
         private void ApplyBlurEffect(float blurIntensity, float focusDistance)
         {
+            if(!_postProcessVolume || !_depthOfField) { return; }
             
-            // either find or create post-process volume
+            
+            // Configure blur settings
+            _depthOfField.mode.value = DepthOfFieldMode.Bokeh; // Might try gaussian soon
+            _depthOfField.focusDistance.value = focusDistance; // things close to this distance are in focus, anything else is blurred
+            _depthOfField.aperture.value = Mathf.Lerp(32f, 0.1f, blurIntensity); // Higher aperture = more blur (I think 32 is the max value)
+            _depthOfField.focalLength.value = 50f;
+            _depthOfField.active = true;
+
+        }
+
+        private void SetChromaticAberrationIntensity(float amount)
+        {
+            if (!_postProcessVolume || !_chromaticAberration) { return; }
+            _chromaticAberration.intensity.Override(amount);
+        }
+
+        private void RemoveBlurEffect()
+        {
+            if (_depthOfField != null)
+            {
+                _depthOfField.active = false;
+            }
+        }
+
+        private void RemoveChromaticAberrationEffect()
+        {
+            if (_chromaticAberration != null)
+            {
+                _chromaticAberration.intensity.Override(0f);
+            }
+
+        }
+
+        #region Utility Functions
+
+        private void TrySetPostProcessing()
+        {
+            // Searches for a post process volume on this object, and creates one if none exists
             if (_postProcessVolume == null)
             {
                 _postProcessVolume = GetComponent<Volume>();
-        
+
                 if (_postProcessVolume == null)
                 {
                     _postProcessVolume = gameObject.AddComponent<Volume>();
@@ -213,68 +270,39 @@ namespace Player.Camera
                     _postProcessVolume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
                 }
             }
-    
-            // Get our Depth of Field effect modifier
-            if (!_postProcessVolume.profile.TryGet(out _depthOfField))
-            {
-                _depthOfField = _postProcessVolume.profile.Add<DepthOfField>(true);
-            }
-    
-            // Configure blur settings
-            _depthOfField.mode.value = DepthOfFieldMode.Bokeh; // Might try gaussian soon
-            _depthOfField.focusDistance.value = focusDistance; // things close to this distance are in focus, anything else is blurred
-            _depthOfField.aperture.value = Mathf.Lerp(32f, 0.1f, blurIntensity); // Higher aperture = more blur (I think 32 is the max value)
-            _depthOfField.focalLength.value = 50f;
-            _depthOfField.active = true;
-            // chromatic aberration
-            
         }
         
-        public void SetChromaticAberrationIntensity(float amount)
+        private void TrySetChromaticAberration()
         {
-            // if we dont have a _chromaticAberration effect, try to get it
-            if (_chromaticAberration == null)
+            // tries to get the chromatic aberration effect from the post processing volume
+            if (_postProcessVolume != null)
             {
-                if (_postProcessVolume == null)
-                {
-                    _postProcessVolume = GetComponent<Volume>();
-        
-                    if (_postProcessVolume == null)
-                    {
-                        _postProcessVolume = gameObject.AddComponent<Volume>();
-                        _postProcessVolume.isGlobal = true;
-                        _postProcessVolume.priority = 1;
-                        _postProcessVolume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
-                    }
-                }
-                
                 if (!_postProcessVolume.profile.TryGet(out _chromaticAberration))
                 {
                     _chromaticAberration = _postProcessVolume.profile.Add<ChromaticAberration>(true);
                 }
             }
-            
-            if (_chromaticAberration != null)
-            {
-                // 'amount' is a float between 0 and 1
-                _chromaticAberration.intensity.Override(amount);
-            }
         }
-        
-        private void RemoveBlurEffect()
+
+        private void TrySetFieldOfDepth()
         {
-            if (_depthOfField != null)
+            // Tries to get the depth of field effect from the post processing volume
+            if (!_postProcessVolume.profile.TryGet(out _depthOfField))
             {
-                _depthOfField.active = false;
+                _depthOfField = _postProcessVolume.profile.Add<DepthOfField>(true);
             }
         }
-        
-        private void RemoveChromaticAberrationEffect()
+
+        private void InitializePostProcessing()
         {
-            if (_chromaticAberration != null)
-            {
-                _chromaticAberration.intensity.Override(0f);
-            }
+            // set the post processing volume on this object (or creates one if none exists)
+            TrySetPostProcessing();
+            // tries to set the chromatic aberration effect from the post processing volume
+            TrySetChromaticAberration();
+            // tries to set the depth of field effect from the post processing volume
+            TrySetFieldOfDepth();
         }
+
+        #endregion
     }
 }
