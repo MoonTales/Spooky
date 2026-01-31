@@ -19,7 +19,8 @@ public class AttractorAI : MonoBehaviour
 		Investigate,
 		RushOver,
 		Chase,
-		Attack
+		Attack,
+		Inspect
 	}
 	#endregion
 
@@ -41,7 +42,43 @@ public class AttractorAI : MonoBehaviour
 
 	public enum FunctionType
 	{
-		TestFunction_floatF_boolB
+		TestFunction_floatF_boolB,
+		ReprogramReaction_REPROGRAM,
+		DeleteFocus
+	}
+
+	[System.Serializable]
+	public class EnemyStateListWrapper
+	{
+		public List<EnemyState> stateRestriction;
+	}
+
+	[System.Serializable]
+	public class FunctionPickerListWrapper
+	{
+		public List<FunctionPicker> functionExecutions;
+	}
+
+	[System.Serializable]
+	public class EnemyReactionReprogram
+	{
+		public AttractorType[] possibleAttractorTypeChanges;
+		[Tooltip("Inclusve")]
+		public float[] possibleMinIntensityChanges;
+		[Tooltip("Non-inclusve")]
+		public float[] possibleMaxIntensityChanges;
+		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
+		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
+		public EnemyState[] possibleStateChangeChanges;
+		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
+			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
+			"it will automatically target the defaultFocus/Player")]
+		public bool[] possibleTargetDetectedObjectChanges;
+		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
+			"instead of the Attractor with the highest intensity")]
+		public bool[] possiblePrioritizeDistanceInsteadOfIntensityChanges;
+		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
+		public bool[] possibleInvertPriorityChanges;
 	}
 
 	[System.Serializable]
@@ -49,6 +86,11 @@ public class AttractorAI : MonoBehaviour
 	{
 		public FunctionType function;
 		public List<string> arguments;
+		[Tooltip("This is only for functions that reprogram reactions in the behaviour hierarchy. The array contains possible reactions to reprogram  based on" +
+			"their index in the list")]
+		public int[] possiblePriorityReprograms;
+		[Tooltip("Only useful for functions that reprogram a reaction")]
+		public EnemyReactionReprogram reprogramParameters;
 	}
 
 	public void TestFunction(List<string> arguments)
@@ -61,6 +103,13 @@ public class AttractorAI : MonoBehaviour
 			Debug.Log($"Oh wow {F}");
 		}
 	}
+	public void DeleteFocus()
+	{
+		if (nextFocus != Player.PlayerManager.Instance.GetPlayer().transform)
+		{
+			nextFocus.gameObject.SetActive(false);
+		}
+	} 
 
 	[System.Serializable]
 	public class EnemyReactions
@@ -91,6 +140,8 @@ public class AttractorAI : MonoBehaviour
 		public bool invertPriority = false;
 	}
 
+	
+
 	public List<EnemyReactions> behaviourHierarchy;
 	private bool forceCurrentStateBuffer = false;
 	private bool awaitingStateWithForcedBuffer = false;
@@ -103,6 +154,44 @@ public class AttractorAI : MonoBehaviour
 	private int currentStatePriority;
 	private int nextStatePriority;
 	private int lowestPriority;
+	
+	public void ReprogramReaction(int[] priority, EnemyReactionReprogram reactionEdits)
+	{
+		if (priority.Length < 1)
+		{
+			return;
+		}
+
+		int chosenPriority = priority[Random.Range(0, priority.Length)];
+
+		if (priority.Length < behaviourHierarchy.Count)
+		{
+			EnemyReactions chosenReaction = behaviourHierarchy[chosenPriority];
+
+			if (reactionEdits.possibleAttractorTypeChanges.Length > 0)
+				chosenReaction.attractorType = reactionEdits.possibleAttractorTypeChanges[Random.Range(0, reactionEdits.possibleAttractorTypeChanges.Length)];
+			if (reactionEdits.possibleMinIntensityChanges.Length > 0)
+				chosenReaction.minIntensity = reactionEdits.possibleMinIntensityChanges[Random.Range(0, reactionEdits.possibleMinIntensityChanges.Length)];
+			if (reactionEdits.possibleMaxIntensityChanges.Length > 0)
+				chosenReaction.maxIntensity = reactionEdits.possibleMaxIntensityChanges[Random.Range(0, reactionEdits.possibleMaxIntensityChanges.Length)];
+			if (reactionEdits.possibleStateRestrictionChanges.Length > 0)
+				chosenReaction.stateRestriction = reactionEdits.possibleStateRestrictionChanges[Random.Range(0,
+					reactionEdits.possibleStateRestrictionChanges.Length)].stateRestriction;
+			if (reactionEdits.possibleFunctionExecutionsChanges.Length > 0)
+				chosenReaction.functionExecutions = reactionEdits.possibleFunctionExecutionsChanges[Random.Range(0,
+					reactionEdits.possibleFunctionExecutionsChanges.Length)].functionExecutions;
+			if (reactionEdits.possibleStateChangeChanges.Length > 0)
+				chosenReaction.stateChange = reactionEdits.possibleStateChangeChanges[Random.Range(0, reactionEdits.possibleStateChangeChanges.Length)];
+			if (reactionEdits.possibleTargetDetectedObjectChanges.Length > 0)
+				chosenReaction.targetDetectedObject = reactionEdits.possibleTargetDetectedObjectChanges[Random.Range(0,
+					reactionEdits.possibleTargetDetectedObjectChanges.Length)];
+			if (reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
+				chosenReaction.prioritizeDistanceInsteadOfIntensity = reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges[Random.Range(0,
+					reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length)];
+			if (reactionEdits.possibleInvertPriorityChanges.Length > 0)
+				chosenReaction.invertPriority = reactionEdits.possibleInvertPriorityChanges[Random.Range(0, reactionEdits.possibleInvertPriorityChanges.Length)];
+		}
+	}
 
 	[System.Serializable]
 	public class EnemySense
@@ -129,9 +218,6 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float walkSpdAnimMult;
 	[SerializeField] private float screamTime = 1;
 	[SerializeField] private Collider attackBox;
-
-	[Header("Jump Settings")]
-	
 
 	[Header("WanderState")]
 	[SerializeField] private float wanderSpeed;
@@ -183,10 +269,14 @@ public class AttractorAI : MonoBehaviour
 	private bool aboutToAttack = true;
 	private bool finishedAttack = false;
 
+	[Header("InspectState")]
+	[SerializeField] private float inspectTime = 0;
+	private float currentInspect = 0;
+
 	#endregion
 
 
-	
+
 	public void Test2()
 	{
 		Debug.Log("yah");
@@ -301,6 +391,12 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.TestFunction_floatF_boolB:
 				TestFunction(function.arguments);
 				break;
+			case FunctionType.ReprogramReaction_REPROGRAM:
+				ReprogramReaction(function.possiblePriorityReprograms, function.reprogramParameters);
+				break;
+			case FunctionType.DeleteFocus:
+				DeleteFocus();
+				break;
 		}
 	}
 
@@ -315,6 +411,11 @@ public class AttractorAI : MonoBehaviour
 		if (!(currentState == EnemyState.Chase) && !onlyScreamOnFirstChase)
 		{
 			aboutToChaseScream = true;
+		}
+		if (!(currentState == EnemyState.Inspect))
+		{
+			animator.SetBool("Inspecting", false);
+			currentInspect = 0;
 		}
 
 		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
@@ -529,6 +630,20 @@ public class AttractorAI : MonoBehaviour
 					nextState = attackRevertState;
 					nextStatePriority = attackRevertPriority;
 				}
+				currentFocus = nextFocus;
+				currentState = nextState;
+				currentStatePriority = nextStatePriority;
+			}
+		}
+		else if (currentState == EnemyState.Inspect)
+		{
+			agent.speed = 0;
+			animator.SetBool("Inspecting", true);
+			currentInspect += Time.deltaTime;
+			if (currentInspect >= inspectTime)
+			{
+				currentInspect = 0;
+				animator.SetBool("Inspecting", false);
 				currentFocus = nextFocus;
 				currentState = nextState;
 				currentStatePriority = nextStatePriority;

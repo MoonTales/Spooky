@@ -155,8 +155,22 @@ namespace Player
             return null;
         }
 
-        
-        
-        
+        public float GetDistance(Vector3 objectPosition)
+        {
+            // Calculates the Euclidian distance between the requesting object and player
+            // Takes in Vector3 of the requesting object obtained through transform.position
+            // Returns 0.0f and throws error if _player not found
+
+            if (_player != null)
+            {
+                return Vector3.Distance(objectPosition, _player.transform.position);
+            }
+            else
+            {
+                DebugUtils.LogError("Player object not found!");
+                return 0.0f;
+            }
+
+        }
     }
 }
