@@ -41,7 +41,20 @@ public class AttractorAI : MonoBehaviour
 
 	public enum FunctionType
 	{
-		TestFunction_floatF_boolB
+		TestFunction_floatF_boolB,
+		ReprogramReaction_REPROGRAM
+	}
+
+	[System.Serializable]
+	public class EnemyStateListWrapper
+	{
+		public List<EnemyState> stateRestriction;
+	}
+
+	[System.Serializable]
+	public class FunctionPickerListWrapper
+	{
+		public List<FunctionPicker> functionExecutions;
 	}
 
 	[System.Serializable]
@@ -52,8 +65,8 @@ public class AttractorAI : MonoBehaviour
 		public float[] possibleMinIntensityChanges;
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
-		public List<EnemyState>[] possibleStateRestrictionChanges;
-		[SerializeField] public List<FunctionPicker>[] possibleFunctionExecutionsChanges;
+		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
+		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
 		public EnemyState[] possibleStateChangeChanges;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
@@ -71,11 +84,10 @@ public class AttractorAI : MonoBehaviour
 	{
 		public FunctionType function;
 		public List<string> arguments;
-		public bool reprogram = false;
-		[Tooltip("This is only for functions that reprogram reactions in the behaviour hierarchy, and will only work if reprogram is true. The array contains" +
-			"possible reactions to reprogram  based on their index in the list")]
+		[Tooltip("This is only for functions that reprogram reactions in the behaviour hierarchy. The array contains possible reactions to reprogram  based on" +
+			"their index in the list")]
 		public int[] possiblePriorityReprograms;
-		[Tooltip("Only useful for functions that reprogram a reaction. reprogram must be true")]
+		[Tooltip("Only useful for functions that reprogram a reaction")]
 		public EnemyReactionReprogram reprogramParameters;
 	}
 
@@ -119,6 +131,8 @@ public class AttractorAI : MonoBehaviour
 		public bool invertPriority = false;
 	}
 
+	
+
 	public List<EnemyReactions> behaviourHierarchy;
 	private bool forceCurrentStateBuffer = false;
 	private bool awaitingStateWithForcedBuffer = false;
@@ -131,6 +145,44 @@ public class AttractorAI : MonoBehaviour
 	private int currentStatePriority;
 	private int nextStatePriority;
 	private int lowestPriority;
+	
+	public void ReprogramReaction(int[] priority, EnemyReactionReprogram reactionEdits)
+	{
+		if (priority.Length < 1)
+		{
+			return;
+		}
+
+		int chosenPriority = priority[Random.Range(0, priority.Length)];
+
+		if (priority.Length < behaviourHierarchy.Count)
+		{
+			EnemyReactions chosenReaction = behaviourHierarchy[chosenPriority];
+
+			if (reactionEdits.possibleAttractorTypeChanges.Length > 0)
+				chosenReaction.attractorType = reactionEdits.possibleAttractorTypeChanges[Random.Range(0, reactionEdits.possibleAttractorTypeChanges.Length)];
+			if (reactionEdits.possibleMinIntensityChanges.Length > 0)
+				chosenReaction.minIntensity = reactionEdits.possibleMinIntensityChanges[Random.Range(0, reactionEdits.possibleMinIntensityChanges.Length)];
+			if (reactionEdits.possibleMaxIntensityChanges.Length > 0)
+				chosenReaction.maxIntensity = reactionEdits.possibleMaxIntensityChanges[Random.Range(0, reactionEdits.possibleMaxIntensityChanges.Length)];
+			if (reactionEdits.possibleStateRestrictionChanges.Length > 0)
+				chosenReaction.stateRestriction = reactionEdits.possibleStateRestrictionChanges[Random.Range(0,
+					reactionEdits.possibleStateRestrictionChanges.Length)].stateRestriction;
+			if (reactionEdits.possibleFunctionExecutionsChanges.Length > 0)
+				chosenReaction.functionExecutions = reactionEdits.possibleFunctionExecutionsChanges[Random.Range(0,
+					reactionEdits.possibleFunctionExecutionsChanges.Length)].functionExecutions;
+			if (reactionEdits.possibleStateChangeChanges.Length > 0)
+				chosenReaction.stateChange = reactionEdits.possibleStateChangeChanges[Random.Range(0, reactionEdits.possibleStateChangeChanges.Length)];
+			if (reactionEdits.possibleTargetDetectedObjectChanges.Length > 0)
+				chosenReaction.targetDetectedObject = reactionEdits.possibleTargetDetectedObjectChanges[Random.Range(0,
+					reactionEdits.possibleTargetDetectedObjectChanges.Length)];
+			if (reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
+				chosenReaction.prioritizeDistanceInsteadOfIntensity = reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges[Random.Range(0,
+					reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length)];
+			if (reactionEdits.possibleInvertPriorityChanges.Length > 0)
+				chosenReaction.invertPriority = reactionEdits.possibleInvertPriorityChanges[Random.Range(0, reactionEdits.possibleInvertPriorityChanges.Length)];
+		}
+	}
 
 	[System.Serializable]
 	public class EnemySense
@@ -328,6 +380,9 @@ public class AttractorAI : MonoBehaviour
 		{
 			case FunctionType.TestFunction_floatF_boolB:
 				TestFunction(function.arguments);
+				break;
+			case FunctionType.ReprogramReaction_REPROGRAM:
+				ReprogramReaction(function.possiblePriorityReprograms, function.reprogramParameters);
 				break;
 		}
 	}

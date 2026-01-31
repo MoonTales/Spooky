@@ -13592,10 +13592,19 @@ MonoBehaviour:
     maxIntensity: 25
     stateRestriction: 
     functionExecutions:
-    - function: 0
-      arguments:
-      - 17
-      - true
+    - function: 1
+      arguments: []
+      possiblePriorityReprograms: 00000000
+      reprogramParameters:
+        possibleAttractorTypeChanges: 03000000
+        possibleMinIntensityChanges: []
+        possibleMaxIntensityChanges: []
+        possibleStateRestrictionChanges: []
+        possibleFunctionExecutionsChanges: []
+        possibleStateChangeChanges: 
+        possibleTargetDetectedObjectChanges: 
+        possiblePrioritizeDistanceInsteadOfIntensityChanges: 
+        possibleInvertPriorityChanges: 
     stateChange: 4
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
