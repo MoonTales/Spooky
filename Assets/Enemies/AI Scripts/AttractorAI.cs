@@ -19,7 +19,8 @@ public class AttractorAI : MonoBehaviour
 		Investigate,
 		RushOver,
 		Chase,
-		Attack
+		Attack,
+		Inspect
 	}
 	#endregion
 
@@ -42,7 +43,8 @@ public class AttractorAI : MonoBehaviour
 	public enum FunctionType
 	{
 		TestFunction_floatF_boolB,
-		ReprogramReaction_REPROGRAM
+		ReprogramReaction_REPROGRAM,
+		DeleteFocus
 	}
 
 	[System.Serializable]
@@ -101,6 +103,13 @@ public class AttractorAI : MonoBehaviour
 			Debug.Log($"Oh wow {F}");
 		}
 	}
+	public void DeleteFocus()
+	{
+		if (nextFocus != Player.PlayerManager.Instance.GetPlayer().transform)
+		{
+			nextFocus.gameObject.SetActive(false);
+		}
+	} 
 
 	[System.Serializable]
 	public class EnemyReactions
@@ -210,9 +219,6 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float screamTime = 1;
 	[SerializeField] private Collider attackBox;
 
-	[Header("Jump Settings")]
-	
-
 	[Header("WanderState")]
 	[SerializeField] private float wanderSpeed;
 	[Tooltip("Maximum distance from current position that the enemy can choose to walk to")]
@@ -263,10 +269,14 @@ public class AttractorAI : MonoBehaviour
 	private bool aboutToAttack = true;
 	private bool finishedAttack = false;
 
+	[Header("InspectState")]
+	[SerializeField] private float inspectTime = 0;
+	private float currentInspect = 0;
+
 	#endregion
 
 
-	
+
 	public void Test2()
 	{
 		Debug.Log("yah");
@@ -384,6 +394,9 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.ReprogramReaction_REPROGRAM:
 				ReprogramReaction(function.possiblePriorityReprograms, function.reprogramParameters);
 				break;
+			case FunctionType.DeleteFocus:
+				DeleteFocus();
+				break;
 		}
 	}
 
@@ -398,6 +411,11 @@ public class AttractorAI : MonoBehaviour
 		if (!(currentState == EnemyState.Chase) && !onlyScreamOnFirstChase)
 		{
 			aboutToChaseScream = true;
+		}
+		if (!(currentState == EnemyState.Inspect))
+		{
+			animator.SetBool("Inspecting", false);
+			currentInspect = 0;
 		}
 
 		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
@@ -612,6 +630,20 @@ public class AttractorAI : MonoBehaviour
 					nextState = attackRevertState;
 					nextStatePriority = attackRevertPriority;
 				}
+				currentFocus = nextFocus;
+				currentState = nextState;
+				currentStatePriority = nextStatePriority;
+			}
+		}
+		else if (currentState == EnemyState.Inspect)
+		{
+			agent.speed = 0;
+			animator.SetBool("Inspecting", true);
+			currentInspect += Time.deltaTime;
+			if (currentInspect >= inspectTime)
+			{
+				currentInspect = 0;
+				animator.SetBool("Inspecting", false);
 				currentFocus = nextFocus;
 				currentState = nextState;
 				currentStatePriority = nextStatePriority;
