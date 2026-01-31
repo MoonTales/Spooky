@@ -3,6 +3,7 @@ using Player;
 using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
+using Inspection;
 
 public class InspectionSystem : Singleton<InspectionSystem>
 {
@@ -263,5 +264,15 @@ public class InspectionSystem : Singleton<InspectionSystem>
         {
             SetLayerRecursively(child.gameObject, layer);
         }
+    }
+
+    // Get inspected object thank u Cohen :D
+    public InspectableObject GetCurrentInspectedObject()
+    {
+        if (_currentInspectedObject != null)
+        {
+            return _currentInspectedObject.GetComponent<InspectableObject>();
+        }
+        return null;
     }
 }
