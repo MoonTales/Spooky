@@ -52,8 +52,13 @@ public class PauseMenuController : MonoBehaviour
         Cursor.visible = false;
         Time.timeScale = 1f;
         paused = false;
-        PauseMenuCanvas.SetActive(false);
+        ShowMenu(false);
     }
+
+    public void ShowMenu(bool show)
+        {
+            if (PauseMenuCanvas != null){PauseMenuCanvas.SetActive(show);}
+        }
 
     public void MainMenuButton()
     {
