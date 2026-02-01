@@ -7188,6 +7188,52 @@ MonoBehaviour:
   m_Bidirectional: 0
   m_AutoUpdatePosition: 1
   m_Area: 0
+--- !u!1 &544122976
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 544122978}
+  - component: {fileID: 544122977}
+  m_Layer: 0
+  m_Name: VolumeFogSwitcher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &544122977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544122976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e26e29fa941c6e44ab9afb470ed94220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  theRenderer: {fileID: 4913142327145503463, guid: e6cc592140e3df64cad7b97a8f963786, type: 2}
+  fogMaterial: {fileID: 2100000, guid: f2e0e5c42022d3f4ca219877f7a15978, type: 2}
+--- !u!4 &544122978
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544122976}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 821.54596, y: 16.084366, z: 289.4673}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &563881260
 GameObject:
   m_ObjectHideFlags: 0
@@ -27075,6 +27121,7 @@ SceneRoots:
   - {fileID: 1068887593}
   - {fileID: 1917131601}
   - {fileID: 1383898612}
+  - {fileID: 544122978}
   - {fileID: 824079497}
   - {fileID: 375534078}
   - {fileID: 1420905346}
