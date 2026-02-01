@@ -99,6 +99,11 @@ namespace Player.Camera
             InitializePostProcessing();
         }
 
+        private void Update()
+        {
+            // we want to smoothly transition to these values, not instantly snap
+        }
+
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
         {
             // Stop any active sway effect when state changes
