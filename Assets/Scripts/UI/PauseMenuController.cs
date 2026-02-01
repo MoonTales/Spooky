@@ -13,6 +13,10 @@ public class PauseMenuController : MonoBehaviour
     public static bool paused = false;
     public GameObject PauseMenuCanvas;
 
+    public GameObject SettingsCanvas;
+
+    public GameObject SettingsSliders;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -53,6 +57,8 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         paused = false;
         ShowMenu(false);
+        SettingsCanvas.SetActive(false);
+        SettingsSliders.SetActive(false);
     }
 
     public void ShowMenu(bool show)
