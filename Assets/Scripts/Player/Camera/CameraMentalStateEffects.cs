@@ -34,6 +34,8 @@ namespace Player.Camera
         private Coroutine _activeSwayCoroutine;
         
         
+        
+        
         // Now we are gonna have our serialized fields that we can tweak in the inspector
         [SerializeField]
         TiredSwaySettings mildlyTiredSwaySettings = new TiredSwaySettings
@@ -79,9 +81,15 @@ namespace Player.Camera
             verticalFrequency = 0.9f,
             horizontalFrequency = 1f
         };
-        
 
-        
+        private float _currentBlurIntensity;
+        private float _currentFocusDistance;
+        private float _currentChromaticAberration;
+        private float _targetBlurIntensity;
+        private float _targetFocusDistance;
+        private float _targetChromaticAberration;
+        private float transitionSpeed = 0.25f;
+
 
         protected override void RegisterSubscriptions()
         {
@@ -101,7 +109,24 @@ namespace Player.Camera
 
         private void Update()
         {
-            // we want to smoothly transition to these values, not instantly snap
+            // Smoothly lerp blur and chromatic aberration values
+            
+            _currentBlurIntensity = Mathf.Lerp(_currentBlurIntensity, _targetBlurIntensity, Time.deltaTime * transitionSpeed);
+            _currentFocusDistance = Mathf.Lerp(_currentFocusDistance, _targetFocusDistance, Time.deltaTime * transitionSpeed);
+            _currentChromaticAberration = Mathf.Lerp(_currentChromaticAberration, _targetChromaticAberration, Time.deltaTime * transitionSpeed);
+            
+            // Apply the current values using helper functions
+            if (_targetBlurIntensity > 0 || _currentBlurIntensity > 0.01f)
+            {
+                ApplyBlurEffect(_currentBlurIntensity, _currentFocusDistance);
+            }
+            else
+            {
+                RemoveBlurEffect();
+            }
+            
+            SetChromaticAberrationIntensity(_currentChromaticAberration);
+            
         }
 
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
@@ -112,9 +137,7 @@ namespace Player.Camera
                 StopCoroutine(_activeSwayCoroutine);
                 _activeSwayCoroutine = null;
             }
-
-            RemoveBlurEffect();
-            RemoveChromaticAberrationEffect();
+            
             _currentMentalState = newMentalState;
             
             switch (newMentalState)
@@ -156,7 +179,8 @@ namespace Player.Camera
 
         private void HandleNormalStateEffects()
         {
-            RemoveBlurEffect(); // Add this!
+            RemoveBlurEffect();
+            RemoveChromaticAberrationEffect();
         }
 
         private void HandleMildlyAnxiousEffects()
@@ -181,32 +205,44 @@ namespace Player.Camera
 
         private void HandleMildlySleepDeprivedEffects()
         {
-            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(moderatelyTiredSwaySettings));
+            _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(mildlyTiredSwaySettings));
             // Add blur effect
-            ApplyBlurEffect(blurIntensity: 10f, focusDistance: 3f);
-            SetChromaticAberrationIntensity(1);
+            _targetBlurIntensity = 10f;
+            _targetFocusDistance = 3f;
+            _targetChromaticAberration = 1f;
+            //ApplyBlurEffect(blurIntensity: 10f, focusDistance: 3f);
+            //SetChromaticAberrationIntensity(1);
         }
 
         private void HandleModeratelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(moderatelyTiredSwaySettings));
-            ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);
-            SetChromaticAberrationIntensity(2);
+            _targetBlurIntensity = 15f;
+            _targetFocusDistance = 2f;
+            _targetChromaticAberration = 2f;
+            //ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);
+            //SetChromaticAberrationIntensity(2);
         }
 
         private void HandleSeverelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(severelyTiredSwaySettings));
-            ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);
-            SetChromaticAberrationIntensity(3);
+            _targetBlurIntensity = 20f;
+            _targetFocusDistance = 1f;
+            _targetChromaticAberration = 3f;
+            //ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);
+            //SetChromaticAberrationIntensity(3);
         }
 
 
         private void HandleExhaustedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(exhaustedTiredSwaySettings));
-            ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);
-            SetChromaticAberrationIntensity(4);
+            _targetBlurIntensity = 25f;
+            _targetFocusDistance = 0.5f;
+            _targetChromaticAberration = 4f;
+            //ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);
+            //SetChromaticAberrationIntensity(4);
         }
 
         private void HandleBreakdownEffects()
@@ -278,6 +314,11 @@ namespace Player.Camera
 
         private void RemoveBlurEffect()
         {
+            _targetBlurIntensity = 0f;
+            _targetFocusDistance = 10f;
+            _currentBlurIntensity = 0f;
+            _currentFocusDistance = 10f;
+            
             if (_depthOfField != null)
             {
                 _depthOfField.active = false;
@@ -286,6 +327,8 @@ namespace Player.Camera
 
         private void RemoveChromaticAberrationEffect()
         {
+            _currentChromaticAberration = 0f;
+            _targetChromaticAberration = 0f;
             if (_chromaticAberration != null)
             {
                 _chromaticAberration.intensity.Override(0f);
