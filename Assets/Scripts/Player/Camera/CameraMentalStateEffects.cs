@@ -110,23 +110,21 @@ namespace Player.Camera
         private void Update()
         {
             // Smoothly lerp blur and chromatic aberration values
-            
             _currentBlurIntensity = Mathf.Lerp(_currentBlurIntensity, _targetBlurIntensity, Time.deltaTime * transitionSpeed);
             _currentFocusDistance = Mathf.Lerp(_currentFocusDistance, _targetFocusDistance, Time.deltaTime * transitionSpeed);
             _currentChromaticAberration = Mathf.Lerp(_currentChromaticAberration, _targetChromaticAberration, Time.deltaTime * transitionSpeed);
-            
-            // Apply the current values using helper functions
-            if (_targetBlurIntensity > 0 || _currentBlurIntensity > 0.01f)
+    
+            // Apply the current values
+            if (_currentBlurIntensity > 0.01f)
             {
                 ApplyBlurEffect(_currentBlurIntensity, _currentFocusDistance);
             }
-            else
+            else if (_depthOfField != null && _depthOfField.active)
             {
-                RemoveBlurEffect();
+                _depthOfField.active = false;
             }
-            
+    
             SetChromaticAberrationIntensity(_currentChromaticAberration);
-            
         }
 
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
@@ -179,8 +177,9 @@ namespace Player.Camera
 
         private void HandleNormalStateEffects()
         {
-            RemoveBlurEffect();
-            RemoveChromaticAberrationEffect();
+            _targetBlurIntensity = 0f;
+            _targetFocusDistance = 10f;
+            _targetChromaticAberration = 0f;
         }
 
         private void HandleMildlyAnxiousEffects()
