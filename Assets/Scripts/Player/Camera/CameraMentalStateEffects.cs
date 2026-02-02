@@ -88,7 +88,7 @@ namespace Player.Camera
         private float _targetBlurIntensity;
         private float _targetFocusDistance;
         private float _targetChromaticAberration;
-        private float transitionSpeed = 0.25f;
+        private float transitionSpeed = 5f;//0.25f; // lets make this settable aswell
 
 
         protected override void RegisterSubscriptions()
@@ -113,7 +113,7 @@ namespace Player.Camera
             _currentBlurIntensity = Mathf.Lerp(_currentBlurIntensity, _targetBlurIntensity, Time.deltaTime * transitionSpeed);
             _currentFocusDistance = Mathf.Lerp(_currentFocusDistance, _targetFocusDistance, Time.deltaTime * transitionSpeed);
             _currentChromaticAberration = Mathf.Lerp(_currentChromaticAberration, _targetChromaticAberration, Time.deltaTime * transitionSpeed);
-    
+
             // Apply the current values
             if (_currentBlurIntensity > 0.01f)
             {
@@ -123,8 +123,16 @@ namespace Player.Camera
             {
                 _depthOfField.active = false;
             }
-    
-            SetChromaticAberrationIntensity(_currentChromaticAberration);
+
+            // Apply chromatic aberration
+            if (_currentChromaticAberration > 0.01f)
+            {
+                SetChromaticAberrationIntensity(_currentChromaticAberration);
+            }
+            else if (_chromaticAberration != null)
+            {
+                _chromaticAberration.intensity.Override(0f);
+            }
         }
 
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
@@ -177,9 +185,36 @@ namespace Player.Camera
 
         private void HandleNormalStateEffects()
         {
+            DebugUtils.Log("----------------------------------------");
+            DebugUtils.Log("Player mental state is now NORMAL. Removing all effects.");
+            DebugUtils.Log("----------------------------------------");
+            // Immediately reset all values (no lerping)
             _targetBlurIntensity = 0f;
             _targetFocusDistance = 10f;
             _targetChromaticAberration = 0f;
+            _currentBlurIntensity = 0f;
+            _currentFocusDistance = 10f;
+            _currentChromaticAberration = 0f;
+    
+            // Immediately disable effects
+            if (_depthOfField != null)
+            {
+                _depthOfField.active = false;
+            }
+    
+            if (_chromaticAberration != null)
+            {
+                _chromaticAberration.intensity.Override(0f);
+            }
+    
+            // Reset pan/tilt to neutral
+            if (_panTilt != null)
+            {
+                _panTilt.PanAxis.Value = 0f;
+                _panTilt.TiltAxis.Value = 0f;
+            }
+    
+            transitionSpeed = 2f;
         }
 
         private void HandleMildlyAnxiousEffects()
@@ -209,6 +244,7 @@ namespace Player.Camera
             _targetBlurIntensity = 10f;
             _targetFocusDistance = 3f;
             _targetChromaticAberration = 1f;
+            transitionSpeed = 0.5f;
             //ApplyBlurEffect(blurIntensity: 10f, focusDistance: 3f);
             //SetChromaticAberrationIntensity(1);
         }
@@ -219,6 +255,7 @@ namespace Player.Camera
             _targetBlurIntensity = 15f;
             _targetFocusDistance = 2f;
             _targetChromaticAberration = 2f;
+            transitionSpeed = 0.5f;
             //ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);
             //SetChromaticAberrationIntensity(2);
         }
@@ -229,6 +266,7 @@ namespace Player.Camera
             _targetBlurIntensity = 20f;
             _targetFocusDistance = 1f;
             _targetChromaticAberration = 3f;
+            transitionSpeed = 0.5f;
             //ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);
             //SetChromaticAberrationIntensity(3);
         }
@@ -240,6 +278,7 @@ namespace Player.Camera
             _targetBlurIntensity = 25f;
             _targetFocusDistance = 0.5f;
             _targetChromaticAberration = 4f;
+            transitionSpeed = 0.5f;
             //ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);
             //SetChromaticAberrationIntensity(4);
         }
