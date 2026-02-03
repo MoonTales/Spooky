@@ -50,6 +50,11 @@ namespace UI
 
         private void OnInteractHoverStarted(IInteractable interactable)
         {
+            Debug.Log("[HUD] Hover started");
+            Debug.Log($"[HUD] PromptKey = '{interactable.PromptKey.place}.{interactable.PromptKey.id}'");
+            Debug.Log($"[HUD] Prompt = '{TextDB.GetPrompt(interactable.PromptKey.place, interactable.PromptKey.id)}'");
+
+
             if (interactable == null)
             {
                 SetPrompt("");
