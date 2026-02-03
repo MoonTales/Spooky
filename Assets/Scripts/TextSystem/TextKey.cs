@@ -1,0 +1,15 @@
+using System;
+
+[Serializable]
+
+// The CSV Mapper! This maps a place.id to a row in the CSV file, in essence 
+public struct TextKey
+{
+    public string place;
+    public string id;
+
+    public bool IsValid => !string.IsNullOrWhiteSpace(place) && !string.IsNullOrWhiteSpace(id);
+    public override string ToString() => $"{place}.{id}";
+
+    public static TextKey Empty => new TextKey { place = "", id = "" };
+}

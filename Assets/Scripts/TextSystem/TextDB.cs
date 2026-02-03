@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
+// The CSV Parser! It loads all CSVs and reads them, and drags their text kicking and screaming into a dictionary :D
 public static class TextDB
 {
     private static bool loaded;
