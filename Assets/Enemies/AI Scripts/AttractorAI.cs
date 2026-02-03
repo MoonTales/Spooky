@@ -44,7 +44,8 @@ public class AttractorAI : MonoBehaviour
 	{
 		TestFunction_floatF_boolB,
 		ReprogramReaction_REPROGRAM,
-		DeleteFocus
+		DeleteFocus,
+		ChangeStats_STATS
 	}
 
 	[System.Serializable]
@@ -109,7 +110,23 @@ public class AttractorAI : MonoBehaviour
 		{
 			nextFocus.gameObject.SetActive(false);
 		}
-	} 
+	}
+
+	public enum Stats
+	{
+
+	}
+	public enum Alteration
+	{
+		plus,
+		minus,
+		times,
+		dividedBy
+	}
+	public void ChangeStats(Stats statToChange, Alteration changeBy, float changeAmount)
+	{
+		
+	}
 
 	[System.Serializable]
 	public class EnemyReactions
@@ -274,13 +291,6 @@ public class AttractorAI : MonoBehaviour
 	private float currentInspect = 0;
 
 	#endregion
-
-
-
-	public void Test2()
-	{
-		Debug.Log("yah");
-	}
 
 	void Start()
 	{
