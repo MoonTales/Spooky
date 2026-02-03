@@ -13,9 +13,11 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
     [Header("Mode")]
     [SerializeField] private ToggleMode mode = ToggleMode.Light;
 
-    [Header("Prompt")]
-    [SerializeField] private string promptWhenOff = "Turn on";
-    [SerializeField] private string promptWhenOn = "Turn off";
+    [Header("Prompt Keys (CSV rows)")]
+    [SerializeField] private TextKey promptWhenOffKey; 
+    [SerializeField] private TextKey promptWhenOnKey;  
+
+    public TextKey PromptKey => IsOn() ? promptWhenOnKey : promptWhenOffKey;
 
     // Targets (use whichever matches your mode)
     [Header("Targets")]
@@ -23,8 +25,6 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
     [SerializeField] private AudioSource targetAudio;
     [SerializeField] private GameObject targetObject;
     // add more as we need
-
-    public string Prompt => IsOn() ? promptWhenOn : promptWhenOff;
 
 
     // From the IInteractable interface - set these as appropriate

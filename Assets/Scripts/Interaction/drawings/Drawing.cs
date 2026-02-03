@@ -41,23 +41,13 @@ namespace Interaction.drawings
         private Quaternion _returnTargetRotation;
         private Vector3 _returnTargetScale;
         private Transform _returnTargetParent;
-    
-        // Interface Properties
-        public string Prompt 
-        { 
-            get 
-            {
-                if (IsDrawingInInventory())
-                {
-                    return "Examine Drawing";
-                }
-                else
-                {
-                    return "Collect Drawing";
-                }
-            }
-        }
-    
+
+        // Interface Properties - now linked to keys
+        [Header("Text Keys (CSV row pointers)")]
+        [SerializeField] private TextKey promptCollectKey; 
+        [SerializeField] private TextKey promptExamineKey;
+        public TextKey PromptKey => IsDrawingInInventory() ? promptExamineKey : promptCollectKey;
+
         private void Start()
         {
             // setup references
