@@ -220,21 +220,46 @@ namespace Player.Camera
         private void HandleMildlyAnxiousEffects()
         {
             // unique effects
+            _targetBlurIntensity = 0f;
+            _targetFocusDistance = 10f;
+            _targetChromaticAberration = 0f;
+            _currentBlurIntensity = 0f;
+            _currentFocusDistance = 10f;
+            _currentChromaticAberration = 0f;
+            
         }
 
         private void HandleModeratelyAnxiousEffects()
         {
             // unique effects
+            _targetBlurIntensity = 0f;
+            _targetFocusDistance = 10f;
+            _targetChromaticAberration = 0f;
+            _currentBlurIntensity = 0f;
+            _currentFocusDistance = 10f;
+            _currentChromaticAberration = 0f;
         }
 
         private void HandleSeverelyAnxiousEffects()
         {
             // unique effects
+            _targetBlurIntensity = 0f;
+            _targetFocusDistance = 10f;
+            _targetChromaticAberration = 0f;
+            _currentBlurIntensity = 0f;
+            _currentFocusDistance = 10f;
+            _currentChromaticAberration = 0f;
         }
 
         private void HandlePanicEffects()
         {
             // unique effects
+            _targetBlurIntensity = 0f;
+            _targetFocusDistance = 10f;
+            _targetChromaticAberration = 0f;
+            _currentBlurIntensity = 0f;
+            _currentFocusDistance = 10f;
+            _currentChromaticAberration = 0f;
         }
 
         private void HandleMildlySleepDeprivedEffects()
