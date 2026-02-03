@@ -2,7 +2,7 @@ using System;
 
 [Serializable]
 
-// The CSV Mapper Key!
+// Where the super cool identifier for every row lives! Basically constructs (place, id)
 public struct TextKey
 {
     public string place;

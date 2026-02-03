@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-// super cool CSV Mapper! This does the   mapping
+// applies the text field from TextDB to a TMP_Text component - mapper, tangentially
 
 [RequireComponent(typeof(TMP_Text))]
 public class TextKeyTMP : MonoBehaviour
