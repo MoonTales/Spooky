@@ -84,7 +84,7 @@ public static class TextDB
         LoadAllIfNeeded();
 
         if (!map.TryGetValue(key, out var row))
-            return $"missing {key}";
+            return "";
 
         return field switch
         {
