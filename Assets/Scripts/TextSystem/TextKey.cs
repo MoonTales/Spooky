@@ -2,7 +2,7 @@ using System;
 
 [Serializable]
 
-// The CSV Mapper! This maps a place.id to a row in the CSV file, in essence 
+// The CSV Mapper Key!
 public struct TextKey
 {
     public string place;
