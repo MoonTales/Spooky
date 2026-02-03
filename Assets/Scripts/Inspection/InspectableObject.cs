@@ -13,23 +13,23 @@ namespace Inspection
     // WIll soon inherit from the InteractableObject class / Interactable system Interface
     public class InspectableObject : EventSubscriberBase, IInteractable
     {
-        
-        [Header("Inspection Object Settings")]
-        [SerializeField, Tooltip("The name shown when the player inspects this object")] 
-        private string objectName = "Inspectable Object";
-        [SerializeField, Tooltip("A short description of the object shown during inspection")]
-        private string objectDescription = "This is an inspectable object. You can provide a description here.";
-        
+
+        [Header("Text Keys (CSV row pointers)")]
+        [SerializeField, Tooltip("Row key that contains name / description fields for inspection UI")]
+        private TextKey rowKey;
+        [SerializeField, Tooltip("Row key that contains the prompt field for hover interaction text (optional as needed)")]
+        private TextKey promptKey;
+
         [SerializeField] private int requiredHour = -1; // -1 means no time restriction
         
         // internal 
         private MeshRenderer[] _meshRenderers;
         private Collider[] _objColliders;
-        
+
         // Getters
-        public string GetObjectName() { return objectName; }
-        public string GetObjectDescription() { return objectDescription; }
-        
+        public TextKey RowKey => rowKey;
+        public TextKey PromptKey => promptKey;
+
         // Interface Implementation
         public bool CanInteract(Interactor interactor)
         {
@@ -51,7 +51,7 @@ namespace Inspection
 
         protected override void OnWorldClockTicked(int newHour)
         {
-            DebugUtils.Log($"InspectableObject '{objectName}' received World Clock Tick: {newHour}");
+            DebugUtils.Log($"InspectableObject '{rowKey}' received World Clock Tick: {newHour}");
 
             if (newHour >= requiredHour)
             {
@@ -76,6 +76,5 @@ namespace Inspection
             }
         }
 
-        public string Prompt { get; } = "Inspect Object";
     }
 }

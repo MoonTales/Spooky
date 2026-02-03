@@ -484,9 +484,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1 &9139715
 GameObject:
@@ -2453,6 +2456,22 @@ PrefabInstance:
       propertyPath: drawingID
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptCollectKey.id
+      value: drawing_collect
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptExamineKey.id
+      value: drawing_examine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptCollectKey.place
+      value: prompt
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptExamineKey.place
+      value: prompt
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3802,9 +3821,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1001 &171580740
 PrefabInstance:
@@ -4405,9 +4427,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1001 &197268917
 PrefabInstance:
@@ -7730,9 +7755,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Special Book
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: 4
 --- !u!64 &298272087
 MeshCollider:
@@ -8461,6 +8489,22 @@ PrefabInstance:
     - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
       propertyPath: uniqueDrawingID
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
+      propertyPath: promptCollectKey.id
+      value: drawing_collect
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
+      propertyPath: promptExamineKey.id
+      value: drawing_examine
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
+      propertyPath: promptCollectKey.place
+      value: prompt
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
+      propertyPath: promptExamineKey.place
+      value: prompt
       objectReference: {fileID: 0}
     - target: {fileID: 6155179742582205522, guid: c5a710777d6eeb54889303cb66318749, type: 3}
       propertyPath: m_Mesh
@@ -9957,9 +10001,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Special Book
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: 3
 --- !u!64 &372070446
 MeshCollider:
@@ -13584,9 +13631,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Special Book
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: 2
 --- !u!1 &518006388
 GameObject:
@@ -13956,8 +14006,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 0
-  promptWhenOff: Turn on
-  promptWhenOn: Turn off
+  promptWhenOffKey:
+    place: 
+    id: 
+  promptWhenOnKey:
+    place: 
+    id: 
   targetLight: {fileID: 0}
   targetAudio: {fileID: 0}
   targetObject: {fileID: 0}
@@ -13974,8 +14028,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 0
-  promptWhenOff: Turn on
-  promptWhenOn: Turn off
+  promptWhenOffKey:
+    place: 
+    id: 
+  promptWhenOnKey:
+    place: 
+    id: 
   targetLight: {fileID: 0}
   targetAudio: {fileID: 0}
   targetObject: {fileID: 0}
@@ -14344,9 +14402,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1 &527026345
 GameObject:
@@ -15713,9 +15774,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1 &570293097
 GameObject:
@@ -19379,9 +19443,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1001 &736914600
 PrefabInstance:
@@ -19830,9 +19897,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1001 &775210929
 PrefabInstance:
@@ -20657,6 +20727,22 @@ PrefabInstance:
     - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
       propertyPath: location
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
+      propertyPath: promptCollectKey.id
+      value: drawing_collect
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
+      propertyPath: promptExamineKey.id
+      value: drawing_examine
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
+      propertyPath: promptCollectKey.place
+      value: prompt
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486339086855756400, guid: c5a710777d6eeb54889303cb66318749, type: 3}
+      propertyPath: promptExamineKey.place
+      value: prompt
       objectReference: {fileID: 0}
     - target: {fileID: 6155179742582205522, guid: c5a710777d6eeb54889303cb66318749, type: 3}
       propertyPath: m_Mesh
@@ -26034,9 +26120,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1001 &1066769269
 PrefabInstance:
@@ -26109,6 +26198,22 @@ PrefabInstance:
     - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
       propertyPath: location
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
+      propertyPath: promptCollectKey.id
+      value: drawing_collect
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
+      propertyPath: promptExamineKey.id
+      value: drawing_examine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
+      propertyPath: promptCollectKey.place
+      value: prompt
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
+      propertyPath: promptExamineKey.place
+      value: prompt
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27140,6 +27245,22 @@ PrefabInstance:
       propertyPath: location
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptCollectKey.id
+      value: drawing_collect
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptExamineKey.id
+      value: drawing_examine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptCollectKey.place
+      value: prompt
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptExamineKey.place
+      value: prompt
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -27970,9 +28091,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: bedroom
+    id: book1
+  promptKey:
+    place: bedroom
+    id: books
   requiredHour: -1
 --- !u!1 &1143600238
 GameObject:
@@ -28911,9 +29035,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1001 &1184220029
 PrefabInstance:
@@ -31433,9 +31560,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1 &1282249620
 GameObject:
@@ -32319,9 +32449,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!43 &1314108449
 Mesh:
@@ -33199,9 +33332,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Special Book
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: 3
 --- !u!64 &1334272824
 MeshCollider:
@@ -34049,9 +34185,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1 &1364552362
 GameObject:
@@ -35343,9 +35482,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1001 &1396303491
 PrefabInstance:
@@ -38439,9 +38581,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!43 &1494369359
 Mesh:
@@ -40638,9 +40783,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!43 &1571131055
 Mesh:
@@ -42864,9 +43012,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1 &1673897544
 GameObject:
@@ -48211,6 +48362,22 @@ PrefabInstance:
       propertyPath: uniqueDrawingID
       value: 44
       objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptCollectKey.id
+      value: drawing_collect
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptExamineKey.id
+      value: drawing_examine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptCollectKey.place
+      value: prompt
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptExamineKey.place
+      value: prompt
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -49990,9 +50157,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!1 &1925945793
 GameObject:
@@ -55086,9 +55256,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Inspectable Object
-  objectDescription: This is an inspectable object. You can provide a description
-    here.
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
   requiredHour: -1
 --- !u!43 &2132679499
 Mesh:
@@ -57110,8 +57283,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 2
-  promptWhenOff: Turn on
-  promptWhenOn: Turn off
+  promptWhenOffKey:
+    place: prompt
+    id: lamp_on
+  promptWhenOnKey:
+    place: prompt
+    id: lamp_off
   targetLight: {fileID: 0}
   targetAudio: {fileID: 0}
   targetObject: {fileID: 2461893102777535845}
@@ -58807,6 +58984,22 @@ PrefabInstance:
     - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
       propertyPath: uniqueDrawingID
       value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
+      propertyPath: promptCollectKey.id
+      value: drawing_collect
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
+      propertyPath: promptExamineKey.id
+      value: drawing_examine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
+      propertyPath: promptCollectKey.place
+      value: prompt
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875196547337809617, guid: 08f0c757fd8ecb542ba2c611c59807b0, type: 3}
+      propertyPath: promptExamineKey.place
+      value: prompt
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -61231,6 +61424,22 @@ PrefabInstance:
     - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
       propertyPath: uniqueDrawingID
       value: 33
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptCollectKey.id
+      value: drawing_collect
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptExamineKey.id
+      value: drawing_examine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptCollectKey.place
+      value: prompt
+      objectReference: {fileID: 0}
+    - target: {fileID: 7907601509377743193, guid: e341cb41204af5f48bb35b691da4509d, type: 3}
+      propertyPath: promptExamineKey.place
+      value: prompt
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
