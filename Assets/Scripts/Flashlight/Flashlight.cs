@@ -205,9 +205,6 @@ public class Flashlight : Singleton<Flashlight>
     private void OnFlashlightToggled(bool isOn)
     {
         
-        // we can just do a check here, to make sure we are not in the pause meny gamestate
-        // there is other places this can go, but this works and its easy
-        if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Paused) { return; }
         
         // Handle flashlight toggle event
         if (isOn)
