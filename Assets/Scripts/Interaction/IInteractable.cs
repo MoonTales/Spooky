@@ -2,8 +2,8 @@ using UnityEngine;
 
 public interface IInteractable
 {
-    // maybe a short prompt for UI, like "pick up key", "hide", "turn off alarm"
-    string Prompt { get; }
+    // key to a short prompt
+    TextKey PromptKey { get; }
 
 
     // return false to block interaction (locked, already used, wrong state, whatever)

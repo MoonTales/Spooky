@@ -6,7 +6,8 @@ public class SceneTeleportInteraction : MonoBehaviour, IInteractable
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     [SerializeField] private string sceneName = "";
-    
+    public TextKey PromptKey => default;
+
     public string Prompt { get; }
     public bool CanInteract(Interactor interactor)
     {
