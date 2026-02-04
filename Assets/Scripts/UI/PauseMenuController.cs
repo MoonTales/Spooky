@@ -7,15 +7,19 @@ using Inspection;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Managers;
 
 public class PauseMenuController : MonoBehaviour
 {
     public static bool paused = false;
-    public GameObject PauseMenuCanvas;
+    [SerializeField] private GameObject PauseMenuCanvas;
 
-    public GameObject SettingsCanvas;
+    [SerializeField] private GameObject SettingsCanvas;
 
-    public GameObject SettingsSliders;
+    [SerializeField] private GameObject SettingsSliders;
+    
+    // Internal variables
+    private Types.GameState _previousGameState;
 
     // Start is called before the first frame update
     void Start()
@@ -26,7 +30,8 @@ public class PauseMenuController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // Added TAB as an option, cause sometimes ESC has weird behaviors
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
         {
             if (paused)
             {
@@ -41,19 +46,26 @@ public class PauseMenuController : MonoBehaviour
 
     void Stop()
     {
+        
+        // before anything, cache the previous game state
+        _previousGameState = GameStateManager.Instance.GetCurrentGameState();
         EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Paused);
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        // Removing these, cause the cursor itself handles this logic internall in the Cursor class
+        //Cursor.lockState = CursorLockMode.None;
+        //Cursor.visible = true;
         Time.timeScale = 0f;
         paused = true;
         PauseMenuCanvas.SetActive(true);
+        
     }
 
     public void Play()
     {
-        EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // we load in whatever our cached state was before we paused
+        EventBroadcaster.Broadcast_GameStateChanged(_previousGameState);
+        // again, these are handled automatically, since we dont know what state we are loading into
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
         Time.timeScale = 1f;
         paused = false;
         ShowMenu(false);

@@ -81,17 +81,20 @@ namespace UI
             {
                 case Types.GameState.Gameplay:
                     SetInspectionText("", "");
-                    if (_hudCrosshair != null) _hudCrosshair.enabled = true;
+                    if (_hudCrosshair != null){ _hudCrosshair.enabled = true;}
                     ShowHUD(true);
                     break;
-
                 case Types.GameState.Cutscene:
+                    if (_hudCrosshair != null){ _hudCrosshair.enabled = false;}
+                    break;
                 case Types.GameState.MainMenu:
                     ShowHUD(false);
                     break;
-
                 case Types.GameState.Inspecting:
                     HandleInspection();
+                    break;
+                case Types.GameState.Paused:
+                    ShowHUD(false);
                     break;
             }
         }
@@ -105,7 +108,7 @@ namespace UI
                 return;
             }
 
-            // pull name / desc from CSV name / desc fields using the inspectable’s row key
+            // pull name / desc from CSV name / desc fields using the inspectableï¿½s row key
             string name = TextDB.GetName(obj.RowKey.place, obj.RowKey.id);
             string desc = TextDB.GetDesc(obj.RowKey.place, obj.RowKey.id);
 
