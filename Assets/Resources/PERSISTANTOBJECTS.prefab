@@ -44,14 +44,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5267adddd28c6544f9e911e2d2e33017, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultCurrentHealth: 100
-  defaultMaxHealth: 100
+  defaultCurrentMentalHealth: 100
+  defaultMaxMentalHealth: 100
   defaultCurrentStamina: 100
   defaultMaxStamina: 100
   defaultMovementSpeed: 5
-  defaultPlayerHealthState: 0
-  injuredHealthCutoff: 0.75
-  criticalHealthCutoff: 0.25
+  defaultPlayerMentalState: 0
+  defaultPlayerMentalCoreState: 0
+  NormalMentalHealthCutoff: 1
+  MildlyAnxiousMentalHealthCutoff: 0.8
+  ModeratlyAnxiousMentalHealthCutoff: 0.6
+  SeverlyAnxiousMentalHealthCutoff: 0.25
+  PanicMentalHealthCutoff: 0.1
+  MildlySleepDeprivedMentalHealthCutoff: 0.8
+  ModeratlySleepDeprivedMentalHealthCutoff: 0.6
+  SeverlySleepDeprivedMentalHealthCutoff: 0.25
+  ExhaustedMentalHealthCutoff: 0.1
 --- !u!1 &3530379015126378944
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,7 +278,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1657568860585563929, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
       propertyPath: m_VersionIndex
-      value: 1812
+      value: 1815
       objectReference: {fileID: 0}
     - target: {fileID: 1840900198907958763, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
       propertyPath: cameraTransform
@@ -286,11 +294,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4476944612804632008, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
       propertyPath: m_VersionIndex
-      value: 2274
+      value: 2277
       objectReference: {fileID: 0}
     - target: {fileID: 5846909533257318856, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
       propertyPath: m_VersionIndex
-      value: 1528
+      value: 1531
       objectReference: {fileID: 0}
     - target: {fileID: 7094810660777727507, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
       propertyPath: m_Name

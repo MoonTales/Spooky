@@ -9,7 +9,7 @@ using Types = System.Types;
 namespace Player.Camera
 {
     
-    public class CameraMentalStateEffects : EventSubscriberBase
+    public class CameraMentalStateEffects : Singleton<CameraMentalStateEffects>
     {
         // Setting up structs (these can be private, since I know no other class will need these)
         [Serializable]
@@ -32,7 +32,6 @@ namespace Player.Camera
         // Track current mental state and active coroutine
         private Types.PlayerMentalState _currentMentalState;
         private Coroutine _activeSwayCoroutine;
-        
         
         
         
@@ -89,7 +88,20 @@ namespace Player.Camera
         private float _targetFocusDistance;
         private float _targetChromaticAberration;
         private float transitionSpeed = 5f;//0.25f; // lets make this settable aswell
-
+        
+        public void ResetEffects()
+        {
+            OnPlayerMentalStateChanged(Types.PlayerMentalState.Normal);
+        }
+        
+        public void SetCustomVisualEffects(float blurIntensity, float focusDistance, float chromaticAberration, float newTransitionSpeed)
+        {
+            _targetBlurIntensity = blurIntensity;
+            _targetFocusDistance = focusDistance;
+            _targetChromaticAberration = chromaticAberration;
+            transitionSpeed = newTransitionSpeed;
+        }
+        
 
         protected override void RegisterSubscriptions()
         {
@@ -185,16 +197,8 @@ namespace Player.Camera
 
         private void HandleNormalStateEffects()
         {
-            DebugUtils.Log("----------------------------------------");
-            DebugUtils.Log("Player mental state is now NORMAL. Removing all effects.");
-            DebugUtils.Log("----------------------------------------");
             // Immediately reset all values (no lerping)
-            _targetBlurIntensity = 0f;
-            _targetFocusDistance = 10f;
-            _targetChromaticAberration = 0f;
-            _currentBlurIntensity = 0f;
-            _currentFocusDistance = 10f;
-            _currentChromaticAberration = 0f;
+            SetCustomVisualEffects(blurIntensity:0f, focusDistance:10f, chromaticAberration:0f, newTransitionSpeed:5f);
     
             // Immediately disable effects
             if (_depthOfField != null)
@@ -205,13 +209,6 @@ namespace Player.Camera
             if (_chromaticAberration != null)
             {
                 _chromaticAberration.intensity.Override(0f);
-            }
-    
-            // Reset pan/tilt to neutral
-            if (_panTilt != null)
-            {
-                _panTilt.PanAxis.Value = 0f;
-                _panTilt.TiltAxis.Value = 0f;
             }
     
             transitionSpeed = 2f;
@@ -226,6 +223,7 @@ namespace Player.Camera
             _currentBlurIntensity = 0f;
             _currentFocusDistance = 10f;
             _currentChromaticAberration = 0f;
+
             
         }
 
@@ -266,46 +264,26 @@ namespace Player.Camera
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(mildlyTiredSwaySettings));
             // Add blur effect
-            _targetBlurIntensity = 10f;
-            _targetFocusDistance = 3f;
-            _targetChromaticAberration = 1f;
-            transitionSpeed = 0.5f;
-            //ApplyBlurEffect(blurIntensity: 10f, focusDistance: 3f);
-            //SetChromaticAberrationIntensity(1);
+            SetCustomVisualEffects(blurIntensity: 10f, focusDistance: 3f, chromaticAberration: 1f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleModeratelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(moderatelyTiredSwaySettings));
-            _targetBlurIntensity = 15f;
-            _targetFocusDistance = 2f;
-            _targetChromaticAberration = 2f;
-            transitionSpeed = 0.5f;
-            //ApplyBlurEffect(blurIntensity: 15f, focusDistance: 2f);
-            //SetChromaticAberrationIntensity(2);
+            SetCustomVisualEffects(blurIntensity: 15f, focusDistance: 2f, chromaticAberration: 2f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleSeverelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(severelyTiredSwaySettings));
-            _targetBlurIntensity = 20f;
-            _targetFocusDistance = 1f;
-            _targetChromaticAberration = 3f;
-            transitionSpeed = 0.5f;
-            //ApplyBlurEffect(blurIntensity: 20f, focusDistance: 1f);
-            //SetChromaticAberrationIntensity(3);
+            SetCustomVisualEffects(blurIntensity: 20f, focusDistance: 1f, chromaticAberration: 3f, newTransitionSpeed: 0.5f);
         }
 
 
         private void HandleExhaustedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(exhaustedTiredSwaySettings));
-            _targetBlurIntensity = 25f;
-            _targetFocusDistance = 0.5f;
-            _targetChromaticAberration = 4f;
-            transitionSpeed = 0.5f;
-            //ApplyBlurEffect(blurIntensity: 25f, focusDistance: 0.5f);
-            //SetChromaticAberrationIntensity(4);
+            SetCustomVisualEffects(blurIntensity: 25f, focusDistance: 0.5f, chromaticAberration: 4f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleBreakdownEffects()
@@ -374,31 +352,7 @@ namespace Player.Camera
             if (!_postProcessVolume || !_chromaticAberration) { return; }
             _chromaticAberration.intensity.Override(amount);
         }
-
-        private void RemoveBlurEffect()
-        {
-            _targetBlurIntensity = 0f;
-            _targetFocusDistance = 10f;
-            _currentBlurIntensity = 0f;
-            _currentFocusDistance = 10f;
-            
-            if (_depthOfField != null)
-            {
-                _depthOfField.active = false;
-            }
-        }
-
-        private void RemoveChromaticAberrationEffect()
-        {
-            _currentChromaticAberration = 0f;
-            _targetChromaticAberration = 0f;
-            if (_chromaticAberration != null)
-            {
-                _chromaticAberration.intensity.Override(0f);
-            }
-
-        }
-
+        
         #region Utility Functions
 
         private void TrySetPostProcessing()
