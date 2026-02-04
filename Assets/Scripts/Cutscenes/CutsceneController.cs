@@ -16,8 +16,9 @@ namespace Cutscenes
     }
     public class CutsceneController : EventSubscriberBase, IInteractable
     {
-    
-        
+        public TextKey PromptKey => default;
+
+
         [SerializeField] private GameObject cutsceneToPlay;
         [SerializeField] private CutsceneType cutsceneType;
         [SerializeField] private bool  playOnlyOnce = true;
