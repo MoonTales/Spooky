@@ -4,6 +4,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 using Inspection;
+using Managers;
 
 public class InspectionSystem : Singleton<InspectionSystem>
 {
@@ -251,7 +252,11 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 panTilt.TiltAxis.Value = savedPanTilt.y;
                 panTilt.enabled = true;
             }
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            // only set this, if we are not currently in the main menu (an edge case)
+            if (GameStateManager.Instance.GetCurrentGameState() != Types.GameState.MainMenu)
+            {
+                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            }
         }
     }
     

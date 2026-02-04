@@ -37,7 +37,6 @@ public class PauseMenuController : MonoBehaviour
         // Added TAB as an option, cause sometimes ESC has weird behaviors
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
         {
-            DebugUtils.Log("[PauseMenuController] Pause/Unpause key pressed: our current GameState is " + GameStateManager.Instance.GetCurrentGameState());
             if (paused)
             {
                 Play();
@@ -51,8 +50,6 @@ public class PauseMenuController : MonoBehaviour
 
     void Stop()
     {
-        DebugUtils.LogWarning("[PauseMenuController] Pausing game from current state: " + GameStateManager.Instance.GetCurrentGameState());
-        DebugUtils.LogWarning("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         // before anything, cache the previous game state
         _previousGameState = GameStateManager.Instance.GetCurrentGameState();
         EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Paused);
@@ -67,7 +64,6 @@ public class PauseMenuController : MonoBehaviour
 
     public void Play()
     {
-        DebugUtils.LogWarning("[PauseMenuController] Resuming game to previous state: " + _previousGameState);
         // we load in whatever our cached state was before we paused
         EventBroadcaster.Broadcast_GameStateChanged(_previousGameState);
         // again, these are handled automatically, since we dont know what state we are loading into
