@@ -30,6 +30,9 @@ public class PauseMenuController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        // we should not be able to pause while on the main menu
+        if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu) { return; }
         // Added TAB as an option, cause sometimes ESC has weird behaviors
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
         {
