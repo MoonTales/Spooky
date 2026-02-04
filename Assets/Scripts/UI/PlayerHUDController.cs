@@ -91,6 +91,7 @@ namespace UI
                     ShowHUD(false);
                     break;
                 case Types.GameState.Inspecting:
+                    DebugUtils.LogError("Setting HUD to Inspecting State");
                     HandleInspection();
                     break;
                 case Types.GameState.Paused:
@@ -101,10 +102,13 @@ namespace UI
 
         private void HandleInspection()
         {
+            ShowHUD(true);
+            Debug.Log("[HUD] Handling Inspection HUD Update");
             InspectableObject obj = InspectionSystem.Instance.GetCurrentInspectedObject();
             if (obj == null)
             {
                 SetInspectionText("", "");
+                Debug.LogWarning("[HUD] InspectionSystem returned null InspectableObject");
                 return;
             }
 
@@ -114,11 +118,18 @@ namespace UI
 
             // blank means "not inspectable / show nothing"
             if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(desc))
+            {
+                Debug.Log("[HUD] Inspection Name and Description are blank, hiding inspection text");
                 SetInspectionText("", "");
+            }
             else
+            {
+                SetInspectionTextVisible(true);
                 SetInspectionText(name, desc);
+            }
 
-            if (_hudCrosshair != null) _hudCrosshair.enabled = false;
+
+            if (_hudCrosshair != null){ _hudCrosshair.enabled = false;}
             SetPrompt("");
         }
 
@@ -146,6 +157,11 @@ namespace UI
             _hudInteractionPromptText.gameObject.SetActive(!string.IsNullOrEmpty(_hudInteractionPromptText.text));
         }
 
+        private void SetInspectionTextVisible(bool visible)
+        {
+            if (_hudItemNameText != null) _hudItemNameText.gameObject.SetActive(visible);
+            if (_hudItemDescriptionText != null) _hudItemDescriptionText.gameObject.SetActive(visible);
+        }
         private void SetInspectionText(string name, string desc)
         {
             if (_hudItemNameText != null) _hudItemNameText.text = name ?? "";
