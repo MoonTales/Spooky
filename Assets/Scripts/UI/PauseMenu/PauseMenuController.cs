@@ -33,9 +33,11 @@ public class PauseMenuController : MonoBehaviour
         
         // we should not be able to pause while on the main menu
         if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu) { return; }
+
         // Added TAB as an option, cause sometimes ESC has weird behaviors
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
         {
+            DebugUtils.Log("[PauseMenuController] Pause/Unpause key pressed: our current GameState is " + GameStateManager.Instance.GetCurrentGameState());
             if (paused)
             {
                 Play();
@@ -49,7 +51,8 @@ public class PauseMenuController : MonoBehaviour
 
     void Stop()
     {
-        
+        DebugUtils.LogWarning("[PauseMenuController] Pausing game from current state: " + GameStateManager.Instance.GetCurrentGameState());
+        DebugUtils.LogWarning("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         // before anything, cache the previous game state
         _previousGameState = GameStateManager.Instance.GetCurrentGameState();
         EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Paused);
@@ -64,6 +67,7 @@ public class PauseMenuController : MonoBehaviour
 
     public void Play()
     {
+        DebugUtils.LogWarning("[PauseMenuController] Resuming game to previous state: " + _previousGameState);
         // we load in whatever our cached state was before we paused
         EventBroadcaster.Broadcast_GameStateChanged(_previousGameState);
         // again, these are handled automatically, since we dont know what state we are loading into
@@ -83,7 +87,19 @@ public class PauseMenuController : MonoBehaviour
 
     public void MainMenuButton()
     {
+        
+        // since we are returning to the main menu, we need to adjust time scale back to normal
+        // this should probably becoem a function since we need to reuse it
+        Time.timeScale = 1f;
+        paused = false;
+        ShowMenu(false);
+        SettingsCanvas.SetActive(false);
+        SettingsSliders.SetActive(false);
+        // we also need to "reset" the cached paused state, and set it to cutscene, cause we know the game will always
+        _previousGameState = Types.GameState.Cutscene;
+        // resume into a cutscene from the main menu
         EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
         SceneSwapper.Instance.SwapScene("MainMenu");
+        
     }
 }

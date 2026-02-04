@@ -275,4 +275,15 @@ public class InspectionSystem : Singleton<InspectionSystem>
         }
         return null;
     }
+    
+    protected override void OnGameStateChanged(Types.GameState newstate)
+    {
+        // If we are inspecting and the game state changes away from inspecting, end inspection
+        // UNLESS we are pausing the game while inspecting, we will allow that
+        if (_isInspecting && newstate != Types.GameState.Inspecting)
+        {
+            if (newstate == Types.GameState.Paused) { return; }
+            EndInspection();
+        }
+    }
 }
