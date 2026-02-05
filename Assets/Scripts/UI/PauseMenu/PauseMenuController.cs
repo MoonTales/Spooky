@@ -14,9 +14,12 @@ public class PauseMenuController : MonoBehaviour
     public static bool paused = false;
     [SerializeField] private GameObject PauseMenuCanvas;
 
-    [SerializeField] private GameObject SettingsCanvas;
+    
+    // pause menu buttons
+    private Button _playButton;
+    private Button _settingsButton;
+    private Button _quitButton;
 
-    [SerializeField] private GameObject SettingsSliders;
     
     // Internal variables
     private Types.GameState _previousGameState;
@@ -72,8 +75,7 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         paused = false;
         ShowMenu(false);
-        SettingsCanvas.SetActive(false);
-        SettingsSliders.SetActive(false);
+        SettingsController.Instance.CloseSettings();
     }
 
     public void ShowMenu(bool show)
@@ -89,8 +91,7 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         paused = false;
         ShowMenu(false);
-        SettingsCanvas.SetActive(false);
-        SettingsSliders.SetActive(false);
+        SettingsController.Instance.CloseSettings();
         // we also need to "reset" the cached paused state, and set it to cutscene, cause we know the game will always
         _previousGameState = Types.GameState.Cutscene;
         // resume into a cutscene from the main menu
