@@ -26,6 +26,12 @@ public class CursorController : EventSubscriberBase
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 break;
+            // Added these (in case you wanna look momo
+            case Types.GameState.Paused:
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                break;
+            // end of what was added
         }
     }
 }
