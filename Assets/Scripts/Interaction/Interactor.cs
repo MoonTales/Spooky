@@ -1,6 +1,8 @@
 using System;
+using Managers;
 using Player;
 using UnityEngine;
+using Types = System.Types;
 
 public class Interactor : MonoBehaviour
 {
@@ -24,6 +26,12 @@ public class Interactor : MonoBehaviour
 
         Debug.DrawRay(origin, dir * castDistance, Color.red);
 
+        // if we are not in the Gameplay state, we should not allow interaction
+        if (GameStateManager.Instance.GetCurrentGameState() != Types.GameState.Gameplay)
+        {
+            EventBroadcaster.Broadcast_OnEndedHoverInteractable();
+            return;
+        }
         
         
         if (Physics.Raycast(origin, dir, out RaycastHit hitInfo, castDistance))

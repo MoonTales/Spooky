@@ -81,41 +81,55 @@ namespace UI
             {
                 case Types.GameState.Gameplay:
                     SetInspectionText("", "");
-                    if (_hudCrosshair != null) _hudCrosshair.enabled = true;
+                    if (_hudCrosshair != null){ _hudCrosshair.enabled = true;}
                     ShowHUD(true);
                     break;
-
                 case Types.GameState.Cutscene:
+                    if (_hudCrosshair != null){ _hudCrosshair.enabled = false;}
+                    break;
                 case Types.GameState.MainMenu:
                     ShowHUD(false);
                     break;
-
                 case Types.GameState.Inspecting:
+                    DebugUtils.LogError("Setting HUD to Inspecting State");
                     HandleInspection();
+                    break;
+                case Types.GameState.Paused:
+                    ShowHUD(false);
                     break;
             }
         }
 
         private void HandleInspection()
         {
+            ShowHUD(true);
+            Debug.Log("[HUD] Handling Inspection HUD Update");
             InspectableObject obj = InspectionSystem.Instance.GetCurrentInspectedObject();
             if (obj == null)
             {
                 SetInspectionText("", "");
+                Debug.LogWarning("[HUD] InspectionSystem returned null InspectableObject");
                 return;
             }
 
-            // pull name / desc from CSV name / desc fields using the inspectable’s row key
+            // pull name / desc from CSV name / desc fields using the inspectableï¿½s row key
             string name = TextDB.GetName(obj.RowKey.place, obj.RowKey.id);
             string desc = TextDB.GetDesc(obj.RowKey.place, obj.RowKey.id);
 
             // blank means "not inspectable / show nothing"
             if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(desc))
+            {
+                Debug.Log("[HUD] Inspection Name and Description are blank, hiding inspection text");
                 SetInspectionText("", "");
+            }
             else
+            {
+                SetInspectionTextVisible(true);
                 SetInspectionText(name, desc);
+            }
 
-            if (_hudCrosshair != null) _hudCrosshair.enabled = false;
+
+            if (_hudCrosshair != null){ _hudCrosshair.enabled = false;}
             SetPrompt("");
         }
 
@@ -143,6 +157,11 @@ namespace UI
             _hudInteractionPromptText.gameObject.SetActive(!string.IsNullOrEmpty(_hudInteractionPromptText.text));
         }
 
+        private void SetInspectionTextVisible(bool visible)
+        {
+            if (_hudItemNameText != null) _hudItemNameText.gameObject.SetActive(visible);
+            if (_hudItemDescriptionText != null) _hudItemDescriptionText.gameObject.SetActive(visible);
+        }
         private void SetInspectionText(string name, string desc)
         {
             if (_hudItemNameText != null) _hudItemNameText.text = name ?? "";
