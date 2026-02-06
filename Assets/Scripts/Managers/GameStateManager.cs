@@ -98,12 +98,17 @@ namespace Managers
             {
                 EventBroadcaster.Broadcast_GameRestarted();
             }
-            
-            
-            
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                var data = new Types.NotificationData(
+                    duration: 5.0f, 
+                    messageKey: new TextKey { place = "Tutorial", id = "WASD"},
+                    messageOverride: "Custom Notification: Use WASD to move around!"
+                );
+                data.Send();
+            }
         }
-
-
+        
         protected override void OnGameStateChanged(Types.GameState newState)
         {
             
