@@ -51,9 +51,9 @@ namespace UI.PauseMenu
                 child.gameObject.SetActive(true);
             }
             SliderSettings.SetActive(true);
-            for (int i = 0; i < MainMenuSettings.transform.childCount; i++)
+            foreach (Transform child in SliderSettings.transform)
             {
-                MainMenuSettings.transform.GetChild(i).gameObject.SetActive(true);
+                child.gameObject.SetActive(true);
             }
         }
         public void OpenPauseSettings()
