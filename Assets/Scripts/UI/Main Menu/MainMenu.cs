@@ -7,7 +7,7 @@ using Types = System.Types;
 
 namespace UI.Main_Menu
 {
-    public class MainMenu : Singleton<MainMenu>
+    public class MainMenu : MonoBehaviour
     {
     
         [SerializeField] private GameObject mainMenuCanvas;
@@ -52,6 +52,7 @@ namespace UI.Main_Menu
 
         private void OnSettingsButtonClicked()
         {
+            mainMenuCanvas.SetActive(false);
             SettingsController.Instance.OpenMainMenuSettings();
         }
 

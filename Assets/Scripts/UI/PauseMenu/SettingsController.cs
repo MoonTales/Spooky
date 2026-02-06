@@ -70,7 +70,9 @@ namespace UI.PauseMenu
             // if we are in the main menu, we want to make sure the main menu is visible again
             if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu)
             {
-                MainMenu.Instance.MainMenuVisible();
+                // Look for the main menu in the scene can make this a broadcast if we want)
+                MainMenu mainMenu = FindObjectOfType<MainMenu>();
+                if (mainMenu != null) { mainMenu.MainMenuVisible(); }
             }
         }
 
