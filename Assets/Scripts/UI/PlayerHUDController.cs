@@ -21,6 +21,8 @@ namespace UI
         private TMP_Text _hudInteractionPromptText;
         private TMP_Text _hudItemNameText;
         private TMP_Text _hudItemDescriptionText;
+        // notificationText is handled via the NotificationController
+        private TMP_Text _hudNotificationText; public TMP_Text GetNotificationText() { return _hudNotificationText; }
 
 
         protected override void RegisterSubscriptions()
@@ -43,7 +45,8 @@ namespace UI
 
             _hudItemNameText = transform.Find("ItemName").GetComponent<TMP_Text>();
             _hudItemDescriptionText = transform.Find("ItemDescription").GetComponent<TMP_Text>();
-
+            _hudNotificationText = transform.Find("NotificationText").GetComponent<TMP_Text>();
+            _hudNotificationText.gameObject.SetActive(false);
             SetPrompt("");
             SetInspectionText("", "");
         }

@@ -135,5 +135,11 @@ namespace System
 
         public static event OnWorldLocationChanged OnWorldLocationChangedEvent;
         public static void Broadcast_OnWorldLocationChanged(Types.WorldLocation newLocation) { OnWorldLocationChangedEvent?.Invoke(newLocation); }
+        
+        
+        public static event OnNotificationSentHandler OnNotificationSent;
+        public delegate void OnNotificationSentHandler(Types.NotificationData notificationData);
+        public static void Broadcast_OnNotificationSent(Types.NotificationData notificationData) { OnNotificationSent?.Invoke(notificationData); }
+        
     }
 }
