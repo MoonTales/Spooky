@@ -1,15 +1,40 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Types = System.Types;
 
 namespace Player
 {
     public class PlayerInventory : Singleton<PlayerInventory>
     {
+        // Customization variablews for the feel of the game
+        [SerializeField] private int _maxDrawingsPerNight = 3;
+        [SerializeField] private int _maxDrawingsPerAct = 3;
+        
+        // Internal variables to help this new system
+        private int _currentDrawingsThisNight = 0;
+        
+        
         // Store only the IDs of collected drawings
         private readonly HashSet<int> _collectedDrawingIDs = new HashSet<int>();
     
         
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
+        {
+            // we want to check some logic anytime we leave or enter a location
+            // whenever we return to the bedroom, we want to reset how many drawins we have collected this night
+            if (worldLocation == Types.WorldLocation.Bedroom)
+            {
+                _currentDrawingsThisNight = 0;
+            }
+        }
         
         protected override void OnGameRestarted()
         {
@@ -25,6 +50,7 @@ namespace Player
         
         public void AddDrawing(int drawingID)
         {
+            
             if (_collectedDrawingIDs.Add(drawingID))
             {
                 DebugUtils.LogSuccess($"Added Drawing ID {drawingID} to Player Inventory. Total Drawings: {_collectedDrawingIDs.Count}");
@@ -33,6 +59,18 @@ namespace Player
             {
                 DebugUtils.LogWarning($"Drawing ID {drawingID} is already in Player Inventory.");
             }
+            _currentDrawingsThisNight ++;
+        }
+
+        public bool CanAddDrawing()
+        {
+            if (_currentDrawingsThisNight >= _maxDrawingsPerNight)
+            {
+                DebugUtils.LogWarning($"Cannot add drawing. Reached max drawings for the night ({_maxDrawingsPerNight}).");
+                return false;
+            }
+
+            return true;
         }
         
         public void RemoveDrawing(int drawingID)

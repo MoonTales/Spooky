@@ -277,8 +277,12 @@ namespace Interaction.drawings
     
         private void CollectDrawing()
         {
-            PlayerInventory.Instance.AddDrawing(drawingID);
-            gameObject.SetActive(false);
+            if (PlayerInventory.Instance.CanAddDrawing())
+            {
+                PlayerInventory.Instance.AddDrawing(drawingID);
+                gameObject.SetActive(false);
+            }
+            
         }
     
 
