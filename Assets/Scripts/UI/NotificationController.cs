@@ -49,10 +49,14 @@ namespace UI
             if (!string.IsNullOrEmpty(notificationData.messageOverride))
             {
                 _notificationText.text = notificationData.messageOverride;
-            } 
+            }
+            else
+            {
+                // otherwise, we need to try to use the TextField
+                _notificationText.text = TextDB.GetText(notificationData.messageKey.place, notificationData.messageKey.id);
+            }
             
-            // otherwise, we need to try to use the TextField
-            _notificationText.text = TextDB.GetText(notificationData.messageKey.place, notificationData.messageKey.id);
+
             
             // double check we have some text to show
             if (string.IsNullOrEmpty(_notificationText.text))
