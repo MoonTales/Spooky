@@ -50,7 +50,12 @@ namespace Player
         
         public void AddDrawing(int drawingID)
         {
-            
+            Types.NotificationData data = new(
+                duration: 1.0f, 
+                messageKey: new TextKey { place = "Notifications", id = "CollectedDrawingSuccess"},
+                messageOverride: $"Collected a Drawing"
+            );
+            data.Send();
             if (_collectedDrawingIDs.Add(drawingID))
             {
                 DebugUtils.LogSuccess($"Added Drawing ID {drawingID} to Player Inventory. Total Drawings: {_collectedDrawingIDs.Count}");
@@ -67,6 +72,12 @@ namespace Player
             if (_currentDrawingsThisNight >= _maxDrawingsPerNight)
             {
                 DebugUtils.LogWarning($"Cannot add drawing. Reached max drawings for the night ({_maxDrawingsPerNight}).");
+                Types.NotificationData data = new(
+                    duration: 3.0f, 
+                    messageKey: new TextKey { place = "Notifications", id = "CollectedDrawingFail"},
+                    messageOverride: $"Unable to hold more drawings. You have reached the maximum for the night."
+                );
+                data.Send();
                 return false;
             }
 
