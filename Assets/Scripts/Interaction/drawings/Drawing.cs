@@ -20,6 +20,11 @@ namespace Interaction.drawings
         [SerializeField] private float pickupTransitionSpeed = 8f;
         [SerializeField] private float returnTransitionSpeed = 8f;
         [SerializeField] private Vector3 handOffset = new Vector3(0, 0, 0.3f);
+        
+        
+        // We will be able to determine if a drawing is in the correct position, IF:
+        // its drawing ID*11 = the uniqueDrawingID
+        public bool isInCorrectPosition = false;
     
         // Pickup state
         // Internal bool to track if this drawing is currently picked up
@@ -54,6 +59,11 @@ namespace Interaction.drawings
             _rigidbody = GetComponent<Rigidbody>();
             _colliders = GetComponentsInChildren<Collider>();
             InitializeDrawingState();
+        }
+
+        public bool CheckIfInCorrectPosition()
+        {
+            return drawingID * 11 == uniqueDrawingID;
         }
     
         public bool CanInteract(Interactor interactor)
