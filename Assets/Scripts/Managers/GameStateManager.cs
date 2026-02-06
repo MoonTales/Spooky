@@ -100,7 +100,7 @@ namespace Managers
             }
             if (Input.GetKeyDown(KeyCode.N))
             {
-                var data = new Types.NotificationData(
+                Types.NotificationData data = new(
                     duration: 5.0f, 
                     messageKey: new TextKey { place = "Tutorial", id = "WASD"},
                     messageOverride: "Custom Notification: Use WASD to move around!"

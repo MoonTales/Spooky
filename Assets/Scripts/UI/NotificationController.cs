@@ -46,7 +46,20 @@ namespace UI
             _notificationText.gameObject.SetActive(true);
             
             // set the text to the notification message
-            _notificationText.text = notificationData.messageOverride;
+            if (!string.IsNullOrEmpty(notificationData.messageOverride))
+            {
+                _notificationText.text = notificationData.messageOverride;
+            } 
+            
+            // otherwise, we need to try to use the TextField
+            _notificationText.text = TextDB.GetText(notificationData.messageKey.place, notificationData.messageKey.id);
+            
+            // double check we have some text to show
+            if (string.IsNullOrEmpty(_notificationText.text))
+            {
+                DebugUtils.LogError("NotificationController received a notification with no message to display!");
+                _notificationText.text = "[ERROR: No Notification Message]";
+            }
             
             // Start the full notification sequence
             StartCoroutine(ShowNotificationSequence(notificationData.duration));
