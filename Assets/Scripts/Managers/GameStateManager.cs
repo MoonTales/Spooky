@@ -11,11 +11,13 @@ namespace Managers
     public class GameStateManager : Singleton<GameStateManager>
     {
 
+        [SerializeField] private int _maxDrawingsPerAct = 3; public int GetMaxDrawingsPerAct() { return _maxDrawingsPerAct; }
         
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
         private Types.GameState _currentGameState = Types.GameState.MainMenu; public Types.GameState GetCurrentGameState() { return _currentGameState; }
-        private Types.WorldLocation _currentWorldLocation = new Types.WorldLocation();
+        private Types.WorldLocation _currentWorldLocation = new Types.WorldLocation(); public Types.WorldLocation GetCurrentWorldLocation() { return _currentWorldLocation; }
+        
         private int _currentWorldClockHour = 1; public int GetCurrentWorldClockHour() { return _currentWorldClockHour; }
         public void Start()
         {
@@ -33,6 +35,14 @@ namespace Managers
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerHealthStateChanged);
             TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
                 () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+
+        }
+        
+        
+        public void SetWorldClockHour(int hour)
+        {
+            _currentWorldClockHour = hour;
+            EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
         }
 
         private void OnWorldLocationChanged(Types.WorldLocation worldLocation)

@@ -3,6 +3,7 @@ using Managers;
 using Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using Types = System.Types;
 
 namespace Interaction.drawings
@@ -24,7 +25,7 @@ namespace Interaction.drawings
         
         // We will be able to determine if a drawing is in the correct position, IF:
         // its drawing ID*11 = the uniqueDrawingID
-        public bool isInCorrectPosition = false;
+        public bool _isInCorrectPosition = false; public bool IsInCorrectPosition() { return _isInCorrectPosition; }
     
         // Pickup state
         // Internal bool to track if this drawing is currently picked up
@@ -59,11 +60,13 @@ namespace Interaction.drawings
             _rigidbody = GetComponent<Rigidbody>();
             _colliders = GetComponentsInChildren<Collider>();
             InitializeDrawingState();
+            UpdateIfIsInCorrectPosition();
         }
 
-        public bool CheckIfInCorrectPosition()
+        public void UpdateIfIsInCorrectPosition()
         {
-            return drawingID * 11 == uniqueDrawingID;
+            
+            _isInCorrectPosition = drawingID * 11 == uniqueDrawingID;
         }
     
         public bool CanInteract(Interactor interactor)
@@ -219,7 +222,9 @@ namespace Interaction.drawings
             if (IsReturnTransitionComplete())
             {
                 SnapToReturnPosition();
+                UpdateIfIsInCorrectPosition();
                 CompleteReturnTransition();
+                
             }
         }
     
@@ -250,6 +255,8 @@ namespace Interaction.drawings
             // we also need to ensure that we never save if any drawing is being held
             if (!DrawingStateManager.Instance.IsAnyDrawingCurrentlyHeld())
             {
+                // update the correctness of the position
+                UpdateIfIsInCorrectPosition();
                 DrawingStateManager.Instance.UpdateDrawingTransformData();
             }
             

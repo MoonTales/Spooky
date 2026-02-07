@@ -8,8 +8,7 @@ namespace Player
     public class PlayerInventory : Singleton<PlayerInventory>
     {
         // Customization variablews for the feel of the game
-        [SerializeField] private int _maxDrawingsPerNight = 9;
-        [SerializeField] private int _maxDrawingsPerAct = 3;
+        [SerializeField] private int _maxDrawingsPerNight = 3;
         
         // Internal variables to help this new system
         private int _currentDrawingsThisNight = 0;
