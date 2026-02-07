@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.DeveloperPanel;
+using Managers;
 using Player;
 using TMPro;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace System
         
         // Internal Variables
         private bool _developerModeEnabled = true;
-        private KeyCode _developerModeToggleKey = KeyCode.D;
+        private KeyCode _developerModeToggleKey = KeyCode.Backslash;
         private KeyCode _holdDeveloperModeKey = KeyCode.LeftControl;
 
         private GameObject _developerCanvas;
@@ -43,8 +44,8 @@ namespace System
         
         // GAME SPECIFIC STUFF
         [SerializeField] private TMP_Text _hudSanityStateText;
-        [SerializeField] private TMP_Text _hudSanityValueText;
-
+        [SerializeField] private TMP_Text _GameStateText;
+        [SerializeField] private TMP_Text _WorldLocationText;
         private void Start()
         {
             //_developerCanvas = transform.Find("DevCanvas").gameObject;
@@ -81,13 +82,21 @@ namespace System
 
             if (_hudSanityStateText)
             {
-                _hudSanityStateText.text = "Mental State: [" +PlayerStats.Instance.GetPlayerStats().GetPlayerMentalState().ToString() + "]";
+                // this will be "Mental Core State: [STATE] - Mental State: [STATE] - Mental Health: [CURRENT / MAX]"
+                _hudSanityStateText.text = "Mental State: [" + PlayerStats.Instance.GetPlayerStats().GetPlayerMentalState() +
+                                           "] - [" + PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth() + 
+                                           " / " + PlayerStats.Instance.GetPlayerStats().GetMaxMentalHealth() + "]";
+            }
 
-            }
-            if (_hudSanityValueText)
+            if (_GameStateText)
             {
-                _hudSanityValueText.text = "[" + Mathf.RoundToInt(PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth()).ToString() + "]";
+                _GameStateText.text = "Game State: [" + GameStateManager.Instance.GetCurrentGameState().ToString() + "]";
             }
+            if (_WorldLocationText)
+            {
+                _WorldLocationText.text = "World Location: [" + GameStateManager.Instance.GetCurrentWorldLocation().ToString() + "]";
+            }
+
         }
     
         void ToggleDeveloperMode()
@@ -124,13 +133,6 @@ namespace System
         /// </summary>
         private void RegisterCommands()
         {
-            // Example commands
-            RegisterCommand(KeyCode.F1, () => DebugUtils.Log("F1 Command Executed"), "F1 - Print Test Message");
-            RegisterCommand(KeyCode.F2, () => Time.timeScale = 2f, "F2 - Speed Up Time (2x)");
-            RegisterCommand(KeyCode.F3, () => Time.timeScale = 1f, "F3 - Normal Time Speed");
-            RegisterCommand(KeyCode.F4, () => Application.LoadLevel(0), "F4 - Reload Current Scene");
-            RegisterCommand(KeyCode.G, ToggleGodMode, "G - Toggle God Mode");
-            
             // Official Commands
             RegisterCommand(KeyCode.Minus, () => EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f), "Send off a broadcasts to simulate the player taking 10 mental damage (this is the same as raising anxiety or sleep deprivation by 10 points)");
             RegisterCommand(KeyCode.Equals, () => EventBroadcaster.Broadcast_OnPlayerDamaged(-10.0f), "Send off a broadcast to simulate the player healing 10 mental health (this is the same as lowering anxiety or sleep deprivation by 10 points)");
