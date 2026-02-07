@@ -57,6 +57,7 @@ namespace System
             
             // Update the UI to show all commands
             UpdateCommandUI();
+            ToggleDeveloperMode(); // Start with developer mode off by default
 
         }
         
