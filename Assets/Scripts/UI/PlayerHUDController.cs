@@ -16,8 +16,7 @@ namespace UI
         // Crosshair
         private Image _hudCrosshair;
         // Textmeshpro Text ui
-        private TMP_Text _hudSanityStateText;
-        private TMP_Text _hudSanityValueText;
+
         private TMP_Text _hudInteractionPromptText;
         private TMP_Text _hudItemNameText;
         private TMP_Text _hudItemDescriptionText;
@@ -38,11 +37,7 @@ namespace UI
         {
             _hudCanvas = GetComponent<Canvas>();
             _hudCrosshair = transform.Find("CrossHair").GetComponent<Image>();
-
-            _hudSanityStateText = transform.Find("SanityState").GetComponent<TMP_Text>();
-            _hudSanityValueText = transform.Find("SanityValue").GetComponent<TMP_Text>();
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
-
             _hudItemNameText = transform.Find("ItemName").GetComponent<TMP_Text>();
             _hudItemDescriptionText = transform.Find("ItemDescription").GetComponent<TMP_Text>();
             _hudNotificationText = transform.Find("NotificationText").GetComponent<TMP_Text>();
@@ -141,14 +136,7 @@ namespace UI
             if (_hudCanvas != null) _hudCanvas.enabled = show;
         }
 
-        private void Update()
-        {
-            if (_hudSanityStateText)
-                _hudSanityStateText.text = PlayerStats.Instance.GetPlayerStats().GetPlayerMentalState().ToString();
 
-            if (_hudSanityValueText)
-                _hudSanityValueText.text = Mathf.RoundToInt(PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth()).ToString();
-        }
 
         private void SetPrompt(string s)
         {
