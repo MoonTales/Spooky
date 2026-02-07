@@ -45,8 +45,7 @@ namespace Player
         {
             // based on the gamestate, we need to do specific things to the sanity drain
             // we also do not want to do this, if we are in the Tutorial or Main Menu
-            bool isInTutorialOrMainMenu = GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial || GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu;
-            if (newGameState == Types.GameState.Gameplay && !isInTutorialOrMainMenu)
+            if (newGameState == Types.GameState.Gameplay)
             {
                 // start sanity drain
                 if (_sanityDrainCoroutine == null)
@@ -72,6 +71,8 @@ namespace Player
                 // Drain sanity over time based on core state
                 Types.PlayerMentalCoreState coreState = _playerStats.GetPlayerMentalCoreState();
                 float drainAmount = 0f;
+                
+                
                 if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
                 {
                     drainAmount = 1f; // Drain 1 mental health per interval
@@ -81,6 +82,11 @@ namespace Player
                     drainAmount = 2f; // Drain 2 mental health per interval
                 }
 
+                bool isInTutorialOrMainMenu = GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial || GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu;
+                if (isInTutorialOrMainMenu)
+                {
+                    drainAmount = 0f; // No drain in tutorial or main menu
+                }
                 UpdateCurrentMentalHealth(-drainAmount);
 
                 // Wait for a set interval before draining again
@@ -101,7 +107,7 @@ namespace Player
         {
             // whenever we load from the main menu, we reset the player stats (like setting us to sleep deprived)
             DebugUtils.LogSuccess("PlayerStats: OnGameStarted - Resetting Player Stats to Default");
-            _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+            _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
         }
         
         protected override void RegisterSubscriptions()

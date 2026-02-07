@@ -73,7 +73,7 @@ namespace Managers
                 {
                     // this means the player fell asleep while in the bedroom, and should be sent to the nightmare
 
-                    SceneSwapper.Instance.SwapScene("FirstAiTest");
+                    SceneSwapper.Instance.SwapScene("Nightmare1");
                     // swap the core state to anxious
                     PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
                     EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
