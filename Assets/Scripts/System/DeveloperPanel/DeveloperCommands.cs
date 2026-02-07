@@ -18,12 +18,14 @@ namespace System
     {
         public KeyCode CommandKey;
         public Action CommandAction;
+        public string CommandName;
         public string CommandDescription;
         
-        public DeveloperCommand(KeyCode key, Action action, string description)
+        public DeveloperCommand(KeyCode key, Action action, string name, string description)
         {
             CommandKey = key;
             CommandAction = action;
+            CommandName = name;
             CommandDescription = description;
         }
     }
@@ -94,7 +96,7 @@ namespace System
             }
             if (_WorldLocationText)
             {
-                _WorldLocationText.text = "World Location: [" + GameStateManager.Instance.GetCurrentWorldLocation().ToString() + "]";
+                _WorldLocationText.text = "World Location: [" + GameStateManager.Instance.GetCurrentWorldLocation().ToString() + "]" + " - World Clock Hour: [" + GameStateManager.Instance.GetCurrentWorldClockHour().ToString() + "]";
             }
 
         }
@@ -123,9 +125,9 @@ namespace System
         /// <summary>
         /// Register a new developer command
         /// </summary>
-        public void RegisterCommand(KeyCode key, Action action, string description)
+        public void RegisterCommand(KeyCode inKey, Action inAction, string inName, string inDescription)
         {
-            _developerCommands.Add(new DeveloperCommand(key, action, description));
+            _developerCommands.Add(new DeveloperCommand(inKey, inAction, inName, inDescription));
         }
         
         /// <summary>
@@ -134,9 +136,10 @@ namespace System
         private void RegisterCommands()
         {
             // Official Commands
-            RegisterCommand(KeyCode.Minus, () => EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f), "Send off a broadcasts to simulate the player taking 10 mental damage (this is the same as raising anxiety or sleep deprivation by 10 points)");
-            RegisterCommand(KeyCode.Equals, () => EventBroadcaster.Broadcast_OnPlayerDamaged(-10.0f), "Send off a broadcast to simulate the player healing 10 mental health (this is the same as lowering anxiety or sleep deprivation by 10 points)");
-            
+            RegisterCommand(KeyCode.Minus, () => EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f), "Hurt Player", "Send off a broadcasts to simulate the player taking 10 mental damage (this is the same as raising anxiety or sleep deprivation by 10 points)");
+            RegisterCommand(KeyCode.Equals, () => EventBroadcaster.Broadcast_OnPlayerDamaged(-10.0f), "Heal Player", "Send off a broadcast to simulate the player healing 10 mental health (this is the same as lowering anxiety or sleep deprivation by 10 points)");
+            RegisterCommand(KeyCode.LeftBracket, () => GameStateManager.Instance.SetWorldClockHour(GameStateManager.Instance.GetCurrentWorldClockHour() - 1), "Decrease World Clock", "Send off a broadcast to decrease the world clock hour by 1");
+            RegisterCommand(KeyCode.RightBracket, () => GameStateManager.Instance.SetWorldClockHour(GameStateManager.Instance.GetCurrentWorldClockHour() + 1), "Increase World Clock", "Send off a broadcast to increase the world clock hour by 1");
         }
         
         /// <summary>
@@ -161,7 +164,7 @@ namespace System
                 TMP_Text keyText = newCommandUI.transform.Find("KeyCode").GetComponent<TMP_Text>();
                 if (keyText)
                 {
-                    keyText.text = "KEYCODE: [" + command.CommandKey.ToString() + "]";
+                    keyText.text = command.CommandName.ToString() + " - KEYCODE: [" + command.CommandKey.ToString() + "]";
                     keyText.color = Color.yellow;
                     keyText.fontStyle = TMPro.FontStyles.Bold;
                 }

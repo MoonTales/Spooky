@@ -87,12 +87,7 @@ namespace Managers
 
         protected void Update()
         {
-            // small update to show how this would work
-            if(Input.GetKeyDown(KeyCode.X))
-            {
-                DebugUtils.Log("Player Damaged Event Broadcasted with 10.0f damage");
-                EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f);
-            }
+
             if(Input.GetKeyDown(KeyCode.G))
             {
                 DebugUtils.Log("Switching to Gameplay State");
