@@ -49,7 +49,7 @@ namespace UI.Main_Menu
             
             // Yes it snaps away, but this will be changed once the game has a fade away or anything to transition us into gameplay!
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            SceneSwapper.Instance.SwapScene("Bedroom");
+            SceneSwapper.Instance.SwapScene("TutorialNightmare");
             
         }
 
