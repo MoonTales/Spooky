@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.DeveloperPanel;
 using Managers;
 using Player;
 using TMPro;
@@ -48,6 +47,7 @@ namespace System
         [SerializeField] private TMP_Text _hudSanityStateText;
         [SerializeField] private TMP_Text _GameStateText;
         [SerializeField] private TMP_Text _WorldLocationText;
+        [SerializeField] private TMP_Text _drawingCollectionText;
         private void Start()
         {
             //_developerCanvas = transform.Find("DevCanvas").gameObject;
@@ -68,8 +68,23 @@ namespace System
                 ToggleDeveloperMode();
             }
             
+            
+            // at anytime, when the player is holding the holdDeveloperModeKey, we want to enable the cursor, and then return it to its previous state when they release it.
+            // This allows developers to interact with the developer canvas without having to toggle developer mode on and off
+            
             // If we are ever not in Developmode, just return early and ignore all other commands
             if (!_developerModeEnabled) {return;}
+            
+            if (Input.GetKeyDown(_holdDeveloperModeKey))
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else if (Input.GetKeyUp(_holdDeveloperModeKey))
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
             
             // Check for command key presses
             foreach (DeveloperCommand command in _developerCommands)
@@ -99,6 +114,11 @@ namespace System
                 _WorldLocationText.text = "World Location: [" + GameStateManager.Instance.GetCurrentWorldLocation().ToString() + "]" + " - World Clock Hour: [" + GameStateManager.Instance.GetCurrentWorldClockHour().ToString() + "]";
             }
 
+            if (_drawingCollectionText)
+            {
+                _drawingCollectionText.text = "Drawings Collected: [" + PlayerInventory.Instance.GetCurrentDrawingsThisNight() + "/ " + PlayerInventory.Instance.GetMaxDrawingsPerNight() + "] - (" + PlayerInventory.Instance.GetDrawingCount() + " in Inventory)";
+            }
+
         }
     
         void ToggleDeveloperMode()
@@ -109,9 +129,6 @@ namespace System
             if (_developerModeEnabled && _developerCanvas)
             {
                 _developerCanvas.SetActive(true);
-                // set the cursor to Game and ui mode so we can interact with the developer canvas
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
             }
             else if (_developerCanvas)
             {
@@ -136,12 +153,20 @@ namespace System
         private void RegisterCommands()
         {
             // Official Commands
+            RegisterCommand(KeyCode.G, () => EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay), "Force Gameplay State", "Send off a broadcast to force the game state to switch to Gameplay (this will also trigger all associated events that come with entering the gameplay state)");
             RegisterCommand(KeyCode.Minus, () => EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f), "Hurt Player", "Send off a broadcasts to simulate the player taking 10 mental damage (this is the same as raising anxiety or sleep deprivation by 10 points)");
             RegisterCommand(KeyCode.Equals, () => EventBroadcaster.Broadcast_OnPlayerDamaged(-10.0f), "Heal Player", "Send off a broadcast to simulate the player healing 10 mental health (this is the same as lowering anxiety or sleep deprivation by 10 points)");
+            RegisterCommand(KeyCode.Delete, () => EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Breakdown), "Kill Player", "Send off a broadcast to simulate the player's mental state breaking down and reaching 0");
             RegisterCommand(KeyCode.LeftBracket, () => GameStateManager.Instance.SetWorldClockHour(GameStateManager.Instance.GetCurrentWorldClockHour() - 1), "Decrease World Clock", "Send off a broadcast to decrease the world clock hour by 1");
             RegisterCommand(KeyCode.RightBracket, () => GameStateManager.Instance.SetWorldClockHour(GameStateManager.Instance.GetCurrentWorldClockHour() + 1), "Increase World Clock", "Send off a broadcast to increase the world clock hour by 1");
+            RegisterCommand(KeyCode.Semicolon, () => EventBroadcaster.Broadcast_GameRestarted(), "Emulate Game Restart", "Send off a broadcast to emulate the game being restarted (this simulates if we did return to main menu.)");
+            
+            // Scene traversal commands
+            RegisterCommand(KeyCode.Alpha1, () => SceneSwapper.Instance.SwapScene("Bedroom"), "Load Bedroom Scene", "Load the Bedroom Scene instantly");
+            RegisterCommand(KeyCode.Alpha2, () => SceneSwapper.Instance.SwapScene("Nightmare1"), "Load Nightmare Scene", "Load the Nightmare 1 Scene instantly");
+            RegisterCommand(KeyCode.Alpha3, () => SceneSwapper.Instance.SwapScene("TutorialNightmare"), "Load Tutorial Scene", "Load the Tutorial Nightmare Scene instantly");
         }
-        
+
         /// <summary>
         /// Updates the UI to display all registered commands
         /// </summary>
@@ -178,14 +203,6 @@ namespace System
                     
                 }
             }
-        }
-        
-        
-        
-        private void ToggleGodMode()
-        {
-            DebugUtils.Log("God Mode Toggled");
-            // Your god mode logic here
         }
     }
 }

@@ -58,32 +58,6 @@ namespace Managers
                 RestoreDrawingsToTransform();
             }
         }
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                UpdateDrawingTransformData();
-            }
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                CheckForAllCorrectPlacements();
-            }
-            if (Input.GetKeyDown(KeyCode.X))
-            {
-                RestoreDrawingsToTransform();
-            }
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                // print the number of drawings
-                int count = PlayerInventory.Instance.GetDrawingCount();
-                DebugUtils.LogSuccess($"Player has {count} drawings in inventory.");
-                
-                
-            }
-            
-        }
-        
-        
 
         // Collect all drawings in the scene and update their transform data
         public void UpdateDrawingTransformData()

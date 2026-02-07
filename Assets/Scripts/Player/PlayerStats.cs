@@ -148,16 +148,7 @@ namespace Player
         {
             UpdateCurrentMentalHealth(-damageAmount);
         }
-
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                // debug print the current player stats
-                _playerStats.DebugPrintStats();
-            }
-            
-        }
+        
 
         private void InitializeDefaultStats()
         {

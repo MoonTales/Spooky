@@ -85,34 +85,13 @@ namespace Managers
             
         }
 
-        protected void Update()
+        protected override void OnGameRestarted()
         {
-
-            if(Input.GetKeyDown(KeyCode.G))
-            {
-                DebugUtils.Log("Switching to Gameplay State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            }
-            
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour += 1);
-            }
-            
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                EventBroadcaster.Broadcast_GameRestarted();
-            }
-            if (Input.GetKeyDown(KeyCode.N))
-            {
-                Types.NotificationData data = new(
-                    duration: 5.0f, 
-                    messageKey: new TextKey { place = "Tutorial", id = "WASD"},
-                    messageOverride: "Custom Notification: Use WASD to move around!"
-                );
-                data.Send();
-            }
+            // when we restart, we wanna reset the world clock hour back to 1
+            SetWorldClockHour(1);
         }
+
+
         
         protected override void OnGameStateChanged(Types.GameState newState)
         {
@@ -131,6 +110,7 @@ namespace Managers
             //2. If we EVER return to the main menu, we can consider that a game restart
             if (_currentGameState != Types.GameState.MainMenu && newState == Types.GameState.MainMenu)
             {
+                
                 EventBroadcaster.Broadcast_GameRestarted();
             }
             
