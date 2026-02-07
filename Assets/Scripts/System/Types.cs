@@ -32,7 +32,8 @@ namespace System
         public enum WorldLocation
         {
             Bedroom,
-            Nightmare
+            Nightmare,
+            Tutorial,
         }
         
         /* ------------------------ System Types ------------------------ */

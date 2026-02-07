@@ -3,6 +3,7 @@ using Managers;
 using Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using Types = System.Types;
 
 namespace Interaction.drawings
@@ -20,6 +21,11 @@ namespace Interaction.drawings
         [SerializeField] private float pickupTransitionSpeed = 8f;
         [SerializeField] private float returnTransitionSpeed = 8f;
         [SerializeField] private Vector3 handOffset = new Vector3(0, 0, 0.3f);
+        
+        
+        // We will be able to determine if a drawing is in the correct position, IF:
+        // its drawing ID*11 = the uniqueDrawingID
+        public bool _isInCorrectPosition = false; public bool IsInCorrectPosition() { return _isInCorrectPosition; }
     
         // Pickup state
         // Internal bool to track if this drawing is currently picked up
@@ -54,6 +60,13 @@ namespace Interaction.drawings
             _rigidbody = GetComponent<Rigidbody>();
             _colliders = GetComponentsInChildren<Collider>();
             InitializeDrawingState();
+            UpdateIfIsInCorrectPosition();
+        }
+
+        public void UpdateIfIsInCorrectPosition()
+        {
+            
+            _isInCorrectPosition = drawingID * 11 == uniqueDrawingID;
         }
     
         public bool CanInteract(Interactor interactor)
@@ -209,7 +222,9 @@ namespace Interaction.drawings
             if (IsReturnTransitionComplete())
             {
                 SnapToReturnPosition();
+                UpdateIfIsInCorrectPosition();
                 CompleteReturnTransition();
+                
             }
         }
     
@@ -240,6 +255,8 @@ namespace Interaction.drawings
             // we also need to ensure that we never save if any drawing is being held
             if (!DrawingStateManager.Instance.IsAnyDrawingCurrentlyHeld())
             {
+                // update the correctness of the position
+                UpdateIfIsInCorrectPosition();
                 DrawingStateManager.Instance.UpdateDrawingTransformData();
             }
             
@@ -277,8 +294,12 @@ namespace Interaction.drawings
     
         private void CollectDrawing()
         {
-            PlayerInventory.Instance.AddDrawing(drawingID);
-            gameObject.SetActive(false);
+            if (PlayerInventory.Instance.CanAddDrawing())
+            {
+                PlayerInventory.Instance.AddDrawing(drawingID);
+                gameObject.SetActive(false);
+            }
+            
         }
     
 
@@ -413,6 +434,10 @@ namespace Interaction.drawings
         private bool IsInNightmare()
         {
             return location == Types.WorldLocation.Nightmare;
+        }
+        private bool IsInTutorial()
+        {
+            return location == Types.WorldLocation.Tutorial;
         }
     
         #endregion
