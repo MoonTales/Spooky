@@ -133,9 +133,9 @@ namespace System
             else if (_developerCanvas)
             {
                 _developerCanvas.SetActive(false);
-                // set the cursor back to locked mode for gameplay
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
+                
+                // Set the gamestate, to be the current gamestate, so that Cursor correectly updates
+                EventBroadcaster.Broadcast_GameStateChanged(GameStateManager.Instance.GetCurrentGameState());
             }
         }
         
