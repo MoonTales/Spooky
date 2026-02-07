@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Managers;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Types = System.Types;
@@ -43,7 +44,9 @@ namespace Player
         protected override void OnGameStateChanged(Types.GameState newGameState)
         {
             // based on the gamestate, we need to do specific things to the sanity drain
-            if (newGameState == Types.GameState.Gameplay)
+            // we also do not want to do this, if we are in the Tutorial or Main Menu
+            bool isInTutorialOrMainMenu = GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial || GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu;
+            if (newGameState == Types.GameState.Gameplay && !isInTutorialOrMainMenu)
             {
                 // start sanity drain
                 if (_sanityDrainCoroutine == null)
@@ -121,6 +124,10 @@ namespace Player
                 _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
             }
             else if (newLocation == Types.WorldLocation.Nightmare)
+            {
+                _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+            }
+            else if (newLocation == Types.WorldLocation.Tutorial)
             {
                 _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
             }

@@ -435,6 +435,10 @@ namespace Interaction.drawings
         {
             return location == Types.WorldLocation.Nightmare;
         }
+        private bool IsInTutorial()
+        {
+            return location == Types.WorldLocation.Tutorial;
+        }
     
         #endregion
     }
