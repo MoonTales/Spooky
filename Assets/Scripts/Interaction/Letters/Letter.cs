@@ -20,9 +20,13 @@ namespace Interaction.Letters
                 messageOverride: "This is a fun letter!"
             );
             data.Send();
-            Destroy(this.gameObject);
-            // Start the Inspection UI for this letter
             InspectionSystem.Instance.StartInspection(gameObject);
+        }
+
+        public override void OnInspectionFinished()
+        {
+            // Custom logic that can run once the inspection has been completed fully
+            DebugUtils.Log($"Finished inspecting letter: !!");
         }
     }
 }

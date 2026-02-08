@@ -75,6 +75,9 @@ namespace Inspection
                 }
             }
         }
-
+        public virtual void OnInspectionFinished()
+        {
+            // Custom logic that can run once the inspection has been completed fully
+        }
     }
 }
