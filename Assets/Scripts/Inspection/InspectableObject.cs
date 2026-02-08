@@ -16,9 +16,9 @@ namespace Inspection
 
         [Header("Text Keys (CSV row pointers)")]
         [SerializeField, Tooltip("Row key that contains name / description fields for inspection UI")]
-        private TextKey rowKey;
+        protected TextKey rowKey;
         [SerializeField, Tooltip("Row key that contains the prompt field for hover interaction text (optional as needed)")]
-        private TextKey promptKey;
+        protected TextKey promptKey;
 
         [SerializeField] private int requiredHour = -1; // -1 means no time restriction
         

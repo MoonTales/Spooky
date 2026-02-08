@@ -227,5 +227,13 @@ namespace System
                 return $"NotificationData(Duration: {_duration}, MessageKey: {_messageKey}, MessageOverride: {_messageOverride})";
             }
         }
+        
+        // Letter Types as an Enum
+        [Serializable]
+        public enum LetterType
+        {
+            Researcher,
+            Friend,
+        }
     }
 }
