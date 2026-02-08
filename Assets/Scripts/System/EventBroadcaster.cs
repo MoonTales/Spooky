@@ -1,3 +1,4 @@
+using Cutscenes;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -83,7 +84,12 @@ namespace System
         public static event GameStateChangedHandler OnGameStateChanged;
         public static void Broadcast_GameStateChanged(Types.GameState newState) { OnGameStateChanged?.Invoke(newState); }
         //---------------------------------------------------------------------------------//
-
+        
+        
+        // cutscene related
+        public delegate void RequestStartCutsceneHandler(CutsceneController cutscenePrefab);
+        public static event RequestStartCutsceneHandler OnRequestStartCutscene;
+        public static void Broadcast_OnRequestStartCutscene(CutsceneController cutscenePrefab) { OnRequestStartCutscene?.Invoke(cutscenePrefab); }
     
         /// <summary>
         /// Player specific broadcasts.

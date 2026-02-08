@@ -32,6 +32,7 @@ namespace System
             gameObject.AddComponent<PlayerInventory>();
             gameObject.AddComponent<DrawingStateManager>();
             gameObject.AddComponent<NotificationController>();
+            gameObject.AddComponent<CutsceneManager>();
             
             
         

@@ -28,6 +28,7 @@ namespace Cutscenes
         private void Start()
         {
             playableDirector = cutsceneToPlay.GetComponent<PlayableDirector>();
+            playableDirector.playOnAwake = false;
             if (cutsceneType == CutsceneType.PlayOnStart){PlayCutscene();}
         }
 
@@ -40,30 +41,11 @@ namespace Cutscenes
 
         private void PlayCutscene()
         {
-            
-            // Subscribe to the stopped event
-            if (playableDirector != null)
-            {
-                playableDirector.stopped += EndCutscene;
-            }
-            
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
-            cutsceneToPlay.SetActive(true);
-        
+            DebugUtils.Log($"[CutsceneController] Requesting to play cutscene: {cutsceneToPlay.name}");
+            EventBroadcaster.Broadcast_OnRequestStartCutscene(this);
         }
         
-        // Child classes can override this to add functionality when the cutscene ends
-        protected virtual void EndCutscene(PlayableDirector obj)
-        {
-            // ensure that the current GameState isnt main menu, otherwise this is a false trigger
-            if (GameStateManager.Instance && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu) { return; }
-            Debug.Log("[CutsceneController] Cutscene ended.");
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            Debug.Log($"[CutsceneController] Disabling: {cutsceneToPlay.name}");
-            playableDirector.stopped -= EndCutscene;
-            cutsceneToPlay.SetActive(false);
-            
-        }
+
 
         public string Prompt { get; }
         public bool CanInteract(Interactor interactor)
@@ -76,7 +58,11 @@ namespace Cutscenes
         {
             if (cutsceneType == CutsceneType.PlayOnInteraction) { PlayCutscene(); }
         }
-        
+
+        public void CutsceneEnded()
+        {
+            gameObject.SetActive(false);
+        }
         
     }
 }
