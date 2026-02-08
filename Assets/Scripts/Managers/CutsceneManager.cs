@@ -16,16 +16,10 @@ namespace Managers
         // this is the current cutscene that is playing, if any. this is used to prevent multiple cutscenes from playing at once, and to allow for skipping cutscenes.
         private CutsceneController _currentCutscene;
         private PlayableDirector _playableDirector;
-
-        protected override void RegisterSubscriptions()
-        {
-            base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnRequestStartCutscene += OnRequestStartCutscene, () => EventBroadcaster.OnRequestStartCutscene -= OnRequestStartCutscene);
-        }
-        
         
 
-        private void OnRequestStartCutscene(CutsceneController cutsceneController)
+        
+        public void OnRequestStartCutscene(CutsceneController cutsceneController)
         {
             DebugUtils.Log($"[CutsceneManager] Received request to start cutscene: {cutsceneController.name}");
             // ensure we dont already have a cutscene playing
@@ -48,6 +42,12 @@ namespace Managers
             _playableDirector.Play();
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
         }
+        
+        public void OnRequestSkipCutscene()
+        {
+            if (!_currentCutscene || !_playableDirector) { return; }
+            _currentCutscene.CutsceneEnded();
+        }
 
         private void OnCutsceneEnd(PlayableDirector obj)
         {
@@ -55,9 +55,10 @@ namespace Managers
             _playableDirector.stopped -= OnCutsceneEnd;
             // ensure that the current GameState isnt main menu, otherwise this is a false trigger
             if (GameStateManager.Instance && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu) { return; }
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
             _currentCutscene.CutsceneEnded();
+            _playableDirector.Stop();
             _currentCutscene = null;
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
     }
 }

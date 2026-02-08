@@ -86,11 +86,6 @@ namespace System
         //---------------------------------------------------------------------------------//
         
         
-        // cutscene related
-        public delegate void RequestStartCutsceneHandler(CutsceneController cutscenePrefab);
-        public static event RequestStartCutsceneHandler OnRequestStartCutscene;
-        public static void Broadcast_OnRequestStartCutscene(CutsceneController cutscenePrefab) { OnRequestStartCutscene?.Invoke(cutscenePrefab); }
-    
         /// <summary>
         /// Player specific broadcasts.
         ///

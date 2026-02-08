@@ -41,8 +41,7 @@ namespace Cutscenes
 
         private void PlayCutscene()
         {
-            DebugUtils.Log($"[CutsceneController] Requesting to play cutscene: {cutsceneToPlay.name}");
-            EventBroadcaster.Broadcast_OnRequestStartCutscene(this);
+            CutsceneManager.Instance.OnRequestStartCutscene(this);
         }
         
 
@@ -62,6 +61,7 @@ namespace Cutscenes
         public void CutsceneEnded()
         {
             gameObject.SetActive(false);
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
         
     }
