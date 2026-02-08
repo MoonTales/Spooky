@@ -1,20 +1,16 @@
 using UnityEngine;
 using System;
+using Inspection;
 using Types = System.Types;
 
 namespace Interaction.Letters
 {
-    public class Letter : MonoBehaviour, IInteractable
+    public class Letter : InspectableObject, IInteractable
     {
     
         public TextKey PromptKey { get; }
         // Start is called once before the first execution of Update after the MonoBehaviour is created
-    
-        public bool CanInteract(Interactor interactor)
-        {
-            // you can always interact with letters
-            return true;
-        }
+        
 
         public void Interact(Interactor interactor)
         {
@@ -25,6 +21,8 @@ namespace Interaction.Letters
             );
             data.Send();
             Destroy(this.gameObject);
+            // Start the Inspection UI for this letter
+            InspectionSystem.Instance.StartInspection(gameObject);
         }
     }
 }
