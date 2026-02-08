@@ -8,10 +8,10 @@ namespace Player
     public class PlayerInventory : Singleton<PlayerInventory>
     {
         // Customization variablews for the feel of the game
-        [SerializeField] private int _maxDrawingsPerNight = 3;
+        [SerializeField] private int _maxDrawingsPerNight = 3; public int GetMaxDrawingsPerNight() { return _maxDrawingsPerNight; }
         
         // Internal variables to help this new system
-        private int _currentDrawingsThisNight = 0;
+        private int _currentDrawingsThisNight = 0; public int GetCurrentDrawingsThisNight() { return _currentDrawingsThisNight; }
         
         
         // Store only the IDs of collected drawings
@@ -120,13 +120,5 @@ namespace Player
             }
         }
         
-        public void Update()
-        {
-            // For testing purposes, press 'I' to list inventory contents
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                DebugListInventory();
-            }
-        }
     }
 }
