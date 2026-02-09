@@ -37,6 +37,8 @@ namespace Managers
         private EventInstance _ambienceDistortionSnapshotInstance;
         private EventInstance _heartbeatInstance;
         private bool _heartbeatIsPlaying;
+        private EventInstance _pauseSnapshotInstance;
+        private bool _pauseSnapshotActive;
 
         #region Parameterized Sfx
         // Per-call parameter payload for FMOD events.
@@ -68,6 +70,17 @@ namespace Managers
         [SerializeField] private bool heartbeatIntensityParameterIsGlobal = false;
         [SerializeField, Range(0f, 1f)] private float heartbeatStartThreshold = 0.55f;
         [SerializeField, Range(0f, 1f)] private float heartbeatStopThreshold = 0.45f;
+
+        [Header("Settings Menu Audio")]
+        [SerializeField] private string masterBusPath = "bus:/";
+        [SerializeField] private string sfxBusPath = "bus:/SFX";
+        [SerializeField] private string musicBusPath = "bus:/Music";
+        [SerializeField] private string ambienceBusPath = "bus:/Ambience";
+        [SerializeField] private EventReference pauseSnapshotEvent;
+        private Bus _masterBus;
+        private Bus _sfxBus;
+        private Bus _musicBus;
+        private Bus _ambienceBus;
         
         [Header("Mutes")]
         public bool muteSFX = false;
@@ -80,9 +93,6 @@ namespace Managers
         #endregion
         #endregion
         private AudioClip NullClip = null;
-
-
-  
 
         //variables for the soundtrack
         public AudioSource Musicsource;
@@ -106,6 +116,7 @@ namespace Managers
 
             BuildSfxMap();
             CachePlayerMovementBus();
+            CacheSettingsBuses();
 
             AudioSource mus = gameObject.AddComponent<AudioSource>();
             Musicsource = mus;
@@ -119,6 +130,7 @@ namespace Managers
         {
             StopAndReleaseHeartbeat();
             StopAndReleaseAmbienceSnapshot();
+            SetPauseSnapshotEnabled(false);
             base.OnDestroy();
         }
 
@@ -177,6 +189,99 @@ namespace Managers
             {
                 _playerMovementBus.stopAllEvents(FMOD.Studio.STOP_MODE.IMMEDIATE);
             }
+        }
+
+        public void SetSfxVolume(float normalizedVolume)
+        {
+            float clamped = Mathf.Clamp01(normalizedVolume);
+            if (_sfxBus.isValid())
+            {
+                _sfxBus.setVolume(clamped);
+            }
+            sfxValue = clamped;
+            muteSFX = clamped <= 0.0001f;
+        }
+
+        public void SetMasterVolume(float normalizedVolume)
+        {
+            float clamped = Mathf.Clamp01(normalizedVolume);
+            if (_masterBus.isValid())
+            {
+                _masterBus.setVolume(clamped);
+            }
+        }
+
+        public void SetMusicVolume(float normalizedVolume)
+        {
+            float clamped = Mathf.Clamp01(normalizedVolume);
+            if (_musicBus.isValid())
+            {
+                _musicBus.setVolume(clamped);
+            }
+            musicValue = clamped;
+            muteMusic = clamped <= 0.0001f;
+        }
+
+        public void SetAmbienceVolume(float normalizedVolume)
+        {
+            float clamped = Mathf.Clamp01(normalizedVolume);
+            if (_ambienceBus.isValid())
+            {
+                _ambienceBus.setVolume(clamped);
+            }
+        }
+
+        public void SetSfxMuted(bool isMuted)
+        {
+            muteSFX = isMuted;
+            if (_sfxBus.isValid())
+            {
+                _sfxBus.setMute(isMuted);
+            }
+            if (isMuted)
+            {
+                StopAndReleaseHeartbeat();
+            }
+        }
+
+        public void SetMusicMuted(bool isMuted)
+        {
+            muteMusic = isMuted;
+            if (_musicBus.isValid())
+            {
+                _musicBus.setMute(isMuted);
+            }
+        }
+
+        public void SetPauseSnapshotEnabled(bool enabled)
+        {
+            if (pauseSnapshotEvent.IsNull)
+            {
+                return;
+            }
+
+            if (enabled)
+            {
+                if (_pauseSnapshotActive)
+                {
+                    return;
+                }
+
+                if (!_pauseSnapshotInstance.isValid())
+                {
+                    _pauseSnapshotInstance = RuntimeManager.CreateInstance(pauseSnapshotEvent);
+                }
+                _pauseSnapshotInstance.start();
+                _pauseSnapshotActive = true;
+                return;
+            }
+
+            if (_pauseSnapshotInstance.isValid())
+            {
+                _pauseSnapshotInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _pauseSnapshotInstance.release();
+            }
+            _pauseSnapshotActive = false;
         }
 
         public void PlayParamSfx(SfxId sfxId, Transform fromTransform = null, params SfxParam[] parameters)
@@ -495,6 +600,29 @@ namespace Managers
             if (!_playerMovementBus.isValid())
             {
                 _playerMovementBus = RuntimeManager.GetBus(playerMovementBusPath);
+            }
+        }
+
+        private void CacheSettingsBuses()
+        {
+            if (!_masterBus.isValid() && !string.IsNullOrWhiteSpace(masterBusPath))
+            {
+                _masterBus = RuntimeManager.GetBus(masterBusPath);
+            }
+
+            if (!_sfxBus.isValid() && !string.IsNullOrWhiteSpace(sfxBusPath))
+            {
+                _sfxBus = RuntimeManager.GetBus(sfxBusPath);
+            }
+
+            if (!_musicBus.isValid() && !string.IsNullOrWhiteSpace(musicBusPath))
+            {
+                _musicBus = RuntimeManager.GetBus(musicBusPath);
+            }
+
+            if (!_ambienceBus.isValid() && !string.IsNullOrWhiteSpace(ambienceBusPath))
+            {
+                _ambienceBus = RuntimeManager.GetBus(ambienceBusPath);
             }
         }
 
