@@ -93,12 +93,24 @@ namespace Interaction.Letters
 
         public void Interact(Interactor interactor)
         {
-            Types.NotificationData data = new(
-                duration: 3.0f, 
-                messageKey: new TextKey { place = "Letters", id = "LetterContent1"},
-                messageOverride: "This is a fun letter!"
-            );
-            data.Send();
+            if (_letterType == Types.LetterType.Researcher)
+            {
+                Types.NotificationData data = new(
+                    duration: 3.0f, 
+                    messageKey: new TextKey { place = "Letters", id = "LetterContent1"},
+                    messageOverride: "This is a researcher's letter!"
+                );
+                data.Send();
+            }
+            else if (_letterType == Types.LetterType.Friend)
+            {
+                Types.NotificationData data = new(
+                    duration: 3.0f, 
+                    messageKey: new TextKey { place = "Letters", id = "LetterContent2"},
+                    messageOverride: "This is a friend's letter!"
+                );
+                data.Send();
+            }
             InspectionSystem.Instance.StartInspection(gameObject);
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Interaction.Letters;
 using UnityEngine;
 using Types = System.Types;
 
@@ -8,12 +9,13 @@ namespace Managers
     /// <summary>
     /// The goal of this class, will handle the notes that spawn into the game at the start of each "Act"
     /// </summary>
-    public class NoteManager : Singleton<NoteManager>
+    public class LetterManager : Singleton<LetterManager>
     {
         
         // Internal variables
         private GameObject _notePrefab;
-        private GameObject _currentNote;
+        private GameObject _currentNoteResearcher;
+        private GameObject _currentNoteFriend;
         
         [Header("Note Slide Settings")]
         [SerializeField] private float slideDistance = 1.5f; // Base distance the note slides
@@ -57,21 +59,33 @@ namespace Managers
             
             int currentAct = GameStateManager.Instance.GetCurrentWorldClockHour();
             // look through each act
-            if (currentAct == 1)
+            if (currentAct == 1 || currentAct == 2 || currentAct == 3)
             {
                 // look for the object in the scene called "NoteSpawnLocation"
                 GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
                 // spawn the note prefab at the location of the "NoteSpawnLocation" object
                 if (!spawnLocation) { return;}
                 
-                _currentNote = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
-                
+                _currentNoteResearcher = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
+                // cast to a Letter and set the letter type to researcher
+                _currentNoteResearcher.GetComponent<Letter>().SetLetterType(Types.LetterType.Researcher);
                 // Start the sliding coroutine
-                StartCoroutine(SlideNote(_currentNote));
+                StartCoroutine(SlideNote(_currentNoteResearcher));
+                
+                // now we will also send a friend letter, but we will delay it by a few seconds and have it slide in after the researcher letter
+                _currentNoteFriend = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
+                _currentNoteFriend.GetComponent<Letter>().SetLetterType(Types.LetterType.Friend);
+                StartCoroutine(DelayedSlideNote(_currentNoteFriend, 2f)); // Delay of 2 second before sliding in the friend note
+                
             }
             
         }
         
+        private IEnumerator DelayedSlideNote(GameObject note, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            StartCoroutine(SlideNote(note));
+        }
         private IEnumerator SlideNote(GameObject note)
         {
             if (note == null){ yield break;}
@@ -112,17 +126,5 @@ namespace Managers
             note.transform.position = endPosition;
             note.transform.rotation = targetRotation;
         }
-        
-        private void ForceSpawnNote()
-        {
-            // Force spawn for testing purposes
-            GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
-            if (!spawnLocation) { return;}
-            
-            _currentNote = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
-            StartCoroutine(SlideNote(_currentNote));
-        }
-        
-        
     }
 }
