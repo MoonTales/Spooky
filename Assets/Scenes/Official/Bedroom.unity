@@ -17327,8 +17327,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 672449848}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.24927463, y: 0.66168904, z: -0.23917137, w: 0.6654524}
-  m_LocalPosition: {x: -8.122711, y: 1.9277487, z: 1.4172301}
+  m_LocalRotation: {x: -0.24337587, y: -0.6637797, z: 0.23330638, w: -0.66763234}
+  m_LocalPosition: {x: -8.867711, y: 1.7757486, z: 1.9142299}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35812,6 +35812,7 @@ GameObject:
   - component: {fileID: 1414124884}
   - component: {fileID: 1414124886}
   - component: {fileID: 1414124887}
+  - component: {fileID: 1414124888}
   m_Layer: 0
   m_Name: Timeline
   m_TagString: Untagged
@@ -35840,6 +35841,8 @@ PlayableDirector:
     value: {fileID: 1444703598}
   - key: {fileID: 8684225542893427161, guid: 365b87aeac4a6c2438ea71c4487e6089, type: 2}
     value: {fileID: 1011756540}
+  - key: {fileID: 7317257445946632590, guid: 365b87aeac4a6c2438ea71c4487e6089, type: 2}
+    value: {fileID: 1414124888}
   m_ExposedReferences:
     m_References:
     - 37990f25661c53541ad3e104b2cbaebd: {fileID: 0}
@@ -35901,6 +35904,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab1da68057e794d49a7156d8f360616f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1414124888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414124883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals: []
+    m_Events: []
 --- !u!1 &1417988400
 GameObject:
   m_ObjectHideFlags: 0

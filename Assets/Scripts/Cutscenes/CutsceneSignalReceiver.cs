@@ -25,6 +25,8 @@ namespace Cutscenes
                 PlayDialogue(dialogueMarker);
             }
         }
+        
+        // using this idea, we can connect to any function we want
 
         private void PlayDialogue(DialogueMarker dialogueMarker)
         {
