@@ -133,6 +133,14 @@ public class InspectionSystem : Singleton<InspectionSystem>
         
         // reset the target zoom position
         targetZoomPosition = _currentInspectedObject.transform.localPosition;
+        
+        // Call any inspection finished logic on the inspected object
+        // I should change this to just be the default
+        InspectableObject inspectable = _currentInspectedObject.GetComponent<InspectableObject>();
+        if (inspectable != null)
+        {
+            inspectable.OnInspectionFinished();
+        }
     }
     
     private void HandleInspection()

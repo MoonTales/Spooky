@@ -33,6 +33,8 @@ namespace System
             gameObject.AddComponent<DrawingStateManager>();
             gameObject.AddComponent<NotificationController>();
             gameObject.AddComponent<CutsceneManager>();
+            gameObject.AddComponent<NoteManager>();
+
             
             
         
