@@ -11,11 +11,13 @@ namespace Managers
     public class GameStateManager : Singleton<GameStateManager>
     {
 
+        [SerializeField] private int _maxDrawingsPerAct = 3; public int GetMaxDrawingsPerAct() { return _maxDrawingsPerAct; }
         
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
         private Types.GameState _currentGameState = Types.GameState.MainMenu; public Types.GameState GetCurrentGameState() { return _currentGameState; }
-        private Types.WorldLocation _currentWorldLocation = new Types.WorldLocation();
+        private Types.WorldLocation _currentWorldLocation = new Types.WorldLocation(); public Types.WorldLocation GetCurrentWorldLocation() { return _currentWorldLocation; }
+        
         private int _currentWorldClockHour = 1; public int GetCurrentWorldClockHour() { return _currentWorldClockHour; }
         public void Start()
         {
@@ -33,6 +35,14 @@ namespace Managers
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerHealthStateChanged);
             TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
                 () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+
+        }
+        
+        
+        public void SetWorldClockHour(int hour)
+        {
+            _currentWorldClockHour = hour;
+            EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
         }
 
         private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
@@ -57,20 +67,16 @@ namespace Managers
                     SceneSwapper.Instance.SwapScene("Bedroom");
                     // swap the core state to sleep deprived
                     PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
-                    PlayerStats.Instance.SetMentalState(Types.PlayerMentalState.Normal);
-                    
-                    EventBroadcaster.Broadcast_OnPlayerDamaged(0);
+                    EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
                 }
                 else if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
                 {
                     // this means the player fell asleep while in the bedroom, and should be sent to the nightmare
 
-                    SceneSwapper.Instance.SwapScene("FirstAiTest");
+                    SceneSwapper.Instance.SwapScene("Nightmare1");
                     // swap the core state to anxious
                     PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
-                    //PlayerStats.Instance.SetMentalState(Types.PlayerMentalState.Normal);
-                    
-                    // bruh idk why I should need this but ok
+                    EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
 
                 }
                 
@@ -79,35 +85,14 @@ namespace Managers
             
         }
 
-        protected void Update()
+        protected override void OnGameRestarted()
         {
-            // small update to show how this would work
-            if(Input.GetKeyDown(KeyCode.X))
-            {
-                DebugUtils.Log("Player Damaged Event Broadcasted with 10.0f damage");
-                EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f);
-            }
-            if(Input.GetKeyDown(KeyCode.G))
-            {
-                DebugUtils.Log("Switching to Gameplay State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            }
-            
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour += 1);
-            }
-            
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                EventBroadcaster.Broadcast_GameRestarted();
-            }
-            
-            
-            
+            // when we restart, we wanna reset the world clock hour back to 1
+            SetWorldClockHour(1);
         }
 
 
+        
         protected override void OnGameStateChanged(Types.GameState newState)
         {
             
@@ -125,6 +110,7 @@ namespace Managers
             //2. If we EVER return to the main menu, we can consider that a game restart
             if (_currentGameState != Types.GameState.MainMenu && newState == Types.GameState.MainMenu)
             {
+                
                 EventBroadcaster.Broadcast_GameRestarted();
             }
             

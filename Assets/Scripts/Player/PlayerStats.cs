@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Managers;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Types = System.Types;
@@ -43,6 +44,7 @@ namespace Player
         protected override void OnGameStateChanged(Types.GameState newGameState)
         {
             // based on the gamestate, we need to do specific things to the sanity drain
+            // we also do not want to do this, if we are in the Tutorial or Main Menu
             if (newGameState == Types.GameState.Gameplay)
             {
                 // start sanity drain
@@ -69,6 +71,8 @@ namespace Player
                 // Drain sanity over time based on core state
                 Types.PlayerMentalCoreState coreState = _playerStats.GetPlayerMentalCoreState();
                 float drainAmount = 0f;
+                
+                
                 if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
                 {
                     drainAmount = 1f; // Drain 1 mental health per interval
@@ -78,6 +82,11 @@ namespace Player
                     drainAmount = 2f; // Drain 2 mental health per interval
                 }
 
+                bool isInTutorialOrMainMenu = GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial || GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu;
+                if (isInTutorialOrMainMenu)
+                {
+                    drainAmount = 0f; // No drain in tutorial or main menu
+                }
                 UpdateCurrentMentalHealth(-drainAmount);
 
                 // Wait for a set interval before draining again
@@ -98,7 +107,7 @@ namespace Player
         {
             // whenever we load from the main menu, we reset the player stats (like setting us to sleep deprived)
             DebugUtils.LogSuccess("PlayerStats: OnGameStarted - Resetting Player Stats to Default");
-            _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+            _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
         }
         
         protected override void RegisterSubscriptions()
@@ -124,6 +133,10 @@ namespace Player
             {
                 _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
             }
+            else if (newLocation == Types.WorldLocation.Tutorial)
+            {
+                _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+            }
         }
         
         public void ResetAllStatsToDefault()
@@ -135,16 +148,7 @@ namespace Player
         {
             UpdateCurrentMentalHealth(-damageAmount);
         }
-
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                // debug print the current player stats
-                _playerStats.DebugPrintStats();
-            }
-            
-        }
+        
 
         private void InitializeDefaultStats()
         {

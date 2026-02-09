@@ -32,7 +32,8 @@ namespace System
         public enum WorldLocation
         {
             Bedroom,
-            Nightmare
+            Nightmare,
+            Tutorial,
         }
         
         /* ------------------------ System Types ------------------------ */
@@ -201,5 +202,38 @@ namespace System
         
         /* ------------------------ End Flashlight Related Types ------------------------ */
         
+        [Serializable]
+        public struct NotificationData
+        {
+            private float _duration; public float duration { get { return _duration; } }
+            private TextKey _messageKey; public TextKey messageKey { get { return _messageKey; } }
+            private string _messageOverride; public string messageOverride { get { return _messageOverride; } }
+
+            public NotificationData(float duration, TextKey messageKey, string messageOverride = "")
+            {
+                _duration = duration;
+                _messageKey = messageKey;
+                _messageOverride = messageOverride;
+            }
+
+            public void Send()
+            {
+                EventBroadcaster.Broadcast_OnNotificationSent(this);
+            }
+            
+            // to string
+            public override string ToString()
+            {
+                return $"NotificationData(Duration: {_duration}, MessageKey: {_messageKey}, MessageOverride: {_messageOverride})";
+            }
+        }
+        
+        // Letter Types as an Enum
+        [Serializable]
+        public enum LetterType
+        {
+            Researcher,
+            Friend,
+        }
     }
 }

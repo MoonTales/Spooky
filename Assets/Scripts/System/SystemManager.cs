@@ -1,5 +1,6 @@
 using Managers;
 using Player;
+using UI;
 using UnityEngine;
 
 namespace System
@@ -30,6 +31,8 @@ namespace System
             gameObject.AddComponent<SceneSwapper>();
             gameObject.AddComponent<PlayerInventory>();
             gameObject.AddComponent<DrawingStateManager>();
+            gameObject.AddComponent<NotificationController>();
+            gameObject.AddComponent<LetterManager>();
             
             
         

@@ -55,13 +55,22 @@ namespace System
             {
                 DebugUtils.Log("Broadcasting world location change to Bedroom");
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Bedroom);
+                EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+
             }
-            if (scene.name.ToLower() == "firstaitest")
+            if (scene.name.ToLower() == "nightmare1")
             {
                 DebugUtils.Log("Broadcasting world location change to Nightmare");
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
+                EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
             }
-            
+
+            if (scene.name.ToLower() == "tutorialnightmare")
+            {
+                DebugUtils.LogError("Broadcasting world location change to Tutorial Nightmare");
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);
+                EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+            }
         }
     }
 }

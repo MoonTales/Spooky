@@ -8,7 +8,7 @@ namespace Player
     /// <summary>
     /// Handles camera effects including headbob and peeking/leaning mechanics
     /// </summary>
-    public class CameraEffectsSystems : EventSubscriberBase
+    public class CameraEffectsSystems : Singleton<CameraEffectsSystems>
     {
         [Header("Headbob Settings")]
         [Header("Walking")]

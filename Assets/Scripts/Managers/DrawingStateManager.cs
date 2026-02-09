@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Interaction.drawings;
+using Player;
 using UnityEngine;
 using Types = System.Types;
 
@@ -33,6 +34,10 @@ namespace Managers
         // Cache of drawings in the current scene
         private List<Drawing> _drawingsInScene = new List<Drawing>();
         
+        // Determine how many drawings are in the "correct" position
+        private int totalNumberOfDrawings = 9; // hardcoded game value for now
+        
+        
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
@@ -53,31 +58,6 @@ namespace Managers
                 RestoreDrawingsToTransform();
             }
         }
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                UpdateDrawingTransformData();
-            }
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                // debug print all of the drawing transform data
-                foreach (DrawingTransformData data in _drawingTransformDataList)
-                {
-                    Debug.Log(data.ToString());
-                }
-                if (_drawingTransformDataList.Count == 0)
-                {
-                    Debug.Log("No drawing transform data saved.");
-                }
-            }
-            if (Input.GetKeyDown(KeyCode.X))
-            {
-                RestoreDrawingsToTransform();
-            }
-        }
-        
-        
 
         // Collect all drawings in the scene and update their transform data
         public void UpdateDrawingTransformData()
@@ -103,7 +83,40 @@ namespace Managers
                 if (drawing == null){ continue;}
                 
                 UpdateOrAddDrawingTransform(drawing);
+                // Check if the drawing is in the "correct" position (this is just a placeholder condition, replace with actual logic)
             }
+
+            
+            CheckForAllCorrectPlacements();
+        }
+
+        public int CheckForAllCorrectPlacements()
+        {
+            // loop through all of the drawings in the scene (only enabled ones)
+            int count = 0;
+            foreach (Drawing drawing in _drawingsInScene)
+            {
+                if (drawing == null){ continue;}
+                UpdateOrAddDrawingTransform(drawing);
+                // Check if the drawing is in the "correct" position (this is just a placeholder condition, replace with actual logic)
+                if (drawing.IsInCorrectPosition())
+                {
+                    count++;
+                }
+            }
+            if (count >= totalNumberOfDrawings)
+            {
+                DebugUtils.LogSuccess("All drawings are in the correct position!");
+                Types.NotificationData data = new(
+                    duration: 3.0f, 
+                    messageKey: new TextKey { place = "Notifications", id = "AllDrawingsCorrect"},
+                    messageOverride: $"All drawings are in the correct position! YOU WIN!!"
+                );
+                data.Send();
+            }
+            
+            return count;
+            
         }
 
         private void RestoreDrawingsToTransform()
@@ -138,9 +151,34 @@ namespace Managers
                     drawing.transform.localScale = data.Scale;
                 }
             }
+            
+            // this is called when we load in, so we can use it to see if we should Tick the world clock
+            //TODO: this is VERY messy rn, I dont like it
+            // all of these also only run if we are in the bedroom
+            if (GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Bedroom)
+            {
+                return;
+            }
+            int numberOfCorrectDrawings = PlayerInventory.Instance.GetDrawingCount();
+            int numberOfDrawingsToAdvanceClock = GameStateManager.Instance.GetMaxDrawingsPerAct();
+            // essentially, this could be 3, which means
+            // 0-2 is Act 1, 3-5 is Act 2, and 6-9 is Act 3 (which we can win from)
+            int currentHour = GameStateManager.Instance.GetCurrentWorldClockHour();
+            // if numberOfCorrectDrawings is greater than
+            if (currentHour == 1)
+            {
+                if (numberOfCorrectDrawings >= numberOfDrawingsToAdvanceClock)
+                {
+                    GameStateManager.Instance.SetWorldClockHour(currentHour + 1);
+                }
+            }else if (currentHour == 2)
+            {
+                if (numberOfCorrectDrawings >= numberOfDrawingsToAdvanceClock * 2)
+                {
+                    GameStateManager.Instance.SetWorldClockHour(currentHour + 1);
+                }
+            }
         }
-        
-        
         private void UpdateOrAddDrawingTransform(Drawing drawing)
         {
             // Find if this drawing already exists in our data list

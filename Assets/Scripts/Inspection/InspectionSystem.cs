@@ -4,6 +4,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 using Inspection;
+using Managers;
 
 public class InspectionSystem : Singleton<InspectionSystem>
 {
@@ -132,6 +133,14 @@ public class InspectionSystem : Singleton<InspectionSystem>
         
         // reset the target zoom position
         targetZoomPosition = _currentInspectedObject.transform.localPosition;
+        
+        // Call any inspection finished logic on the inspected object
+        // I should change this to just be the default
+        InspectableObject inspectable = _currentInspectedObject.GetComponent<InspectableObject>();
+        if (inspectable != null)
+        {
+            inspectable.OnInspectionFinished();
+        }
     }
     
     private void HandleInspection()
@@ -251,7 +260,11 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 panTilt.TiltAxis.Value = savedPanTilt.y;
                 panTilt.enabled = true;
             }
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            // only set this, if we are not currently in the main menu (an edge case)
+            if (GameStateManager.Instance.GetCurrentGameState() != Types.GameState.MainMenu)
+            {
+                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            }
         }
     }
     
@@ -274,5 +287,16 @@ public class InspectionSystem : Singleton<InspectionSystem>
             return _currentInspectedObject.GetComponent<InspectableObject>();
         }
         return null;
+    }
+    
+    protected override void OnGameStateChanged(Types.GameState newstate)
+    {
+        // If we are inspecting and the game state changes away from inspecting, end inspection
+        // UNLESS we are pausing the game while inspecting, we will allow that
+        if (_isInspecting && newstate != Types.GameState.Inspecting)
+        {
+            if (newstate == Types.GameState.Paused) { return; }
+            EndInspection();
+        }
     }
 }

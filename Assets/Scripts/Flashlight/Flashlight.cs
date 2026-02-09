@@ -204,6 +204,8 @@ public class Flashlight : Singleton<Flashlight>
     
     private void OnFlashlightToggled(bool isOn)
     {
+        
+        
         // Handle flashlight toggle event
         if (isOn)
         {

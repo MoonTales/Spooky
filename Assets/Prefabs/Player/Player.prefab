@@ -1346,6 +1346,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 984c00a2bb33cca43aa58da2a079c472, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heartbeatAudioSource: {fileID: 0}
+  heartbeatClip: {fileID: 8300000, guid: f6488845c47ffbd46b37c3f103f5bf67, type: 3}
+  mildlyTiredSwaySettings:
+    intensity: 5.3
+    speed: 0.25
+    verticalBias: 0.7
+    verticalSin: 0
+    horizontalSin: 1
+    verticalFrequency: 0.25
+    horizontalFrequency: 0.75
+  moderatelyTiredSwaySettings:
+    intensity: 6.3
+    speed: 0.3
+    verticalBias: 0.7
+    verticalSin: 0
+    horizontalSin: 1
+    verticalFrequency: 0.5
+    horizontalFrequency: 0.85
+  severelyTiredSwaySettings:
+    intensity: 8.3
+    speed: 0.5
+    verticalBias: 0.7
+    verticalSin: 0
+    horizontalSin: 1
+    verticalFrequency: 0.7
+    horizontalFrequency: 0.9
+  exhaustedTiredSwaySettings:
+    intensity: 12.3
+    speed: 0.75
+    verticalBias: 0.75
+    verticalSin: 0
+    horizontalSin: 1
+    verticalFrequency: 0.9
+    horizontalFrequency: 1
 --- !u!1 &7974783582780965627
 GameObject:
   m_ObjectHideFlags: 0

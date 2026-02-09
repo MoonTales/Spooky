@@ -16,8 +16,9 @@ namespace Cutscenes
     }
     public class CutsceneController : EventSubscriberBase, IInteractable
     {
-    
-        
+        public TextKey PromptKey => default;
+
+
         [SerializeField] private GameObject cutsceneToPlay;
         [SerializeField] private CutsceneType cutsceneType;
         [SerializeField] private bool  playOnlyOnce = true;
@@ -54,6 +55,8 @@ namespace Cutscenes
         // Child classes can override this to add functionality when the cutscene ends
         protected virtual void EndCutscene(PlayableDirector obj)
         {
+            // ensure that the current GameState isnt main menu, otherwise this is a false trigger
+            if (GameStateManager.Instance && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu) { return; }
             Debug.Log("[CutsceneController] Cutscene ended.");
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
             Debug.Log($"[CutsceneController] Disabling: {cutsceneToPlay.name}");
