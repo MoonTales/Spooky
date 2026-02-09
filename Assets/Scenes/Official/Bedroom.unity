@@ -16108,7 +16108,7 @@ RectTransform:
   m_Children:
   - {fileID: 1444703595}
   - {fileID: 1011756537}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1414124885}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -17327,8 +17327,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 672449848}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.018925564, y: 0.99158823, z: -0.06169451, w: 0.11219801}
-  m_LocalPosition: {x: -7.972711, y: 2.607749, z: -0.5297699}
+  m_LocalRotation: {x: 0.24927463, y: 0.66168904, z: -0.23917137, w: 0.6654524}
+  m_LocalPosition: {x: -8.122711, y: 1.9277487, z: 1.4172301}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35811,6 +35811,7 @@ GameObject:
   - component: {fileID: 1414124885}
   - component: {fileID: 1414124884}
   - component: {fileID: 1414124886}
+  - component: {fileID: 1414124887}
   m_Layer: 0
   m_Name: Timeline
   m_TagString: Untagged
@@ -35863,6 +35864,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1067931501}
+  - {fileID: 595375830}
   m_Father: {fileID: 570293099}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1414124886
@@ -35887,6 +35889,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1414124887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414124883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab1da68057e794d49a7156d8f360616f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1417988400
 GameObject:
   m_ObjectHideFlags: 0
@@ -62945,7 +62959,6 @@ SceneRoots:
   - {fileID: 77230377}
   - {fileID: 104571045}
   - {fileID: 672449853}
-  - {fileID: 595375830}
   - {fileID: 570293099}
   - {fileID: 312624405}
   - {fileID: 3757255451517788487}

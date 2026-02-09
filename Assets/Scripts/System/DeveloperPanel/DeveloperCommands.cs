@@ -163,7 +163,7 @@ namespace System
             RegisterCommand(KeyCode.Semicolon, () => EventBroadcaster.Broadcast_GameRestarted(), "Emulate Game Restart", "Send off a broadcast to emulate the game being restarted (this simulates if we did return to main menu.)");
             
             // Cutscenes
-            RegisterCommand(KeyCode.Semicolon, () => CutsceneManager.Instance.OnRequestSkipCutscene(), "Skip Cutscene", "Send off a broadcast to skip the current cutscene (if any is playing)");
+            RegisterCommand(KeyCode.Alpha0, () => CutsceneManager.Instance.OnRequestSkipCutscene(), "Skip Cutscene", "Send off a broadcast to skip the current cutscene (if any is playing)");
             
             // Scene traversal commands
             RegisterCommand(KeyCode.Alpha1, () => SceneSwapper.Instance.SwapScene("Bedroom"), "Load Bedroom Scene", "Load the Bedroom Scene instantly");

@@ -58,7 +58,7 @@ namespace Managers
             _currentCutscene.CutsceneEnded();
             _playableDirector.Stop();
             _currentCutscene = null;
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            //EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
     }
 }
