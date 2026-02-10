@@ -152,7 +152,6 @@ namespace Player
             float targetVerticalLean = 0f;
 
             Vector3 forward = _cameraTransform.forward;
-            Debug.DrawRay(_cameraTransform.position, forward * 2f, Color.green);
 
             // Get input
             if (Keyboard.current.qKey.isPressed)

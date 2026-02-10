@@ -162,6 +162,10 @@ namespace System
             RegisterCommand(KeyCode.RightBracket, () => GameStateManager.Instance.SetWorldClockHour(GameStateManager.Instance.GetCurrentWorldClockHour() + 1), "Increase World Clock", "Send off a broadcast to increase the world clock hour by 1");
             RegisterCommand(KeyCode.Semicolon, () => EventBroadcaster.Broadcast_GameRestarted(), "Emulate Game Restart", "Send off a broadcast to emulate the game being restarted (this simulates if we did return to main menu.)");
             
+            // Cutscenes
+            RegisterCommand(KeyCode.Alpha0, () => CutsceneManager.Instance.OnRequestSkipCutscene(), "Skip Cutscene", "Send off a broadcast to skip the current cutscene (if any is playing)");
+            RegisterCommand(KeyCode.Backspace, () => DebugUtils.ClearConsole(), "Clear Console", "Clears the Unity Console of all messages");
+
             // Scene traversal commands
             RegisterCommand(KeyCode.Alpha1, () => SceneSwapper.Instance.SwapScene("Bedroom"), "Load Bedroom Scene", "Load the Bedroom Scene instantly");
             RegisterCommand(KeyCode.Alpha2, () => SceneSwapper.Instance.SwapScene("Nightmare1"), "Load Nightmare Scene", "Load the Nightmare 1 Scene instantly");
