@@ -34,7 +34,6 @@ namespace Managers
         {
             base.Awake();
             _notePrefab = Resources.Load<GameObject>("Prefabs/Letter");
-
         }
         
         protected override void RegisterSubscriptions()
@@ -125,6 +124,14 @@ namespace Managers
             // Ensure we end at exactly the target position and rotation
             note.transform.position = endPosition;
             note.transform.rotation = targetRotation;
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                SpawnAnchorManager.Instance.RequestSpawnAtAnyAnchor(_notePrefab);
+            }
         }
     }
 }

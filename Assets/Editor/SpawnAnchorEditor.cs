@@ -74,7 +74,7 @@ namespace Placeables
             
             // Visualize button - Blue theme
             GUI.backgroundColor = new Color(0.4f, 0.7f, 1f);
-            if (GUILayout.Button("👁 Visualize", Styles.buttonStyle))
+            if (GUILayout.Button(new GUIContent("👁 Visualize", "Preview Spawn Location"), Styles.buttonStyle))
             {
                 spawnAnchor.Editor_VisualizeSpawnPoints();
                 EditorUtility.SetDirty(spawnAnchor);

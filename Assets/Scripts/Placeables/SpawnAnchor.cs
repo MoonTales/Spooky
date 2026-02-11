@@ -5,6 +5,9 @@ using UnityEngine;
 namespace Placeables
 {
     /// <summary>
+    ///
+    /// /// Class Created by: MoonTales Studios 
+    /// 
     /// Class used to handle custom spawning logic for any objects that need to be spawned as part(s) of the world.
     ///
     /// This will be a placeable object in the world, which will draw a gizmo in the editor showing where objects will be spawned in relation to this anchor.
@@ -31,7 +34,7 @@ namespace Placeables
     public class SpawnAnchor : MonoBehaviour
     {
         [Header("Spawn Data")]
-        [SerializeField] private GameObject prefabToSpawn;
+        [SerializeField] private List<GameObject> prefabsToSpawn;
         [SerializeField] private float _spawnAreaSize = 10f;
         [SerializeField] private int _numberOfSpawnPoints = 15;
         [SerializeField] private int _numberOfObjectsToSpawn = 1;
@@ -40,6 +43,8 @@ namespace Placeables
         [SerializeField] private int _maxRetries = 10; // Maximum attempts to find a flat surface per spawn point
         [SerializeField] private float seed = -1; // Option to automatically generate and spawn on Start
         [SerializeField] private List<SpawnData> _spawnDataList = new List<SpawnData>();
+        [SerializeField] private bool _randomizeOnSpawn = true; public bool IsRandomizingOnSpawn(){return _randomizeOnSpawn;}
+        [SerializeField] private GameObject _parentObjectForSpawns = null; public GameObject GetParentObjectForSpawns(){return _parentObjectForSpawns;}
         private bool _bDrawGizmos = true; public bool IsDrawingGizmos(){return _bDrawGizmos;}
 
         
@@ -133,7 +138,8 @@ namespace Placeables
         // Call this to spawn all objects
         public void SpawnObjects()
         {
-            if (!prefabToSpawn){return;}
+            if (prefabsToSpawn.Count == 0){return;}
+            if(_randomizeOnSpawn){ GenerateSpawnPoints(); }
             List<GameObject> currentSpawnBatch = new List<GameObject>();
             // Randomly select [_numberOfObjectsToSpawn] spawn points from the list and spawn the prefab there
             // Once something has been spawned, we can remove it from the list to avoid spawning multiple objects in the same spot
@@ -153,8 +159,13 @@ namespace Placeables
                 Vector3 worldPosition = transform.TransformPoint(spawnData.localPosition);
                 
                 // Instantiate the prefab at the world position
-                GameObject obj = Instantiate(prefabToSpawn, worldPosition, spawnData.localRotation);
-                
+                // randomly select a prefab from the list to spawn
+                GameObject selectedPrefab = prefabsToSpawn[UnityEngine.Random.Range(0, prefabsToSpawn.Count)];
+                GameObject obj = Instantiate(selectedPrefab, worldPosition, spawnData.localRotation);
+                if (_parentObjectForSpawns)
+                {
+                    obj.transform.parent = _parentObjectForSpawns.transform;
+                }
                 currentSpawnBatch.Add(obj);
                 
                 
@@ -164,6 +175,20 @@ namespace Placeables
             _spawnedObjects.Add(currentSpawnBatch);
             
         }
+
+        public void ManualSpawn(GameObject prefabToSpawn)
+        {
+            GenerateSpawnPoints();
+            if (_spawnDataList.Count == 0){return;}
+            // pick a random spawn point from the list
+            int randomIndex = UnityEngine.Random.Range(0, _spawnDataList.Count);
+            SpawnData spawnData = _spawnDataList[randomIndex];
+            // Convert local position back to world position
+            Vector3 worldPosition = transform.TransformPoint(spawnData.localPosition);
+            // Instantiate the prefab at the world position
+            GameObject obj = Instantiate(prefabToSpawn, worldPosition, spawnData.localRotation);
+        }
+        
         
         private void Start()
         {
@@ -282,9 +307,14 @@ namespace Placeables
                     Vector3 worldPos = transform.TransformPoint(data.localPosition);
                     Quaternion worldRot = transform.rotation * data.localRotation;
             
-                    GameObject reSpawnedObj = Instantiate(prefabToSpawn, worldPos, worldRot);
+                    GameObject selectedPrefab = prefabsToSpawn[UnityEngine.Random.Range(0, prefabsToSpawn.Count)];
+                    GameObject reSpawnedObj = Instantiate(selectedPrefab, worldPos, worldRot);
                     reSpawnedObj.transform.localScale = Vector3.one * data.size;
     
+                    if (_parentObjectForSpawns)
+                    {
+                        reSpawnedObj.transform.parent = _parentObjectForSpawns.transform;
+                    }
                     reSpawnedBatch.Add(reSpawnedObj);
                 }
 
