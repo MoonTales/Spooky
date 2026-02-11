@@ -16,14 +16,12 @@ namespace Placeables
     [Serializable]
     public struct SpawnData
     {
-        public GameObject prefab;
         public Vector3 localPosition;
         public Quaternion localRotation;
         public float size;
         
-        public SpawnData(GameObject prefab, Vector3 localPosition, Quaternion localRotation, float size)
+        public SpawnData(Vector3 localPosition, Quaternion localRotation, float size)
         {
-            this.prefab = prefab;
             this.localPosition = localPosition;
             this.localRotation = localRotation;
             this.size = size;
@@ -32,6 +30,7 @@ namespace Placeables
     
     public class SpawnAnchor : MonoBehaviour
     {
+        [Header("Spawn Data")]
         [SerializeField] private GameObject prefabToSpawn;
         [SerializeField] private float _spawnAreaSize = 10f;
         [SerializeField] private int _numberOfSpawnPoints = 15;
@@ -42,26 +41,22 @@ namespace Placeables
         [SerializeField] private float seed = -1; // Option to automatically generate and spawn on Start
         [SerializeField] private List<SpawnData> _spawnDataList = new List<SpawnData>();
         [SerializeField] private bool bDrawGizmos = true;
-        // Check if a surface is flat enough based on its normal
-        private bool IsSurfaceFlat(Vector3 normal)
-        {
-            float angle = Vector3.Angle(Vector3.up, normal);
-            return angle <= _maxSlopeAngle;
-        }
+
+        
+        // Internal Information used to store previous gameobjects we have spawned, so we can clean them up if needed
+        // this will be a list of lists, where each inner list corresponds to ALL of the objects spawned from a single Spawn() call
+        List<List<GameObject>> _spawnedObjects = new List<List<GameObject>>();
+        List<List<SpawnData>> _undoneObjects = new List<List<SpawnData>>();
         
         // Generate spawn points based on the anchor position
-        private void GenerateSpawnPoints()
+        private void GenerateSpawnPoints(bool bSpawnInEditor = false)
         {
             _spawnDataList.Clear();
             
             RaycastHit hit;
-            if (!Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity))
-                return;
+            if (!Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity)) {return;}
             
-            if (seed >= 0)
-            {
-                UnityEngine.Random.InitState((int)seed);
-            }
+            if (seed >= 0) { UnityEngine.Random.InitState((int)seed); }
             
             for (int i = 0; i < _numberOfSpawnPoints; i++)
             {
@@ -117,10 +112,9 @@ namespace Placeables
                     
                     // Create spawn data entry
                     SpawnData data = new SpawnData(
-                        prefabToSpawn, // Prefab to be assigned later
                         localPos,
-                        Quaternion.identity, // Default rotation
-                        1f // Default size
+                        Quaternion.identity,
+                        1f
                     );
                     
                     _spawnDataList.Add(data);
@@ -131,36 +125,54 @@ namespace Placeables
                 }
             }
             
+            if (bSpawnInEditor){ SpawnObjects();}
+            
         }
         
         // Call this to spawn all objects
         public void SpawnObjects()
         {
-            foreach (var spawnData in _spawnDataList)
+            if (!prefabToSpawn){return;}
+            List<GameObject> currentSpawnBatch = new List<GameObject>();
+            // Randomly select [_numberOfObjectsToSpawn] spawn points from the list and spawn the prefab there
+            // Once something has been spawned, we can remove it from the list to avoid spawning multiple objects in the same spot
+            List<SpawnData> availableSpawnPoints = new List<SpawnData>(_spawnDataList);
+            for (int i = 0; i < _numberOfObjectsToSpawn; i++)
             {
-                if (spawnData.prefab != null)
-                {
-                    Vector3 worldPosition = transform.TransformPoint(spawnData.localPosition);
-                    Quaternion worldRotation = transform.rotation * spawnData.localRotation;
-                    
-                    GameObject spawned = Instantiate(spawnData.prefab, worldPosition, worldRotation);
-                    spawned.transform.localScale = Vector3.one * spawnData.size;
-                }
+                // if we run out of spawn points, break out of the loop
+                if (availableSpawnPoints.Count <= 0) { break; }
+                
+                // get a random spawn point from the list
+                int randomIndex = UnityEngine.Random.Range(0, availableSpawnPoints.Count);
+                
+                // read the spawnData
+                SpawnData spawnData = availableSpawnPoints[randomIndex];
+                
+                // Convert local position back to world position
+                Vector3 worldPosition = transform.TransformPoint(spawnData.localPosition);
+                
+                // Instantiate the prefab at the world position
+                GameObject obj = Instantiate(prefabToSpawn, worldPosition, spawnData.localRotation);
+                
+                currentSpawnBatch.Add(obj);
+                
+                
+                // Remove this spawn point from the available list
+                availableSpawnPoints.RemoveAt(randomIndex);
             }
+            _spawnedObjects.Add(currentSpawnBatch);
+            
         }
         
-        void Start()
+        private void Start()
         {
             // Optionally generate and spawn on start
-            ClearSpawnPoints();
+            //ClearSpawnPoints();
             GenerateSpawnPoints();
             SpawnObjects();
         }
 
-        void Update()
-        {
-        
-        }
+
         
         // Gizmo drawing for the spawn anchor
         public void OnDrawGizmos()
@@ -198,7 +210,7 @@ namespace Placeables
                     Gizmos.DrawLine(transform.position, worldPosition);
                     Gizmos.DrawSphere(worldPosition, 0.05f);
                     
-                    // Optionally draw a wire sphere to show the size
+                    
                     if (spawnData.size > 0)
                     {
                         Gizmos.color = Color.green;
@@ -207,18 +219,88 @@ namespace Placeables
                 }
             }
         }
-        
-        // Editor helper - call this from a custom inspector button
-        [ContextMenu("Generate Spawn Points")]
-        public void GenerateSpawnPointsFromEditor()
+
+        #region Editor Functions
+        [ContextMenu("Visualize Spawn Points")]
+        public void Editor_VisualizeSpawnPoints()
         {
-            GenerateSpawnPoints();
+            GenerateSpawnPoints(bSpawnInEditor: false);
+        }
+        [ContextMenu("Spawn Objects")]
+        public void Editor_SpawnObjects()
+        {
+            SpawnObjects();
         }
         
         [ContextMenu("Clear Spawn Points")]
-        public void ClearSpawnPoints()
+        public void Editor_ClearSpawnPoints()
         {
             _spawnDataList.Clear();
         }
+        
+        [ContextMenu("Undo Last Spawn")]
+        public void Editor_UndoLastSpawn()
+        {
+            if (_spawnedObjects.Count > 0)
+            {
+                List<GameObject> lastBatch = _spawnedObjects[_spawnedObjects.Count - 1];
+                List<SpawnData> spawnDataBatch = new List<SpawnData>();
+
+                foreach (var obj in lastBatch)
+                {
+                    if (obj) 
+                    { 
+                        // Convert world position to local position relative to anchor
+                        Vector3 localPos = transform.InverseTransformPoint(obj.transform.position);
+                        Quaternion localRot = Quaternion.Inverse(transform.rotation) * obj.transform.rotation;
+                
+                        spawnDataBatch.Add(new SpawnData(
+                            localPos, 
+                            localRot, 
+                            obj.transform.localScale.x
+                        ));
+                        DestroyImmediate(obj); 
+                    }
+                }
+                _spawnedObjects.RemoveAt(_spawnedObjects.Count - 1);
+                _undoneObjects.Add(spawnDataBatch);
+            }
+        }
+
+        [ContextMenu("Redo Last Undo")]
+        public void Editor_RedoLastUndo()
+        {
+            if (_undoneObjects.Count > 0)
+            {
+                List<SpawnData> lastUndoneBatch = _undoneObjects[_undoneObjects.Count - 1];
+                List<GameObject> reSpawnedBatch = new List<GameObject>();
+
+                foreach (var data in lastUndoneBatch)
+                {
+                    // Convert local position back to world position
+                    Vector3 worldPos = transform.TransformPoint(data.localPosition);
+                    Quaternion worldRot = transform.rotation * data.localRotation;
+            
+                    GameObject reSpawnedObj = Instantiate(prefabToSpawn, worldPos, worldRot);
+                    reSpawnedObj.transform.localScale = Vector3.one * data.size;
+    
+                    reSpawnedBatch.Add(reSpawnedObj);
+                }
+
+                _spawnedObjects.Add(reSpawnedBatch);
+                _undoneObjects.RemoveAt(_undoneObjects.Count - 1);
+            }
+        }
+        
+        #endregion
+        
+        # region Helper Functions
+        // Check if a surface is flat enough based on its normal
+        private bool IsSurfaceFlat(Vector3 normal)
+        {
+            float angle = Vector3.Angle(Vector3.up, normal);
+            return angle <= _maxSlopeAngle;
+        }
+        #endregion
     }
 }

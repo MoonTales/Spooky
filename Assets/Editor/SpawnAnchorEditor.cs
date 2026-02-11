@@ -6,6 +6,35 @@ namespace Placeables
     [CustomEditor(typeof(SpawnAnchor))]
     public class SpawnAnchorEditor : Editor
     {
+        private static class Styles
+        {
+            public static GUIStyle headerStyle;
+            public static GUIStyle buttonStyle;
+            public static GUIStyle sectionStyle;
+            
+            static Styles()
+            {
+                headerStyle = new GUIStyle(EditorStyles.boldLabel)
+                {
+                    fontSize = 14,
+                    alignment = TextAnchor.MiddleCenter,
+                    normal = { textColor = new Color(0.8f, 0.8f, 0.8f) }
+                };
+                
+                buttonStyle = new GUIStyle(GUI.skin.button)
+                {
+                    fontSize = 11,
+                    fontStyle = FontStyle.Bold,
+                    fixedHeight = 32
+                };
+                
+                sectionStyle = new GUIStyle(EditorStyles.helpBox)
+                {
+                    padding = new RectOffset(10, 10, 10, 10)
+                };
+            }
+        }
+        
         public override void OnInspectorGUI()
         {
             // Draw the default inspector
@@ -13,21 +42,85 @@ namespace Placeables
             
             SpawnAnchor spawnAnchor = (SpawnAnchor)target;
             
-            // Add some space
-            EditorGUILayout.Space(10);
+            EditorGUILayout.Space(15);
             
-            // Add buttons
-            if (GUILayout.Button("Generate Spawn Points", GUILayout.Height(30)))
-            {
-                spawnAnchor.GenerateSpawnPointsFromEditor();
-                EditorUtility.SetDirty(spawnAnchor); // Mark as dirty so Unity saves the changes
-            }
+            // Header section
+            DrawHeader();
             
-            if (GUILayout.Button("Clear Spawn Points", GUILayout.Height(30)))
+            EditorGUILayout.Space(5);
+            
+            // Buttons section with colored backgrounds
+            EditorGUILayout.BeginVertical(Styles.sectionStyle);
+            
+            DrawVisualizationButtons(spawnAnchor);
+            EditorGUILayout.Space(8);
+            DrawActionButtons(spawnAnchor);
+            
+            EditorGUILayout.EndVertical();
+        }
+        
+        private void DrawHeader()
+        {
+            Rect rect = GUILayoutUtility.GetRect(GUIContent.none, Styles.headerStyle, GUILayout.Height(30));
+            EditorGUI.DrawRect(rect, new Color(0.2f, 0.2f, 0.2f, 0.3f));
+            GUI.Label(rect, "Spawn Anchor Editor", Styles.headerStyle);
+        }
+        
+        private void DrawVisualizationButtons(SpawnAnchor spawnAnchor)
+        {
+            GUILayout.Label("Visualization", EditorStyles.miniBoldLabel);
+            
+            EditorGUILayout.BeginHorizontal();
+            
+            // Visualize button - Blue theme
+            GUI.backgroundColor = new Color(0.4f, 0.7f, 1f);
+            if (GUILayout.Button("👁 Visualize", Styles.buttonStyle))
             {
-                spawnAnchor.ClearSpawnPoints();
+                spawnAnchor.Editor_VisualizeSpawnPoints();
                 EditorUtility.SetDirty(spawnAnchor);
             }
+            
+            // Clear button - Orange theme
+            GUI.backgroundColor = new Color(1f, 0.6f, 0.3f);
+            if (GUILayout.Button("✖ Clear", Styles.buttonStyle))
+            {
+                spawnAnchor.Editor_ClearSpawnPoints();
+                EditorUtility.SetDirty(spawnAnchor);
+            }
+            
+            GUI.backgroundColor = Color.white;
+            EditorGUILayout.EndHorizontal();
+        }
+        
+        private void DrawActionButtons(SpawnAnchor spawnAnchor)
+        {
+            GUILayout.Label("Actions", EditorStyles.miniBoldLabel);
+            
+            // Spawn button - Green theme
+            GUI.backgroundColor = new Color(0.4f, 0.8f, 0.4f);
+            if (GUILayout.Button("▶ Spawn Objects", Styles.buttonStyle))
+            {
+                spawnAnchor.Editor_SpawnObjects();
+                EditorUtility.SetDirty(spawnAnchor);
+            }
+            
+            // Undo button - Red theme
+            GUI.backgroundColor = new Color(0.9f, 0.4f, 0.4f);
+            if (GUILayout.Button("↶ Undo Last Spawn", Styles.buttonStyle))
+            {
+                spawnAnchor.Editor_UndoLastSpawn();
+                EditorUtility.SetDirty(spawnAnchor);
+            }
+            
+            // Redo button - Purple theme
+            GUI.backgroundColor = new Color(0.7f, 0.4f, 0.9f);
+            if (GUILayout.Button("↷ Redo Last Spawn", Styles.buttonStyle))
+            {
+                spawnAnchor.Editor_RedoLastUndo();
+                EditorUtility.SetDirty(spawnAnchor);
+            }
+            
+            GUI.backgroundColor = Color.white;
         }
     }
 }
