@@ -53,7 +53,7 @@ namespace Placeables
             EditorGUILayout.BeginVertical(Styles.sectionStyle);
             
             DrawVisualizationButtons(spawnAnchor);
-            EditorGUILayout.Space(8);
+            EditorGUILayout.Space(10);
             DrawActionButtons(spawnAnchor);
             
             EditorGUILayout.EndVertical();
@@ -81,10 +81,18 @@ namespace Placeables
             }
             
             // Clear button - Orange theme
+            
             GUI.backgroundColor = new Color(1f, 0.6f, 0.3f);
             if (GUILayout.Button("✖ Clear", Styles.buttonStyle))
             {
                 spawnAnchor.Editor_ClearSpawnPoints();
+                EditorUtility.SetDirty(spawnAnchor);
+            }
+            
+            GUI.backgroundColor = spawnAnchor.IsDrawingGizmos() ? Color.white : Color.gray;
+            if (GUILayout.Button("Toggle Visualization", Styles.buttonStyle))
+            {
+                spawnAnchor.Editor_ToggleGizmos();
                 EditorUtility.SetDirty(spawnAnchor);
             }
             
@@ -105,7 +113,7 @@ namespace Placeables
             }
             
             // Undo button - Red theme
-            GUI.backgroundColor = new Color(0.9f, 0.4f, 0.4f);
+            GUI.backgroundColor = spawnAnchor.GetNumberOfSpawnedLists() != 0 ? new Color(0.9f, 0.4f, 0.4f) : Color.black;
             if (GUILayout.Button("↶ Undo Last Spawn", Styles.buttonStyle))
             {
                 spawnAnchor.Editor_UndoLastSpawn();
@@ -113,7 +121,7 @@ namespace Placeables
             }
             
             // Redo button - Purple theme
-            GUI.backgroundColor = new Color(0.7f, 0.4f, 0.9f);
+            GUI.backgroundColor = spawnAnchor.GetNumberOfUndoneLists() != 0 ? new Color(0.7f, 0.4f, 0.9f) : Color.black;
             if (GUILayout.Button("↷ Redo Last Spawn", Styles.buttonStyle))
             {
                 spawnAnchor.Editor_RedoLastUndo();

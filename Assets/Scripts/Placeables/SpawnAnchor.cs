@@ -40,13 +40,14 @@ namespace Placeables
         [SerializeField] private int _maxRetries = 10; // Maximum attempts to find a flat surface per spawn point
         [SerializeField] private float seed = -1; // Option to automatically generate and spawn on Start
         [SerializeField] private List<SpawnData> _spawnDataList = new List<SpawnData>();
-        [SerializeField] private bool bDrawGizmos = true;
+        private bool _bDrawGizmos = true; public bool IsDrawingGizmos(){return _bDrawGizmos;}
 
+        
         
         // Internal Information used to store previous gameobjects we have spawned, so we can clean them up if needed
         // this will be a list of lists, where each inner list corresponds to ALL of the objects spawned from a single Spawn() call
-        List<List<GameObject>> _spawnedObjects = new List<List<GameObject>>();
-        List<List<SpawnData>> _undoneObjects = new List<List<SpawnData>>();
+        private List<List<GameObject>> _spawnedObjects = new List<List<GameObject>>(); public int GetNumberOfSpawnedLists(){return _spawnedObjects.Count;}
+        private List<List<SpawnData>> _undoneObjects = new List<List<SpawnData>>(); public int GetNumberOfUndoneLists(){return _undoneObjects.Count;}
         
         // Generate spawn points based on the anchor position
         private void GenerateSpawnPoints(bool bSpawnInEditor = false)
@@ -177,7 +178,7 @@ namespace Placeables
         // Gizmo drawing for the spawn anchor
         public void OnDrawGizmos()
         {
-            if(!bDrawGizmos){return;}
+            if(!_bDrawGizmos){return;}
             // draw a Gizmo at the position of this object
             Gizmos.color = Color.cyan;
             Gizmos.DrawSphere(transform.position, 0.1f);
@@ -290,6 +291,12 @@ namespace Placeables
                 _spawnedObjects.Add(reSpawnedBatch);
                 _undoneObjects.RemoveAt(_undoneObjects.Count - 1);
             }
+        }
+        
+        [ContextMenu("Toggle Gizmos")]
+        public void Editor_ToggleGizmos()
+        {
+            _bDrawGizmos = !_bDrawGizmos;
         }
         
         #endregion
