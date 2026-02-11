@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Interaction.Letters;
+using Placeables;
 using UnityEngine;
 using Types = System.Types;
 
@@ -131,6 +132,10 @@ namespace Managers
             if (Input.GetKeyDown(KeyCode.Y))
             {
                 SpawnAnchorManager.Instance.RequestSpawnAtAnyAnchor(_notePrefab);
+            }
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                SpawnAnchorManager.Instance.RequestSpawnAtAnchorByIdentifier(_notePrefab, AnchorIdentifier.Act2);
             }
         }
     }

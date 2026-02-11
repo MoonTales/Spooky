@@ -45,18 +45,31 @@ namespace Managers
         // This function will be called, which will look for any available Spawn Anchor and spawn the given prefab at that location
         public void RequestSpawnAtAnyAnchor(GameObject prefabToSpawn)
         {
-            // inefficient, but safe
-            UpdateSpawnAnchorsInScene();
-            
             if (spawnAnchorsInScene.Count == 0)
             {
                 Debug.LogWarning("No Spawn Anchors found in the scene! Cannot spawn prefab.");
                 return;
             }
 
-            // For simplicity, we'll just use the first available spawn anchor. You could implement more complex logic here if needed.
-            SpawnAnchor anchor = spawnAnchorsInScene[0];
+            // pick a random anchor from the list of spawn anchors in the scene, and spawn the prefab at that location
+            
+            SpawnAnchor anchor = spawnAnchorsInScene[UnityEngine.Random.Range(0, spawnAnchorsInScene.Count)];
             anchor.ManualSpawn(prefabToSpawn);
+        }
+
+        public void RequestSpawnAtAnchorByIdentifier(GameObject prefabToSpawn, AnchorIdentifier identifier)
+        {
+
+            // look through all of spawnAnchorsInScene, and pick a random one that matches the given identifier, then spawn the prefab at that location
+            List<SpawnAnchor> matchingAnchors = spawnAnchorsInScene.FindAll(anchor => anchor.GetAnchorIdentifier() == identifier);
+            if (matchingAnchors.Count == 0)
+            {
+                Debug.LogWarning($"No Spawn Anchors with identifier {identifier} found in the scene! Cannot spawn prefab.");
+                return;
+            }
+            // pick a random matching anchor
+            SpawnAnchor selectedAnchor = matchingAnchors[UnityEngine.Random.Range(0, matchingAnchors.Count)];
+            selectedAnchor.ManualSpawn(prefabToSpawn);
         }
     }
 }

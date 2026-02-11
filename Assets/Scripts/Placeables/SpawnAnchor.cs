@@ -30,6 +30,14 @@ namespace Placeables
             this.size = size;
         }
     }
+
+    [Serializable]
+    public enum AnchorIdentifier
+    {
+        Act1,
+        Act2,
+        Act3
+    }
     
     public class SpawnAnchor : MonoBehaviour
     {
@@ -41,7 +49,10 @@ namespace Placeables
         [SerializeField] private float _maxRaycastDistance = 100f;
         [SerializeField] private float _maxSlopeAngle = 15f; // Maximum angle from horizontal to be considered "flat"
         [SerializeField] private int _maxRetries = 10; // Maximum attempts to find a flat surface per spawn point
-        [SerializeField] private float seed = -1; // Option to automatically generate and spawn on Start
+        [SerializeField] private float seed = -1;
+        [SerializeField] private int priority = 0; public int GetPriority(){return priority;} // High priority will be considered first
+        [SerializeField] private AnchorIdentifier anchorIdentifier; public AnchorIdentifier GetAnchorIdentifier(){return anchorIdentifier;}
+
         [SerializeField] private List<SpawnData> _spawnDataList = new List<SpawnData>();
         [SerializeField] private bool _randomizeOnSpawn = true; public bool IsRandomizingOnSpawn(){return _randomizeOnSpawn;}
         [SerializeField] private GameObject _parentObjectForSpawns = null; public GameObject GetParentObjectForSpawns(){return _parentObjectForSpawns;}

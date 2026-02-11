@@ -17327,8 +17327,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 672449848}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.24337587, y: -0.6637797, z: 0.23330638, w: -0.66763234}
-  m_LocalPosition: {x: -8.867711, y: 1.7757486, z: 1.9142299}
+  m_LocalRotation: {x: 0.24927463, y: 0.66168904, z: -0.23917137, w: 0.6654524}
+  m_LocalPosition: {x: -8.122711, y: 1.9277487, z: 1.4172301}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35850,7 +35850,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!320 &1414124884
 PlayableDirector:
   m_ObjectHideFlags: 0
@@ -45233,57 +45233,104 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabsToSpawn: []
-  _spawnAreaSize: 10
-  _numberOfSpawnPoints: 15
-  _numberOfObjectsToSpawn: 1
+  _spawnAreaSize: 12
+  _numberOfSpawnPoints: 30
+  _numberOfObjectsToSpawn: 15
   _maxRaycastDistance: 100
   _maxSlopeAngle: 15
   _maxRetries: 10
   seed: -1
+  priority: 0
+  anchorIdentifier: 0
   _spawnDataList:
-  - localPosition: {x: 3.715136, y: -2.4495502, z: -0.6423678}
+  - localPosition: {x: 1.8389308, y: -3.2875502, z: 3.668987}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: -0.60800076, y: -2.455, z: -3.961029}
+  - localPosition: {x: -0.15571594, y: -2.1170144, z: 0.75820893}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: -4.701616, y: -2.4303265, z: -0.1788438}
+  - localPosition: {x: 0.7640287, y: -3.2875502, z: 1.6672635}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: -2.6941962, y: -2.455, z: -1.9012065}
+  - localPosition: {x: -0.9392614, y: -3.2875502, z: -3.006072}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: -2.1338606, y: -2.455, z: -2.625606}
+  - localPosition: {x: 1.2977936, y: -3.2875502, z: 2.1456146}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: 4.2992024, y: -2.4495502, z: 3.4080398}
+  - localPosition: {x: 3.6467094, y: -3.2875502, z: -3.7273107}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: 3.5535731, y: -2.4495502, z: -3.2077456}
+  - localPosition: {x: 0.771162, y: -3.293, z: 5.6449614}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: -0.99312544, y: -2.455, z: 1.0516758}
+  - localPosition: {x: -3.3192246, y: -3.2875502, z: -1.5947421}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: 0.6130552, y: -2.4495502, z: 0.6511597}
+  - localPosition: {x: 1.3671348, y: -3.2875502, z: -0.9958863}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: 3.3315651, y: -2.4495502, z: 1.6904781}
+  - localPosition: {x: 4.899637, y: -3.293, z: 5.3657813}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: 0.5612922, y: -2.4495502, z: 1.4650915}
+  - localPosition: {x: -1.2825775, y: -3.2875502, z: 0.28232217}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: -1.1327281, y: -1.332664, z: 1.8268268}
+  - localPosition: {x: 5.5363655, y: -3.293, z: -3.8080974}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: 1.5296321, y: -2.4495502, z: 2.4555807}
+  - localPosition: {x: -1.9506416, y: -3.2875502, z: -0.9280138}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: 3.2433095, y: -2.4495502, z: 4.4545736}
+  - localPosition: {x: 5.7332454, y: -3.293, z: -2.1944294}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
-  - localPosition: {x: 2.9821038, y: -2.4495502, z: -2.817864}
+  - localPosition: {x: -2.8960886, y: -3.2875502, z: 1.6214144}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -3.0394304, y: -3.2875502, z: 3.0874238}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -4.181926, y: -3.293, z: -3.5190897}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: 2.4770257, y: -3.2875502, z: -2.6938977}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: 4.1214824, y: -3.2875502, z: 5.1002464}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -0.23790175, y: -3.2875502, z: 4.1214423}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: 3.2240996, y: -3.2875502, z: -2.784945}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -1.0011902, y: -3.2875502, z: -1.946007}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -4.8123627, y: -3.293, z: -2.7261534}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: 4.71051, y: -3.2875502, z: 3.7556674}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -3.4024732, y: -3.2875502, z: 3.742351}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -4.461231, y: -2.170664, z: 3.0159397}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: 3.8498647, y: -3.2875502, z: -1.3937209}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -1.6962159, y: -3.2875502, z: -0.16646934}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: 4.4384537, y: -3.2875502, z: 1.119257}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -3.0023632, y: -3.2875502, z: 1.3883584}
     localRotation: {x: 0, y: 0, z: 0, w: 1}
     size: 1
   _randomizeOnSpawn: 1
@@ -45297,7 +45344,7 @@ Transform:
   m_GameObject: {fileID: 1689798345}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.6686978, y: 2.58, z: -0.9826669}
+  m_LocalPosition: {x: -0.397, y: 3.418, z: -1.723}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46745,6 +46792,69 @@ PlayableDirector:
     value: {fileID: 79615367}
   m_ExposedReferences:
     m_References: []
+--- !u!1 &1763093070
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1763093072}
+  - component: {fileID: 1763093071}
+  m_Layer: 0
+  m_Name: SPAWN
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1763093071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763093070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcd6fb6507ae2e743a47647676470eb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabsToSpawn: []
+  _spawnAreaSize: 3
+  _numberOfSpawnPoints: 2
+  _numberOfObjectsToSpawn: 1
+  _maxRaycastDistance: 100
+  _maxSlopeAngle: 15
+  _maxRetries: 10
+  seed: -1
+  priority: 0
+  anchorIdentifier: 1
+  _spawnDataList:
+  - localPosition: {x: 0.5357976, y: -2.085, z: 0.728004}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  - localPosition: {x: -1.0208077, y: -2.085, z: -1.3982899}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    size: 1
+  _randomizeOnSpawn: 1
+  _parentObjectForSpawns: {fileID: 0}
+--- !u!4 &1763093072
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763093070}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.607, y: 2.21, z: -1.085}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1779160078 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2caf196c019001c4baf434d8cf077a2f, type: 3}
@@ -63141,3 +63251,4 @@ SceneRoots:
   - {fileID: 1729165989}
   - {fileID: 1112157945}
   - {fileID: 1689798347}
+  - {fileID: 1763093072}
