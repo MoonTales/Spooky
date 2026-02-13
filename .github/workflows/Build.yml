@@ -35,8 +35,26 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
-
-      - uses: actions/upload-artifact@v4
+      
+      # Referenced the following links; added second upload attempt on error
+      # https://github.com/actions/upload-artifact
+      # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax
+      # https://github.com/actions/upload-pages-artifact/issues/97
+      - name: Upload build artifact (attempt 1)
+        id: upload_artifact_attempt_1
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
         with:
           name: Build-${{ matrix.targetPlatform }}
           path: build/${{ matrix.targetPlatform }}
+          overwrite: true
+          compression-level: 0
+
+      - name: Upload build artifact (retry)
+        if: steps.upload_artifact_attempt_1.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-${{ matrix.targetPlatform }}
+          path: build/${{ matrix.targetPlatform }}
+          overwrite: true
+          compression-level: 0

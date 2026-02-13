@@ -60,20 +60,18 @@ public class TerrorRadius : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Timer so that we're not recalculating distance constantly, tune interval as needed
+        distance = PlayerManager.Instance.GetDistance(transform.position);
+
+        float terrorIntensity = CalculateNormalizedTerrorIntensity();
+        EventBroadcaster.Broadcast_OnTerrorIntensityChanged(terrorIntensity);
+
+        // Timer keeps damage cadence separate from audio updates.
         timer += Time.deltaTime;
 
         if (timer >= interval)
         {
-            //distance = calcDistance();
-            distance = PlayerManager.Instance.GetDistance(transform.position);
-            //Debug.Log("Distance to Player: " + distance);
-
             //Can manually set ranges to adjust the volume/visual/anxiety effects based on distance here
             terrorDamage();
-
-
-            //
             
             timer = 0f;
         }
@@ -105,6 +103,22 @@ public class TerrorRadius : MonoBehaviour
             Debug.Log("Terror Damage: " + farDmg);
         }
 
+    }
+
+    private float CalculateNormalizedTerrorIntensity()
+    {   
+        // Returns terror as a percentage in [0, 1]
+        if (distance <= veryClose)
+        {
+            return 1f;
+        }
+
+        if (distance >= far)
+        {
+            return 0f;
+        }
+
+        return Mathf.InverseLerp(far, veryClose, distance);
     }
 
     /*
