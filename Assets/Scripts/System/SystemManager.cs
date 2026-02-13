@@ -34,6 +34,7 @@ namespace System
             gameObject.AddComponent<NotificationController>();
             gameObject.AddComponent<CutsceneManager>();
             gameObject.AddComponent<LetterManager>();
+            gameObject.AddComponent<SpawnAnchorManager>();
 
             
             

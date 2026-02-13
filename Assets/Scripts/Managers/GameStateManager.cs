@@ -12,7 +12,7 @@ namespace Managers
     {
 
         [SerializeField] private int _maxDrawingsPerAct = 3; public int GetMaxDrawingsPerAct() { return _maxDrawingsPerAct; }
-        
+        [SerializeField] private int _MaxDrawingsInGame = 9; public int GetMaxDrawingsInGame() { return _MaxDrawingsInGame; }
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
         private Types.GameState _currentGameState = Types.GameState.MainMenu; public Types.GameState GetCurrentGameState() { return _currentGameState; }
