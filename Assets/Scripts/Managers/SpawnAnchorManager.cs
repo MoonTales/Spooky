@@ -30,6 +30,12 @@ namespace Managers
         {
             // anytime we change world locations, we want to update our list of spawn anchors in the scene to reflect the new location
             UpdateSpawnAnchorsInScene();
+            
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare)
+            {
+                // if we are entering the nightmare, we want to populate the nightmare with drawings
+                PopulateNightmare();
+            }
         }
 
         private void UpdateSpawnAnchorsInScene()
