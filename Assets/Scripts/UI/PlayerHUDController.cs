@@ -89,7 +89,6 @@ namespace UI
                     ShowHUD(false);
                     break;
                 case Types.GameState.Inspecting:
-                    DebugUtils.LogError("Setting HUD to Inspecting State");
                     HandleInspection();
                     break;
                 case Types.GameState.Paused:

@@ -199,7 +199,6 @@ public class Flashlight : Singleton<Flashlight>
         }
     
         // draw a debug ray
-        Debug.DrawRay(ray.origin, ray.direction * maxFlickerDistance, Color.yellow);
     }
     
     private void OnFlashlightToggled(bool isOn)

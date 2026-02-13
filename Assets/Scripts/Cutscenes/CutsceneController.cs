@@ -17,55 +17,40 @@ namespace Cutscenes
     public class CutsceneController : EventSubscriberBase, IInteractable
     {
         public TextKey PromptKey => default;
-
-
+        
+        
         [SerializeField] private GameObject cutsceneToPlay;
         [SerializeField] private CutsceneType cutsceneType;
         [SerializeField] private bool  playOnlyOnce = true;
-
-        private PlayableDirector playableDirector;
+        
+        private PlayableDirector _playableDirector;
+        private CutsceneSignalReceiver _cutsceneSignalReceiver;
+        
         
         private void Start()
         {
-            playableDirector = cutsceneToPlay.GetComponent<PlayableDirector>();
-            if (cutsceneType == CutsceneType.PlayOnStart){PlayCutscene();}
-        }
+            if (cutsceneType == CutsceneType.PlayOnStart){CutsceneManager.Instance.OnRequestStartCutscene(this);}
 
+            _playableDirector = GetComponentInChildren<PlayableDirector>(true);
+    
+            if (_playableDirector != null)
+            {
+                _cutsceneSignalReceiver = _playableDirector.gameObject.GetComponent<CutsceneSignalReceiver>();
+                if (_cutsceneSignalReceiver == null)
+                {
+                    _cutsceneSignalReceiver = _playableDirector.gameObject.AddComponent<CutsceneSignalReceiver>();
+                }
+                
+                _playableDirector.SetGenericBinding(_cutsceneSignalReceiver, _cutsceneSignalReceiver);
+            }
+        }
+        
         protected override void OnGameStarted()
         {
-            if (cutsceneType == CutsceneType.PlayOnGameStart){PlayCutscene();}
+            if (cutsceneType == CutsceneType.PlayOnGameStart){CutsceneManager.Instance.OnRequestStartCutscene(this);}
         }
         
         
-
-        private void PlayCutscene()
-        {
-            
-            // Subscribe to the stopped event
-            if (playableDirector != null)
-            {
-                playableDirector.stopped += EndCutscene;
-            }
-            
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
-            cutsceneToPlay.SetActive(true);
-        
-        }
-        
-        // Child classes can override this to add functionality when the cutscene ends
-        protected virtual void EndCutscene(PlayableDirector obj)
-        {
-            // ensure that the current GameState isnt main menu, otherwise this is a false trigger
-            if (GameStateManager.Instance && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu) { return; }
-            Debug.Log("[CutsceneController] Cutscene ended.");
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            Debug.Log($"[CutsceneController] Disabling: {cutsceneToPlay.name}");
-            playableDirector.stopped -= EndCutscene;
-            cutsceneToPlay.SetActive(false);
-            
-        }
-
-        public string Prompt { get; }
         public bool CanInteract(Interactor interactor)
         {
             // only allowed to interact during gameplay
@@ -74,9 +59,13 @@ namespace Cutscenes
 
         public void Interact(Interactor interactor)
         {
-            if (cutsceneType == CutsceneType.PlayOnInteraction) { PlayCutscene(); }
+            if (cutsceneType == CutsceneType.PlayOnInteraction) { CutsceneManager.Instance.OnRequestStartCutscene(this); }
         }
-        
-        
+
+        public void CutsceneEnded()
+        {
+            gameObject.SetActive(false);
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+        }
     }
 }
