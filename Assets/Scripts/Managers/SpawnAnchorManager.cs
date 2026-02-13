@@ -70,6 +70,24 @@ namespace Managers
 
             //Step 4. Attempt to find available Spawn Anchors, that match has the correct priorityID
             List<SpawnAnchor> matchingAnchors = spawnAnchorsInScene.FindAll(anchor => anchor.GetAnchorIdentifier() == anchorIdentifierToUse);
+            // if there is none, try with the -1 identifier, which means it can spawn regardless of the act. keep trying untill we reach -1
+            for (int i = (int)anchorIdentifierToUse; i >= -1; i--)
+            {
+                matchingAnchors = spawnAnchorsInScene.FindAll(anchor => anchor.GetAnchorIdentifier() == (AnchorIdentifier)i);
+                if (matchingAnchors.Count > 0)
+                {
+                    // we found some matching anchors, so we can break out of the loop and use these anchors to spawn our drawings
+                    break;
+                }
+            }
+            if (matchingAnchors.Count == 0)
+            {
+                // we found no anchors at all, so we cannot spawn any drawings
+                Debug.LogError($"No Spawn Anchors with identifier {anchorIdentifierToUse} or lower found in the scene! Cannot spawn any drawings for this act.");
+                return;
+            }
+            
+            
 
             //Step 5. Spawn the drawings at a spawn anchor that has NOT been used yet
             int numberOfDrawingsInGame = GameStateManager.Instance.GetMaxDrawingsInGame();
