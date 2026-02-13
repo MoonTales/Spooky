@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Placeables
 {
     /// <summary>
@@ -51,11 +55,13 @@ namespace Placeables
         [SerializeField] private int _maxRetries = 10; // Maximum attempts to find a flat surface per spawn point
         [SerializeField] private float seed = -1;
         [SerializeField] private int priority = 0; public int GetPriority(){return priority;} // High priority will be considered first
+        [SerializeField] private int priorityDrawingNumber = -1; public int GetPriorityDrawingNumber(){return priorityDrawingNumber;} // when spawning, we will first try to spawn a Drawing with a matching priorityDrawingNumber
         [SerializeField] private AnchorIdentifier anchorIdentifier; public AnchorIdentifier GetAnchorIdentifier(){return anchorIdentifier;}
 
         [SerializeField] private List<SpawnData> _spawnDataList = new List<SpawnData>();
         [SerializeField] private bool _randomizeOnSpawn = true; public bool IsRandomizingOnSpawn(){return _randomizeOnSpawn;}
         [SerializeField] private GameObject _parentObjectForSpawns = null; public GameObject GetParentObjectForSpawns(){return _parentObjectForSpawns;}
+        [SerializeField] private bool _bHasBeenSpawnedAtLeastOnce = false; public bool HasBeenSpawnedAtLeastOnce(){return _bHasBeenSpawnedAtLeastOnce;}
         private bool _bDrawGizmos = true; public bool IsDrawingGizmos(){return _bDrawGizmos;}
 
         
@@ -185,6 +191,7 @@ namespace Placeables
             }
             _spawnedObjects.Add(currentSpawnBatch);
             
+            _bHasBeenSpawnedAtLeastOnce = true;
         }
 
         public void ManualSpawn(GameObject prefabToSpawn)
@@ -198,6 +205,7 @@ namespace Placeables
             Vector3 worldPosition = transform.TransformPoint(spawnData.localPosition);
             // Instantiate the prefab at the world position
             GameObject obj = Instantiate(prefabToSpawn, worldPosition, spawnData.localRotation);
+            _bHasBeenSpawnedAtLeastOnce = true;
         }
         
         
@@ -215,10 +223,21 @@ namespace Placeables
         public void OnDrawGizmos()
         {
             if(!_bDrawGizmos){return;}
+    
             // draw a Gizmo at the position of this object
             Gizmos.color = Color.cyan;
             Gizmos.DrawSphere(transform.position, 0.1f);
-            
+    
+            #if UNITY_EDITOR
+            // Draw the priority number above the cyan sphere
+            GUIStyle style = new GUIStyle();
+            style.normal.textColor = Color.white;
+            style.fontSize = 16;
+            style.fontStyle = FontStyle.Bold;
+            var displayMessage = priorityDrawingNumber >= 0 ? priorityDrawingNumber.ToString() : "No Priority";
+            Handles.Label(transform.position + Vector3.up * 0.3f, displayMessage, style);
+            #endif
+    
             // draw a line down to the ground
             RaycastHit hit;
             if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity))
@@ -228,26 +247,26 @@ namespace Placeables
                 Gizmos.color = Color.red;
                 Gizmos.DrawSphere(hit.point, 0.1f);
             }
-            
+    
             // draw a square around the hit point to show the spawn area
             if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity))
             {
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireCube(hit.point, new Vector3(_spawnAreaSize, 0.1f, _spawnAreaSize));
             }
-            
+    
             // Draw spawn points from the list if they exist
             if (_spawnDataList.Count > 0)
             {
                 foreach (var spawnData in _spawnDataList)
                 {
                     Vector3 worldPosition = transform.TransformPoint(spawnData.localPosition);
-                    
+            
                     Gizmos.color = Color.blue;
                     Gizmos.DrawLine(transform.position, worldPosition);
                     Gizmos.DrawSphere(worldPosition, 0.05f);
-                    
-                    
+            
+            
                     if (spawnData.size > 0)
                     {
                         Gizmos.color = Color.green;
