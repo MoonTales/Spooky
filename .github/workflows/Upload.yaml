@@ -35,21 +35,17 @@ jobs:
           zip -r ../../Game.zip .
           cd ../..
 
-      # Install Butler
       - name: Install Butler
         run: |
-          curl -L https://github.com/itchio/butler/releases/latest/download/butler-linux-amd64.zip -o butler.zip
+          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
           unzip butler.zip
           chmod +x butler
-          sudo mv butler /usr/local/bin/butler
-
-
-      # Deploy to Itch.io
+          ./butler -V
+      
       - name: Deploy to itch.io
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |
-          butler login
-          butler push Game.zip moontalesstudio/spooky-game:windows
+          ./butler push Game.zip moontalesstudio/spooky-game:windows
 
       # Pray that it works
