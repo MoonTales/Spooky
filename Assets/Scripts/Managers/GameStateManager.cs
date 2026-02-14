@@ -22,7 +22,7 @@ namespace Managers
         public void Start()
         {
             // Initialize the game state
-            _currentGameState = Types.GameState.Gameplay;
+            _currentGameState = Types.GameState.MainMenu;
             // for now, we will assume the game starts
             EventBroadcaster.Broadcast_GameStateChanged(_currentGameState);
         }
