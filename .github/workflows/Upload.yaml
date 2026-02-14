@@ -1,0 +1,37 @@
+name: Deploy to Itch.io
+
+on:
+  push:
+    branches: [ development ]
+
+jobs:
+  deploy:
+    name: Deploy to Itch.io
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: Build.yaml 
+          name: Build-StandaloneWindows64
+          path: build/StandaloneWindows64
+          search_artifacts: true
+          workflow_conclusion: success
+
+      - name: Zip Build
+        run: |
+          cd build/StandaloneWindows64
+          zip -r ../../Game.zip .
+          cd ../..
+
+      - name: Deploy to itch.io
+        uses: manleydev/butler-publish-itchio-action@master
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_API_KEY }}
+          CHANNEL: windows
+          ITCH_GAME: spooky-game
+          ITCH_USER: moontalesstudio
+          PACKAGE: Game.zip
