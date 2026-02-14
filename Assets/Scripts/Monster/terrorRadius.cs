@@ -64,8 +64,18 @@ public class TerrorRadius : MonoBehaviour
     {
         distance = PlayerManager.Instance.GetDistance(transform.position);
 
-        float terrorIntensity = CalculateNormalizedTerrorIntensity();
-        EventBroadcaster.Broadcast_OnTerrorIntensityChanged(terrorIntensity, GetTerrorAudioSourceTransform());
+        bool isNightmare = GameStateManager.Instance != null
+            && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare;
+
+        if (isNightmare)
+        {
+            float terrorIntensity = CalculateNormalizedTerrorIntensity();
+            EventBroadcaster.Broadcast_OnTerrorIntensityChanged(terrorIntensity, GetTerrorAudioSourceTransform());
+        }
+        else
+        {
+            EventBroadcaster.Broadcast_OnTerrorIntensityChanged(0f, null);
+        }
 
         // Timer keeps damage cadence separate from audio updates.
         timer += Time.deltaTime;

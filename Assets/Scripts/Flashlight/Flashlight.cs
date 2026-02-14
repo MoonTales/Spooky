@@ -112,8 +112,8 @@ public class Flashlight : Singleton<Flashlight>
         // Get camera if not assigned
         if (_playerCamera == null) {_playerCamera = Camera.main;}
         
-        // Initialize flashlight state
-        OnFlashlightToggled(_isOn);
+        // Initialize flashlight state without triggering toggle SFX on startup.
+        OnFlashlightToggled(_isOn, false);
         
         CinemaCamera = PlayerManager.Instance.GetCinemachineCamera();
         panTilt = CinemaCamera.GetComponent<CinemachinePanTilt>();
@@ -201,26 +201,28 @@ public class Flashlight : Singleton<Flashlight>
         // draw a debug ray
     }
     
-    private void OnFlashlightToggled(bool isOn)
+    private void OnFlashlightToggled(bool isOn, bool playSfx = true)
     {
         
         
         // Handle flashlight toggle event
         if (isOn)
         {
-            HandleFlashlightOn();
+            HandleFlashlightOn(playSfx);
         }
         else
         {
-            HandleFlashlightOff();
+            HandleFlashlightOff(playSfx);
         }
     }
 
-    private void HandleFlashlightOn()
+    private void HandleFlashlightOn(bool playSfx)
     {
         EventBroadcaster.Broadcast_OnFlashlightToggled(true);
-        // play SFX
-        AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
+        if (playSfx)
+        {
+            AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
+        }
         // turn on all light components
         SetAllLights(true);
         // Start special flicker timer
@@ -242,11 +244,13 @@ public class Flashlight : Singleton<Flashlight>
         }
     }
     
-    private void HandleFlashlightOff()
+    private void HandleFlashlightOff(bool playSfx)
     {
         EventBroadcaster.Broadcast_OnFlashlightToggled(false);
-        // play SFX
-        AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
+        if (playSfx)
+        {
+            AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
+        }
         // turn off all light components
         SetAllLights(false);
         // Stop special flicker timer
