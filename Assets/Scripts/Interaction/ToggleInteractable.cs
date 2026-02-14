@@ -7,6 +7,7 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
         Light,
         AudioSource,
         GameObjectActive,
+        Animator
         // add more as needed that fit the 'toggle' structure
     }
 
@@ -24,6 +25,7 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
     [SerializeField] private Light targetLight;
     [SerializeField] private AudioSource targetAudio;
     [SerializeField] private GameObject targetObject;
+    [SerializeField] private Animator targetAnimator;
     // add more as we need
 
 
@@ -41,6 +43,7 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
             ToggleMode.Light => targetLight != null,
             ToggleMode.AudioSource => targetAudio != null,
             ToggleMode.GameObjectActive => targetObject != null,
+            ToggleMode.Animator => targetAnimator != null,
             // add more as we need
             _ => false
         };
@@ -74,6 +77,11 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
             targetObject = gameObject;
         }
 
+        if (targetAnimator == null)
+        {
+            targetAnimator = GetComponentInChildren<Animator>();
+        }
+
         // add more as we need
     }
 
@@ -84,6 +92,7 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
             ToggleMode.Light => targetLight != null && targetLight.enabled,
             ToggleMode.AudioSource => targetAudio != null && targetAudio.enabled && targetAudio.isPlaying,
             ToggleMode.GameObjectActive => targetObject != null && targetObject.activeSelf,
+            ToggleMode.Animator => targetAnimator != null && targetAnimator.enabled,
             // add more as we need
             _ => false
         };
@@ -117,8 +126,13 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
                 targetObject.SetActive(on);
                 break;
 
+            // for animators
+            case ToggleMode.Animator:
+                targetAnimator.enabled = on;
+                break;
 
-            // add more as we need
+
+                // add more as we need
 
         }
     }
