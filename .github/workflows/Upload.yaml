@@ -21,7 +21,7 @@ jobs:
       - name: Download Build Artifact
         uses: dawidd6/action-download-artifact@v3
         with:
-          workflow: Build.yaml
+          workflow: Build.yml
           workflow_search: true
           name: Build-StandaloneWindows64
           path: build/StandaloneWindows64
