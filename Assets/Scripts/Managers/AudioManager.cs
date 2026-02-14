@@ -35,7 +35,6 @@ namespace Managers
         private EventInstance _nightmareAmbienceInstance;
         private EventInstance _mainMenuMusicInstance;
         private EventInstance _heartbeatInstance;
-        private bool _heartbeatIsPlaying;
         private EventInstance _terrorLoopInstance;
         private bool _terrorLoopIsPlaying;
         private Transform _terrorSourceTransform;
@@ -68,10 +67,10 @@ namespace Managers
         [SerializeField] private EventReference terrorLoopEvent;
         [SerializeField] private EventReference nightmareAmbLoopEvent;
         [SerializeField] private EventReference heartbeatLoopEvent;
-        [SerializeField] private string heartbeatIntensityParameter = "Intensity";
-        [SerializeField] private bool heartbeatIntensityParameterIsGlobal = false;
-        [SerializeField, Range(0f, 1f)] private float heartbeatStartThreshold = 0.55f;
-        [SerializeField, Range(0f, 1f)] private float heartbeatStopThreshold = 0.45f;
+        [SerializeField] private string heartbeatTerrorParameter = "Terror";
+        [SerializeField] private string heartbeatMentalHealthParameter = "MentalHealth";
+        [SerializeField] private bool heartbeatTerrorParameterIsGlobal = true;
+        [SerializeField] private bool heartbeatMentalHealthParameterIsGlobal = true;
         [SerializeField] private bool logTerrorParameterValue = false;
 
         [Header("Settings Menu Audio")]
@@ -237,10 +236,6 @@ namespace Managers
             {
                 _sfxBus.setMute(isMuted);
             }
-            if (isMuted)
-            {
-                StopAndReleaseHeartbeat();
-            }
         }
 
         public void SetMusicMuted(bool isMuted)
@@ -332,10 +327,9 @@ namespace Managers
         private void RefreshMentalAudio()
         {
             float terrorSeverityForAudio = IsNightmareWorldLocation() ? _terrorSeverity : 0f;
-            float combinedSeverity = Mathf.Clamp01(Mathf.Max(_mentalStateSeverity, terrorSeverityForAudio));
             ApplyTerrorLoop(terrorSeverityForAudio);
             ApplyNightmareAmbience();
-            ApplyHeartbeat(combinedSeverity);
+            ApplyHeartbeat();
         }
 
         private void PlayMainMenuMusicIfNeeded()
@@ -436,37 +430,33 @@ namespace Managers
             }
         }
 
-        private void ApplyHeartbeat(float combinedSeverity)
+        private void ApplyHeartbeat()
         {
+            if (!IsNightmareWorldLocation())
+            {
+                StopAndReleaseHeartbeat();
+                return;
+            }
+
             if (heartbeatLoopEvent.IsNull)
             {
                 return;
             }
 
-            if (_heartbeatIsPlaying)
-            {
-                if (combinedSeverity <= heartbeatStopThreshold || muteSFX)
-                {
-                    StopAndReleaseHeartbeat();
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(heartbeatIntensityParameter) && _heartbeatInstance.isValid())
-                {
-                    SetFmodParameter(_heartbeatInstance, heartbeatIntensityParameter, combinedSeverity, heartbeatIntensityParameterIsGlobal);
-                }
-                return;
-            }
-
-            if (combinedSeverity >= heartbeatStartThreshold && !muteSFX)
+            if (!_heartbeatInstance.isValid())
             {
                 _heartbeatInstance = CreateEventInstance(heartbeatLoopEvent);
-                if (!string.IsNullOrWhiteSpace(heartbeatIntensityParameter))
-                {
-                    SetFmodParameter(_heartbeatInstance, heartbeatIntensityParameter, combinedSeverity, heartbeatIntensityParameterIsGlobal);
-                }
                 _heartbeatInstance.start();
-                _heartbeatIsPlaying = true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(heartbeatTerrorParameter))
+            {
+                SetFmodParameter(_heartbeatInstance, heartbeatTerrorParameter, _terrorSeverity, heartbeatTerrorParameterIsGlobal);
+            }
+
+            if (!string.IsNullOrWhiteSpace(heartbeatMentalHealthParameter))
+            {
+                SetFmodParameter(_heartbeatInstance, heartbeatMentalHealthParameter, _mentalStateSeverity, heartbeatMentalHealthParameterIsGlobal);
             }
         }
 
@@ -573,7 +563,6 @@ namespace Managers
                 _heartbeatInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 _heartbeatInstance.release();
             }
-            _heartbeatIsPlaying = false;
         }
 
         private void StopAndReleaseTerrorLoop()
