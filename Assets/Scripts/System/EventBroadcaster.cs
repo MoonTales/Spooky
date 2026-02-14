@@ -104,9 +104,9 @@ namespace System
         public static event OnPlayerHealthStateChangedHandler OnPlayerHealthStateChanged;
         public static void Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState newMentalState) { OnPlayerHealthStateChanged?.Invoke(newMentalState); }
 
-        public delegate void OnTerrorIntensityChangedHandler(float normalizedIntensity);
+        public delegate void OnTerrorIntensityChangedHandler(float normalizedIntensity, Transform terrorSourceTransform);
         public static event OnTerrorIntensityChangedHandler OnTerrorIntensityChanged;
-        public static void Broadcast_OnTerrorIntensityChanged(float normalizedIntensity) { OnTerrorIntensityChanged?.Invoke(normalizedIntensity); }
+        public static void Broadcast_OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform) { OnTerrorIntensityChanged?.Invoke(normalizedIntensity, terrorSourceTransform); }
         
         
         public delegate void OnFlashlightToggledHandler(bool isOn);

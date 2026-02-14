@@ -77,15 +77,24 @@ MonoBehaviour:
       Data4: 369320740
     Path: event:/sfx/player/movement/footstep
   playerMovementBusPath: bus:/SFX/Player/Movement
-  ambienceDistortionSnapshot:
+  terrorDistortionParameter: Terror
+  mentalHealthDistortionParameter: MentalHealth
+  terrorParameterIsGlobal: 1
+  mentalHealthParameterIsGlobal: 1
+  terrorLoopEvent:
+    Guid:
+      Data1: 2097291503
+      Data2: 1085846812
+      Data3: 555803024
+      Data4: 1634982556
+    Path: event:/amb/bg/nightmare/mental-terror-loop
+  nightmareAmbLoopEvent:
     Guid:
       Data1: -198520460
       Data2: 1165664335
       Data3: 580708496
       Data4: -533915791
-    Path: event:/amb/bg/mental-amb
-  terrorDistortionParameter: Terror
-  mentalHealthDistortionParameter: MentalHealth
+    Path: event:/amb/bg/nightmare/mental-amb-loop
   heartbeatLoopEvent:
     Guid:
       Data1: 0
@@ -94,10 +103,20 @@ MonoBehaviour:
       Data4: 0
     Path: 
   heartbeatIntensityParameter: Intensity
+  heartbeatIntensityParameterIsGlobal: 0
   heartbeatStartThreshold: 0.55
   heartbeatStopThreshold: 0.45
+  logTerrorParameterValue: 0
+  masterBusPath: bus:/
+  sfxBusPath: bus:/SFX
+  musicBusPath: bus:/Music
+  ambienceBusPath: bus:/Ambience
+  pauseSnapshotEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   muteSFX: 0
   muteMusic: 0
-  Musicsource: {fileID: 0}
-  sfxValue: 1
-  musicValue: 1
