@@ -33,6 +33,7 @@ namespace Managers
         private float _terrorSeverity;
 
         private EventInstance _nightmareAmbienceInstance;
+        private EventInstance _mainMenuMusicInstance;
         private EventInstance _heartbeatInstance;
         private bool _heartbeatIsPlaying;
         private EventInstance _terrorLoopInstance;
@@ -74,6 +75,7 @@ namespace Managers
         [SerializeField] private bool logTerrorParameterValue = false;
 
         [Header("Settings Menu Audio")]
+        [SerializeField] private EventReference mainMenuMusicEvent;
         [SerializeField] private string masterBusPath = "bus:/";
         [SerializeField] private string sfxBusPath = "bus:/SFX";
         [SerializeField] private string musicBusPath = "bus:/Music";
@@ -114,6 +116,7 @@ namespace Managers
             StopAndReleaseHeartbeat();
             StopAndReleaseTerrorLoop();
             StopAndReleaseNightmareAmbience();
+            StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
         }
@@ -152,6 +155,20 @@ namespace Managers
                 _terrorSourceTransform = null;
             }
             RefreshMentalAudio();
+        }
+
+        protected override void OnGameStateChanged(Types.GameState newState)
+        {
+            base.OnGameStateChanged(newState);
+
+            if (newState == Types.GameState.MainMenu)
+            {
+                PlayMainMenuMusicIfNeeded();
+            }
+            else
+            {
+                StopMainMenuMusic(true);
+            }
         }
 
         // Public API: gameplay-triggered SFX
@@ -319,6 +336,40 @@ namespace Managers
             ApplyTerrorLoop(terrorSeverityForAudio);
             ApplyNightmareAmbience();
             ApplyHeartbeat(combinedSeverity);
+        }
+
+        private void PlayMainMenuMusicIfNeeded()
+        {
+            if (mainMenuMusicEvent.IsNull || muteMusic)
+            {
+                return;
+            }
+
+            if (_mainMenuMusicInstance.isValid())
+            {
+                FMOD.RESULT stateResult = _mainMenuMusicInstance.getPlaybackState(out PLAYBACK_STATE playbackState);
+                if (stateResult == FMOD.RESULT.OK
+                    && (playbackState == PLAYBACK_STATE.PLAYING || playbackState == PLAYBACK_STATE.STARTING))
+                {
+                    return;
+                }
+
+                _mainMenuMusicInstance.release();
+            }
+
+            _mainMenuMusicInstance = CreateEventInstance(mainMenuMusicEvent);
+            _mainMenuMusicInstance.start();
+        }
+
+        private void StopMainMenuMusic(bool allowFadeout)
+        {
+            if (!_mainMenuMusicInstance.isValid())
+            {
+                return;
+            }
+
+            _mainMenuMusicInstance.stop(allowFadeout ? FMOD.Studio.STOP_MODE.ALLOWFADEOUT : FMOD.Studio.STOP_MODE.IMMEDIATE);
+            _mainMenuMusicInstance.release();
         }
 
         private void ApplyTerrorLoop(float terrorSeverity)
