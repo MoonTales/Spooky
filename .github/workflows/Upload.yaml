@@ -38,10 +38,11 @@ jobs:
       # Install Butler
       - name: Install Butler
         run: |
-          curl -L https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default -o butler.zip
+          curl -L https://github.com/itchio/butler/releases/latest/download/butler-linux-amd64.zip -o butler.zip
           unzip butler.zip
           chmod +x butler
           sudo mv butler /usr/local/bin/butler
+
 
       # Deploy to Itch.io
       - name: Deploy to itch.io
