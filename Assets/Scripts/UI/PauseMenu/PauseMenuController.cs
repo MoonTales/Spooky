@@ -48,16 +48,19 @@ namespace UI.PauseMenu
 
         private void OnPlayerButtonClicked()
         {
+            PlayUiButtonClickSfx();
             Play();
         }
         private void OnSettingsButtonClicked()
         {
+            PlayUiButtonClickSfx();
             // hide these current settings
             PauseMenuCanvas.SetActive(false);
             SettingsController.Instance.OpenPauseSettings();
         }
         private void OnMainMenuButtonClicked()
         {
+            PlayUiButtonClickSfx();
             // since we are returning to the main menu, we need to adjust time scale back to normal
             // this should probably becoem a function since we need to reuse it
             Time.timeScale = 1f;
@@ -122,6 +125,15 @@ namespace UI.PauseMenu
         public void ShowMenu(bool show)
         {
             if (PauseMenuCanvas != null){PauseMenuCanvas.SetActive(show);}
+        }
+
+        private static void PlayUiButtonClickSfx()
+        {
+            AudioManager audioManager = FindAnyObjectByType<AudioManager>();
+            if (audioManager != null)
+            {
+                audioManager.PlaySfx(AudioManager.SfxId.Flashlight);
+            }
         }
     
     }

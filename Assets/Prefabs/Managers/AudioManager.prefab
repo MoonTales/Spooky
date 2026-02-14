@@ -52,7 +52,7 @@ MonoBehaviour:
         Data2: 1274669532
         Data3: 316999592
         Data4: 2026019272
-      Path: event:/sfx/player/flashlight
+      Path: event:/sfx/switches/flashlight
   - id: 0
     eventRef:
       Guid:
@@ -87,14 +87,14 @@ MonoBehaviour:
       Data2: 1085846812
       Data3: 555803024
       Data4: 1634982556
-    Path: event:/amb/bg/nightmare/mental-terror-loop
+    Path: event:/amb/nightmare/mental-terror-loop
   nightmareAmbLoopEvent:
     Guid:
       Data1: -198520460
       Data2: 1165664335
       Data3: 580708496
       Data4: -533915791
-    Path: event:/amb/bg/nightmare/mental-amb-loop
+    Path: event:/amb/nightmare/mental-amb-loop
   heartbeatLoopEvent:
     Guid:
       Data1: 0
@@ -107,6 +107,13 @@ MonoBehaviour:
   heartbeatStartThreshold: 0.55
   heartbeatStopThreshold: 0.45
   logTerrorParameterValue: 0
+  mainMenuMusicEvent:
+    Guid:
+      Data1: -578515550
+      Data2: 1080999304
+      Data3: 134868098
+      Data4: 563664113
+    Path: event:/music/main-menu
   masterBusPath: bus:/
   sfxBusPath: bus:/SFX
   musicBusPath: bus:/Music

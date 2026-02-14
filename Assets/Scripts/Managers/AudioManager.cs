@@ -33,6 +33,7 @@ namespace Managers
         private float _terrorSeverity;
 
         private EventInstance _nightmareAmbienceInstance;
+        private EventInstance _mainMenuMusicInstance;
         private EventInstance _heartbeatInstance;
         private bool _heartbeatIsPlaying;
         private EventInstance _terrorLoopInstance;
@@ -74,6 +75,7 @@ namespace Managers
         [SerializeField] private bool logTerrorParameterValue = false;
 
         [Header("Settings Menu Audio")]
+        [SerializeField] private EventReference mainMenuMusicEvent;
         [SerializeField] private string masterBusPath = "bus:/";
         [SerializeField] private string sfxBusPath = "bus:/SFX";
         [SerializeField] private string musicBusPath = "bus:/Music";
@@ -96,6 +98,8 @@ namespace Managers
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerMentalStateChanged);
             TrackSubscription(() => EventBroadcaster.OnTerrorIntensityChanged += OnTerrorIntensityChanged,
                 () => EventBroadcaster.OnTerrorIntensityChanged -= OnTerrorIntensityChanged);
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
         }
 
         protected override void Awake()
@@ -112,6 +116,7 @@ namespace Managers
             StopAndReleaseHeartbeat();
             StopAndReleaseTerrorLoop();
             StopAndReleaseNightmareAmbience();
+            StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
         }
@@ -125,6 +130,14 @@ namespace Managers
 
         private void OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform)
         {
+            if (!IsNightmareWorldLocation())
+            {
+                _terrorSeverity = 0f;
+                _terrorSourceTransform = null;
+                RefreshMentalAudio();
+                return;
+            }
+
             _terrorSeverity = Mathf.Clamp01(normalizedIntensity);
             _terrorSourceTransform = terrorSourceTransform;
             if (logTerrorParameterValue)
@@ -132,6 +145,30 @@ namespace Managers
                 Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
             }
             RefreshMentalAudio();
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation newLocation)
+        {
+            if (newLocation != Types.WorldLocation.Nightmare)
+            {
+                _terrorSeverity = 0f;
+                _terrorSourceTransform = null;
+            }
+            RefreshMentalAudio();
+        }
+
+        protected override void OnGameStateChanged(Types.GameState newState)
+        {
+            base.OnGameStateChanged(newState);
+
+            if (newState == Types.GameState.MainMenu)
+            {
+                PlayMainMenuMusicIfNeeded();
+            }
+            else
+            {
+                StopMainMenuMusic(true);
+            }
         }
 
         // Public API: gameplay-triggered SFX
@@ -294,14 +331,55 @@ namespace Managers
         // Mental audio stack
         private void RefreshMentalAudio()
         {
-            float combinedSeverity = Mathf.Clamp01(Mathf.Max(_mentalStateSeverity, _terrorSeverity));
-            ApplyTerrorLoop(_terrorSeverity);
+            float terrorSeverityForAudio = IsNightmareWorldLocation() ? _terrorSeverity : 0f;
+            float combinedSeverity = Mathf.Clamp01(Mathf.Max(_mentalStateSeverity, terrorSeverityForAudio));
+            ApplyTerrorLoop(terrorSeverityForAudio);
             ApplyNightmareAmbience();
             ApplyHeartbeat(combinedSeverity);
         }
 
+        private void PlayMainMenuMusicIfNeeded()
+        {
+            if (mainMenuMusicEvent.IsNull || muteMusic)
+            {
+                return;
+            }
+
+            if (_mainMenuMusicInstance.isValid())
+            {
+                FMOD.RESULT stateResult = _mainMenuMusicInstance.getPlaybackState(out PLAYBACK_STATE playbackState);
+                if (stateResult == FMOD.RESULT.OK
+                    && (playbackState == PLAYBACK_STATE.PLAYING || playbackState == PLAYBACK_STATE.STARTING))
+                {
+                    return;
+                }
+
+                _mainMenuMusicInstance.release();
+            }
+
+            _mainMenuMusicInstance = CreateEventInstance(mainMenuMusicEvent);
+            _mainMenuMusicInstance.start();
+        }
+
+        private void StopMainMenuMusic(bool allowFadeout)
+        {
+            if (!_mainMenuMusicInstance.isValid())
+            {
+                return;
+            }
+
+            _mainMenuMusicInstance.stop(allowFadeout ? FMOD.Studio.STOP_MODE.ALLOWFADEOUT : FMOD.Studio.STOP_MODE.IMMEDIATE);
+            _mainMenuMusicInstance.release();
+        }
+
         private void ApplyTerrorLoop(float terrorSeverity)
         {
+            if (!IsNightmareWorldLocation())
+            {
+                StopAndReleaseTerrorLoop();
+                return;
+            }
+
             if (terrorLoopEvent.IsNull)
             {
                 return;
@@ -330,6 +408,12 @@ namespace Managers
 
         private void ApplyNightmareAmbience()
         {
+            if (!IsNightmareWorldLocation())
+            {
+                StopAndReleaseNightmareAmbience();
+                return;
+            }
+
             if (nightmareAmbLoopEvent.IsNull)
             {
                 return;
@@ -428,6 +512,12 @@ namespace Managers
                 default:
                     return 0f;
             }
+        }
+
+        private static bool IsNightmareWorldLocation()
+        {
+            return GameStateManager.Instance != null
+                && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare;
         }
 
         private void PlayEvent(EventReference eventReference, Transform fromTransform)
