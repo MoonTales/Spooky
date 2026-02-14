@@ -14116,6 +14116,7 @@ MonoBehaviour:
   targetLight: {fileID: 0}
   targetAudio: {fileID: 0}
   targetObject: {fileID: 0}
+  targetAnimator: {fileID: 0}
 --- !u!114 &518006397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14138,6 +14139,7 @@ MonoBehaviour:
   targetLight: {fileID: 0}
   targetAudio: {fileID: 0}
   targetObject: {fileID: 0}
+  targetAnimator: {fileID: 0}
 --- !u!1 &525132102
 GameObject:
   m_ObjectHideFlags: 0
@@ -45241,6 +45243,7 @@ MonoBehaviour:
   _maxRetries: 10
   seed: -1
   priority: 0
+  priorityDrawingNumber: -1
   anchorIdentifier: 0
   _spawnDataList:
   - localPosition: {x: 1.8389308, y: -3.2875502, z: 3.668987}
@@ -45335,6 +45338,7 @@ MonoBehaviour:
     size: 1
   _randomizeOnSpawn: 1
   _parentObjectForSpawns: {fileID: 0}
+  _bHasBeenSpawnedAtLeastOnce: 0
 --- !u!4 &1689798347
 Transform:
   m_ObjectHideFlags: 0
@@ -46830,6 +46834,7 @@ MonoBehaviour:
   _maxRetries: 10
   seed: -1
   priority: 0
+  priorityDrawingNumber: -1
   anchorIdentifier: 1
   _spawnDataList:
   - localPosition: {x: 0.5357976, y: -2.085, z: 0.728004}
@@ -46840,6 +46845,7 @@ MonoBehaviour:
     size: 1
   _randomizeOnSpawn: 1
   _parentObjectForSpawns: {fileID: 0}
+  _bHasBeenSpawnedAtLeastOnce: 0
 --- !u!4 &1763093072
 Transform:
   m_ObjectHideFlags: 0
@@ -53992,7 +53998,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &2060089290
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -57682,6 +57688,7 @@ MonoBehaviour:
   targetLight: {fileID: 0}
   targetAudio: {fileID: 0}
   targetObject: {fileID: 2461893102777535845}
+  targetAnimator: {fileID: 0}
 --- !u!65 &919132149595273695
 BoxCollider:
   m_ObjectHideFlags: 0
