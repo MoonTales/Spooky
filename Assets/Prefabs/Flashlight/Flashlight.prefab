@@ -47,10 +47,41 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flickerTag: Enemy
-  flickerDuration: 0.5
-  flickerSpeed: 0.1
   maxFlickerDistance: 10
-  playerCamera: {fileID: 0}
+  highBatteryFlicker:
+    specialFlickerChance: 0.3
+    minOnTimeToTriggerSpecialFlicker: 10
+    maxOnTimeToTriggerSpecialFlicker: 40
+    flickerDuration: 0.5
+    flickerSpeed: 0.1
+  mediumBatteryFlicker:
+    specialFlickerChance: 0.5
+    minOnTimeToTriggerSpecialFlicker: 10
+    maxOnTimeToTriggerSpecialFlicker: 30
+    flickerDuration: 0.4
+    flickerSpeed: 0.08
+  lowBatteryFlicker:
+    specialFlickerChance: 0.7
+    minOnTimeToTriggerSpecialFlicker: 5
+    maxOnTimeToTriggerSpecialFlicker: 10
+    flickerDuration: 0.3
+    flickerSpeed: 0.05
+  criticalBatteryFlicker:
+    specialFlickerChance: 0.9
+    minOnTimeToTriggerSpecialFlicker: 1
+    maxOnTimeToTriggerSpecialFlicker: 5
+    flickerDuration: 0.2
+    flickerSpeed: 0.03
+  maxBatteryLife: 100
+  minBatterylife: 20
+  batteryDrainRate: 10
+  batteryRechargeRate: 0.5
+  highBatteryThreshold: 75
+  mediumBatteryThreshold: 50
+  lowBatteryThreshold: 20
+  criticalBatteryThreshold: 1
+  panDrag: 8
+  tiltDrag: 8
 --- !u!1 &2835380890093545611
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,8 +279,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 0.9137255, g: 0.9137255, b: 0.9137255, a: 1}
-  m_Intensity: 2000
+  m_Color: {r: 0.76, g: 0.76, b: 0.76, a: 1}
+  m_Intensity: 150
   m_Range: 3000
   m_SpotAngle: 50
   m_InnerSpotAngle: 24.9
@@ -371,7 +402,7 @@ Light:
   serializedVersion: 11
   m_Type: 0
   m_Color: {r: 0.9137255, g: 0.9137255, b: 0.9137255, a: 1}
-  m_Intensity: 1500
+  m_Intensity: 30
   m_Range: 1800
   m_SpotAngle: 30
   m_InnerSpotAngle: 24.9

@@ -113,6 +113,9 @@ namespace Managers
                     messageOverride: $"All drawings are in the correct position! YOU WIN!!"
                 );
                 data.Send();
+                
+                // Now we will play credits
+                SceneSwapper.Instance.SwapScene("Credits");
             }
             
             return count;
