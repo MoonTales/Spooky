@@ -62,9 +62,11 @@ namespace UI.PauseMenu
                 return;
             }
 
+            AutoBindAudioSlidersIfNeeded();
+
             if (masterSlider == null || musicSlider == null || sfxSlider == null)
             {
-                Debug.LogWarning("SettingsController: Assign Master/Music/SFX sliders in inspector.");
+                Debug.LogWarning("SettingsController: Could not resolve Master/Music/SFX sliders. Assign them in inspector.");
                 return;
             }
 
@@ -75,6 +77,50 @@ namespace UI.PauseMenu
             SetAudioSliderValues(masterVolume, musicVolume, sfxVolume);
             BindAudioSliderCallbacks();
             _audioSlidersInitialized = true;
+        }
+
+        private void AutoBindAudioSlidersIfNeeded()
+        {
+            if (masterSlider != null && musicSlider != null && sfxSlider != null)
+            {
+                return;
+            }
+
+            if (SliderSettings == null)
+            {
+                return;
+            }
+
+            Slider[] sliders = SliderSettings.GetComponentsInChildren<Slider>(true);
+            foreach (Slider slider in sliders)
+            {
+                string nameLower = slider.name.ToLowerInvariant();
+                if (masterSlider == null && nameLower.Contains("master"))
+                {
+                    masterSlider = slider;
+                    continue;
+                }
+
+                if (sfxSlider == null && nameLower.Contains("sfx"))
+                {
+                    sfxSlider = slider;
+                    continue;
+                }
+
+                if (musicSlider == null && nameLower.Contains("music"))
+                {
+                    musicSlider = slider;
+                }
+            }
+
+            // Fallback: use the first three sliders in deterministic order.
+            //           this is fragile! Sliders should be 
+            if (sliders.Length >= 3)
+            {
+                if (masterSlider == null) { masterSlider = sliders[0]; }
+                if (musicSlider == null) { musicSlider = sliders[1]; }
+                if (sfxSlider == null) { sfxSlider = sliders[2]; }
+            }
         }
 
         private static float LoadSavedVolume(string key)
