@@ -39,7 +39,7 @@ namespace UI.PauseMenu
                 if (button.name == "Back")
                 {
                     _mainMenuBackButton = button;
-                    _mainMenuBackButton.onClick.AddListener(CloseSettings);
+                    _mainMenuBackButton.onClick.AddListener(OnMainMenuBackButtonClicked);
                 }
             }
             // loop through all children of the pause menu settings, and find the back button, and add a listener to it
@@ -49,7 +49,7 @@ namespace UI.PauseMenu
                 if (button.name == "Back")
                 {
                     _pauseMenuBackButton = button;
-                    _pauseMenuBackButton.onClick.AddListener(ReturnToPauseMenu);
+                    _pauseMenuBackButton.onClick.AddListener(OnPauseMenuBackButtonClicked);
                 }
             }
         
@@ -252,6 +252,27 @@ namespace UI.PauseMenu
         {
             CloseSettings();
             PauseMenuController.Instance.ShowMenu(true);
+        }
+
+        private void OnMainMenuBackButtonClicked()
+        {
+            PlayUiButtonClickSfx();
+            CloseSettings();
+        }
+
+        private void OnPauseMenuBackButtonClicked()
+        {
+            PlayUiButtonClickSfx();
+            ReturnToPauseMenu();
+        }
+
+        private static void PlayUiButtonClickSfx()
+        {
+            AudioManager audioManager = FindAnyObjectByType<AudioManager>();
+            if (audioManager != null)
+            {
+                audioManager.PlaySfx(AudioManager.SfxId.Flashlight);
+            }
         }
     }
 }
