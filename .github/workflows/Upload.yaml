@@ -4,6 +4,12 @@ on:
   push:
     branches: [ Development ]
 
+
+permissions:
+  actions: read
+  contents: read
+
+
 jobs:
   deploy:
     name: Deploy to Itch.io
