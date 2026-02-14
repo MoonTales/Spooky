@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using FMODUnity;
 using FMOD.Studio;
-using Player;
 using Types = System.Types;
 
 
@@ -11,15 +10,14 @@ namespace Managers
 {
     public class AudioManager : Singleton<AudioManager>
     {
-        #region SFX
-        // IDs for unparameterized events
+        // IDs for unparameterized SFX event mappings.
         public enum SfxId
         {
             // Player
             Jump, Landing, Flashlight, CrouchIn, CrouchOut, PeekIn, PeekOut, TippytoeIn, TippytoeOut,
         }
 
-        // Inspector-configured entry mapping a SfxId to an FMOD event.
+        // Inspector entry mapping SfxId -> FMOD event.
         [Serializable]
         public struct SfxEntry
         {
@@ -27,20 +25,22 @@ namespace Managers
             public EventReference eventRef;
         }
 
+        // Runtime state
         [SerializeField] private SfxEntry[] sfxEvents;      // Inspector-assigned map of SfxId -> FMOD EventReference.
         private Dictionary<SfxId, EventReference> _sfxMap;  // Runtime lookup built from sfxEvents for fast access.
         private Bus _playerMovementBus;
         private float _mentalStateSeverity;
         private float _terrorSeverity;
-        private bool _seededMentalStateFromStats;
 
-        private EventInstance _ambienceDistortionSnapshotInstance;
+        private EventInstance _nightmareAmbienceInstance;
         private EventInstance _heartbeatInstance;
         private bool _heartbeatIsPlaying;
+        private EventInstance _terrorLoopInstance;
+        private bool _terrorLoopIsPlaying;
+        private Transform _terrorSourceTransform;
         private EventInstance _pauseSnapshotInstance;
         private bool _pauseSnapshotActive;
 
-        #region Parameterized Sfx
         // Per-call parameter payload for FMOD events.
         public readonly struct SfxParam
         {
@@ -54,22 +54,24 @@ namespace Managers
             }
         }
 
-        // Parameterized Events
+        // Serialized FMOD event references and parameters.
         [Header("Player Sounds")]
         [SerializeField] private EventReference footstepPlayer;     // Parameterized footstep event with Surface label parameter.
         [SerializeField] private string playerMovementBusPath = "bus:/SFX/Player/Movement"; // Bus containing player movement events for quick stops.
 
         [Header("Mental Audio")]
-        [SerializeField] private EventReference ambienceDistortionSnapshot;
         [SerializeField] private string terrorDistortionParameter = "Terror";
-        [SerializeField] private bool terrorParameterIsGlobal = true;
         [SerializeField] private string mentalHealthDistortionParameter = "MentalHealth";
+        [SerializeField] private bool terrorParameterIsGlobal = true;
         [SerializeField] private bool mentalHealthParameterIsGlobal = true;
+        [SerializeField] private EventReference terrorLoopEvent;
+        [SerializeField] private EventReference nightmareAmbLoopEvent;
         [SerializeField] private EventReference heartbeatLoopEvent;
         [SerializeField] private string heartbeatIntensityParameter = "Intensity";
         [SerializeField] private bool heartbeatIntensityParameterIsGlobal = false;
         [SerializeField, Range(0f, 1f)] private float heartbeatStartThreshold = 0.55f;
         [SerializeField, Range(0f, 1f)] private float heartbeatStopThreshold = 0.45f;
+        [SerializeField] private bool logTerrorParameterValue = false;
 
         [Header("Settings Menu Audio")]
         [SerializeField] private string masterBusPath = "bus:/";
@@ -85,22 +87,8 @@ namespace Managers
         [Header("Mutes")]
         public bool muteSFX = false;
         public bool muteMusic = false;
-
-        [Header("Enemy Effects")]
-        [Header("General Sounds")]
-        [Header("UI Audio")]
-        [Header("Soundtracks")]
-        #endregion
-        #endregion
-        private AudioClip NullClip = null;
-
-        //variables for the soundtrack
-        public AudioSource Musicsource;
-        public float sfxValue = 1;
-        public float musicValue = 1;
-
-        private bool muted = false;
-
+        
+        // Lifecycle
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
@@ -117,60 +105,36 @@ namespace Managers
             BuildSfxMap();
             CachePlayerMovementBus();
             CacheSettingsBuses();
-
-            AudioSource mus = gameObject.AddComponent<AudioSource>();
-            Musicsource = mus;
-            mus.playOnAwake = false;
-            mus.spatialBlend = 0f;
-            mus.loop = true;
-            mus.volume = 0;
         }
 
         protected override void OnDestroy()
         {
             StopAndReleaseHeartbeat();
-            StopAndReleaseAmbienceSnapshot();
+            StopAndReleaseTerrorLoop();
+            StopAndReleaseNightmareAmbience();
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
         }
-
-        /// <summary>
-        /// Play a sound effect at a given volume multiplier.  
-        /// Volume can be higher than 1.0f to boost the clip.  
-        /// If a GameObject is provided, sound plays from its world position (3D).  
-        /// </summary>
-        /// 
-
-        private void Start()
-        {
-            sfxValue = 1;
-            musicValue = 1;
-            TrySeedMentalStateFromPlayerStats();
-        }
         
-        private void Update()
-        {
-            Musicsource.volume = musicValue;
-            UpdateMentalSeverityFromStats();
-            if (!_seededMentalStateFromStats)
-            {
-                TrySeedMentalStateFromPlayerStats();
-            }
-        }
-
+        // Event handlers
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
         {
             _mentalStateSeverity = GetMentalStateSeverity(newMentalState);
             RefreshMentalAudio();
         }
 
-        private void OnTerrorIntensityChanged(float normalizedIntensity)
+        private void OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform)
         {
             _terrorSeverity = Mathf.Clamp01(normalizedIntensity);
-            Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
+            _terrorSourceTransform = terrorSourceTransform;
+            if (logTerrorParameterValue)
+            {
+                Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
+            }
             RefreshMentalAudio();
         }
 
+        // Public API: gameplay-triggered SFX
         public void PlayFootstep(string surfaceLabel, Transform fromTransform = null)
         {
             if (muteSFX) return;
@@ -198,7 +162,6 @@ namespace Managers
             {
                 _sfxBus.setVolume(clamped);
             }
-            sfxValue = clamped;
             muteSFX = clamped <= 0.0001f;
         }
 
@@ -218,7 +181,6 @@ namespace Managers
             {
                 _musicBus.setVolume(clamped);
             }
-            musicValue = clamped;
             muteMusic = clamped <= 0.0001f;
         }
 
@@ -306,32 +268,6 @@ namespace Managers
             instance.start();
             instance.release();
         }
-
-        private void PlayEvent(EventReference eventReference, Transform fromTransform)
-        {
-            if (muteSFX) return;
-            if (eventReference.IsNull) return;
-
-            EventInstance instance = CreateEventInstance(eventReference, fromTransform);
-            instance.start();
-            instance.release();
-        }
-
-        private EventInstance CreateEventInstance(EventReference eventReference, Transform fromTransform)
-        {
-            // Use RuntimeManager to ensure correct FMOD instance tracking and virtualization.
-            EventInstance instance = RuntimeManager.CreateInstance(eventReference);
-
-            Vector3 position = fromTransform != null
-                ? fromTransform.position
-                : Camera.main != null
-                    ? Camera.main.transform.position
-                    : Vector3.zero;
-
-            instance.set3DAttributes(RuntimeUtils.To3DAttributes(position));
-            return instance;
-        }
-
         
         public void PlaySfx(SfxId sfxId, Transform fromTransform = null)
         {
@@ -349,122 +285,70 @@ namespace Managers
             }
         }
         
-        #region Player Sounds
-        #region Jumping and Landing
         public void PlayPlayerJumping(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
         {
             StopFootstepsImmediate();
             PlaySfx(SfxId.Jump, fromTransform);
         }
-        public void PlayPlayerLanding(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            PlaySfx(SfxId.Landing, fromTransform);
-        }
-        #endregion
-        #region Crouching Sounds
-        public void PlayPlayerCrouchIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            PlaySfx(SfxId.CrouchIn, fromTransform);
-        }
-        public void PlayPlayerCrouchOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            PlaySfx(SfxId.CrouchOut, fromTransform);
-        }
-        #endregion
-        #region Footstep Sounds
-        #endregion
-        #region Peaking
-        public void PlayPlayerPeakIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            PlaySfx(SfxId.PeekIn, fromTransform);
-        }
-        public void PlayPlayerPeakOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            PlaySfx(SfxId.PeekOut, fromTransform);
-        }
-        #endregion
-        #region Tippytoe
-        public void PlayPlayerTippytoeIn(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            PlaySfx(SfxId.TippytoeIn, fromTransform);
-        }
-        public void PlayPlayerTippytoeOut(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
-        {
-            PlaySfx(SfxId.TippytoeOut, fromTransform);
-        }
-        #endregion
-        #endregion
 
-        private void TrySeedMentalStateFromPlayerStats()
-        {
-            PlayerStats playerStats = FindAnyObjectByType<PlayerStats>();
-            if (playerStats == null)
-            {
-                return;
-            }
-
-            _mentalStateSeverity = GetMentalSeverityFromStats(playerStats);
-            _seededMentalStateFromStats = true;
-            RefreshMentalAudio();
-        }
-
-        private void UpdateMentalSeverityFromStats()
-        {
-            PlayerStats playerStats = FindAnyObjectByType<PlayerStats>();
-            if (playerStats == null)
-            {
-                return;
-            }
-
-            float nextSeverity = GetMentalSeverityFromStats(playerStats);
-            if (Mathf.Abs(nextSeverity - _mentalStateSeverity) > 0.001f)
-            {
-                _mentalStateSeverity = nextSeverity;
-                RefreshMentalAudio();
-            }
-        }
-
-        private float GetMentalSeverityFromStats(PlayerStats playerStats)
-        {
-            Types.FPlayerStats stats = playerStats.GetPlayerStats();
-            float max = stats.GetMaxMentalHealth();
-            if (max <= 0f)
-            {
-                return 1f;
-            }
-
-            float normalizedHealth = Mathf.Clamp01(stats.GetCurrentMentalHealth() / max);
-            return 1f - normalizedHealth;
-        }
-
+        // Mental audio stack
         private void RefreshMentalAudio()
         {
             float combinedSeverity = Mathf.Clamp01(Mathf.Max(_mentalStateSeverity, _terrorSeverity));
-            ApplyAmbienceDistortion(combinedSeverity);
+            ApplyTerrorLoop(_terrorSeverity);
+            ApplyNightmareAmbience();
             ApplyHeartbeat(combinedSeverity);
         }
 
-        private void ApplyAmbienceDistortion(float combinedSeverity)
+        private void ApplyTerrorLoop(float terrorSeverity)
         {
-            if (ambienceDistortionSnapshot.IsNull)
+            if (terrorLoopEvent.IsNull)
             {
                 return;
             }
 
-            if (!_ambienceDistortionSnapshotInstance.isValid())
+            bool shouldPlay = terrorSeverity > 0.0001f && _terrorSourceTransform != null;
+            if (!shouldPlay)
             {
-                _ambienceDistortionSnapshotInstance = RuntimeManager.CreateInstance(ambienceDistortionSnapshot);
-                _ambienceDistortionSnapshotInstance.start();
+                StopAndReleaseTerrorLoop();
+                return;
+            }
+
+            if (!_terrorLoopIsPlaying)
+            {
+                _terrorLoopInstance = CreateEventInstance(terrorLoopEvent, _terrorSourceTransform);
+                _terrorLoopInstance.start();
+                _terrorLoopIsPlaying = true;
+                return;
+            }
+
+            if (_terrorLoopInstance.isValid())
+            {
+                _terrorLoopInstance.set3DAttributes(RuntimeUtils.To3DAttributes(_terrorSourceTransform.position));
+            }
+        }
+
+        private void ApplyNightmareAmbience()
+        {
+            if (nightmareAmbLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            if (!_nightmareAmbienceInstance.isValid())
+            {
+                _nightmareAmbienceInstance = CreateEventInstance(nightmareAmbLoopEvent);
+                _nightmareAmbienceInstance.start();
             }
 
             if (!string.IsNullOrWhiteSpace(terrorDistortionParameter))
             {
-                SetFmodParameter(_ambienceDistortionSnapshotInstance, terrorDistortionParameter, _terrorSeverity, terrorParameterIsGlobal);
+                SetFmodParameter(_nightmareAmbienceInstance, terrorDistortionParameter, _terrorSeverity, terrorParameterIsGlobal);
             }
 
             if (!string.IsNullOrWhiteSpace(mentalHealthDistortionParameter))
             {
-                SetFmodParameter(_ambienceDistortionSnapshotInstance, mentalHealthDistortionParameter, _mentalStateSeverity, mentalHealthParameterIsGlobal);
+                SetFmodParameter(_nightmareAmbienceInstance, mentalHealthDistortionParameter, _mentalStateSeverity, mentalHealthParameterIsGlobal);
             }
         }
 
@@ -492,7 +376,7 @@ namespace Managers
 
             if (combinedSeverity >= heartbeatStartThreshold && !muteSFX)
             {
-                _heartbeatInstance = RuntimeManager.CreateInstance(heartbeatLoopEvent);
+                _heartbeatInstance = CreateEventInstance(heartbeatLoopEvent);
                 if (!string.IsNullOrWhiteSpace(heartbeatIntensityParameter))
                 {
                     SetFmodParameter(_heartbeatInstance, heartbeatIntensityParameter, combinedSeverity, heartbeatIntensityParameterIsGlobal);
@@ -502,6 +386,7 @@ namespace Managers
             }
         }
 
+        // FMOD helpers
         private void SetFmodParameter(EventInstance instance, string parameterName, float value, bool isGlobal)
         {
             if (string.IsNullOrWhiteSpace(parameterName))
@@ -545,6 +430,52 @@ namespace Managers
             }
         }
 
+        private void PlayEvent(EventReference eventReference, Transform fromTransform)
+        {
+            if (muteSFX) return;
+            if (eventReference.IsNull) return;
+
+            EventInstance instance = CreateEventInstance(eventReference, fromTransform);
+            instance.start();
+            instance.release();
+        }
+
+        private EventInstance CreateEventInstance(EventReference eventReference, Transform fromTransform = null)
+        {
+            // Use RuntimeManager to ensure correct FMOD instance tracking and virtualization.
+            EventInstance instance = RuntimeManager.CreateInstance(eventReference);
+
+            if (EventInstanceIs3D(instance))
+            {
+                Vector3 position = fromTransform != null
+                    ? fromTransform.position
+                    : Camera.main != null
+                        ? Camera.main.transform.position
+                        : Vector3.zero;
+
+                instance.set3DAttributes(RuntimeUtils.To3DAttributes(position));
+            }
+            return instance;
+        }
+
+        private static bool EventInstanceIs3D(EventInstance instance)
+        {
+            if (!instance.isValid())
+            {
+                return false;
+            }
+
+            FMOD.RESULT descriptionResult = instance.getDescription(out EventDescription description);
+            if (descriptionResult != FMOD.RESULT.OK)
+            {
+                return false;
+            }
+
+            FMOD.RESULT is3DResult = description.is3D(out bool is3D);
+            return is3DResult == FMOD.RESULT.OK && is3D;
+        }
+
+        // Cleanup and cache
         private void StopAndReleaseHeartbeat()
         {
             if (_heartbeatInstance.isValid())
@@ -555,12 +486,22 @@ namespace Managers
             _heartbeatIsPlaying = false;
         }
 
-        private void StopAndReleaseAmbienceSnapshot()
+        private void StopAndReleaseTerrorLoop()
         {
-            if (_ambienceDistortionSnapshotInstance.isValid())
+            if (_terrorLoopInstance.isValid())
             {
-                _ambienceDistortionSnapshotInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
-                _ambienceDistortionSnapshotInstance.release();
+                _terrorLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _terrorLoopInstance.release();
+            }
+            _terrorLoopIsPlaying = false;
+        }
+
+        private void StopAndReleaseNightmareAmbience()
+        {
+            if (_nightmareAmbienceInstance.isValid())
+            {
+                _nightmareAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _nightmareAmbienceInstance.release();
             }
         }
 
@@ -625,7 +566,5 @@ namespace Managers
                 _ambienceBus = RuntimeManager.GetBus(ambienceBusPath);
             }
         }
-
-        
     }
 }
