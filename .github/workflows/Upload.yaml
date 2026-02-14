@@ -15,11 +15,12 @@ jobs:
       - name: Download Build Artifact
         uses: dawidd6/action-download-artifact@v3
         with:
-          workflow: Build.yaml 
+          workflow: Build project 
           name: Build-StandaloneWindows64
           path: build/StandaloneWindows64
           search_artifacts: true
           workflow_conclusion: success
+          check_artifacts: true
 
       - name: Zip Build
         run: |
