@@ -59,7 +59,7 @@ namespace System
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
             }
 
-            if (scene.name.ToLower() == "tutorialnightmare")
+            if (scene.name.ToLower() == "tutorial")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
