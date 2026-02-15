@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    [DisallowMultipleComponent]
-    [RequireComponent(typeof(Button))]
+    [DisallowMultipleComponent]         // only one UI SFX component per object
+    [RequireComponent(typeof(Button))]  // ensure object actually has a button
     public class UIButtonSfx : MonoBehaviour, IPointerEnterHandler
     {
         [SerializeField] private bool playHover = true;

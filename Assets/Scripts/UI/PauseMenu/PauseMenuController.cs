@@ -28,7 +28,7 @@ namespace UI.PauseMenu
             Button[] allButtons = GetComponentsInChildren<Button>(true);
             foreach (Button button in allButtons)
             {
-                UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
+                UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
 
                 if (button.name == "Continue")
                 {
