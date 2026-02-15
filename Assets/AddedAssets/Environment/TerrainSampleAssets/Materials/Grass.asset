@@ -28,6 +28,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _ALPHATEST_ON
+  - _RECEIVE_SHADOWS_OFF
   m_InvalidKeywords:
   - _DISABLE_DECALS
   - _DISABLE_SSR
@@ -47,6 +48,7 @@ Material:
   - TransparentBackface
   - RayTracingPrepass
   - ForwardEmissiveForDeferred
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -103,9 +105,9 @@ Material:
     m_Floats:
     - AO_Scale: 0.5
     - Alpha_Clip_Threshold: 0.5
-    - Animation_Cutoff: 20
-    - Distance_Fade_End: 80
-    - Distance_Fade_Start: 40
+    - Animation_Cutoff: 5
+    - Distance_Fade_End: 20
+    - Distance_Fade_Start: 10
     - Dither_Scale: 1.5
     - Enable_Blend_Terrain_Color: 0
     - Normal_Scale: 2
@@ -121,7 +123,7 @@ Material:
     - Wind_Blast: 0.05
     - Wind_Intensity: 0.1
     - Wind_Ripples: 0.05
-    - Wind_Speed: 5
+    - Wind_Speed: 1
     - Wind_Turbulence: 0
     - Wind_Wavelength: 10
     - Wind_Yaw: 180
@@ -146,7 +148,7 @@ Material:
     - _Blend: 0
     - _BlendMode: 0
     - _BlendModePreserveSpecular: 0
-    - _CastShadows: 1
+    - _CastShadows: 0
     - _ConservativeDepthOffsetEnable: 0
     - _Cull: 0
     - _CullMode: 0
@@ -166,7 +168,7 @@ Material:
     - _QueueControl: 1
     - _QueueOffset: 0
     - _RayTracing: 0
-    - _ReceiveShadows: 1
+    - _ReceiveShadows: 0
     - _ReceivesSSR: 0
     - _ReceivesSSRTransparent: 0
     - _RefractionModel: 0
