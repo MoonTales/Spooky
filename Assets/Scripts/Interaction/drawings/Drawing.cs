@@ -100,7 +100,7 @@ namespace Interaction.drawings
             }
         }
 
-        public void Interact(Interactor interactor)
+        public virtual void Interact(Interactor interactor)
         {
             // If player is holding a drawing and this slot has a drawing, swap them
             if (_currentlyHeldDrawing != null)
