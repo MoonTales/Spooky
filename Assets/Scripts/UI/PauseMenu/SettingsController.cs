@@ -36,6 +36,8 @@ namespace UI.PauseMenu
             Button[] mainMenuButtons = MainMenuSettings.GetComponentsInChildren<Button>();
             foreach (Button button in mainMenuButtons)
             {
+                UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
+
                 if (button.name == "Back")
                 {
                     _mainMenuBackButton = button;
@@ -46,6 +48,8 @@ namespace UI.PauseMenu
             Button[] pauseMenuButtons = PauseSettings.GetComponentsInChildren<Button>();
             foreach (Button button in pauseMenuButtons)
             {
+                UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
+
                 if (button.name == "Back")
                 {
                     _pauseMenuBackButton = button;
@@ -256,23 +260,13 @@ namespace UI.PauseMenu
 
         private void OnMainMenuBackButtonClicked()
         {
-            PlayUiButtonClickSfx();
             CloseSettings();
         }
 
         private void OnPauseMenuBackButtonClicked()
         {
-            PlayUiButtonClickSfx();
             ReturnToPauseMenu();
         }
 
-        private static void PlayUiButtonClickSfx()
-        {
-            AudioManager audioManager = FindAnyObjectByType<AudioManager>();
-            if (audioManager != null)
-            {
-                audioManager.PlaySfx(AudioManager.SfxId.Flashlight);
-            }
-        }
     }
 }
