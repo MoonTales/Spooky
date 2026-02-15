@@ -54,6 +54,9 @@ namespace Managers
             }
         }
 
+        [Header("Debug")]
+        [SerializeField] private bool debugAudioLogs = false;
+
         // Serialized FMOD event references and parameters.
         [Header("Player Sounds")]
         [SerializeField] private EventReference footstepPlayer;     // Parameterized footstep event with Surface label parameter.
@@ -80,8 +83,7 @@ namespace Managers
         [SerializeField] private string musicBusPath = "bus:/Music";
         [SerializeField] private string ambienceBusPath = "bus:/Ambience";
         [SerializeField] private EventReference pauseSnapshotEvent;
-        [Header("Debug")]
-        [SerializeField] private bool debugAudioLogs = false;
+
         private Bus _masterBus;
         private Bus _sfxBus;
         private Bus _musicBus;
