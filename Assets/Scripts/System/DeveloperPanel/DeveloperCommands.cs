@@ -170,7 +170,7 @@ namespace System
             // Scene traversal commands
             RegisterCommand(KeyCode.Alpha1, () => SceneSwapper.Instance.SwapScene("Bedroom"), "Load Bedroom Scene", "Load the Bedroom Scene instantly");
             RegisterCommand(KeyCode.Alpha2, () => SceneSwapper.Instance.SwapScene("Nightmare1"), "Load Nightmare Scene", "Load the Nightmare 1 Scene instantly");
-            RegisterCommand(KeyCode.Alpha3, () => SceneSwapper.Instance.SwapScene("TutorialNightmare"), "Load Tutorial Scene", "Load the Tutorial Nightmare Scene instantly");
+            RegisterCommand(KeyCode.Alpha3, () => SceneSwapper.Instance.SwapScene("Tutorial"), "Load Tutorial Scene", "Load the Tutorial Nightmare Scene instantly");
         }
 
         /// <summary>
