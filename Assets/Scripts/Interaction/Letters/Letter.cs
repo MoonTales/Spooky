@@ -91,7 +91,7 @@ namespace Interaction.Letters
 
 
 
-        public void Interact(Interactor interactor)
+        public new void Interact(Interactor interactor)
         {
             if (_letterType == Types.LetterType.Researcher)
             {

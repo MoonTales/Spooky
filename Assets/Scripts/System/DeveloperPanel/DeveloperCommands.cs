@@ -125,7 +125,6 @@ namespace System
         void ToggleDeveloperMode()
         {
             _developerModeEnabled = !_developerModeEnabled;
-            DebugUtils.Log($"Developer Mode: {(_developerModeEnabled ? "Enabled" : "Disabled")}");
 
             if (_developerModeEnabled && _developerCanvas)
             {

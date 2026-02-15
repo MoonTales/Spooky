@@ -59,7 +59,7 @@ namespace Placeables
             EditorGUILayout.EndVertical();
         }
         
-        private void DrawHeader()
+        private new void DrawHeader()
         {
             Rect rect = GUILayoutUtility.GetRect(GUIContent.none, Styles.headerStyle, GUILayout.Height(30));
             EditorGUI.DrawRect(rect, new Color(0.2f, 0.2f, 0.2f, 0.3f));

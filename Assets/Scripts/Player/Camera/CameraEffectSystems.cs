@@ -47,8 +47,9 @@ namespace Player
         private float _peekVerticalAmount;
         [SerializeField] private Transform _cameraTransform; // this is gonna be assigned, as just.. us lol.
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             if (_cameraTransform != null)
             {
                 _cameraBaseY = _cameraTransform.localPosition.y;

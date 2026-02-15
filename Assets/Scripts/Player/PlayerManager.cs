@@ -83,14 +83,13 @@ namespace Player
             }
             
             // if we still dont have a player position, we will just spawn at the world origin
-            DebugUtils.LogWarning("No PlayerSpawnAnchor found, spawning player at world origin (0,0,0)");
             TeleportPlayer(Vector3.zero);
             
         }
         
         private void OnPlayerStateChanged(Types.PlayerMentalState newMentalState)
         {
-            DebugUtils.LogSuccess("Player state changed to: " + newMentalState.ToString());
+            
         }
 
         

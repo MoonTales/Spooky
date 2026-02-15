@@ -5,7 +5,6 @@ using Managers;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using XtremeFPS.FPSController;
 using Random = Unity.Mathematics.Random;
 using Types = System.Types;
 
@@ -63,7 +62,6 @@ namespace Player
         private float _verticalVelocity;
         private float _targetHeight;
         private bool _lockedInput = false;
-        private float time;
         private float _cameraBaseY;
         private float _currentSpeed;
 
@@ -319,7 +317,6 @@ namespace Player
                 
             }
             _isCrouching = !_isCrouching;
-            time = 0f;
         }
 
         public void ForceCrouch()
@@ -335,7 +332,6 @@ namespace Player
                 
             }
             _isCrouching = !_isCrouching;
-            time = 0f;
         }
         private void OnJump(InputAction.CallbackContext obj)
         {
