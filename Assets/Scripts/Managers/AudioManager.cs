@@ -159,6 +159,7 @@ namespace Managers
         protected override void OnGameStateChanged(Types.GameState newState)
         {
             base.OnGameStateChanged(newState);
+            SetPauseSnapshotEnabled(newState == Types.GameState.Paused);
 
             if (newState == Types.GameState.MainMenu)
             {

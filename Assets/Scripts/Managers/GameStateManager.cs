@@ -22,7 +22,7 @@ namespace Managers
         public void Start()
         {
             // Initialize the game state
-            _currentGameState = Types.GameState.Gameplay;
+            _currentGameState = Types.GameState.MainMenu;
             // for now, we will assume the game starts
             EventBroadcaster.Broadcast_GameStateChanged(_currentGameState);
         }
@@ -43,6 +43,18 @@ namespace Managers
         {
             _currentWorldClockHour = hour;
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
+        }
+
+        public void CycleWorldLocation(int direction)
+        {
+            int count = Enum.GetValues(typeof(Types.WorldLocation)).Length;
+            int nextIndex = ((int)_currentWorldLocation + direction) % count;
+            if (nextIndex < 0)
+            {
+                nextIndex += count;
+            }
+
+            EventBroadcaster.Broadcast_OnWorldLocationChanged((Types.WorldLocation)nextIndex);
         }
 
         private void OnWorldLocationChanged(Types.WorldLocation worldLocation)

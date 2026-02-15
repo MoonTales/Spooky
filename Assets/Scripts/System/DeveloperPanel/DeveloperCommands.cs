@@ -160,6 +160,8 @@ namespace System
             RegisterCommand(KeyCode.Delete, () => EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Breakdown), "Kill Player", "Send off a broadcast to simulate the player's mental state breaking down and reaching 0");
             RegisterCommand(KeyCode.LeftBracket, () => GameStateManager.Instance.SetWorldClockHour(GameStateManager.Instance.GetCurrentWorldClockHour() - 1), "Decrease World Clock", "Send off a broadcast to decrease the world clock hour by 1");
             RegisterCommand(KeyCode.RightBracket, () => GameStateManager.Instance.SetWorldClockHour(GameStateManager.Instance.GetCurrentWorldClockHour() + 1), "Increase World Clock", "Send off a broadcast to increase the world clock hour by 1");
+            RegisterCommand(KeyCode.Comma, () => GameStateManager.Instance.CycleWorldLocation(-1), "Prev World Location", "Cycle to the previous world location enum value");
+            RegisterCommand(KeyCode.Period, () => GameStateManager.Instance.CycleWorldLocation(1), "Next World Location", "Cycle to the next world location enum value");
             RegisterCommand(KeyCode.Semicolon, () => EventBroadcaster.Broadcast_GameRestarted(), "Emulate Game Restart", "Send off a broadcast to emulate the game being restarted (this simulates if we did return to main menu.)");
             
             // Cutscenes
