@@ -688,7 +688,7 @@ public class AttractorAI : MonoBehaviour
 
 	private void SetNewRandomDestination()
 	{
-		Vector3 randomPoint = FindObjectOfType<NavMeshSurface>().transform.position + Random.insideUnitSphere * patrolRadius;
+		Vector3 randomPoint = FindFirstObjectByType<NavMeshSurface>().transform.position + Random.insideUnitSphere * patrolRadius;
 		NavMeshHit hit;
 
 		// Sample the NavMesh to find the closest valid point within the specified range

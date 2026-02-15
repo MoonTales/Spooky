@@ -51,7 +51,7 @@ namespace Player
         public void SearchForSpawnAnchor(string spawnPointID = "")
         {
             // logic to search for a spawn anchor in the scene
-            PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsOfType<PlayerSpawnAnchor>();
+            PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsByType<PlayerSpawnAnchor>(FindObjectsSortMode.None);
             
             // debug print the number of spawn anchors found
             // loop through all of the spawn anchors to find the default one

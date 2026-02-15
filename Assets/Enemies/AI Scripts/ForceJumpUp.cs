@@ -17,14 +17,14 @@ public class MakeLinksBiDirectional : MonoBehaviour
     public void SetAllOffMeshLinksBiDirectional()
     {
         // For the legacy OffMeshLink components
-        links = FindObjectsOfType<OffMeshLink>();
+        links = FindObjectsByType<OffMeshLink>(FindObjectsSortMode.None);
         foreach (OffMeshLink link in links)
         {
             link.activated = true;
             link.biDirectional = true; // Set to true
         }
 
-        links2 = FindObjectsOfType<NavMeshLink>();
+        links2 = FindObjectsByType<NavMeshLink>(FindObjectsSortMode.None);
         foreach (NavMeshLink link in links2)
         {
             link.activated = true;

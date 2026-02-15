@@ -19,7 +19,7 @@ public class TraumaInducer : MonoBehaviour
         PlayParticles();
 
         /* Find all gameobjects in the scene and loop through them until we find all the nearvy stress receivers */
-        var targets = UnityEngine.Object.FindObjectsOfType<GameObject>();
+        var targets = UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
         for(int i = 0; i < targets.Length; ++i)
         {
             var receiver = targets[i].GetComponent<StressReceiver>();

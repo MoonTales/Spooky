@@ -61,10 +61,6 @@ public class Interactor : MonoBehaviour
             {
                 EventBroadcaster.Broadcast_OnBeganHoverInteractable(interactable);
             }
-            else
-            {
-                Debug.Log("Object is not interactable currently!!");
-            }
             if (Input.GetKeyDown(interactKey) )
             {
                 if (interactable.CanInteract(this) && IsAllowedToInteract())
@@ -76,7 +72,6 @@ public class Interactor : MonoBehaviour
         }
         else
         {
-            Debug.Log("No hit");
             EventBroadcaster.Broadcast_OnEndedHoverInteractable();
         }
     }

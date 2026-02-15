@@ -4,7 +4,8 @@ using UnityEngine;
 
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-
+#pragma warning disable CS0618
+#pragma warning disable CS0672
 namespace MirzaBeig.VolumetricFogLite
 {
     public interface IVolumetricFog
@@ -179,6 +180,7 @@ namespace MirzaBeig.VolumetricFogLite
 
             // Called before Execute().
 
+            [Obsolete("This rendering path is for compatibility mode only (when Render Graph is disabled). Use Render Graph API instead.", false)]
             public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
             {
                 int fogDownsampleLevel = settings.fogDownsampleLevel;
@@ -262,4 +264,7 @@ namespace MirzaBeig.VolumetricFogLite
         }
     }
 }
+
+#pragma warning restore CS0672
+#pragma warning restore CS0618
 

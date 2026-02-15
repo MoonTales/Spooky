@@ -42,7 +42,7 @@ namespace Managers
         {
             spawnAnchorsInScene.Clear();
             // find all spawn anchors in the scene and add them to our list
-            SpawnAnchor[] anchors = FindObjectsOfType<SpawnAnchor>();
+            SpawnAnchor[] anchors = FindObjectsByType<SpawnAnchor>(FindObjectsSortMode.None);
             spawnAnchorsInScene.AddRange(anchors);
         }
 
