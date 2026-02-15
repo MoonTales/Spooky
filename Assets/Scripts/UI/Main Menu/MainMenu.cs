@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using UI.PauseMenu;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,6 +45,7 @@ namespace UI.Main_Menu
         // Button connections
         private void OnPlayerButtonClicked()
         {
+            PlayUiButtonClickSfx();
             // close the main menu canvas
             mainMenuCanvas.SetActive(false);
             
@@ -55,18 +57,29 @@ namespace UI.Main_Menu
 
         private void OnSettingsButtonClicked()
         {
+            PlayUiButtonClickSfx();
             mainMenuCanvas.SetActive(false);
             SettingsController.Instance.OpenMainMenuSettings();
         }
 
         private void OnQuitButtonClicked()
         {
+            PlayUiButtonClickSfx();
             Application.Quit();
         }
     
         public void MainMenuVisible()
         {
             mainMenuCanvas.SetActive(true);
+        }
+
+        private static void PlayUiButtonClickSfx()
+        {
+            AudioManager audioManager = FindAnyObjectByType<AudioManager>();
+            if (audioManager != null)
+            {
+                audioManager.PlaySfx(AudioManager.SfxId.Flashlight);
+            }
         }
     }
 }

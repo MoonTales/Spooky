@@ -45,6 +45,18 @@ namespace Managers
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
         }
 
+        public void CycleWorldLocation(int direction)
+        {
+            int count = Enum.GetValues(typeof(Types.WorldLocation)).Length;
+            int nextIndex = ((int)_currentWorldLocation + direction) % count;
+            if (nextIndex < 0)
+            {
+                nextIndex += count;
+            }
+
+            EventBroadcaster.Broadcast_OnWorldLocationChanged((Types.WorldLocation)nextIndex);
+        }
+
         private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
         {
             _currentWorldLocation = worldLocation;

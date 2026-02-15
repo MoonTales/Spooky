@@ -32,6 +32,8 @@ public class DistanceSettings
 
 public class TerrorRadius : MonoBehaviour
 {
+    [Header("Audio")]
+    [SerializeField] private Transform terrorAudioSourceTransform;
 
     // Internal variables such as timer intervals to check distance, and distance float
     private float timer;
@@ -62,8 +64,18 @@ public class TerrorRadius : MonoBehaviour
     {
         distance = PlayerManager.Instance.GetDistance(transform.position);
 
-        float terrorIntensity = CalculateNormalizedTerrorIntensity();
-        EventBroadcaster.Broadcast_OnTerrorIntensityChanged(terrorIntensity);
+        bool isNightmare = GameStateManager.Instance != null
+            && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare;
+
+        if (isNightmare)
+        {
+            float terrorIntensity = CalculateNormalizedTerrorIntensity();
+            EventBroadcaster.Broadcast_OnTerrorIntensityChanged(terrorIntensity, GetTerrorAudioSourceTransform());
+        }
+        else
+        {
+            EventBroadcaster.Broadcast_OnTerrorIntensityChanged(0f, null);
+        }
 
         // Timer keeps damage cadence separate from audio updates.
         timer += Time.deltaTime;
@@ -119,6 +131,12 @@ public class TerrorRadius : MonoBehaviour
         }
 
         return Mathf.InverseLerp(far, veryClose, distance);
+    }
+
+    private Transform GetTerrorAudioSourceTransform()
+    {
+        // Default to this GameObject for quick testing scenes without a monster hierarchy.
+        return terrorAudioSourceTransform != null ? terrorAudioSourceTransform : transform;
     }
 
     /*

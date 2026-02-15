@@ -52,7 +52,7 @@ MonoBehaviour:
         Data2: 1274669532
         Data3: 316999592
         Data4: 2026019272
-      Path: event:/sfx/player/flashlight
+      Path: event:/sfx/switches/flashlight
   - id: 0
     eventRef:
       Guid:
@@ -64,11 +64,12 @@ MonoBehaviour:
   - id: 1
     eventRef:
       Guid:
-        Data1: 400017232
-        Data2: 1086536650
-        Data3: 357605298
-        Data4: -920795188
-      Path: event:/sfx/player/movement/jump
+        Data1: 435730620
+        Data2: 1276468479
+        Data3: 858536617
+        Data4: 2120149737
+      Path: event:/sfx/player/movement/land
+  debugAudioLogs: 0
   footstepPlayer:
     Guid:
       Data1: 1793541463
@@ -76,28 +77,54 @@ MonoBehaviour:
       Data3: -958284151
       Data4: 369320740
     Path: event:/sfx/player/movement/footstep
-  playerMovementBusPath: bus:/SFX/Player/Movement
-  ambienceDistortionSnapshot:
+  playerMovementBusPath: bus:/SFX/StopOnPause/Player/Movement
+  terrorDistortionParameter: Terror
+  mentalHealthDistortionParameter: MentalHealth
+  terrorParameterIsGlobal: 1
+  mentalHealthParameterIsGlobal: 1
+  terrorLoopEvent:
+    Guid:
+      Data1: 2097291503
+      Data2: 1085846812
+      Data3: 555803024
+      Data4: 1634982556
+    Path: event:/amb/nightmare/mental-terror-loop
+  nightmareAmbLoopEvent:
     Guid:
       Data1: -198520460
       Data2: 1165664335
       Data3: 580708496
       Data4: -533915791
-    Path: event:/amb/bg/mental-amb
-  terrorDistortionParameter: Terror
-  mentalHealthDistortionParameter: MentalHealth
+    Path: event:/amb/nightmare/mental-amb-loop
   heartbeatLoopEvent:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
-  heartbeatIntensityParameter: Intensity
-  heartbeatStartThreshold: 0.55
-  heartbeatStopThreshold: 0.45
+      Data1: 1493692059
+      Data2: 1300314028
+      Data3: -807272307
+      Data4: 673174759
+    Path: event:/sfx/player/hearbeat/heartbeat
+  heartbeatTerrorParameter: Terror
+  heartbeatMentalHealthParameter: MentalHealth
+  heartbeatTerrorParameterIsGlobal: 1
+  heartbeatMentalHealthParameterIsGlobal: 1
+  logTerrorParameterValue: 0
+  mainMenuMusicEvent:
+    Guid:
+      Data1: -578515550
+      Data2: 1080999304
+      Data3: 134868098
+      Data4: 563664113
+    Path: event:/music/main-menu
+  masterBusPath: bus:/
+  sfxBusPath: bus:/SFX
+  musicBusPath: bus:/Music
+  ambienceBusPath: bus:/Ambience
+  pauseSnapshotEvent:
+    Guid:
+      Data1: 465369116
+      Data2: 1139649020
+      Data3: -944230996
+      Data4: 1475689940
+    Path: snapshot:/snap_pause
   muteSFX: 0
   muteMusic: 0
-  Musicsource: {fileID: 0}
-  sfxValue: 1
-  musicValue: 1

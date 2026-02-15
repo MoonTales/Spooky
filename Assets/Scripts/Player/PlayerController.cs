@@ -95,7 +95,9 @@ namespace Player
             }
             
             _isGrounded = _characterController.isGrounded;
-            if (_isGrounded && !_wasGrounded)
+            bool isGameplayState = GameStateManager.Instance != null
+                                   && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
+            if (isGameplayState && _isGrounded && !_wasGrounded)
             {
                 AudioManager.Instance.PlaySfx(AudioManager.SfxId.Landing, transform);
             }
@@ -464,6 +466,14 @@ namespace Player
         {
             while (true)
             {
+                bool isGameplayState = GameStateManager.Instance != null
+                                       && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
+                if (!isGameplayState)
+                {
+                    yield return null;
+                    continue;
+                }
+
                 if (!_isGrounded )
                 {
                     yield return null;
@@ -509,6 +519,9 @@ namespace Player
                     break;
                 case Types.GameState.Inspecting:
                     HandleInspectionState();
+                    break;
+                case Types.GameState.Paused:
+                    HandlePausedState();
                     break;
                 // handle other game states as needed
             }
@@ -566,6 +579,15 @@ namespace Player
             }
             // if the player is currently moving (or has any input at all, we want to disable it)
             StopAllPlayerMovement();
+        }
+
+        private void HandlePausedState()
+        {
+            _lockedInput = true;
+            StopAllPlayerMovement();
+            // Resync grounded edge detection so resume does not fire a false landing one-shot.
+            _wasGrounded = _characterController.isGrounded;
+            AudioManager.Instance?.StopFootstepsImmediate();
         }
 
         
