@@ -114,7 +114,6 @@ namespace Managers
             {
                 EventBroadcaster.Broadcast_GameStarted();
                 // this also means we can broadcast the first WorldClock tick
-                DebugUtils.Log("Broadcasting Initial World Clock Hour Change: " + _currentWorldClockHour);
                 EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
                 
             }

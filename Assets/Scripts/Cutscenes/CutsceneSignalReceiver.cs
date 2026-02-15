@@ -9,14 +9,8 @@ namespace Cutscenes
     public class CutsceneSignalReceiver : MonoBehaviour, INotificationReceiver
     {
         
-        private void Awake()
-        {
-            Debug.Log("[CutsceneSignalReceiver] Awake - component exists on: " + gameObject.name);
-        }
-        
         public void OnNotify(Playable origin, INotification notification, object context)
         {
-            DebugUtils.Log($"[CutsceneSignalReceiver] Received notification: {notification.GetType().Name}");
     
             // Use 'as' instead of direct cast for safety
             DialogueMarker dialogueMarker = notification as DialogueMarker;

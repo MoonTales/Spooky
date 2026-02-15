@@ -121,11 +121,6 @@ namespace Player
             
         }
         
-        // TESTING
-        protected override void OnGameStarted()
-        {
-            DebugUtils.LogSuccess("The game started!!");
-        }
 
         private void HandleStateDetection()
         {
@@ -175,29 +170,24 @@ namespace Player
             {
                 case Types.PlayerMovementState.Idle:
                     // logic for entering idle state
-                    DebugUtils.Log("PlayerController: Entered Idle State");
                     stepSoundsAI.intensity = 0;
                     break;
                 case Types.PlayerMovementState.Walking:
                     // logic for entering walking state
-                    DebugUtils.Log("PlayerController: Entered Walking State");
                     stepSoundsAI.intensity = 5;
                     _audioEffectSpeed = 0.5f;
                     break;
                 case Types.PlayerMovementState.Sprinting:
                     // logic for entering sprinting state
-                    DebugUtils.Log("PlayerController: Entered Sprinting State");
                     stepSoundsAI.intensity = 7;
                     _audioEffectSpeed = 0.3f;
                     break;
                 case Types.PlayerMovementState.CrouchIdle:
                     // logic for entering crouch idle state
-                    DebugUtils.Log("PlayerController: Entered Crouch Idle State");
                     stepSoundsAI.intensity = 0;
                     break;
                 case Types.PlayerMovementState.CrouchWalking:
                     // logic for entering crouch walking state
-                    DebugUtils.Log("PlayerController: Entered Crouch Walking State");
                     stepSoundsAI.intensity = 3;
                     _audioEffectSpeed = 0.7f;
                     break;
@@ -208,8 +198,10 @@ namespace Player
         }
 
         #region Initialization
-        private void Awake()
+
+        protected override void Awake()
         {
+            base.Awake();
             // set up initial character variables
             _characterController = GetComponent<CharacterController>();
             _targetHeight = standHeight;
@@ -489,7 +481,6 @@ namespace Player
                     continue;
                 }
 
-                Debug.Log($"Playing {_surfaceType} sound");
                 AudioManager.Instance.PlayFootstep(_surfaceType, transform);
                 
                 yield return new WaitForSeconds(_audioEffectSpeed);

@@ -117,7 +117,6 @@ namespace Interaction.Letters
         public override void OnInspectionFinished()
         {
             // Custom logic that can run once the inspection has been completed fully
-            DebugUtils.Log($"Finished inspecting letter: !!");
         }
     }
 }

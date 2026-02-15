@@ -70,7 +70,7 @@ namespace System
             if (_instance != null && _instance != this)
             {
                 // Log a warning and destroy the duplicate instance
-                DebugUtils.LogWarning($"[Singleton] Duplicate instance of {typeof(T)} found. Destroying this instance.");
+                DebugUtils.LogError($"[Singleton] Duplicate instance of {typeof(T)} found. Destroying this instance.");
                 Destroy(gameObject);
                 return;
             }

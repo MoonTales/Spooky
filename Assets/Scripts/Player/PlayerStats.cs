@@ -106,7 +106,6 @@ namespace Player
         protected override void OnGameStarted()
         {
             // whenever we load from the main menu, we reset the player stats (like setting us to sleep deprived)
-            DebugUtils.LogSuccess("PlayerStats: OnGameStarted - Resetting Player Stats to Default");
             _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
         }
         
@@ -221,7 +220,7 @@ namespace Player
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.Breakdown);
                 }
-                else if (currentMentalHealth <= PanicMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= ExhaustedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.Exhausted);
                 }

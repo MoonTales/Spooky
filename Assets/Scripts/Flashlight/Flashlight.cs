@@ -322,7 +322,6 @@ public class Flashlight : Singleton<Flashlight>
             // Check if battery died and turn off flashlight
             if (_currentBatteryState == Types.FlashlightBatteryState.Dead)
             {
-                DebugUtils.Log("Battery died! Turning off flashlight.");
                 ToggleFlashlight();
                 yield break; // Exit coroutine immediately
             }

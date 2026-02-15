@@ -171,6 +171,7 @@ namespace MirzaBeig.VolumetricFogLite
             // You should never call CommandBuffer.SetRenderTarget. Instead call <c>ConfigureTarget</c> and <c>ConfigureClear</c>.
             // The render pipeline will ensure target setup and clearing happens in a performant manner.
 
+            [Obsolete("This rendering path is for compatibility mode only (when Render Graph is disabled). Use Render Graph API instead.", false)]
             public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
             {
 

@@ -166,7 +166,6 @@ namespace Player
             }
             else
             {
-                DebugUtils.LogError("Player object not found!");
                 return 0.0f;
             }
 

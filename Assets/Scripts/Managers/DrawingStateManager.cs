@@ -62,7 +62,6 @@ namespace Managers
         // Collect all drawings in the scene and update their transform data
         public void UpdateDrawingTransformData()
         {
-            DebugUtils.LogSuccess("Saving drawing transform data...");
             
             // Dont worry about optimization for now
             _drawingsInScene.Clear();
@@ -106,7 +105,6 @@ namespace Managers
             }
             if (count >= totalNumberOfDrawings)
             {
-                DebugUtils.LogSuccess("All drawings are in the correct position!");
                 Types.NotificationData data = new(
                     duration: 3.0f, 
                     messageKey: new TextKey { place = "Notifications", id = "AllDrawingsCorrect"},
@@ -145,9 +143,6 @@ namespace Managers
                 int existingIndex = _drawingTransformDataList.FindIndex(d => d.DrawingID == drawing.GetUniqueDrawingID());
                 if (existingIndex >= 0)
                 {
-                    DebugUtils.LogSuccess($"Restoring Transform for Drawing ID: {drawing.GetUniqueDrawingID()}");
-                    DebugUtils.LogSuccess($"Current Transform: {drawing.transform.position}, Rotation: {drawing.transform.rotation}, Scale: {drawing.transform.localScale}");
-                    DebugUtils.LogSuccess($"Saved Transform: {_drawingTransformDataList[existingIndex].Position}, Rotation: {_drawingTransformDataList[existingIndex].Rotation}, Scale: {_drawingTransformDataList[existingIndex].Scale}");
                     DrawingTransformData data = _drawingTransformDataList[existingIndex];
                     drawing.transform.position = data.Position;
                     drawing.transform.rotation = data.Rotation;

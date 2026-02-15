@@ -51,7 +51,6 @@ namespace Inspection
 
         protected override void OnWorldClockTicked(int newHour)
         {
-            DebugUtils.Log($"InspectableObject '{rowKey}' received World Clock Tick: {newHour}");
 
             if (newHour >= requiredHour)
             {
