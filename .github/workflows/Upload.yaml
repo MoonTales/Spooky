@@ -35,13 +35,15 @@ jobs:
           zip -r ../../Game.zip .
           cd ../..
 
-      - name: Deploy to itch.io
-        uses: yeslayla/butler-publish-itchio-action@v1.0.3
-        env:
-          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_API_KEY }}
-          ITCH_GAME: spooky-game
-          ITCH_USER: moontalesstudio
-          PACKAGE: Game.zip
-          CHANNEL: windows
+      # THIS POINT AND AFTER DOES NOT WORK
+      # Install Butler
+      - name: Setup butler
+        uses: remarkablegames/setup-butler@v2
 
-      # Pray that it works
+
+      # Deploy to Itch.io
+      - name: Deploy to itch.io
+        run: butler push Game.zip moontalesstudio/spooky-game:windows
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          
