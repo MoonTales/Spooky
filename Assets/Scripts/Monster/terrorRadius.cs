@@ -97,22 +97,22 @@ public class TerrorRadius : MonoBehaviour
         if (distance <= veryClose)
         {
             EventBroadcaster.Broadcast_OnPlayerDamaged(veryCloseDmg);
-            Debug.Log("Terror Damage: " + veryCloseDmg);
+            //Debug.Log("Terror Damage: " + veryCloseDmg);
         } 
         else if (distance <= close)
         {
             EventBroadcaster.Broadcast_OnPlayerDamaged(closeDmg);
-            Debug.Log("Terror Damage: " + closeDmg);
+            //Debug.Log("Terror Damage: " + closeDmg);
         }
         else if (distance <= midRange)
         {
             EventBroadcaster.Broadcast_OnPlayerDamaged(midRangeDmg);
-            Debug.Log("Terror Damage: " + midRangeDmg);
+            //Debug.Log("Terror Damage: " + midRangeDmg);
         }
         else if (distance <= far)
         {
             EventBroadcaster.Broadcast_OnPlayerDamaged(farDmg);
-            Debug.Log("Terror Damage: " + farDmg);
+            //Debug.Log("Terror Damage: " + farDmg);
         }
 
     }
