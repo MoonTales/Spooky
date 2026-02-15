@@ -12,7 +12,6 @@ namespace System
     
     public class SceneSwapper : Singleton<SceneSwapper>
     {
-        private float _fadeInTime = 1f;
         // Internal variables
         private string _spawnAnchorID = "";
 
@@ -42,7 +41,6 @@ namespace System
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            DebugUtils.LogSuccess($"[SceneSwapper] Scene loaded: {scene.name}");
             // after the scene has been loaded, we need to ensure the player is teleported to the correct location
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
             // This is when we want to broadcast the world clock

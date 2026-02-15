@@ -160,10 +160,12 @@ public class AttractorAI : MonoBehaviour
 	
 
 	public List<EnemyReactions> behaviourHierarchy;
-	private bool forceCurrentStateBuffer = false;
-	private bool awaitingStateWithForcedBuffer = false;
-	private bool forceSkipCurrentStateBuffer = false;
-	private bool awaitingStateWithSkippedBuffer = false;
+	// <RR> REFACTOR REMOVED
+	// private bool forceCurrentStateBuffer = false;
+	// private bool awaitingStateWithForcedBuffer = false;
+	// private bool forceSkipCurrentStateBuffer = false;
+	// private bool awaitingStateWithSkippedBuffer = false;
+	// <RR> REFACTOR REMOVED END
 
 	private Transform currentFocus;
 	private Transform nextFocus;
