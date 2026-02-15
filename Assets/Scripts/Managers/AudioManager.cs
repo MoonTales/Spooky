@@ -15,6 +15,8 @@ namespace Managers
         {
             // Player
             Jump, Landing, Flashlight, CrouchIn, CrouchOut, PeekIn, PeekOut, TippytoeIn, TippytoeOut,
+            // UI
+            UIHover,
         }
 
         // Inspector entry mapping SfxId -> FMOD event.
