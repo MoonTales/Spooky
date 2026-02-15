@@ -35,7 +35,6 @@ namespace Managers
         private EventInstance _nightmareAmbienceInstance;
         private EventInstance _mainMenuMusicInstance;
         private EventInstance _heartbeatInstance;
-        private bool _heartbeatIsPlaying;
         private EventInstance _terrorLoopInstance;
         private bool _terrorLoopIsPlaying;
         private Transform _terrorSourceTransform;
@@ -55,6 +54,9 @@ namespace Managers
             }
         }
 
+        [Header("Debug")]
+        [SerializeField] private bool debugAudioLogs = false;
+
         // Serialized FMOD event references and parameters.
         [Header("Player Sounds")]
         [SerializeField] private EventReference footstepPlayer;     // Parameterized footstep event with Surface label parameter.
@@ -68,10 +70,10 @@ namespace Managers
         [SerializeField] private EventReference terrorLoopEvent;
         [SerializeField] private EventReference nightmareAmbLoopEvent;
         [SerializeField] private EventReference heartbeatLoopEvent;
-        [SerializeField] private string heartbeatIntensityParameter = "Intensity";
-        [SerializeField] private bool heartbeatIntensityParameterIsGlobal = false;
-        [SerializeField, Range(0f, 1f)] private float heartbeatStartThreshold = 0.55f;
-        [SerializeField, Range(0f, 1f)] private float heartbeatStopThreshold = 0.45f;
+        [SerializeField] private string heartbeatTerrorParameter = "Terror";
+        [SerializeField] private string heartbeatMentalHealthParameter = "MentalHealth";
+        [SerializeField] private bool heartbeatTerrorParameterIsGlobal = true;
+        [SerializeField] private bool heartbeatMentalHealthParameterIsGlobal = true;
         [SerializeField] private bool logTerrorParameterValue = false;
 
         [Header("Settings Menu Audio")]
@@ -81,6 +83,7 @@ namespace Managers
         [SerializeField] private string musicBusPath = "bus:/Music";
         [SerializeField] private string ambienceBusPath = "bus:/Ambience";
         [SerializeField] private EventReference pauseSnapshotEvent;
+
         private Bus _masterBus;
         private Bus _sfxBus;
         private Bus _musicBus;
@@ -125,6 +128,7 @@ namespace Managers
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
         {
             _mentalStateSeverity = GetMentalStateSeverity(newMentalState);
+            LogAudioState($"Mental state changed -> {newMentalState} ({_mentalStateSeverity:0.00}). Expected: nightmare ambience/heartbeat parameters update.");
             RefreshMentalAudio();
         }
 
@@ -140,15 +144,17 @@ namespace Managers
 
             _terrorSeverity = Mathf.Clamp01(normalizedIntensity);
             _terrorSourceTransform = terrorSourceTransform;
-            if (logTerrorParameterValue)
+            if (debugAudioLogs && logTerrorParameterValue)
             {
                 Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
             }
+            LogAudioState($"Terror changed -> {_terrorSeverity:0.00} (source={(terrorSourceTransform != null ? terrorSourceTransform.name : "null")}). Expected: terror loop follows source in Nightmare.");
             RefreshMentalAudio();
         }
 
         private void OnWorldLocationChanged(Types.WorldLocation newLocation)
         {
+            LogAudioState($"World location changed -> {newLocation}. Expected: nightmare ambience/terror/heartbeat only play in Nightmare.");
             if (newLocation != Types.WorldLocation.Nightmare)
             {
                 _terrorSeverity = 0f;
@@ -160,6 +166,8 @@ namespace Managers
         protected override void OnGameStateChanged(Types.GameState newState)
         {
             base.OnGameStateChanged(newState);
+            LogAudioState($"Game state changed -> {newState}. Expected: pause snapshot {(newState == Types.GameState.Paused ? "enabled" : "disabled")}.");
+            SetPauseSnapshotEnabled(newState == Types.GameState.Paused);
 
             if (newState == Types.GameState.MainMenu)
             {
@@ -237,10 +245,6 @@ namespace Managers
             {
                 _sfxBus.setMute(isMuted);
             }
-            if (isMuted)
-            {
-                StopAndReleaseHeartbeat();
-            }
         }
 
         public void SetMusicMuted(bool isMuted)
@@ -256,6 +260,7 @@ namespace Managers
         {
             if (pauseSnapshotEvent.IsNull)
             {
+                LogAudioState("Pause snapshot not started: pause snapshot event is null.");
                 return;
             }
 
@@ -263,6 +268,7 @@ namespace Managers
             {
                 if (_pauseSnapshotActive)
                 {
+                    LogAudioState("Pause snapshot already active.");
                     return;
                 }
 
@@ -272,6 +278,7 @@ namespace Managers
                 }
                 _pauseSnapshotInstance.start();
                 _pauseSnapshotActive = true;
+                LogAudioState("Pause snapshot started. Expected: paused mix behavior now active.");
                 return;
             }
 
@@ -279,6 +286,7 @@ namespace Managers
             {
                 _pauseSnapshotInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 _pauseSnapshotInstance.release();
+                LogAudioState("Pause snapshot stopped.");
             }
             _pauseSnapshotActive = false;
         }
@@ -332,16 +340,16 @@ namespace Managers
         private void RefreshMentalAudio()
         {
             float terrorSeverityForAudio = IsNightmareWorldLocation() ? _terrorSeverity : 0f;
-            float combinedSeverity = Mathf.Clamp01(Mathf.Max(_mentalStateSeverity, terrorSeverityForAudio));
             ApplyTerrorLoop(terrorSeverityForAudio);
             ApplyNightmareAmbience();
-            ApplyHeartbeat(combinedSeverity);
+            ApplyHeartbeat();
         }
 
         private void PlayMainMenuMusicIfNeeded()
         {
             if (mainMenuMusicEvent.IsNull || muteMusic)
             {
+                LogAudioState($"Main menu music not started. Reason: {(mainMenuMusicEvent.IsNull ? "event reference missing" : "music is muted")}.");
                 return;
             }
 
@@ -351,6 +359,7 @@ namespace Managers
                 if (stateResult == FMOD.RESULT.OK
                     && (playbackState == PLAYBACK_STATE.PLAYING || playbackState == PLAYBACK_STATE.STARTING))
                 {
+                    LogAudioState("Main menu music already playing.");
                     return;
                 }
 
@@ -359,6 +368,7 @@ namespace Managers
 
             _mainMenuMusicInstance = CreateEventInstance(mainMenuMusicEvent);
             _mainMenuMusicInstance.start();
+            LogAudioState("Main menu music started.");
         }
 
         private void StopMainMenuMusic(bool allowFadeout)
@@ -397,6 +407,7 @@ namespace Managers
                 _terrorLoopInstance = CreateEventInstance(terrorLoopEvent, _terrorSourceTransform);
                 _terrorLoopInstance.start();
                 _terrorLoopIsPlaying = true;
+                LogAudioState("Terror loop started. Expected: audible 3D terror source in Nightmare.");
                 return;
             }
 
@@ -423,6 +434,7 @@ namespace Managers
             {
                 _nightmareAmbienceInstance = CreateEventInstance(nightmareAmbLoopEvent);
                 _nightmareAmbienceInstance.start();
+                LogAudioState("Nightmare ambience started. Expected: continuous ambience in Nightmare.");
             }
 
             if (!string.IsNullOrWhiteSpace(terrorDistortionParameter))
@@ -436,37 +448,34 @@ namespace Managers
             }
         }
 
-        private void ApplyHeartbeat(float combinedSeverity)
+        private void ApplyHeartbeat()
         {
+            if (!IsNightmareWorldLocation())
+            {
+                StopAndReleaseHeartbeat();
+                return;
+            }
+
             if (heartbeatLoopEvent.IsNull)
             {
                 return;
             }
 
-            if (_heartbeatIsPlaying)
-            {
-                if (combinedSeverity <= heartbeatStopThreshold || muteSFX)
-                {
-                    StopAndReleaseHeartbeat();
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(heartbeatIntensityParameter) && _heartbeatInstance.isValid())
-                {
-                    SetFmodParameter(_heartbeatInstance, heartbeatIntensityParameter, combinedSeverity, heartbeatIntensityParameterIsGlobal);
-                }
-                return;
-            }
-
-            if (combinedSeverity >= heartbeatStartThreshold && !muteSFX)
+            if (!_heartbeatInstance.isValid())
             {
                 _heartbeatInstance = CreateEventInstance(heartbeatLoopEvent);
-                if (!string.IsNullOrWhiteSpace(heartbeatIntensityParameter))
-                {
-                    SetFmodParameter(_heartbeatInstance, heartbeatIntensityParameter, combinedSeverity, heartbeatIntensityParameterIsGlobal);
-                }
                 _heartbeatInstance.start();
-                _heartbeatIsPlaying = true;
+                LogAudioState("Heartbeat loop started. Expected: heartbeat audible in Nightmare.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(heartbeatTerrorParameter))
+            {
+                SetFmodParameter(_heartbeatInstance, heartbeatTerrorParameter, _terrorSeverity, heartbeatTerrorParameterIsGlobal);
+            }
+
+            if (!string.IsNullOrWhiteSpace(heartbeatMentalHealthParameter))
+            {
+                SetFmodParameter(_heartbeatInstance, heartbeatMentalHealthParameter, _mentalStateSeverity, heartbeatMentalHealthParameterIsGlobal);
             }
         }
 
@@ -572,8 +581,8 @@ namespace Managers
             {
                 _heartbeatInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 _heartbeatInstance.release();
+                LogAudioState("Heartbeat loop stopped.");
             }
-            _heartbeatIsPlaying = false;
         }
 
         private void StopAndReleaseTerrorLoop()
@@ -582,6 +591,7 @@ namespace Managers
             {
                 _terrorLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 _terrorLoopInstance.release();
+                LogAudioState("Terror loop stopped.");
             }
             _terrorLoopIsPlaying = false;
         }
@@ -592,7 +602,18 @@ namespace Managers
             {
                 _nightmareAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 _nightmareAmbienceInstance.release();
+                LogAudioState("Nightmare ambience stopped.");
             }
+        }
+
+        private void LogAudioState(string message)
+        {
+            if (!debugAudioLogs)
+            {
+                return;
+            }
+
+            Debug.Log($"AudioManager: {message}");
         }
 
         private EventReference GetSfxEvent(SfxId sfxId)
