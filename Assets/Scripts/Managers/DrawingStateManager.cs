@@ -65,7 +65,7 @@ namespace Managers
             
             // Dont worry about optimization for now
             _drawingsInScene.Clear();
-            Drawing[] allDrawings = FindObjectsOfType<Drawing>();
+            Drawing[] allDrawings = FindObjectsByType<Drawing>(FindObjectsSortMode.None);
 
             foreach (Drawing drawing in allDrawings)
             {

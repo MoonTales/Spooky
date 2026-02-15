@@ -247,7 +247,7 @@ namespace UI.PauseMenu
             if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu)
             {
                 // Look for the main menu in the scene can make this a broadcast if we want)
-                MainMenu mainMenu = FindObjectOfType<MainMenu>();
+                MainMenu mainMenu = FindFirstObjectByType<MainMenu>();
                 if (mainMenu != null) { mainMenu.MainMenuVisible(); }
             }
         }
