@@ -30,11 +30,11 @@ namespace Cutscenes
 
         private void PlayDialogue(DialogueMarker dialogueMarker)
         {
-            
+
             Types.NotificationData data = new(
-                duration: dialogueMarker.displayDuration, 
-                messageKey: new TextKey { place = "Notifications", id = "CollectedDrawingSuccess"},
-                messageOverride: $"THIS WAS CALLED FROM A CUTSCENE!!!"
+                duration: dialogueMarker.displayDuration,
+                messageKey: new TextKey { place = "cutscene", id = "op" }
+                //messageOverride: $"THIS WAS CALLED FROM A CUTSCENE!!!"
             );
             data.Send();
         }
