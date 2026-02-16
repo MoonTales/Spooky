@@ -47,12 +47,12 @@ namespace Interaction.Letters
             if (_letterType == Types.LetterType.Researcher)
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
-                promptKey = new TextKey { place = "prompt", id = "drawing_collect" };
+                promptKey = new TextKey { place = "prompt", id = "res_letter" };
                 rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
-                promptKey = new TextKey { place = "prompt", id = "drawing_collect" };
+                promptKey = new TextKey { place = "prompt", id = "fren_letter" };
                 rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
             }
         }
@@ -63,12 +63,12 @@ namespace Interaction.Letters
             if (_letterType == Types.LetterType.Researcher)
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
-                promptKey = new TextKey { place = "prompt", id = "drawing_collect" };
+                promptKey = new TextKey { place = "prompt", id = "res_letter" };
                 rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
-                promptKey = new TextKey { place = "prompt", id = "drawing_collect" };
+                promptKey = new TextKey { place = "prompt", id = "fren_letter" };
                 rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
             }
         }
@@ -79,12 +79,12 @@ namespace Interaction.Letters
             if (_letterType == Types.LetterType.Researcher)
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
-                promptKey = new TextKey { place = "prompt", id = "drawing_collect" };
+                promptKey = new TextKey { place = "prompt", id = "res_letter" };
                 rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
-                promptKey = new TextKey { place = "prompt", id = "drawing_collect" };
+                promptKey = new TextKey { place = "prompt", id = "fren_letter" };
                 rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
             }
         }
