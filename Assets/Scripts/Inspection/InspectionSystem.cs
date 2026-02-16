@@ -207,10 +207,29 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 // a) a research letter AND has not been written on yet
                 if (_currentInspectedObject.GetComponent<Letter>() != null && !_currentInspectedObject.GetComponent<Letter>().GetHasBeenWrittenOn())
                 {
+                    // if its a friend letter
+                    if (_currentInspectedObject.GetComponent<Letter>().GetLetterType() == Types.LetterType.Friend)
+                    {
+                        // if so, we want to do some unique logic for that (like showing the writing UI)
+                        EndInspection();
+                        return;
+                    }
                     // if so, we want to do some unique logic for that (like showing the writing UI)
                     HandleUniqueInspectionLogic();
+                    return;
                 }
-                EndInspection();
+                else
+                {
+                    EndInspection();
+                }
+                
+                // handles anything other than a letter
+                if (!_currentInspectedObject.GetComponent<Letter>())
+                {
+                    // if not, just end the inspection normally
+                    EndInspection();
+                }
+                
             }
         }
     }
@@ -219,6 +238,33 @@ public class InspectionSystem : Singleton<InspectionSystem>
     {
         // in some cases (like Research Letters, we want to do some unique stuff when we inspect
         DebugUtils.Log("Handling unique inspection logic for " + _currentInspectedObject.name);
+        // what we need to do:
+        // step 1) disable all player controlls
+        // we can do this by setting us to a cutscene state, as thats essentially whats happening
+        //EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
+        
+        // step 2) fade to black
+        new Types.ScreenFadeData(3f, 3f, 3f,
+            HandleFadeFinished,
+            HandleScribbleNote
+        ).Send();
+
+    }
+
+    private void HandleScribbleNote()
+    {
+        // at this point, we should play the scribble sounds and swap the letter model to the one with the writing on it, then fade back in
+        //TODO: Add scribble sound effects here
+        AudioManager.Instance.PlayFootstep("metal", transform);
+        Letter letter = _currentInspectedObject.GetComponent<Letter>();
+    }
+
+    private void HandleFadeFinished()
+    {
+        //step 5) allow us to drop off letter
+        Letter letter = _currentInspectedObject.GetComponent<Letter>();
+        letter.SetHasBeenWrittenOn(true);
+        //EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Inspecting);
     }
     
     private void HandleExitTransition()

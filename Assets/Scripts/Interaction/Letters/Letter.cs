@@ -49,7 +49,7 @@ namespace Interaction.Letters
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
                 promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
+                rowKey = new TextKey { place = "bedroom", id = "res_letter", act = 1 };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
