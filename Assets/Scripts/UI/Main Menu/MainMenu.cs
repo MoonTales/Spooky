@@ -47,13 +47,19 @@ namespace UI.Main_Menu
         // Button connections
         private void OnPlayerButtonClicked()
         {
+            new Types.ScreenFadeData(3f, 1f, 3f,
+                SwapToGame
+            ).Send();
+            
+        }
+
+        private void SwapToGame()
+        {
             // close the main menu canvas
             mainMenuCanvas.SetActive(false);
-            
             // Yes it snaps away, but this will be changed once the game has a fade away or anything to transition us into gameplay!
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
             SceneSwapper.Instance.SwapScene("Tutorial");
-            
         }
 
         private void OnSettingsButtonClicked()
