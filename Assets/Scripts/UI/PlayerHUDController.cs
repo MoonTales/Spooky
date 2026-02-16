@@ -48,9 +48,9 @@ namespace UI
 
         private void OnInteractHoverStarted(IInteractable interactable)
         {
-            Debug.Log("[HUD] Hover started");
-            Debug.Log($"[HUD] PromptKey = '{interactable.PromptKey.place}.{interactable.PromptKey.id}'");
-            Debug.Log($"[HUD] Prompt = '{TextDB.GetPrompt(interactable.PromptKey.place, interactable.PromptKey.id)}'");
+            //Debug.Log("[HUD] Hover started");
+            //Debug.Log($"[HUD] PromptKey = '{interactable.PromptKey.place}.{interactable.PromptKey.id}'");
+            //Debug.Log($"[HUD] Prompt = '{TextDB.GetPrompt(interactable.PromptKey.place, interactable.PromptKey.id)}'");
 
 
             if (interactable == null)
@@ -100,12 +100,10 @@ namespace UI
         private void HandleInspection()
         {
             ShowHUD(true);
-            Debug.Log("[HUD] Handling Inspection HUD Update");
             InspectableObject obj = InspectionSystem.Instance.GetCurrentInspectedObject();
             if (obj == null)
             {
                 SetInspectionText("", "");
-                Debug.LogWarning("[HUD] InspectionSystem returned null InspectableObject");
                 return;
             }
 
@@ -116,7 +114,6 @@ namespace UI
             // blank means "not inspectable / show nothing"
             if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(desc))
             {
-                Debug.Log("[HUD] Inspection Name and Description are blank, hiding inspection text");
                 SetInspectionText("", "");
             }
             else

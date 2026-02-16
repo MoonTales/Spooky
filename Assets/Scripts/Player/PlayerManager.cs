@@ -51,7 +51,7 @@ namespace Player
         public void SearchForSpawnAnchor(string spawnPointID = "")
         {
             // logic to search for a spawn anchor in the scene
-            PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsOfType<PlayerSpawnAnchor>();
+            PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsByType<PlayerSpawnAnchor>(FindObjectsSortMode.None);
             
             // debug print the number of spawn anchors found
             // loop through all of the spawn anchors to find the default one
@@ -83,14 +83,13 @@ namespace Player
             }
             
             // if we still dont have a player position, we will just spawn at the world origin
-            DebugUtils.LogWarning("No PlayerSpawnAnchor found, spawning player at world origin (0,0,0)");
             TeleportPlayer(Vector3.zero);
             
         }
         
         private void OnPlayerStateChanged(Types.PlayerMentalState newMentalState)
         {
-            DebugUtils.LogSuccess("Player state changed to: " + newMentalState.ToString());
+            
         }
 
         
@@ -167,7 +166,6 @@ namespace Player
             }
             else
             {
-                DebugUtils.LogError("Player object not found!");
                 return 0.0f;
             }
 

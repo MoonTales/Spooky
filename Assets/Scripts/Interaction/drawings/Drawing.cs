@@ -100,7 +100,7 @@ namespace Interaction.drawings
             }
         }
 
-        public void Interact(Interactor interactor)
+        public virtual void Interact(Interactor interactor)
         {
             // If player is holding a drawing and this slot has a drawing, swap them
             if (_currentlyHeldDrawing != null)
@@ -110,7 +110,6 @@ namespace Interaction.drawings
             }
     
             // Normal interaction logic (assuming we are NOT swapping)
-            DebugUtils.Log($"Player interacted with Drawing ID {drawingID}");
     
             if (IsDrawingInInventory())
             {
@@ -124,7 +123,6 @@ namespace Interaction.drawings
     
         private void SwapDrawings(Drawing heldDrawing)
         {
-            DebugUtils.Log($"Swapping Drawing ID {heldDrawing.drawingID} with Drawing ID {drawingID}");
 
             // Store the location where the held drawing came from
             Vector3 heldOriginalPos = heldDrawing._originalPosition;
@@ -307,7 +305,6 @@ namespace Interaction.drawings
     
         private void PickupDrawing()
         {
-            DebugUtils.Log($"Player picked up Drawing ID {drawingID} to examine it.");
         
             _handTransform = PlayerManager.Instance.GetPlayerHandTransform();
         
@@ -402,7 +399,6 @@ namespace Interaction.drawings
     
         private void DropDrawing()
         {
-            DebugUtils.Log($"Player dropped Drawing ID {drawingID}");
     
             // Setup return transition
             _returnTargetPosition = _originalPosition;

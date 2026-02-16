@@ -57,20 +57,16 @@ namespace Player
             data.Send();
             if (_collectedDrawingIDs.Add(drawingID))
             {
-                DebugUtils.LogSuccess($"Added Drawing ID {drawingID} to Player Inventory. Total Drawings: {_collectedDrawingIDs.Count}");
+                _currentDrawingsThisNight ++;
             }
-            else
-            {
-                DebugUtils.LogWarning($"Drawing ID {drawingID} is already in Player Inventory.");
-            }
-            _currentDrawingsThisNight ++;
+
+            
         }
 
         public bool CanAddDrawing()
         {
             if (_currentDrawingsThisNight >= _maxDrawingsPerNight)
             {
-                DebugUtils.LogWarning($"Cannot add drawing. Reached max drawings for the night ({_maxDrawingsPerNight}).");
                 Types.NotificationData data = new(
                     duration: 3.0f, 
                     messageKey: new TextKey { place = "Notifications", id = "CollectedDrawingFail"},
@@ -85,20 +81,13 @@ namespace Player
         
         public void RemoveDrawing(int drawingID)
         {
-            if (_collectedDrawingIDs.Remove(drawingID))
-            {
-                DebugUtils.LogSuccess($"Removed Drawing ID {drawingID} from Player Inventory. Total Drawings: {_collectedDrawingIDs.Count}");
-            }
-            else
-            {
-                DebugUtils.LogWarning($"Drawing ID {drawingID} is not in Player Inventory.");
-            }
+            _collectedDrawingIDs.Remove(drawingID);
+            
         }
-        
-        public void ClearInventory()
+
+        private void ClearInventory()
         {
             _collectedDrawingIDs.Clear();
-            DebugUtils.LogSuccess("Cleared Player Inventory.");
         }
         
         public int GetDrawingCount()

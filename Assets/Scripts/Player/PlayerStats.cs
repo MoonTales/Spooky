@@ -22,10 +22,8 @@ namespace Player
         [SerializeField] private float defaultMaxStamina = 100f;
         [SerializeField] private float defaultMovementSpeed = 5f;
         [SerializeField] private Types.PlayerMentalState defaultPlayerMentalState = Types.PlayerMentalState.Normal;
-        [SerializeField] private Types.PlayerMentalCoreState defaultPlayerMentalCoreState = Types.PlayerMentalCoreState.None;
         [Space(10)]
         [Header("Cutoffs for each Mental Health State")]
-        [SerializeField] private float NormalMentalHealthCutoff = 1.0f; 
         // Anxious Mental Health Cutoffs
         [SerializeField] private float MildlyAnxiousMentalHealthCutoff = 0.8f;
         [SerializeField] private float ModeratlyAnxiousMentalHealthCutoff = 0.6f;
@@ -106,7 +104,6 @@ namespace Player
         protected override void OnGameStarted()
         {
             // whenever we load from the main menu, we reset the player stats (like setting us to sleep deprived)
-            DebugUtils.LogSuccess("PlayerStats: OnGameStarted - Resetting Player Stats to Default");
             _playerStats.SetPlayerMentalCoreState(Types.PlayerMentalCoreState.Anxious);
         }
         
@@ -221,19 +218,19 @@ namespace Player
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.Breakdown);
                 }
-                else if (currentMentalHealth <= PanicMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= ExhaustedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.Exhausted);
                 }
-                else if (currentMentalHealth <= SeverlyAnxiousMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= SeverlySleepDeprivedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.SeverelySleepDeprived);
                 }
-                else if (currentMentalHealth <= ModeratlyAnxiousMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= ModeratlySleepDeprivedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.ModeratelySleepDeprived);
                 }
-                else if (currentMentalHealth <= MildlyAnxiousMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= MildlySleepDeprivedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.MildlySleepDeprived);
                 }

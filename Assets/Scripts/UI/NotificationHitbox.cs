@@ -18,7 +18,6 @@ namespace UI
     
         // Internal variables
         private BoxCollider _boxCollider; // the box collider component attached to this game object
-        private bool _hasTriggered = false; // whether the hitbox has already been triggered (for single-use hitboxes)
 
         private void Start()
         {

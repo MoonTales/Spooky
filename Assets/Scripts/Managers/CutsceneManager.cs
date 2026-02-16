@@ -21,7 +21,6 @@ namespace Managers
         
         public void OnRequestStartCutscene(CutsceneController cutsceneController)
         {
-            DebugUtils.Log($"[CutsceneManager] Received request to start cutscene: {cutsceneController.name}");
             // ensure we dont already have a cutscene playing
             if (_currentCutscene) { return; }
             

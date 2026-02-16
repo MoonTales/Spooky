@@ -21,7 +21,7 @@ namespace Cutscenes
         
         [SerializeField] private GameObject cutsceneToPlay;
         [SerializeField] private CutsceneType cutsceneType;
-        [SerializeField] private bool  playOnlyOnce = true;
+        //[SerializeField] private bool  playOnlyOnce = true;
         
         private PlayableDirector _playableDirector;
         private CutsceneSignalReceiver _cutsceneSignalReceiver;

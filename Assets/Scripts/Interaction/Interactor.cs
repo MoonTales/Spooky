@@ -42,7 +42,6 @@ public class Interactor : MonoBehaviour
         
         if (Physics.Raycast(origin, dir, out RaycastHit hitInfo, castDistance, interactionLayerMask))
         {
-            Debug.Log($"Hit object: {hitInfo.collider.gameObject.name}");
             // if we currently have an object we are inspecting, we should not allow any of this to happen
             if (InspectionSystem.Instance.GetCurrentInspectedObject() != null)
             {
@@ -62,10 +61,6 @@ public class Interactor : MonoBehaviour
             {
                 EventBroadcaster.Broadcast_OnBeganHoverInteractable(interactable);
             }
-            else
-            {
-                Debug.Log("Object is not interactable currently!!");
-            }
             if (Input.GetKeyDown(interactKey) )
             {
                 if (interactable.CanInteract(this) && IsAllowedToInteract())
@@ -77,7 +72,6 @@ public class Interactor : MonoBehaviour
         }
         else
         {
-            Debug.Log("No hit");
             EventBroadcaster.Broadcast_OnEndedHoverInteractable();
         }
     }

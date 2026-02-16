@@ -19,7 +19,6 @@ namespace UI
         private TMP_Text _notificationText;
         private float _fadeInTimer = 1f;  // Duration of fade in
         private float _fadeOutTimer = 1f; // Duration of fade out
-        private bool _isFading = false;
         
         protected override void RegisterSubscriptions()
         {
@@ -40,7 +39,6 @@ namespace UI
             StopAllCoroutines();
             
             // now we can handle the popups of the Notifications on the screen
-            DebugUtils.Log($"NotificationController received notification: {notificationData.ToString()}");
             
             // enable the notification text
             _notificationText.gameObject.SetActive(true);
@@ -89,7 +87,6 @@ namespace UI
 
         private IEnumerator FadeInText()
         {
-            _isFading = true;
             float elapsedTime = 0f;
             Color textColor = _notificationText.color;
             
@@ -108,12 +105,10 @@ namespace UI
             // Ensure we end at full opacity
             textColor.a = 1f;
             _notificationText.color = textColor;
-            _isFading = false;
         }
 
         private IEnumerator FadeOutText()
         {
-            _isFading = true;
             float elapsedTime = 0f;
             Color textColor = _notificationText.color;
             
@@ -128,7 +123,6 @@ namespace UI
             // Ensure we end at full transparency
             textColor.a = 0f;
             _notificationText.color = textColor;
-            _isFading = false;
         }
     }
 }

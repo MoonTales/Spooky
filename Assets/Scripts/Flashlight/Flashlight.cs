@@ -65,7 +65,6 @@ public class Flashlight : Singleton<Flashlight>
     [Space(10)]
     [Header("battery Settings")]
     [SerializeField] private float maxBatteryLife = 100f; // Assume this is in seconds for now
-    [SerializeField] private float minBatterylife = 20f; // The lowest battery life we will drop to
     [SerializeField] private float batteryDrainRate = 10f; // percentage per minute
     [SerializeField] private float batteryRechargeRate = 0.5f; // percentage per minute
     // threshold values
@@ -323,7 +322,6 @@ public class Flashlight : Singleton<Flashlight>
             // Check if battery died and turn off flashlight
             if (_currentBatteryState == Types.FlashlightBatteryState.Dead)
             {
-                DebugUtils.Log("Battery died! Turning off flashlight.");
                 ToggleFlashlight();
                 yield break; // Exit coroutine immediately
             }
