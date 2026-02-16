@@ -49,13 +49,21 @@ namespace Interaction.Letters
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
                 promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "bedroom", id = "res_letter", act = 1 };
+                rowKey = new TextKey { place = "bedroom", id = "res_letter1" };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
                 promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
+                rowKey = new TextKey { place = "bedroom", id = "fren_letter1" };
             }
+        }
+
+        public void SetResponseTextKey()
+        {
+            int currentAct = GameStateManager.Instance.GetCurrentWorldClockHour();
+            if (currentAct == 1) { rowKey = new TextKey { place = "bedroom", id = "respond_letter1" }; }
+            if (currentAct == 2) { rowKey = new TextKey { place = "bedroom", id = "respond_letter2" }; }
+            if (currentAct == 3) { rowKey = new TextKey { place = "bedroom", id = "respond_letter3" }; }
         }
 
         private void HandleActTwoLetter()

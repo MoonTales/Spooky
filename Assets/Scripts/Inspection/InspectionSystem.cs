@@ -6,6 +6,7 @@ using Types = System.Types;
 using Inspection;
 using Interaction.Letters;
 using Managers;
+using UI;
 
 public class InspectionSystem : Singleton<InspectionSystem>
 {
@@ -257,6 +258,10 @@ public class InspectionSystem : Singleton<InspectionSystem>
         //TODO: Add scribble sound effects here
         AudioManager.Instance.PlayFootstep("metal", transform);
         Letter letter = _currentInspectedObject.GetComponent<Letter>();
+        letter.SetResponseTextKey();
+        PlayerHUDController.Instance.RefreshInspectionText();
+        
+        // CHANGE THE VISUALS TOO
     }
 
     private void HandleFadeFinished()
