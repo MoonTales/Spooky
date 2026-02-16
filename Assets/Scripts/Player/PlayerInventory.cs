@@ -12,6 +12,7 @@ namespace Player
         
         // Internal variables to help this new system
         private int _currentDrawingsThisNight = 0; public int GetCurrentDrawingsThisNight() { return _currentDrawingsThisNight; }
+        private List<int> _collectedDrawingsThisNight = new List<int>();
         
         
         // Store only the IDs of collected drawings
@@ -23,6 +24,24 @@ namespace Player
             base.RegisterSubscriptions();
             TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
                 () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+            TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerHealthStateChanged,
+                () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerHealthStateChanged);
+        }
+
+        private void OnPlayerHealthStateChanged(Types.PlayerMentalState newMentalState)
+        {
+            // we also need  to take note of what "zone" the player is in, as that will determine where these will need to be respawned
+            
+            // if the player "dies" we will want to remove any drawings they have collected from the inventory
+            if (newMentalState == Types.PlayerMentalState.Breakdown)
+            {
+                // loop through all of the collected drawings this night, and remove them from the inventory
+                foreach (int drawingID in _collectedDrawingsThisNight)
+                {
+                    RemoveDrawing(drawingID);
+                }
+                
+            }
         }
 
         private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
@@ -58,6 +77,7 @@ namespace Player
             if (_collectedDrawingIDs.Add(drawingID))
             {
                 _currentDrawingsThisNight ++;
+                _collectedDrawingsThisNight.Add(drawingID);
             }
 
             
@@ -79,10 +99,9 @@ namespace Player
             return true;
         }
         
-        public void RemoveDrawing(int drawingID)
+        private void RemoveDrawing(int drawingID)
         {
             _collectedDrawingIDs.Remove(drawingID);
-            
         }
 
         private void ClearInventory()

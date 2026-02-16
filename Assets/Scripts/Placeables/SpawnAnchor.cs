@@ -45,6 +45,11 @@ namespace Placeables
     
     public class SpawnAnchor : MonoBehaviour
     {
+        
+        [Header("IMPORTANT DATA")]
+        [SerializeField] private int priorityDrawingNumber = -1; public int GetPriorityDrawingNumber(){return priorityDrawingNumber;} // when spawning, we will first try to spawn a Drawing with a matching priorityDrawingNumber
+        [SerializeField] private AnchorIdentifier anchorIdentifier; public AnchorIdentifier GetAnchorIdentifier(){return anchorIdentifier;}
+        [SerializeField] private int zoneID = 0; public int GetZoneID(){return zoneID;} // the ID of the zone this spawn anchor belongs to.
         [Header("Spawn Data")]
         [SerializeField] private List<GameObject> prefabsToSpawn;
         [SerializeField] private float _spawnAreaSize = 10f;
@@ -55,8 +60,6 @@ namespace Placeables
         [SerializeField] private int _maxRetries = 10; // Maximum attempts to find a flat surface per spawn point
         [SerializeField] private float seed = -1;
         [SerializeField] private int priority = 0; public int GetPriority(){return priority;} // High priority will be considered first
-        [SerializeField] private int priorityDrawingNumber = -1; public int GetPriorityDrawingNumber(){return priorityDrawingNumber;} // when spawning, we will first try to spawn a Drawing with a matching priorityDrawingNumber
-        [SerializeField] private AnchorIdentifier anchorIdentifier; public AnchorIdentifier GetAnchorIdentifier(){return anchorIdentifier;}
 
         [SerializeField] private List<SpawnData> _spawnDataList = new List<SpawnData>();
         [SerializeField] private bool _randomizeOnSpawn = true; public bool IsRandomizingOnSpawn(){return _randomizeOnSpawn;}
@@ -234,7 +237,10 @@ namespace Placeables
             style.normal.textColor = Color.white;
             style.fontSize = 16;
             style.fontStyle = FontStyle.Bold;
-            var displayMessage = priorityDrawingNumber >= 0 ? priorityDrawingNumber.ToString() : "No Priority";
+            style.alignment = TextAnchor.MiddleCenter;
+            var displayMessage_prio = priorityDrawingNumber >= 0 ? "Priority Drawing: " + priorityDrawingNumber.ToString() : "No Priority";
+            var displayMessage = $"Zone ID: {zoneID}\nAnchor: {anchorIdentifier}\n{displayMessage_prio}";
+    
             Handles.Label(transform.position + Vector3.up * 0.3f, displayMessage, style);
             #endif
     
