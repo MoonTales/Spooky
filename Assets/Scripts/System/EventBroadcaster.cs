@@ -146,5 +146,9 @@ namespace System
         public delegate void OnNotificationSentHandler(Types.NotificationData notificationData);
         public static void Broadcast_OnNotificationSent(Types.NotificationData notificationData) { OnNotificationSent?.Invoke(notificationData); }
         
+        public static event OnRequestScreenFadeHandler OnRequestScreenFade;
+        public delegate void OnRequestScreenFadeHandler(Types.ScreenFadeData screenFadeData);
+        public static void Broadcast_OnRequestScreenFade(Types.ScreenFadeData screenFadeData) { OnRequestScreenFade?.Invoke(screenFadeData); }
+        
     }
 }

@@ -35,6 +35,7 @@ namespace System
             gameObject.AddComponent<CutsceneManager>();
             gameObject.AddComponent<LetterManager>();
             gameObject.AddComponent<SpawnAnchorManager>();
+            gameObject.AddComponent<ScreenFadeManager>();
 
             
             

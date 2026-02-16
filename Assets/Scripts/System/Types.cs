@@ -235,5 +235,29 @@ namespace System
             Researcher,
             Friend,
         }
+
+        [Serializable]
+        public struct ScreenFadeData
+        {
+            private float _fadeInDuration; public float GetFadeInDuration() { return _fadeInDuration; }
+            private float _fadeDuration; public float GetFadeDuration() { return _fadeDuration; }
+            private float _fadeOutDuration; public float GetFadeOutDuration() { return _fadeOutDuration; }
+            private Action _onFadeInComplete; public Action GetOnFadeInComplete() { return _onFadeInComplete; }
+            private Action _onFadeOutComplete; public Action GetOnFadeOutComplete() { return _onFadeOutComplete; }
+
+            public ScreenFadeData(float fadeInDuration, float fadeDuration, float fadeOutDuration, Action onFadeInComplete = null, Action onFadeOutComplete = null)
+            {
+                _fadeInDuration = fadeInDuration;
+                _fadeDuration = fadeDuration;
+                _fadeOutDuration = fadeOutDuration;
+                _onFadeInComplete = onFadeInComplete;
+                _onFadeOutComplete = onFadeOutComplete;
+            }
+
+            public void Send()
+            {
+                EventBroadcaster.Broadcast_OnRequestScreenFade(this);
+            }
+        }
     }
 }
