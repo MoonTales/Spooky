@@ -420,9 +420,9 @@ namespace Player
 
             CollisionFlags collisions = _characterController.Move(velocity * Time.deltaTime);
 
-            if ((collisions & CollisionFlags.Above) != 0)
+            if ((collisions & CollisionFlags.Above) != 0 && _verticalVelocity > 0)
             {
-                _verticalVelocity = initialFallVelocity;
+                _verticalVelocity = 0;
             }
         }
 
