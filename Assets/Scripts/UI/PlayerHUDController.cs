@@ -10,7 +10,7 @@ namespace UI
 {
     public class PlayerHUDController : Singleton<PlayerHUDController>
     {
-    
+
         // Internal References to the HUD
         private Canvas _hudCanvas;
         // Crosshair
@@ -23,6 +23,9 @@ namespace UI
         // notificationText is handled via the NotificationController
         private TMP_Text _hudNotificationText; public TMP_Text GetNotificationText() { return _hudNotificationText; }
 
+        private IInteractable _hoveredInteractable;
+        private bool _isInspecting;
+
 
         protected override void RegisterSubscriptions()
         {
@@ -31,6 +34,8 @@ namespace UI
                 () => EventBroadcaster.OnBeganHoverInteractable -= OnInteractHoverStarted);
             TrackSubscription(() => EventBroadcaster.OnEndedHoverInteractable += OnInteractHoverEnded,
                 () => EventBroadcaster.OnEndedHoverInteractable -= OnInteractHoverEnded);
+            TrackSubscription(() => EventBroadcaster.OnWorldClockHourChanged += OnWorldClockHourChanged,
+                () => EventBroadcaster.OnWorldClockHourChanged -= OnWorldClockHourChanged);
         }
 
         private void Start()
@@ -44,6 +49,7 @@ namespace UI
             _hudNotificationText.gameObject.SetActive(false);
             SetPrompt("");
             SetInspectionText("", "");
+            SetInspectionTextVisible(false);
         }
 
         private void OnInteractHoverStarted(IInteractable interactable)
@@ -52,6 +58,7 @@ namespace UI
             //Debug.Log($"[HUD] PromptKey = '{interactable.PromptKey.place}.{interactable.PromptKey.id}'");
             //Debug.Log($"[HUD] Prompt = '{TextDB.GetPrompt(interactable.PromptKey.place, interactable.PromptKey.id)}'");
 
+            _hoveredInteractable = interactable;
 
             if (interactable == null)
             {
@@ -70,20 +77,44 @@ namespace UI
 
         private void OnInteractHoverEnded()
         {
+            _hoveredInteractable = null;
             SetPrompt("");
+        }
+
+        private void OnWorldClockHourChanged(int clockHour)
+        {
+            TextDB.SetCurrentAct(clockHour);
+
+            if (_isInspecting)
+            {
+                HandleInspection();
+                return;
+            }
+
+            if (_hoveredInteractable != null)
+            {
+                OnInteractHoverStarted(_hoveredInteractable);
+            }
+            else
+            {
+                SetPrompt("");
+            }
         }
 
         protected override void OnGameStateChanged(Types.GameState newstate)
         {
+            _isInspecting = (newstate == Types.GameState.Inspecting);
+
             switch (newstate)
             {
                 case Types.GameState.Gameplay:
                     SetInspectionText("", "");
-                    if (_hudCrosshair != null){ _hudCrosshair.enabled = true;}
+                    SetInspectionTextVisible(false);
+                    if (_hudCrosshair != null) { _hudCrosshair.enabled = true; }
                     ShowHUD(true);
                     break;
                 case Types.GameState.Cutscene:
-                    if (_hudCrosshair != null){ _hudCrosshair.enabled = false;}
+                    if (_hudCrosshair != null) { _hudCrosshair.enabled = false; }
                     break;
                 case Types.GameState.MainMenu:
                     ShowHUD(false);
@@ -104,6 +135,7 @@ namespace UI
             if (obj == null)
             {
                 SetInspectionText("", "");
+                SetInspectionTextVisible(false);
                 return;
             }
 
@@ -115,6 +147,7 @@ namespace UI
             if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(desc))
             {
                 SetInspectionText("", "");
+                SetInspectionTextVisible(false);
             }
             else
             {
@@ -122,8 +155,7 @@ namespace UI
                 SetInspectionText(name, desc);
             }
 
-
-            if (_hudCrosshair != null){ _hudCrosshair.enabled = false;}
+            if (_hudCrosshair != null) { _hudCrosshair.enabled = false; }
             SetPrompt("");
         }
 
@@ -132,15 +164,11 @@ namespace UI
             if (_hudCanvas != null) _hudCanvas.enabled = show;
         }
 
-
-
         private void SetPrompt(string s)
         {
             if (_hudInteractionPromptText == null) return;
 
             _hudInteractionPromptText.text = s ?? "";
-
-            // If you want the prompt object to fully hide when blank:
             _hudInteractionPromptText.gameObject.SetActive(!string.IsNullOrEmpty(_hudInteractionPromptText.text));
         }
 
@@ -156,4 +184,3 @@ namespace UI
         }
     }
 }
-

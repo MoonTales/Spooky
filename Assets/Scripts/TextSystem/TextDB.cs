@@ -15,6 +15,7 @@ public static class TextDB
         public string name;   // inspectable name
         public string desc;   // inspectable description
         public string prompt; // interaction prompt
+        public int act;   // for the to-be-renamed world clock - basically just a marker for when this text is meant to be shown 
 
         public bool IsEmpty =>
             string.IsNullOrEmpty(text) &&
@@ -23,7 +24,13 @@ public static class TextDB
             string.IsNullOrEmpty(prompt);
     }
 
-    private static readonly Dictionary<string, TextRow> map = new Dictionary<string, TextRow>();
+    private static readonly Dictionary<string, List<TextRow>> map = new Dictionary<string, List<TextRow>>();
+    private static int currentAct = 1;
+
+    public static void SetCurrentAct(int act)
+    {
+        currentAct = Mathf.Max(1, act);
+    }
 
     public static void LoadAllIfNeeded()
     {
@@ -61,12 +68,27 @@ public static class TextDB
     public static string GetDesc(string place, string id) => GetField(place, id, Field.Desc);
     public static string GetPrompt(string place, string id) => GetField(place, id, Field.Prompt);
 
+    public static int GetAct(string place, string id)
+    {
+        LoadAllIfNeeded();
+        string key = MakeKey(place, id);
+        return GetActByKey(key);
+    }
+
     public static string GetTextByKey(string key) => GetFieldByKey(key, Field.Text);
     public static string GetNameByKey(string key) => GetFieldByKey(key, Field.Name);
     public static string GetDescByKey(string key) => GetFieldByKey(key, Field.Desc);
     public static string GetPromptByKey(string key) => GetFieldByKey(key, Field.Prompt);
 
+    public static int GetActByKey(string key)
+    {
+        LoadAllIfNeeded();
 
+        if (!TryGetRowForCurrentAct(key, out var row))
+            return 1;
+
+        return row.act;
+    }
 
     private enum Field { Text, Name, Desc, Prompt }
 
@@ -83,7 +105,7 @@ public static class TextDB
     {
         LoadAllIfNeeded();
 
-        if (!map.TryGetValue(key, out var row))
+        if (!TryGetRowForCurrentAct(key, out var row))
             return "";
 
         return field switch
@@ -94,6 +116,30 @@ public static class TextDB
             Field.Prompt => row.prompt ?? "",
             _ => ""
         };
+    }
+
+    private static bool TryGetRowForCurrentAct(string key, out TextRow chosen)
+    {
+        chosen = default;
+
+        if (!map.TryGetValue(key, out var list) || list == null || list.Count == 0)
+            return false;
+
+        bool found = false;
+        int bestAct = int.MinValue;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            int a = list[i].act;
+            if (a <= currentAct && a >= bestAct)
+            {
+                bestAct = a;
+                chosen = list[i];
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     private static void TryLoadCsv(TextAsset asset)
@@ -111,6 +157,7 @@ public static class TextDB
             int nameCol = FindCol(header, "name");
             int descCol = FindCol(header, "desc");
             int promptCol = FindCol(header, "prompt");
+            int actCol = FindCol(header, "act");
 
             if (placeCol < 0 || idCol < 0)
             {
@@ -137,21 +184,45 @@ public static class TextDB
                 if (string.IsNullOrWhiteSpace(place) || string.IsNullOrWhiteSpace(id))
                     continue;
 
-                if (map.ContainsKey(key))
-                {
-                    Debug.LogError($"[TextDB] Duplicate key '{key}' in CSV '{asset.name}' at data row {r + 1}.");
-                    continue;
-                }
-
                 TextRow tr = new TextRow
                 {
                     text = textCol >= 0 ? GetField(row, textCol) : "",
                     name = nameCol >= 0 ? GetField(row, nameCol) : "",
                     desc = descCol >= 0 ? GetField(row, descCol) : "",
                     prompt = promptCol >= 0 ? GetField(row, promptCol) : "",
+                    act = 1
                 };
 
-                map[key] = tr;
+                if (actCol >= 0)
+                {
+                    string actStr = GetField(row, actCol).Trim();
+                    if (!string.IsNullOrEmpty(actStr) && int.TryParse(actStr, out int parsedAct))
+                        tr.act = parsedAct;
+                }
+
+                if (!map.TryGetValue(key, out var list))
+                {
+                    list = new List<TextRow>();
+                    map[key] = list;
+                }
+
+                bool duplicateAct = false;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i].act == tr.act)
+                    {
+                        duplicateAct = true;
+                        break;
+                    }
+                }
+
+                if (duplicateAct)
+                {
+                    Debug.LogError($"[TextDB] Duplicate key+act '{key}' act={tr.act} in CSV '{asset.name}' at data row {r + 1}.");
+                    continue;
+                }
+
+                list.Add(tr);
             }
         }
         catch (Exception ex)
@@ -164,7 +235,8 @@ public static class TextDB
     {
         for (int i = 0; i < header.Count; i++)
         {
-            if (string.Equals((header[i] ?? "").Trim(), name, StringComparison.OrdinalIgnoreCase))
+            string h = (header[i] ?? "").Trim().TrimStart('\uFEFF');
+            if (string.Equals(h, name, StringComparison.OrdinalIgnoreCase))
                 return i;
         }
         return -1;
