@@ -42,6 +42,7 @@ namespace Managers
         public void SetWorldClockHour(int hour)
         {
             _currentWorldClockHour = hour;
+            TextDB.SetCurrentAct(_currentWorldClockHour);
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
         }
 
