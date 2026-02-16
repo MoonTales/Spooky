@@ -47,8 +47,7 @@ namespace UI.Main_Menu
         // Button connections
         private void OnPlayerButtonClicked()
         {
-            new Types.ScreenFadeData(3f, 1f, 3f,
-                SwapToGame
+            new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToGame
             ).Send();
             
         }

@@ -40,15 +40,18 @@ namespace Managers
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnWorldClockHourChanged += OnWorldClockUpdated,
-                () => EventBroadcaster.OnWorldClockHourChanged -= OnWorldClockUpdated);
+            TrackSubscription(()=> EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
         }
 
-        private void OnWorldClockUpdated(int clockHour)
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
         {
-            // this will be called each time the world clock updates
-            SpawnNoteForCurrentAct();
+            if (worldLocation == Types.WorldLocation.Bedroom)
+            {
+                SpawnNoteForCurrentAct();
+            }
         }
+
 
 
 
