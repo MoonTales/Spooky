@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 using Inspection;
 using Managers;
 using Types = System.Types;
@@ -114,9 +115,38 @@ namespace Interaction.Letters
             InspectionSystem.Instance.StartInspection(gameObject);
         }
 
-        public override void OnInspectionFinished()
+
+        
+        public override void OnReturnedToOriginalPosition()
         {
-            // Custom logic that can run once the inspection has been completed fully
+            if (_letterType == Types.LetterType.Researcher)
+            {
+                HandleFinishedResearcherLetter();
+            }
+            else if (_letterType == Types.LetterType.Friend)
+            {
+                HandleFinishedFriendLetter();
+            }
         }
+
+        private void HandleFinishedResearcherLetter()
+        {
+            // this will actually be the opposite effect, where it will slide back to the original position it slid in from, and then destroy itself
+            
+        }
+
+
+
+        private void HandleFinishedFriendLetter()
+        {
+            // due to this being a "fake" letter, we want to have it "vanish"
+            // to do this, we will disable its collider, and then "fade it out" by disabling the sprite renderer after a short delay
+            // the letter may be a parent, with multiple children, so we need to make sure we disable the sprite renderers on all children as well
+            // disable the collider
+            // just destroy for now
+            Destroy(gameObject);
+        }
+
+
     }
 }

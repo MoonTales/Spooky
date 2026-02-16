@@ -126,17 +126,6 @@ namespace Managers
             note.transform.position = endPosition;
             note.transform.rotation = targetRotation;
         }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                SpawnAnchorManager.Instance.RequestSpawnAtAnyAnchor(_notePrefab);
-            }
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                SpawnAnchorManager.Instance.RequestSpawnAtAnchorByIdentifier(_notePrefab, AnchorIdentifier.Act2);
-            }
-        }
+        
     }
 }

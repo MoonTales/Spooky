@@ -248,10 +248,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 col.enabled = true;
             }
         
-            // Clear inspecting flags and current object
-            _isInspecting = false;
-            _isExitingInspection = false;
-            _currentInspectedObject = null;
+
         
             // Restore and re-enable pan/tilt
             if (panTilt != null)
@@ -260,6 +257,18 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 panTilt.TiltAxis.Value = savedPanTilt.y;
                 panTilt.enabled = true;
             }
+            
+            InspectableObject inspectable = _currentInspectedObject.GetComponent<InspectableObject>();
+            if (inspectable != null)
+            {
+                inspectable.OnReturnedToOriginalPosition();
+            }
+            
+            // Clear inspecting flags and current object
+            _isInspecting = false;
+            _isExitingInspection = false;
+            _currentInspectedObject = null;
+            
             // only set this, if we are not currently in the main menu (an edge case)
             if (GameStateManager.Instance.GetCurrentGameState() != Types.GameState.MainMenu)
             {
