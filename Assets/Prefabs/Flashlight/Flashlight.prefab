@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3874213745340489112}
   - component: {fileID: 8215302830189473389}
+  - component: {fileID: 4314629412562247381}
   m_Layer: 0
   m_Name: Flashlight
   m_TagString: Untagged
@@ -73,7 +74,6 @@ MonoBehaviour:
     flickerDuration: 0.2
     flickerSpeed: 0.03
   maxBatteryLife: 100
-  minBatterylife: 20
   batteryDrainRate: 10
   batteryRechargeRate: 0.5
   highBatteryThreshold: 75
@@ -82,6 +82,28 @@ MonoBehaviour:
   criticalBatteryThreshold: 1
   panDrag: 8
   tiltDrag: 8
+--- !u!95 &4314629412562247381
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925545138921339292}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: be1633e02cab2e64f8bd57c7d0095134, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2835380890093545611
 GameObject:
   m_ObjectHideFlags: 0
