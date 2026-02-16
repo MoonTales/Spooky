@@ -237,13 +237,6 @@ public class InspectionSystem : Singleton<InspectionSystem>
 
     private void HandleUniqueInspectionLogic()
     {
-        // in some cases (like Research Letters, we want to do some unique stuff when we inspect
-        DebugUtils.Log("Handling unique inspection logic for " + _currentInspectedObject.name);
-        // what we need to do:
-        // step 1) disable all player controlls
-        // we can do this by setting us to a cutscene state, as thats essentially whats happening
-        //EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
-        
         // step 2) fade to black
         new Types.ScreenFadeData(3f, 3f, 3f,
             HandleFadeFinished,
@@ -255,21 +248,25 @@ public class InspectionSystem : Singleton<InspectionSystem>
     private void HandleScribbleNote()
     {
         // at this point, we should play the scribble sounds and swap the letter model to the one with the writing on it, then fade back in
-        //TODO: Add scribble sound effects here
+        //TODO: <SFX> Add scribble sound effects here
         AudioManager.Instance.PlayFootstep("metal", transform);
         Letter letter = _currentInspectedObject.GetComponent<Letter>();
         letter.SetResponseTextKey();
         PlayerHUDController.Instance.RefreshInspectionText();
         
-        // CHANGE THE VISUALS TOO
+        //TODO: CHANGE THE VISUALS TOO
+        // for now we will just like.. idk change the color?
+        Renderer[] renderers = _currentInspectedObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer thisRenderer in renderers)
+        {
+            thisRenderer.material.color = Color.green;
+        }
     }
 
     private void HandleFadeFinished()
     {
-        //step 5) allow us to drop off letter
         Letter letter = _currentInspectedObject.GetComponent<Letter>();
         letter.SetHasBeenWrittenOn(true);
-        //EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Inspecting);
     }
     
     private void HandleExitTransition()

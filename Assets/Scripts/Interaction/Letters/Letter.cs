@@ -73,12 +73,12 @@ namespace Interaction.Letters
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
                 promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
+                rowKey = new TextKey { place = "bedroom", id = "res_letter2" };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
                 promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
+                rowKey = new TextKey { place = "bedroom", id = "fren_letter2" };
             }
         }
         
@@ -89,12 +89,12 @@ namespace Interaction.Letters
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
                 promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
+                rowKey = new TextKey { place = "bedroom", id = "res_letter3" };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
                 promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
+                rowKey = new TextKey { place = "bedroom", id = "fren_letter3" };
             }
         }
 
