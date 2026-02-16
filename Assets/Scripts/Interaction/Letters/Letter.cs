@@ -14,7 +14,7 @@ namespace Interaction.Letters
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         
         private Types.LetterType _letterType; public void SetLetterType(Types.LetterType letterType) { _letterType = letterType; } public Types.LetterType GetLetterType() { return _letterType; }
-        
+        private bool _hasBeenWrittenOn = false; public void SetHasBeenWrittenOn(bool value) { _hasBeenWrittenOn = value; } public bool GetHasBeenWrittenOn() { return _hasBeenWrittenOn; }
         
         
 
@@ -132,7 +132,7 @@ namespace Interaction.Letters
         private void HandleFinishedResearcherLetter()
         {
             // this will actually be the opposite effect, where it will slide back to the original position it slid in from, and then destroy itself
-            
+            StartCoroutine(LetterManager.Instance.ReverseSlideNote(gameObject));
         }
 
 

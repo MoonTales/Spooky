@@ -126,6 +126,32 @@ namespace Managers
             note.transform.position = endPosition;
             note.transform.rotation = targetRotation;
         }
+
+        public IEnumerator ReverseSlideNote(GameObject note)
+        {
+            // this will work identically to the slide note, but it will just reverse the start and end positions and rotations, so it will slide back to the center and unrotate itself
+                if (note == null){ yield break;}
+                Vector3 startPosition = note.transform.position;
+                GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
+                // spawn the note prefab at the location of the "NoteSpawnLocation" object
+                if (!spawnLocation) { yield break;}
+                Vector3 endPosition = spawnLocation.transform.position;
+                Quaternion startRotation = note.transform.rotation;
+                Quaternion targetRotation = Quaternion.identity;
+                float elapsedTime = 0f;
+                while (elapsedTime < slideDuration)
+                {
+                    elapsedTime += Time.deltaTime;
+                    float normalizedTime = elapsedTime / slideDuration;
+                    float curveValue = slideCurve.Evaluate(normalizedTime);
+                    note.transform.position = Vector3.Lerp(startPosition, endPosition, curveValue);
+                    note.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, curveValue);
+                    yield return null;
+                }
+                note.transform.position = endPosition;
+                note.transform.rotation = targetRotation;
+                Destroy(note);
+        }
         
     }
 }
