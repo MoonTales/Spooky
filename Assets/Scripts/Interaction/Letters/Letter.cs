@@ -20,110 +20,30 @@ namespace Interaction.Letters
 
         private void Start()
         {
-            // when the letter spawns in, we are gonna check a few things, and set the information about the letter accordingly;
-            int currentHour = GameStateManager.Instance.GetCurrentWorldClockHour();
             // the only times will be either Act (1), Act (2), or Act (3) (for now)
-            switch (currentHour)
-            {
-                case 1:
-                    HandleActOneLetter();
-                    break;
-                case 2:
-                    HandleActTwoLetter();
-                    break;
-                case 3:
-                    HandleActThreeLetter();
-                    break;
-                default:
-                    DebugUtils.LogWarning("Letter spawned at an unexpected hour!");
-                    break;
-            }
-        }
-
-        
-        // these could also just stay as seperate things
-        private void HandleActOneLetter()
-        {
-            // depending on if this is a friend letter or a researcher letter, we will set the letter type and the prompt key accordingly
             if (_letterType == Types.LetterType.Researcher)
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
                 promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "bedroom", id = "res_letter1" };
+                rowKey = new TextKey { place = "bedroom", id = "res_letter" };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
                 promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "bedroom", id = "fren_letter1" };
+                rowKey = new TextKey { place = "bedroom", id = "fren_letter" };
             }
         }
-
+        
         public void SetResponseTextKey()
         {
-            int currentAct = GameStateManager.Instance.GetCurrentWorldClockHour();
-            if (currentAct == 1) { rowKey = new TextKey { place = "bedroom", id = "respond_letter1" }; }
-            if (currentAct == 2) { rowKey = new TextKey { place = "bedroom", id = "respond_letter2" }; }
-            if (currentAct == 3) { rowKey = new TextKey { place = "bedroom", id = "respond_letter3" }; }
+            rowKey = new TextKey { place = "bedroom", id = "respond_letter" };
         }
 
-        private void HandleActTwoLetter()
-        {
-            // depending on if this is a friend letter or a researcher letter, we will set the letter type and the prompt key accordingly
-            if (_letterType == Types.LetterType.Researcher)
-            {
-                // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
-                promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "bedroom", id = "res_letter2" };
-            }
-            else if (_letterType == Types.LetterType.Friend)
-            {
-                promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "bedroom", id = "fren_letter2" };
-            }
-        }
         
-        private void HandleActThreeLetter()
-        {
-            // depending on if this is a friend letter or a researcher letter, we will set the letter type and the prompt key accordingly
-            if (_letterType == Types.LetterType.Researcher)
-            {
-                // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
-                promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "bedroom", id = "res_letter3" };
-            }
-            else if (_letterType == Types.LetterType.Friend)
-            {
-                promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "bedroom", id = "fren_letter3" };
-            }
-        }
-
-
-
         public new void Interact(Interactor interactor)
         {
-            if (_letterType == Types.LetterType.Researcher)
-            {
-                Types.NotificationData data = new(
-                    duration: 3.0f, 
-                    messageKey: new TextKey { place = "Letters", id = "LetterContent1"},
-                    messageOverride: "This is a researcher's letter!"
-                );
-                data.Send();
-            }
-            else if (_letterType == Types.LetterType.Friend)
-            {
-                Types.NotificationData data = new(
-                    duration: 3.0f, 
-                    messageKey: new TextKey { place = "Letters", id = "LetterContent2"},
-                    messageOverride: "This is a friend's letter!"
-                );
-                data.Send();
-            }
             InspectionSystem.Instance.StartInspection(gameObject);
         }
-
-
         
         public override void OnReturnedToOriginalPosition()
         {
@@ -148,10 +68,6 @@ namespace Interaction.Letters
         private void HandleFinishedFriendLetter()
         {
             // due to this being a "fake" letter, we want to have it "vanish"
-            // to do this, we will disable its collider, and then "fade it out" by disabling the sprite renderer after a short delay
-            // the letter may be a parent, with multiple children, so we need to make sure we disable the sprite renderers on all children as well
-            // disable the collider
-            // just destroy for now
             Destroy(gameObject);
         }
 
