@@ -9,6 +9,9 @@ public class AttractorAI : MonoBehaviour
 {
 	#region InitialSetup
 	private NavMeshAgent agent;
+
+	[Tooltip("Between 0-100")]
+	public float currentDangerLevel = 0;
 	#endregion
 
 	#region States
@@ -64,22 +67,48 @@ public class AttractorAI : MonoBehaviour
 	public class EnemyReactionReprogram
 	{
 		public AttractorType[] possibleAttractorTypeChanges;
+		public float attractorTypeLowerBoundDangerRange = 100;
+		public float attractorTypeUpperBoundDangerRange = 100;
+
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
+		public float minIntensityLowerBoundDangerRange = 100;
+		public float minIntensityUpperBoundDangerRange = 100;
+
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
+		public float maxIntensityLowerBoundDangerRange = 100;
+		public float maxIntensityUpperBoundDangerRange = 100;
+
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
+		public float stateRestrictionLowerBoundDangerRange = 100;
+		public float stateRestrictionUpperBoundDangerRange = 100;
+
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
+		public float functionExecutionLowerBoundDangerRange = 100;
+		public float functionExecutionUpperBoundDangerRange = 100;
+
 		public EnemyState[] possibleStateChangeChanges;
+		public float stateChangeLowerBoundDangerRange = 100;
+		public float stateChangeUpperBoundDangerRange = 100;
+
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
 		public bool[] possibleTargetDetectedObjectChanges;
+		public float targetDetectedObjectLowerBoundDangerRange = 100;
+		public float targetDetectedObjectUpperBoundDangerRange = 100;
+
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
 		public bool[] possiblePrioritizeDistanceInsteadOfIntensityChanges;
+		public float prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange = 100;
+		public float prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange = 100;
+
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
 		public bool[] possibleInvertPriorityChanges;
+		public float invertPriorityLowerBoundDangerRange = 100;
+		public float invertPriorityUpperBoundDangerRange = 100;
 	}
 
 	[System.Serializable]
