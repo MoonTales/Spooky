@@ -9,6 +9,9 @@ public class AttractorAI : MonoBehaviour
 {
 	#region InitialSetup
 	private NavMeshAgent agent;
+
+	[Tooltip("Between 0-100")]
+	public float currentDangerLevel = 0;
 	#endregion
 
 	#region States
@@ -64,22 +67,48 @@ public class AttractorAI : MonoBehaviour
 	public class EnemyReactionReprogram
 	{
 		public AttractorType[] possibleAttractorTypeChanges;
+		public float attractorTypeLowerBoundDangerRange = 100;
+		public float attractorTypeUpperBoundDangerRange = 100;
+
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
+		public float minIntensityLowerBoundDangerRange = 100;
+		public float minIntensityUpperBoundDangerRange = 100;
+
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
+		public float maxIntensityLowerBoundDangerRange = 100;
+		public float maxIntensityUpperBoundDangerRange = 100;
+
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
+		public float stateRestrictionLowerBoundDangerRange = 100;
+		public float stateRestrictionUpperBoundDangerRange = 100;
+
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
+		public float functionExecutionsLowerBoundDangerRange = 100;
+		public float functionExecutionsUpperBoundDangerRange = 100;
+
 		public EnemyState[] possibleStateChangeChanges;
+		public float stateChangeLowerBoundDangerRange = 100;
+		public float stateChangeUpperBoundDangerRange = 100;
+
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
 		public bool[] possibleTargetDetectedObjectChanges;
+		public float targetDetectedObjectLowerBoundDangerRange = 100;
+		public float targetDetectedObjectUpperBoundDangerRange = 100;
+
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
 		public bool[] possiblePrioritizeDistanceInsteadOfIntensityChanges;
+		public float prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange = 100;
+		public float prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange = 100;
+
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
 		public bool[] possibleInvertPriorityChanges;
+		public float invertPriorityLowerBoundDangerRange = 100;
+		public float invertPriorityUpperBoundDangerRange = 100;
 	}
 
 	[System.Serializable]
@@ -92,6 +121,10 @@ public class AttractorAI : MonoBehaviour
 		public int[] possiblePriorityReprograms;
 		[Tooltip("Only useful for functions that reprogram a reaction")]
 		public EnemyReactionReprogram reprogramParameters;
+		[Header("StatChanges")]
+		public Stats[] statsToChange;
+		public Alteration changeStatsBy;
+		public float statsChangeAmount;
 	}
 
 	public void TestFunction(List<string> arguments)
@@ -114,18 +147,141 @@ public class AttractorAI : MonoBehaviour
 
 	public enum Stats
 	{
+		screamTime,
 
+		//Wander
+		wander_speed,
+		wander_patrolRadius,
+		wander_minPatrolTimer,
+		wander_maxPatrolTimer,
+
+		//Investigate
+		investigate_speed,
+		investigate_permanenceTime,
+		investigate_giveUpTime,
+
+		//Rush Over
+		rushOver_speed,
+		rushOver_permanenceTime,
+		rushOver_giveUpTime,
+
+		//Chase
+		chase_speed,
+		chase_permanenceTime,
+		chase_giveUpTime,
+
+		//Attack
+		attack_bufferTime,
+		attack_speed,
+		attack_time,
+		attack_cooldownTime,
+
+		//Inspect
+		inspect_time
 	}
 	public enum Alteration
 	{
 		plus,
 		minus,
 		times,
-		dividedBy
+		dividedBy,
+		equals
 	}
-	public void ChangeStats(Stats statToChange, Alteration changeBy, float changeAmount)
+	public void ChangeStats(Stats[] statsToChange, Alteration changeBy, float changeAmount)
 	{
-		
+		foreach (Stats stat in statsToChange)
+		{
+			switch (stat)
+			{
+				case Stats.screamTime:
+					screamTime = DoAlterationCalculation(screamTime, changeBy, changeAmount);
+					break;
+
+				//Wander
+				case Stats.wander_speed:
+					wanderSpeed = DoAlterationCalculation(wanderSpeed, changeBy, changeAmount);
+					break;
+				case Stats.wander_patrolRadius:
+					patrolRadius = DoAlterationCalculation(patrolRadius, changeBy, changeAmount);
+					break;
+				case Stats.wander_minPatrolTimer:
+					minPatrolTimer = DoAlterationCalculation(minPatrolTimer, changeBy, changeAmount);
+					break;
+				case Stats.wander_maxPatrolTimer:
+					maxPatrolTimer = DoAlterationCalculation(maxPatrolTimer, changeBy, changeAmount);
+					break;
+
+				//Investigate
+				case Stats.investigate_speed:
+					investigateSpeed = DoAlterationCalculation(investigateSpeed, changeBy, changeAmount);
+					break;
+				case Stats.investigate_permanenceTime:
+					permanenceTime = DoAlterationCalculation(permanenceTime, changeBy, changeAmount);
+					break;
+				case Stats.investigate_giveUpTime:
+					giveUpTime = DoAlterationCalculation(giveUpTime, changeBy, changeAmount);
+					break;
+
+				//Rush Over
+				case Stats.rushOver_speed:
+					rushOverSpeed = DoAlterationCalculation(rushOverSpeed, changeBy, changeAmount);
+					break;
+				case Stats.rushOver_permanenceTime:
+					rushPermanenceTime = DoAlterationCalculation(rushPermanenceTime, changeBy, changeAmount);
+					break;
+				case Stats.rushOver_giveUpTime:
+					rushGiveUpTime = DoAlterationCalculation(rushGiveUpTime, changeBy, changeAmount);
+					break;
+
+				//Chase
+				case Stats.chase_speed:
+					chaseSpeed = DoAlterationCalculation(chaseSpeed, changeBy, changeAmount);
+					break;
+				case Stats.chase_permanenceTime:
+					chasePermanenceTime = DoAlterationCalculation(chasePermanenceTime, changeBy, changeAmount);
+					break;
+				case Stats.chase_giveUpTime:
+					chaseGiveUpTime = DoAlterationCalculation(chaseGiveUpTime, changeBy, changeAmount);
+					break;
+
+				//Attack
+				case Stats.attack_bufferTime:
+					attackBufferTime = DoAlterationCalculation(attackBufferTime, changeBy, changeAmount);
+					break;
+				case Stats.attack_speed:
+					attackSpeed = DoAlterationCalculation(attackSpeed, changeBy, changeAmount);
+					break;
+				case Stats.attack_time:
+					attackTime = DoAlterationCalculation(attackTime, changeBy, changeAmount);
+					break;
+				case Stats.attack_cooldownTime:
+					attackCooldownTime = DoAlterationCalculation(attackCooldownTime, changeBy, changeAmount);
+					break;
+
+				//Inspect
+				case Stats.inspect_time:
+					inspectTime = DoAlterationCalculation(inspectTime, changeBy, changeAmount);
+					break;
+			}
+		}
+	}
+	public float DoAlterationCalculation(float valueToChange, Alteration changeBy, float changeAmount)
+	{
+		switch (changeBy)
+		{
+			case Alteration.plus:
+				return Mathf.Max(valueToChange + changeAmount, 0);
+			case Alteration.minus:
+				return Mathf.Max(valueToChange - changeAmount, 0);
+			case Alteration.times:
+				return Mathf.Max(valueToChange * changeAmount, 0);
+			case Alteration.dividedBy:
+				return changeAmount == 0 ? 0 : Mathf.Max(valueToChange / changeAmount, 0);
+			case Alteration.equals:
+				return Mathf.Max(changeAmount, 0);
+			default:
+				return valueToChange;
+		}
 	}
 
 	[System.Serializable]
@@ -176,39 +332,98 @@ public class AttractorAI : MonoBehaviour
 	
 	public void ReprogramReaction(int[] priority, EnemyReactionReprogram reactionEdits)
 	{
-		if (priority.Length < 1)
+		if (priority.Length <= 0)
 		{
 			return;
 		}
 
 		int chosenPriority = priority[Random.Range(0, priority.Length)];
 
-		if (priority.Length < behaviourHierarchy.Count)
+		Debug.Log("Priority length is " + priority.Length + " and behavior hierarchy count is " + behaviourHierarchy.Count);
+
+		if (priority.Length <= behaviourHierarchy.Count)
 		{
 			EnemyReactions chosenReaction = behaviourHierarchy[chosenPriority];
 
+			float tempLowerBound = 0;
+			float tempUpperBound = 100;
+
 			if (reactionEdits.possibleAttractorTypeChanges.Length > 0)
-				chosenReaction.attractorType = reactionEdits.possibleAttractorTypeChanges[Random.Range(0, reactionEdits.possibleAttractorTypeChanges.Length)];
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.attractorTypeLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.attractorTypeUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.attractorType = reactionEdits.possibleAttractorTypeChanges[Random.Range((int)(reactionEdits.possibleAttractorTypeChanges.Length *
+					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleAttractorTypeChanges.Length * tempUpperBound))];
+			}
 			if (reactionEdits.possibleMinIntensityChanges.Length > 0)
-				chosenReaction.minIntensity = reactionEdits.possibleMinIntensityChanges[Random.Range(0, reactionEdits.possibleMinIntensityChanges.Length)];
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.minIntensityLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.minIntensityUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.minIntensity = reactionEdits.possibleMinIntensityChanges[Random.Range((int)(reactionEdits.possibleMinIntensityChanges.Length *
+					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleMinIntensityChanges.Length * tempUpperBound))];
+			}
 			if (reactionEdits.possibleMaxIntensityChanges.Length > 0)
-				chosenReaction.maxIntensity = reactionEdits.possibleMaxIntensityChanges[Random.Range(0, reactionEdits.possibleMaxIntensityChanges.Length)];
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.maxIntensityLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.maxIntensityUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.maxIntensity = reactionEdits.possibleMaxIntensityChanges[Random.Range((int)(reactionEdits.possibleMaxIntensityChanges.Length *
+					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleMaxIntensityChanges.Length * tempUpperBound))];
+			}
 			if (reactionEdits.possibleStateRestrictionChanges.Length > 0)
-				chosenReaction.stateRestriction = reactionEdits.possibleStateRestrictionChanges[Random.Range(0,
-					reactionEdits.possibleStateRestrictionChanges.Length)].stateRestriction;
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.stateRestrictionLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.stateRestrictionUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.stateRestriction = reactionEdits.possibleStateRestrictionChanges[Random.Range((int)(
+					reactionEdits.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleStateRestrictionChanges.Length *
+					tempUpperBound))].stateRestriction;
+			}
 			if (reactionEdits.possibleFunctionExecutionsChanges.Length > 0)
-				chosenReaction.functionExecutions = reactionEdits.possibleFunctionExecutionsChanges[Random.Range(0,
-					reactionEdits.possibleFunctionExecutionsChanges.Length)].functionExecutions;
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.functionExecutionsLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.functionExecutionsUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.functionExecutions = reactionEdits.possibleFunctionExecutionsChanges[Random.Range((int)(
+					reactionEdits.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
+						reactionEdits.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
+			}
 			if (reactionEdits.possibleStateChangeChanges.Length > 0)
-				chosenReaction.stateChange = reactionEdits.possibleStateChangeChanges[Random.Range(0, reactionEdits.possibleStateChangeChanges.Length)];
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.stateChangeLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.stateChangeUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.stateChange = reactionEdits.possibleStateChangeChanges[Random.Range((int)(reactionEdits.possibleStateChangeChanges.Length *
+					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleStateChangeChanges.Length * tempUpperBound))];
+			}
 			if (reactionEdits.possibleTargetDetectedObjectChanges.Length > 0)
-				chosenReaction.targetDetectedObject = reactionEdits.possibleTargetDetectedObjectChanges[Random.Range(0,
-					reactionEdits.possibleTargetDetectedObjectChanges.Length)];
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.targetDetectedObjectLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.targetDetectedObjectUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.targetDetectedObject = reactionEdits.possibleTargetDetectedObjectChanges[Random.Range((int)(
+					reactionEdits.possibleTargetDetectedObjectChanges.Length * tempLowerBound), Mathf.CeilToInt(
+						reactionEdits.possibleTargetDetectedObjectChanges.Length * tempUpperBound))];
+			}
 			if (reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
-				chosenReaction.prioritizeDistanceInsteadOfIntensity = reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges[Random.Range(0,
-					reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length)];
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.prioritizeDistanceInsteadOfIntensity = reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges[Random.Range((int)(
+					reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempLowerBound), Mathf.CeilToInt(
+						reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempUpperBound))];
+			}
 			if (reactionEdits.possibleInvertPriorityChanges.Length > 0)
-				chosenReaction.invertPriority = reactionEdits.possibleInvertPriorityChanges[Random.Range(0, reactionEdits.possibleInvertPriorityChanges.Length)];
+			{
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.invertPriorityLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.invertPriorityUpperBoundDangerRange, 100) / 100;
+
+				chosenReaction.invertPriority = reactionEdits.possibleInvertPriorityChanges[Random.Range((int)(reactionEdits.possibleInvertPriorityChanges.Length *
+					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleInvertPriorityChanges.Length * tempUpperBound))];
+			}
 		}
 	}
 
@@ -408,6 +623,9 @@ public class AttractorAI : MonoBehaviour
 				break;
 			case FunctionType.DeleteFocus:
 				DeleteFocus();
+				break;
+			case FunctionType.ChangeStats_STATS:
+				ChangeStats(function.statsToChange, function.changeStatsBy, function.statsChangeAmount);
 				break;
 		}
 	}
