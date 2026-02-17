@@ -58,6 +58,7 @@ namespace Player
             if (worldLocation == Types.WorldLocation.Bedroom)
             {
                 _currentDrawingsThisNight = 0;
+                _collectedDrawingsThisNight.Clear();
             }
         }
         

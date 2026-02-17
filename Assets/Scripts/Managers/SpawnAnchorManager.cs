@@ -47,8 +47,11 @@ namespace Managers
             spawnAnchorsInScene.AddRange(anchors);
         }
 
-        
 
+        private void HandleDrawingsInZones()
+        {
+            Debug.Log("XXXXX SPECIAL SPAWN LOGIC FOR ZONES ACTIVATED XXXXX");
+        }
         /// <summary>
         /// This is called when we enter the nightmare scene, to populate all of the drawings in the nightmare
         /// </summary>
@@ -66,6 +69,14 @@ namespace Managers
              */
             int lastSeenZone = GameStateManager.Instance.GetCurrentZoneId(); // as this was the last zone the player was in, before death
             // if this is ever -1, that means we had a "good" wakeup and didnt drop anything, and we can just spawn normally based on the act
+            if (lastSeenZone != -1)
+            {
+                HandleDrawingsInZones();
+                return;
+            }
+            
+            // if its not negative 1, treat like normal
+            
             
             
             //Step 3. Attempt to find available Spawn Anchors, that match the worlds anchorIdentifier
