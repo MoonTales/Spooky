@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 using Inspection;
 using Managers;
 using Types = System.Types;
@@ -13,110 +14,63 @@ namespace Interaction.Letters
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         
         private Types.LetterType _letterType; public void SetLetterType(Types.LetterType letterType) { _letterType = letterType; } public Types.LetterType GetLetterType() { return _letterType; }
-        
+        private bool _hasBeenWrittenOn = false; public void SetHasBeenWrittenOn(bool value) { _hasBeenWrittenOn = value; } public bool GetHasBeenWrittenOn() { return _hasBeenWrittenOn; }
         
         
 
         private void Start()
         {
-            // when the letter spawns in, we are gonna check a few things, and set the information about the letter accordingly;
-            int currentHour = GameStateManager.Instance.GetCurrentWorldClockHour();
             // the only times will be either Act (1), Act (2), or Act (3) (for now)
-            switch (currentHour)
-            {
-                case 1:
-                    HandleActOneLetter();
-                    break;
-                case 2:
-                    HandleActTwoLetter();
-                    break;
-                case 3:
-                    HandleActThreeLetter();
-                    break;
-                default:
-                    DebugUtils.LogWarning("Letter spawned at an unexpected hour!");
-                    break;
-            }
-        }
-
-        
-        // these could also just stay as seperate things
-        private void HandleActOneLetter()
-        {
-            // depending on if this is a friend letter or a researcher letter, we will set the letter type and the prompt key accordingly
             if (_letterType == Types.LetterType.Researcher)
             {
                 // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
                 promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
+                rowKey = new TextKey { place = "bedroom", id = "res_letter" };
             }
             else if (_letterType == Types.LetterType.Friend)
             {
                 promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
-            }
-        }
-
-        private void HandleActTwoLetter()
-        {
-            // depending on if this is a friend letter or a researcher letter, we will set the letter type and the prompt key accordingly
-            if (_letterType == Types.LetterType.Researcher)
-            {
-                // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
-                promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
-            }
-            else if (_letterType == Types.LetterType.Friend)
-            {
-                promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
+                rowKey = new TextKey { place = "bedroom", id = "fren_letter" };
             }
         }
         
-        private void HandleActThreeLetter()
+        public void SetResponseTextKey()
         {
-            // depending on if this is a friend letter or a researcher letter, we will set the letter type and the prompt key accordingly
-            if (_letterType == Types.LetterType.Researcher)
-            {
-                // Now we can set the promtkey and the rowKey. this also needs to be hooked up to take in a world clock hour
-                promptKey = new TextKey { place = "prompt", id = "res_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "ResearcherLetterRow" };
-            }
-            else if (_letterType == Types.LetterType.Friend)
-            {
-                promptKey = new TextKey { place = "prompt", id = "fren_letter" };
-                rowKey = new TextKey { place = "Bedroom", id = "FriendLetterRow" };
-            }
+            rowKey = new TextKey { place = "bedroom", id = "respond_letter" };
         }
 
-
-
+        
         public new void Interact(Interactor interactor)
         {
+            InspectionSystem.Instance.StartInspection(gameObject);
+        }
+        
+        public override void OnReturnedToOriginalPosition()
+        {
             if (_letterType == Types.LetterType.Researcher)
             {
-                Types.NotificationData data = new(
-                    duration: 3.0f, 
-                    messageKey: new TextKey { place = "Letters", id = "LetterContent1"},
-                    messageOverride: "This is a researcher's letter!"
-                );
-                data.Send();
+                HandleFinishedResearcherLetter();
             }
             else if (_letterType == Types.LetterType.Friend)
             {
-                Types.NotificationData data = new(
-                    duration: 3.0f, 
-                    messageKey: new TextKey { place = "Letters", id = "LetterContent2"},
-                    messageOverride: "This is a friend's letter!"
-                );
-                data.Send();
+                HandleFinishedFriendLetter();
             }
-            InspectionSystem.Instance.StartInspection(gameObject);
         }
 
-        public override void OnInspectionFinished()
+        private void HandleFinishedResearcherLetter()
         {
-            // Custom logic that can run once the inspection has been completed fully
+            // this will actually be the opposite effect, where it will slide back to the original position it slid in from, and then destroy itself
+            StartCoroutine(LetterManager.Instance.ReverseSlideNote(gameObject));
         }
+
+
+
+        private void HandleFinishedFriendLetter()
+        {
+            // due to this being a "fake" letter, we want to have it "vanish"
+            Destroy(gameObject);
+        }
+
+
     }
 }

@@ -56,16 +56,16 @@ namespace Managers
         {
             _isFading = true;
 
-            // Fade to black (Fade In)
-            yield return StartCoroutine(FadeToBlack(fadeData.GetFadeInDuration()));
-            OnScreenFadeInComplete(fadeData.GetOnFadeInComplete());
+            // Fade to black (Fade Out)
+            yield return StartCoroutine(FadeToBlack(fadeData.GetFadeOutDuration()));
+            OnScreenFadeOutComplete(fadeData.GetOnFadeOutComplete());
 
             // Pause for a set time
             yield return new WaitForSeconds(fadeData.GetFadeDuration());
             
             // Fade to clear (Fade Out)
-            yield return StartCoroutine(FadeToClear(fadeData.GetFadeOutDuration()));
-            OnScreenFadeOutComplete(fadeData.GetOnFadeOutComplete());
+            yield return StartCoroutine(FadeToClear(fadeData.GetFadeInDuration()));
+            OnScreenFadeInComplete(fadeData.GetOnFadeInComplete());
 
             _isFading = false;
         }

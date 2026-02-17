@@ -158,6 +158,14 @@ namespace UI
             if (_hudCrosshair != null) { _hudCrosshair.enabled = false; }
             SetPrompt("");
         }
+        
+        public void RefreshInspectionText()
+        {
+            if (_isInspecting)
+            {
+                HandleInspection();
+            }
+        }
 
         private void ShowHUD(bool show)
         {

@@ -78,5 +78,11 @@ namespace Inspection
         {
             // Custom logic that can run once the inspection has been completed fully
         }
+
+        public virtual void OnReturnedToOriginalPosition()
+        {
+            // Custom logic that can run once the inspected object has been returned to its original position
+            // this is the VERY end of the inspection
+        }
     }
 }

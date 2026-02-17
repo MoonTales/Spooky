@@ -40,15 +40,18 @@ namespace Managers
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
-            TrackSubscription(() => EventBroadcaster.OnWorldClockHourChanged += OnWorldClockUpdated,
-                () => EventBroadcaster.OnWorldClockHourChanged -= OnWorldClockUpdated);
+            TrackSubscription(()=> EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
         }
 
-        private void OnWorldClockUpdated(int clockHour)
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
         {
-            // this will be called each time the world clock updates
-            SpawnNoteForCurrentAct();
+            if (worldLocation == Types.WorldLocation.Bedroom)
+            {
+                SpawnNoteForCurrentAct();
+            }
         }
+
 
 
 
@@ -127,16 +130,31 @@ namespace Managers
             note.transform.rotation = targetRotation;
         }
 
-        private void Update()
+        public IEnumerator ReverseSlideNote(GameObject note)
         {
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                SpawnAnchorManager.Instance.RequestSpawnAtAnyAnchor(_notePrefab);
-            }
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                SpawnAnchorManager.Instance.RequestSpawnAtAnchorByIdentifier(_notePrefab, AnchorIdentifier.Act2);
-            }
+            // this will work identically to the slide note, but it will just reverse the start and end positions and rotations, so it will slide back to the center and unrotate itself
+                if (note == null){ yield break;}
+                Vector3 startPosition = note.transform.position;
+                GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
+                // spawn the note prefab at the location of the "NoteSpawnLocation" object
+                if (!spawnLocation) { yield break;}
+                Vector3 endPosition = spawnLocation.transform.position;
+                Quaternion startRotation = note.transform.rotation;
+                Quaternion targetRotation = Quaternion.identity;
+                float elapsedTime = 0f;
+                while (elapsedTime < slideDuration)
+                {
+                    elapsedTime += Time.deltaTime;
+                    float normalizedTime = elapsedTime / slideDuration;
+                    float curveValue = slideCurve.Evaluate(normalizedTime);
+                    note.transform.position = Vector3.Lerp(startPosition, endPosition, curveValue);
+                    note.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, curveValue);
+                    yield return null;
+                }
+                note.transform.position = endPosition;
+                note.transform.rotation = targetRotation;
+                Destroy(note);
         }
+        
     }
 }

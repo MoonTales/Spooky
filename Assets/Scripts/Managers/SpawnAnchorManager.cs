@@ -46,22 +46,13 @@ namespace Managers
             spawnAnchorsInScene.AddRange(anchors);
         }
 
-
-        private void Update()
-        {
-            // for testing purposes, we will call PopulateNightmare every frame, but in the actual game, this should only be called once when we enter the nightmare scene
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                PopulateNightmare();
-            }
-        }
+        
 
         /// <summary>
         /// This is called when we enter the nightmare scene, to populate all of the drawings in the nightmare
         /// </summary>
         private void PopulateNightmare()
         {
-            
             
             // Refresh the list of spawn anchors in the scene
             UpdateSpawnAnchorsInScene();
