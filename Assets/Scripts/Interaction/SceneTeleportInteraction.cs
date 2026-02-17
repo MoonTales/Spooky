@@ -8,9 +8,10 @@ public class SceneTeleportInteraction : MonoBehaviour, IInteractable
 
     [SerializeField] private bool bShouldResetZoneId = true;
     [SerializeField] private string sceneName = "";
-    public TextKey PromptKey => default;
-
-    public string Prompt { get; }
+    
+    [Header("Text Keys (CSV row pointers)")]
+    [SerializeField] private TextKey promptTextKey;
+    public TextKey PromptKey => promptTextKey;
     public bool CanInteract(Interactor interactor)
     {
         return true;
