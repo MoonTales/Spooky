@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Placeables;
+using Player;
 using UnityEngine;
 using Types = System.Types;
 
@@ -46,8 +47,51 @@ namespace Managers
             spawnAnchorsInScene.AddRange(anchors);
         }
 
-        
 
+        private void HandleDrawingsInZones()
+        {
+            // Get access to ALL of the spawn anchors in the scene, with a machine Zone ID
+            List<SpawnAnchor> zoneAnchors = spawnAnchorsInScene.FindAll(anchor => anchor.GetZoneID() == GameStateManager.Instance.GetCurrentZoneId());
+            
+            // Get access to the list of dropped drawings, and attempt to spawn them at these zone anchors, as these are the only ones that will spawn in the correct location
+            HashSet<int> droppedDrawings = PlayerInventory.Instance.GetDroppedDrawingIDs();
+            
+            // we can loop through all of the dropped drawings, and attempt to spawn them at the correct location
+            // within the zone, we will look for spawn anchors with the correct anchor.GetPriorityDrawingNumber() (which should match the drawing id)
+            foreach (int drawingID in droppedDrawings)
+            {
+                List<SpawnAnchor> matchingPriorityAnchors = zoneAnchors.FindAll(anchor => anchor.GetPriorityDrawingNumber() == drawingID);
+                if (matchingPriorityAnchors.Count == 0)
+                {
+                    // Every zone should have atleast 1 anchor with a -1 prority, with means if nothing else, look for a 01 priority anchor
+                    matchingPriorityAnchors = zoneAnchors.FindAll(anchor => anchor.GetPriorityDrawingNumber() == -1);
+                    if (matchingPriorityAnchors.Count == 0)
+                    {
+                        // we have no anchors with this priority number, so we will just skip spawning this drawing, as there is no available anchor for it
+                        Debug.LogWarning($"No available Spawn Anchors with priority {drawingID} found for zone {GameStateManager.Instance.GetCurrentZoneId()}! Skipping spawn for drawing with ID {drawingID}.");
+                        continue;
+                    }
+                }
+                // pick a random matching anchor
+                SpawnAnchor selectedAnchor = matchingPriorityAnchors[UnityEngine.Random.Range(0, matchingPriorityAnchors.Count)];
+                
+                // we need to load in the drawing prefab from resources
+                // our naming convention is "N_Drawing_i"
+                string prefabName = $"Prefabs/Drawings/Nightmare/N_Drawing_{drawingID}";
+                GameObject prefabToSpawn = Resources.Load<GameObject>(prefabName);
+                if (prefabToSpawn == null)
+                {
+                    Debug.LogError($"Failed to load prefab with name {prefabName} from Resources! Make sure the prefab exists and is located in a Resources folder.");
+                    continue;
+                }
+                selectedAnchor.ManualSpawn(prefabToSpawn);
+            }
+            
+            // now we have spawned in all of the weird edge case drawings that the player dropped on their last life
+            // the rest can be spawned normally, we just need to ensure we dont spawn duplicates
+            
+            
+        }
         /// <summary>
         /// This is called when we enter the nightmare scene, to populate all of the drawings in the nightmare
         /// </summary>
@@ -57,6 +101,24 @@ namespace Managers
             // Refresh the list of spawn anchors in the scene
             UpdateSpawnAnchorsInScene();
 
+            /* There is a priority to how these will work:
+             1st) We will attempt to find a matching zone, in the case our player previously died within a zone. 
+                  if this matches the currentAct, we can spawn normally
+                  
+                  The idea is that if we are currently in act 2, and we reach zone 1 and die, the drawings should try to spawn in zone 1, rather than Act 2
+             */
+            int lastSeenZone = GameStateManager.Instance.GetCurrentZoneId(); // as this was the last zone the player was in, before death
+            // if this is ever -1, that means we had a "good" wakeup and didnt drop anything, and we can just spawn normally based on the act
+            if (lastSeenZone != -1 && lastSeenZone != 0) // as zero is the default value at startup
+            {
+                HandleDrawingsInZones();
+                // after this call we have handled the edge cases
+            }
+            
+            // if its not negative 1, treat like normal
+            
+            
+            
             //Step 3. Attempt to find available Spawn Anchors, that match the worlds anchorIdentifier
             int currentAct = GameStateManager.Instance.GetCurrentWorldClockHour();
             // Hour 1: Act1
@@ -83,8 +145,6 @@ namespace Managers
                 Debug.LogError($"No Spawn Anchors with identifier {anchorIdentifierToUse} or lower found in the scene! Cannot spawn any drawings for this act.");
                 return;
             }
-            
-            
 
             //Step 5. Spawn the drawings at a spawn anchor that has NOT been used yet
             int numberOfDrawingsInGame = GameStateManager.Instance.GetMaxDrawingsInGame();
@@ -92,6 +152,14 @@ namespace Managers
             // we are gonna attempt to spawn the max number of drawings, as once we spawn on thats already collected, it auto handles turning itself off
             for (int i = 1; i < numberOfDrawingsInGame + 1; i++)
             {
+                // if i equals one of the drawing IDs that have been already spawned in (like, from the dropped ones, skip it)
+                HashSet<int> droppedDrawings = PlayerInventory.Instance.GetDroppedDrawingIDs();
+                if (droppedDrawings.Contains(i))
+                {
+                    // we have already spawned this drawing in the "dropped drawings" step, so we can skip it here
+                    continue;
+                }
+                
                 // Attempt to find a spawnAnchor with a matching GetPriorityDrawingNumber()
                 List<SpawnAnchor> matchingPriorityAnchors = matchingAnchors.FindAll(anchor => anchor.GetPriorityDrawingNumber() == i);
                 if (matchingPriorityAnchors.Count == 0)
@@ -121,6 +189,9 @@ namespace Managers
                 }
                 selectedAnchor.ManualSpawn(prefabToSpawn);
             }
+            
+            // finally we can clear the dropped drawings list
+            PlayerInventory.Instance.ClearDroppedDrawings();
             
         }
 
