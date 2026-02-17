@@ -50,7 +50,14 @@ namespace Managers
 
         private void HandleDrawingsInZones()
         {
-            Debug.Log("XXXXX SPECIAL SPAWN LOGIC FOR ZONES ACTIVATED XXXXX");
+            // Get access to ALL of the spawn anchors in the scene, with a machine Zone ID
+            List<SpawnAnchor> zoneAnchors = spawnAnchorsInScene.FindAll(anchor => anchor.GetAnchorIdentifier() == (AnchorIdentifier)GameStateManager.Instance.GetCurrentZoneId());
+            
+            // Get access to the list of dropped drawings, and attempt to spawn them at these zone anchors, as these are the only ones that will spawn in the correct location
+            HashSet<int> droppedDrawings = PlayerInventory.Instance.GetDroppedDrawingIDs();
+            
+            // we can loop through all of the dropped drawings, and attempt to spawn them at the correct location
+            
         }
         /// <summary>
         /// This is called when we enter the nightmare scene, to populate all of the drawings in the nightmare

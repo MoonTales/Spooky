@@ -18,7 +18,7 @@ namespace Player
         // Store only the IDs of collected drawings
         private readonly HashSet<int> _collectedDrawingIDs = new HashSet<int>();
         // we will also need to store "dropped" drawings
-        private readonly HashSet<int> _droppedDrawingIDs = new HashSet<int>();
+        private readonly HashSet<int> _droppedDrawingIDs = new HashSet<int>();  public HashSet<int> GetDroppedDrawingIDs() { return new HashSet<int>(_droppedDrawingIDs); } // return a copy to prevent external modification
     
         
         protected override void RegisterSubscriptions()
