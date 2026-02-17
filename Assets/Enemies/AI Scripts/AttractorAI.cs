@@ -332,14 +332,16 @@ public class AttractorAI : MonoBehaviour
 	
 	public void ReprogramReaction(int[] priority, EnemyReactionReprogram reactionEdits)
 	{
-		if (priority.Length < 1)
+		if (priority.Length <= 0)
 		{
 			return;
 		}
 
 		int chosenPriority = priority[Random.Range(0, priority.Length)];
 
-		if (priority.Length < behaviourHierarchy.Count)
+		Debug.Log("Priority length is " + priority.Length + " and behavior hierarchy count is " + behaviourHierarchy.Count);
+
+		if (priority.Length <= behaviourHierarchy.Count)
 		{
 			EnemyReactions chosenReaction = behaviourHierarchy[chosenPriority];
 
@@ -348,32 +350,32 @@ public class AttractorAI : MonoBehaviour
 
 			if (reactionEdits.possibleAttractorTypeChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.attractorTypeLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.attractorTypeUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.attractorTypeLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.attractorTypeUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.attractorType = reactionEdits.possibleAttractorTypeChanges[Random.Range((int)(reactionEdits.possibleAttractorTypeChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleAttractorTypeChanges.Length * tempUpperBound))];
 			}
 			if (reactionEdits.possibleMinIntensityChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.minIntensityLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.minIntensityUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.minIntensityLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.minIntensityUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.minIntensity = reactionEdits.possibleMinIntensityChanges[Random.Range((int)(reactionEdits.possibleMinIntensityChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleMinIntensityChanges.Length * tempUpperBound))];
 			}
 			if (reactionEdits.possibleMaxIntensityChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.maxIntensityLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.maxIntensityUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.maxIntensityLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.maxIntensityUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.maxIntensity = reactionEdits.possibleMaxIntensityChanges[Random.Range((int)(reactionEdits.possibleMaxIntensityChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleMaxIntensityChanges.Length * tempUpperBound))];
 			}
 			if (reactionEdits.possibleStateRestrictionChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.stateRestrictionLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.stateRestrictionUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.stateRestrictionLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.stateRestrictionUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.stateRestriction = reactionEdits.possibleStateRestrictionChanges[Random.Range((int)(
 					reactionEdits.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleStateRestrictionChanges.Length *
@@ -381,8 +383,8 @@ public class AttractorAI : MonoBehaviour
 			}
 			if (reactionEdits.possibleFunctionExecutionsChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.functionExecutionsLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.functionExecutionsUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.functionExecutionsLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.functionExecutionsUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.functionExecutions = reactionEdits.possibleFunctionExecutionsChanges[Random.Range((int)(
 					reactionEdits.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
@@ -390,16 +392,16 @@ public class AttractorAI : MonoBehaviour
 			}
 			if (reactionEdits.possibleStateChangeChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.stateChangeLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.stateChangeUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.stateChangeLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.stateChangeUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.stateChange = reactionEdits.possibleStateChangeChanges[Random.Range((int)(reactionEdits.possibleStateChangeChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleStateChangeChanges.Length * tempUpperBound))];
 			}
 			if (reactionEdits.possibleTargetDetectedObjectChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.targetDetectedObjectLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.targetDetectedObjectUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.targetDetectedObjectLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.targetDetectedObjectUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.targetDetectedObject = reactionEdits.possibleTargetDetectedObjectChanges[Random.Range((int)(
 					reactionEdits.possibleTargetDetectedObjectChanges.Length * tempLowerBound), Mathf.CeilToInt(
@@ -407,8 +409,8 @@ public class AttractorAI : MonoBehaviour
 			}
 			if (reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.prioritizeDistanceInsteadOfIntensity = reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges[Random.Range((int)(
 					reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempLowerBound), Mathf.CeilToInt(
@@ -416,8 +418,8 @@ public class AttractorAI : MonoBehaviour
 			}
 			if (reactionEdits.possibleInvertPriorityChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel -= reactionEdits.invertPriorityLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel += reactionEdits.invertPriorityUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.invertPriorityLowerBoundDangerRange, 0) / 100;
+				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.invertPriorityUpperBoundDangerRange, 100) / 100;
 
 				chosenReaction.invertPriority = reactionEdits.possibleInvertPriorityChanges[Random.Range((int)(reactionEdits.possibleInvertPriorityChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleInvertPriorityChanges.Length * tempUpperBound))];
