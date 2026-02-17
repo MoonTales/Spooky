@@ -92,6 +92,10 @@ public class AttractorAI : MonoBehaviour
 		public int[] possiblePriorityReprograms;
 		[Tooltip("Only useful for functions that reprogram a reaction")]
 		public EnemyReactionReprogram reprogramParameters;
+		[Header("StatChanges")]
+		public Stats[] statsToChange;
+		public Alteration changeStatsBy;
+		public float statsChangeAmount;
 	}
 
 	public void TestFunction(List<string> arguments)
@@ -114,18 +118,141 @@ public class AttractorAI : MonoBehaviour
 
 	public enum Stats
 	{
+		screamTime,
 
+		//Wander
+		wander_speed,
+		wander_patrolRadius,
+		wander_minPatrolTimer,
+		wander_maxPatrolTimer,
+
+		//Investigate
+		investigate_speed,
+		investigate_permanenceTime,
+		investigate_giveUpTime,
+
+		//Rush Over
+		rushOver_speed,
+		rushOver_permanenceTime,
+		rushOver_giveUpTime,
+
+		//Chase
+		chase_speed,
+		chase_permanenceTime,
+		chase_giveUpTime,
+
+		//Attack
+		attack_bufferTime,
+		attack_speed,
+		attack_time,
+		attack_cooldownTime,
+
+		//Inspect
+		inspect_time
 	}
 	public enum Alteration
 	{
 		plus,
 		minus,
 		times,
-		dividedBy
+		dividedBy,
+		equals
 	}
-	public void ChangeStats(Stats statToChange, Alteration changeBy, float changeAmount)
+	public void ChangeStats(Stats[] statsToChange, Alteration changeBy, float changeAmount)
 	{
-		
+		foreach (Stats stat in statsToChange)
+		{
+			switch (stat)
+			{
+				case Stats.screamTime:
+					screamTime = DoAlterationCalculation(screamTime, changeBy, changeAmount);
+					break;
+
+				//Wander
+				case Stats.wander_speed:
+					wanderSpeed = DoAlterationCalculation(wanderSpeed, changeBy, changeAmount);
+					break;
+				case Stats.wander_patrolRadius:
+					patrolRadius = DoAlterationCalculation(patrolRadius, changeBy, changeAmount);
+					break;
+				case Stats.wander_minPatrolTimer:
+					minPatrolTimer = DoAlterationCalculation(minPatrolTimer, changeBy, changeAmount);
+					break;
+				case Stats.wander_maxPatrolTimer:
+					maxPatrolTimer = DoAlterationCalculation(maxPatrolTimer, changeBy, changeAmount);
+					break;
+
+				//Investigate
+				case Stats.investigate_speed:
+					investigateSpeed = DoAlterationCalculation(investigateSpeed, changeBy, changeAmount);
+					break;
+				case Stats.investigate_permanenceTime:
+					permanenceTime = DoAlterationCalculation(permanenceTime, changeBy, changeAmount);
+					break;
+				case Stats.investigate_giveUpTime:
+					giveUpTime = DoAlterationCalculation(giveUpTime, changeBy, changeAmount);
+					break;
+
+				//Rush Over
+				case Stats.rushOver_speed:
+					rushOverSpeed = DoAlterationCalculation(rushOverSpeed, changeBy, changeAmount);
+					break;
+				case Stats.rushOver_permanenceTime:
+					rushPermanenceTime = DoAlterationCalculation(rushPermanenceTime, changeBy, changeAmount);
+					break;
+				case Stats.rushOver_giveUpTime:
+					rushGiveUpTime = DoAlterationCalculation(rushGiveUpTime, changeBy, changeAmount);
+					break;
+
+				//Chase
+				case Stats.chase_speed:
+					chaseSpeed = DoAlterationCalculation(chaseSpeed, changeBy, changeAmount);
+					break;
+				case Stats.chase_permanenceTime:
+					chasePermanenceTime = DoAlterationCalculation(chasePermanenceTime, changeBy, changeAmount);
+					break;
+				case Stats.chase_giveUpTime:
+					chaseGiveUpTime = DoAlterationCalculation(chaseGiveUpTime, changeBy, changeAmount);
+					break;
+
+				//Attack
+				case Stats.attack_bufferTime:
+					attackBufferTime = DoAlterationCalculation(attackBufferTime, changeBy, changeAmount);
+					break;
+				case Stats.attack_speed:
+					attackSpeed = DoAlterationCalculation(attackSpeed, changeBy, changeAmount);
+					break;
+				case Stats.attack_time:
+					attackTime = DoAlterationCalculation(attackTime, changeBy, changeAmount);
+					break;
+				case Stats.attack_cooldownTime:
+					attackCooldownTime = DoAlterationCalculation(attackCooldownTime, changeBy, changeAmount);
+					break;
+
+				//Inspect
+				case Stats.inspect_time:
+					inspectTime = DoAlterationCalculation(inspectTime, changeBy, changeAmount);
+					break;
+			}
+		}
+	}
+	public float DoAlterationCalculation(float valueToChange, Alteration changeBy, float changeAmount)
+	{
+		switch (changeBy)
+		{
+			case Alteration.plus:
+				return Mathf.Max(valueToChange + changeAmount, 0);
+			case Alteration.minus:
+				return Mathf.Max(valueToChange - changeAmount, 0);
+			case Alteration.times:
+				return Mathf.Max(valueToChange * changeAmount, 0);
+			case Alteration.dividedBy:
+				return changeAmount == 0 ? 0 : Mathf.Max(valueToChange / changeAmount, 0);
+			case Alteration.equals:
+				return Mathf.Max(changeAmount, 0);
+			default:
+				return valueToChange;
+		}
 	}
 
 	[System.Serializable]
@@ -408,6 +535,9 @@ public class AttractorAI : MonoBehaviour
 				break;
 			case FunctionType.DeleteFocus:
 				DeleteFocus();
+				break;
+			case FunctionType.ChangeStats_STATS:
+				ChangeStats(function.statsToChange, function.changeStatsBy, function.statsChangeAmount);
 				break;
 		}
 	}
