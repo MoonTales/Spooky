@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using UnityEngine;
 
 public class SceneTeleportInteraction : MonoBehaviour, IInteractable
@@ -17,6 +18,7 @@ public class SceneTeleportInteraction : MonoBehaviour, IInteractable
     public void Interact(Interactor interactor)
     {
         SceneSwapper.Instance.SwapScene(sceneName);
+        GameStateManager.Instance.SetCurrentZoneId(-1);
     }
 
     public AudioClip HoverSfx { get; }

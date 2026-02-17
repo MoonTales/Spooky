@@ -17,6 +17,8 @@ namespace Player
         
         // Store only the IDs of collected drawings
         private readonly HashSet<int> _collectedDrawingIDs = new HashSet<int>();
+        // we will also need to store "dropped" drawings
+        private readonly HashSet<int> _droppedDrawingIDs = new HashSet<int>();
     
         
         protected override void RegisterSubscriptions()
@@ -38,10 +40,15 @@ namespace Player
                 // loop through all of the collected drawings this night, and remove them from the inventory
                 foreach (int drawingID in _collectedDrawingsThisNight)
                 {
+                    _droppedDrawingIDs.Add(drawingID);
                     RemoveDrawing(drawingID);
                 }
                 
             }
+        }
+        public void ClearDroppedDrawings()
+        {
+            _droppedDrawingIDs.Clear();
         }
 
         private void OnWorldLocationChanged(Types.WorldLocation worldLocation)

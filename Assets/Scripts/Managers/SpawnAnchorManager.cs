@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Placeables;
+using Player;
 using UnityEngine;
 using Types = System.Types;
 
@@ -57,6 +58,16 @@ namespace Managers
             // Refresh the list of spawn anchors in the scene
             UpdateSpawnAnchorsInScene();
 
+            /* There is a priority to how these will work:
+             1st) We will attempt to find a matching zone, in the case our player previously died within a zone. 
+                  if this matches the currentAct, we can spawn normally
+                  
+                  The idea is that if we are currently in act 2, and we reach zone 1 and die, the drawings should try to spawn in zone 1, rather than Act 2
+             */
+            int lastSeenZone = GameStateManager.Instance.GetCurrentZoneId(); // as this was the last zone the player was in, before death
+            // if this is ever -1, that means we had a "good" wakeup and didnt drop anything, and we can just spawn normally based on the act
+            
+            
             //Step 3. Attempt to find available Spawn Anchors, that match the worlds anchorIdentifier
             int currentAct = GameStateManager.Instance.GetCurrentWorldClockHour();
             // Hour 1: Act1
@@ -83,8 +94,6 @@ namespace Managers
                 Debug.LogError($"No Spawn Anchors with identifier {anchorIdentifierToUse} or lower found in the scene! Cannot spawn any drawings for this act.");
                 return;
             }
-            
-            
 
             //Step 5. Spawn the drawings at a spawn anchor that has NOT been used yet
             int numberOfDrawingsInGame = GameStateManager.Instance.GetMaxDrawingsInGame();
@@ -121,6 +130,9 @@ namespace Managers
                 }
                 selectedAnchor.ManualSpawn(prefabToSpawn);
             }
+            
+            // finally we can clear the dropped drawings list
+            PlayerInventory.Instance.ClearDroppedDrawings();
             
         }
 
