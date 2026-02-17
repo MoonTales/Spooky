@@ -16,7 +16,7 @@ public class Interactor : MonoBehaviour
         if (playerCamera == null)
             playerCamera = Camera.main;
         
-        interactionLayerMask = ~LayerMask.GetMask("SoundAttractor", "Ignore Raycast");
+        interactionLayerMask = ~LayerMask.GetMask("SoundAttractor", "Ignore Raycast", "HIDDEN");
     }
     
     
@@ -42,6 +42,7 @@ public class Interactor : MonoBehaviour
         
         if (Physics.Raycast(origin, dir, out RaycastHit hitInfo, castDistance, interactionLayerMask))
         {
+            Debug.Log("Hit parent object: " + hitInfo.collider.gameObject.name);
             // if we currently have an object we are inspecting, we should not allow any of this to happen
             if (InspectionSystem.Instance.GetCurrentInspectedObject() != null)
             {
