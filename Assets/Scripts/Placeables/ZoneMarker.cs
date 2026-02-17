@@ -11,12 +11,13 @@ namespace Placeables
         // if its a transition zone, we will need a second zone ID, second box collider, and a second gizmo color to represent the second zone
         // only have these options visible if this is true
         
+        [SerializeField, Tooltip("if set to true, it will restore whatever zoneID was had before entering this")] private bool RestoreOnExit = false; // if true, when the player exits this zone, it will restore the previous zone ID
         [SerializeField, Tooltip("The zone this is to mark")] private int zoneID; // the ID of the zone this marker represents
         [SerializeField] private Color editorGizmoColor = new Color(1f, 0f, 1f, 0.15f);
         
         // Internal variables
         private BoxCollider _boxCollider; // the box collider component attached to this game object
-
+        private int previousZoneID = -1; // to store the previous zone ID when the player enters this zone, so that we can restore it if needed
 
         private void Start()
         {
@@ -33,6 +34,7 @@ namespace Placeables
             
             // ensure the thing that interacted with us is the player
             if (!other.CompareTag("Player")) { return; }
+            previousZoneID = GameStateManager.Instance.GetCurrentZoneId();
         
             // create our notification data
             Types.NotificationData data = new(
@@ -44,6 +46,27 @@ namespace Placeables
             
             GameStateManager.Instance.SetCurrentZoneId(zoneID);
             
+        }
+        
+        private void OnTriggerExit(Collider other)
+        {
+            // These should only play during Gameplay
+            if (GameStateManager.Instance.GetCurrentGameState() != Types.GameState.Gameplay) { return;}
+            
+            // ensure the thing that interacted with us is the player
+            if (!other.CompareTag("Player")) { return; }
+            
+            if (RestoreOnExit)
+            {
+                // create our notification data
+                Types.NotificationData data = new(
+                    duration: 1, 
+                    messageKey: new TextKey(),
+                    messageOverride: "You just entered the zone: " + previousZoneID
+                );
+                data.Send();
+                GameStateManager.Instance.SetCurrentZoneId(previousZoneID);
+            }
         }
 
         private void OnDrawGizmos()
