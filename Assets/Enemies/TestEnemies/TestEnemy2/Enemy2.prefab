@@ -1463,12 +1463,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentDangerLevel: 0
+  currentStatuses: []
   defaultState: 1
   defaultFocus: {fileID: 0}
   behaviourHierarchy:
   - attractorType: 0
     minIntensity: 15
     maxIntensity: 25
+    statusRestrictions: []
+    allStatusesRequired: 0
     stateRestriction: 
     functionExecutions:
     - function: 3
@@ -1484,6 +1487,12 @@ MonoBehaviour:
         possibleMaxIntensityChanges: []
         maxIntensityLowerBoundDangerRange: 100
         maxIntensityUpperBoundDangerRange: 100
+        possibleStatusRestrictionsChanges: []
+        statusRestrictionsLowerBoundDangerRange: 100
+        statusRestrictionsUpperBoundDangerRange: 100
+        possibleAllStatusesRequiredChanges: 
+        allStatusesRequiredLowerBoundDangerRange: 100
+        allStatusesRequiredUpperBoundDangerRange: 100
         possibleStateRestrictionChanges: []
         stateRestrictionLowerBoundDangerRange: 100
         stateRestrictionUpperBoundDangerRange: 100
@@ -1518,6 +1527,12 @@ MonoBehaviour:
         possibleMaxIntensityChanges: []
         maxIntensityLowerBoundDangerRange: 100
         maxIntensityUpperBoundDangerRange: 100
+        possibleStatusRestrictionsChanges: []
+        statusRestrictionsLowerBoundDangerRange: 100
+        statusRestrictionsUpperBoundDangerRange: 100
+        possibleAllStatusesRequiredChanges: 
+        allStatusesRequiredLowerBoundDangerRange: 100
+        allStatusesRequiredUpperBoundDangerRange: 100
         possibleStateRestrictionChanges: []
         stateRestrictionLowerBoundDangerRange: 100
         stateRestrictionUpperBoundDangerRange: 100
@@ -1552,6 +1567,143 @@ MonoBehaviour:
         possibleMaxIntensityChanges: []
         maxIntensityLowerBoundDangerRange: 100
         maxIntensityUpperBoundDangerRange: 100
+        possibleStatusRestrictionsChanges: []
+        statusRestrictionsLowerBoundDangerRange: 100
+        statusRestrictionsUpperBoundDangerRange: 100
+        possibleAllStatusesRequiredChanges: 
+        allStatusesRequiredLowerBoundDangerRange: 100
+        allStatusesRequiredUpperBoundDangerRange: 100
+        possibleStateRestrictionChanges: []
+        stateRestrictionLowerBoundDangerRange: 100
+        stateRestrictionUpperBoundDangerRange: 100
+        possibleFunctionExecutionsChanges: []
+        functionExecutionsLowerBoundDangerRange: 100
+        functionExecutionsUpperBoundDangerRange: 100
+        possibleStateChangeChanges: 0300000004000000040000000400000004000000040000000400000004000000
+        stateChangeLowerBoundDangerRange: 0
+        stateChangeUpperBoundDangerRange: 0
+        possibleTargetDetectedObjectChanges: 
+        targetDetectedObjectLowerBoundDangerRange: 100
+        targetDetectedObjectUpperBoundDangerRange: 100
+        possiblePrioritizeDistanceInsteadOfIntensityChanges: 
+        prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange: 100
+        prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange: 100
+        possibleInvertPriorityChanges: 
+        invertPriorityLowerBoundDangerRange: 100
+        invertPriorityUpperBoundDangerRange: 100
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+    stateChange: 3
+    targetDetectedObject: 0
+    prioritizeDistanceInsteadOfIntensity: 0
+    invertPriority: 0
+  - attractorType: 1
+    minIntensity: 15
+    maxIntensity: 25
+    statusRestrictions: []
+    allStatusesRequired: 0
+    stateRestriction: 
+    functionExecutions:
+    - function: 3
+      arguments: []
+      possiblePriorityReprograms: 
+      reprogramParameters:
+        possibleAttractorTypeChanges: 
+        attractorTypeLowerBoundDangerRange: 100
+        attractorTypeUpperBoundDangerRange: 100
+        possibleMinIntensityChanges: []
+        minIntensityLowerBoundDangerRange: 100
+        minIntensityUpperBoundDangerRange: 100
+        possibleMaxIntensityChanges: []
+        maxIntensityLowerBoundDangerRange: 100
+        maxIntensityUpperBoundDangerRange: 100
+        possibleStatusRestrictionsChanges: []
+        statusRestrictionsLowerBoundDangerRange: 100
+        statusRestrictionsUpperBoundDangerRange: 100
+        possibleAllStatusesRequiredChanges: 
+        allStatusesRequiredLowerBoundDangerRange: 100
+        allStatusesRequiredUpperBoundDangerRange: 100
+        possibleStateRestrictionChanges: []
+        stateRestrictionLowerBoundDangerRange: 100
+        stateRestrictionUpperBoundDangerRange: 100
+        possibleFunctionExecutionsChanges: []
+        functionExecutionsLowerBoundDangerRange: 100
+        functionExecutionsUpperBoundDangerRange: 100
+        possibleStateChangeChanges: 
+        stateChangeLowerBoundDangerRange: 100
+        stateChangeUpperBoundDangerRange: 100
+        possibleTargetDetectedObjectChanges: 
+        targetDetectedObjectLowerBoundDangerRange: 100
+        targetDetectedObjectUpperBoundDangerRange: 100
+        possiblePrioritizeDistanceInsteadOfIntensityChanges: 
+        prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange: 100
+        prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange: 100
+        possibleInvertPriorityChanges: 
+        invertPriorityLowerBoundDangerRange: 100
+        invertPriorityUpperBoundDangerRange: 100
+      statsToChange: 0000000008000000090000000300000004000000
+      changeStatsBy: 0
+      statsChangeAmount: 1
+    - function: 3
+      arguments: []
+      possiblePriorityReprograms: 
+      reprogramParameters:
+        possibleAttractorTypeChanges: 
+        attractorTypeLowerBoundDangerRange: 100
+        attractorTypeUpperBoundDangerRange: 100
+        possibleMinIntensityChanges: []
+        minIntensityLowerBoundDangerRange: 100
+        minIntensityUpperBoundDangerRange: 100
+        possibleMaxIntensityChanges: []
+        maxIntensityLowerBoundDangerRange: 100
+        maxIntensityUpperBoundDangerRange: 100
+        possibleStatusRestrictionsChanges: []
+        statusRestrictionsLowerBoundDangerRange: 100
+        statusRestrictionsUpperBoundDangerRange: 100
+        possibleAllStatusesRequiredChanges: 
+        allStatusesRequiredLowerBoundDangerRange: 100
+        allStatusesRequiredUpperBoundDangerRange: 100
+        possibleStateRestrictionChanges: []
+        stateRestrictionLowerBoundDangerRange: 100
+        stateRestrictionUpperBoundDangerRange: 100
+        possibleFunctionExecutionsChanges: []
+        functionExecutionsLowerBoundDangerRange: 100
+        functionExecutionsUpperBoundDangerRange: 100
+        possibleStateChangeChanges: 
+        stateChangeLowerBoundDangerRange: 100
+        stateChangeUpperBoundDangerRange: 100
+        possibleTargetDetectedObjectChanges: 
+        targetDetectedObjectLowerBoundDangerRange: 100
+        targetDetectedObjectUpperBoundDangerRange: 100
+        possiblePrioritizeDistanceInsteadOfIntensityChanges: 
+        prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange: 100
+        prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange: 100
+        possibleInvertPriorityChanges: 
+        invertPriorityLowerBoundDangerRange: 100
+        invertPriorityUpperBoundDangerRange: 100
+      statsToChange: 0100000002000000
+      changeStatsBy: 1
+      statsChangeAmount: 1
+    - function: 1
+      arguments: []
+      possiblePriorityReprograms: 00000000
+      reprogramParameters:
+        possibleAttractorTypeChanges: 
+        attractorTypeLowerBoundDangerRange: 100
+        attractorTypeUpperBoundDangerRange: 100
+        possibleMinIntensityChanges: []
+        minIntensityLowerBoundDangerRange: 100
+        minIntensityUpperBoundDangerRange: 100
+        possibleMaxIntensityChanges: []
+        maxIntensityLowerBoundDangerRange: 100
+        maxIntensityUpperBoundDangerRange: 100
+        possibleStatusRestrictionsChanges: []
+        statusRestrictionsLowerBoundDangerRange: 100
+        statusRestrictionsUpperBoundDangerRange: 100
+        possibleAllStatusesRequiredChanges: 
+        allStatusesRequiredLowerBoundDangerRange: 100
+        allStatusesRequiredUpperBoundDangerRange: 100
         possibleStateRestrictionChanges: []
         stateRestrictionLowerBoundDangerRange: 100
         stateRestrictionUpperBoundDangerRange: 100
@@ -1590,6 +1742,18 @@ MonoBehaviour:
     - {fileID: 2853669459090612819}
     invertDetection: 0
     lightSensitive: 1
+  - detectionRadius: 75
+    detectionAngle: 180
+    targetLayer:
+      serializedVersion: 2
+      m_Bits: 256
+    obstacleLayer:
+      serializedVersion: 2
+      m_Bits: 1025
+    senseOrgans:
+    - {fileID: 1779910329964932904}
+    invertDetection: 0
+    lightSensitive: 0
   animator: {fileID: 1779910329955597404}
   walkSpdAnimMult: 10
   screamTime: 1

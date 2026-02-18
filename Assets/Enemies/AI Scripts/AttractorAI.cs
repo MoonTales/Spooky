@@ -25,7 +25,8 @@ public class AttractorAI : MonoBehaviour
 		RushOver,
 		Chase,
 		Attack,
-		Inspect
+		Inspect,
+		Search
 	}
 	#endregion
 
@@ -213,7 +214,13 @@ public class AttractorAI : MonoBehaviour
 		attack_cooldownTime,
 
 		//Inspect
-		inspect_time
+		inspect_time,
+
+		//Search
+		search_speed,
+		search_radius,
+		search_minTimer,
+		search_maxTimer	
 	}
 	public enum Alteration
 	{
@@ -297,6 +304,20 @@ public class AttractorAI : MonoBehaviour
 				//Inspect
 				case Stats.inspect_time:
 					inspectTime = DoAlterationCalculation(inspectTime, changeBy, changeAmount);
+					break;
+
+				//Search
+				case Stats.search_speed:
+					searchSpeed = DoAlterationCalculation(searchSpeed, changeBy, changeAmount);
+					break;
+				case Stats.search_radius:
+					searchRadius = DoAlterationCalculation(searchRadius, changeBy, changeAmount);
+					break;
+				case Stats.search_minTimer:
+					minSearchTimer = DoAlterationCalculation(minSearchTimer, changeBy, changeAmount);
+					break;
+				case Stats.search_maxTimer:
+					maxSearchTimer = DoAlterationCalculation(maxSearchTimer, changeBy, changeAmount);
 					break;
 			}
 		}
@@ -568,6 +589,29 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float inspectTime = 0;
 	private float currentInspect = 0;
 
+	[Header("SearchState")]
+	[SerializeField] private float searchSpeed;
+	[Tooltip("Maximum distance from current position that the enemy can choose to search")]
+	[SerializeField] private float searchRadius;
+	[Tooltip("The shortest amount of time before the enemy decides to move to stop searching")]
+	[SerializeField] private float minSearchTimer;
+	[Tooltip("The longest amount of time before the enemy decides to move to a new location")]
+	[SerializeField] private float maxSearchTimer;
+	[Tooltip("The minimum amount of places the enemy could search")]
+	[SerializeField] private int minSearchAmount;
+	[Tooltip("The maximum amount of places the enemy could search")]
+	[SerializeField] private int maxSearchAmount;
+	[Tooltip("The enemy will only search areas that cannot be detected by the sense at this index in Enemy Senses")]
+	[SerializeField] private int searchSenseIndex;
+	[SerializeField] private bool screamInsteadOfLookAround = false;
+	[SerializeField] private bool dontScreamOrLookAround = false;
+
+	private float searchTimer;
+	private int searchAmount;
+	private List<Vector3> searchLocations = new List<Vector3>();
+	private bool searching = false;
+	private bool searchingSpot = false;
+
 	#endregion
 
 	void Start()
@@ -620,7 +664,7 @@ public class AttractorAI : MonoBehaviour
 		{
 			Transform target = hitCollider.transform;
 
-			if (CheckConeVisibility(target, currentSense))
+			if (CheckConeVisibility(target.position, currentSense))
 			{
 				tempAttractorList.Add(target.GetComponent<Attractor>());
 			}
@@ -628,15 +672,15 @@ public class AttractorAI : MonoBehaviour
 		return tempAttractorList;
 	}
 
-	bool CheckConeVisibility(Transform target, EnemySense currentSense)
+	bool CheckConeVisibility(Vector3 targetPosition, EnemySense currentSense)
 	{
 		foreach (Transform organ in currentSense.senseOrgans)
 		{
-			Vector3 directionToTarget = (target.position - organ.position).normalized;
+			Vector3 directionToTarget = (targetPosition - organ.position).normalized;
 
 			if (Vector3.Angle(organ.forward, directionToTarget) < currentSense.detectionAngle)
 			{
-				float distanceToTarget = Vector3.Distance(organ.position, target.position);
+				float distanceToTarget = Vector3.Distance(organ.position, targetPosition);
 				RaycastHit hit;
 
 				if (Physics.Raycast(organ.position, directionToTarget, out hit, distanceToTarget, currentSense.obstacleLayer | currentSense.targetLayer))
@@ -710,6 +754,14 @@ public class AttractorAI : MonoBehaviour
 		{
 			animator.SetBool("Inspecting", false);
 			currentInspect = 0;
+		}
+		if (!(currentState == EnemyState.Search))
+		{
+			animator.SetBool("LookingAround", false);
+			searchTimer = 0;
+			if (searchLocations.Count > 1)
+				searchLocations.Clear();
+			searching = false;
 		}
 
 		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
@@ -945,6 +997,69 @@ public class AttractorAI : MonoBehaviour
 				currentStatePriority = nextStatePriority;
 			}
 		}
+		else if (currentState == EnemyState.Search)
+		{
+			agent.speed = searchSpeed;
+
+			if (!searching)
+			{
+				if (searchLocations.Count > 0)
+					searchLocations.Clear();
+				searchTimer = Random.Range(minSearchTimer, maxSearchTimer);
+				searchAmount = Random.Range(minSearchAmount, maxSearchAmount + 1);
+
+				for (int spots = 0; spots < searchAmount; spots++)
+				{
+					Vector3 searchSpot = FindSearchSpot();
+					if (searchSpot != Vector3.zero)
+						searchLocations.Add(searchSpot);
+					else
+						break;
+				}
+
+				searchingSpot = false;
+				searching = true;
+			}
+
+			else
+			{
+				searchTimer -= Time.deltaTime;
+
+				if (!searchingSpot)
+				{
+					if (searchLocations.Count > 0)
+					{
+						int lastIndex = searchLocations.Count - 1;
+						agent.SetDestination(searchLocations[lastIndex]);
+						searchLocations.RemoveAt(lastIndex);
+						searchingSpot = true;
+					}
+					else
+					{
+						animator.SetBool("LookingAround", false);
+						searchTimer = 0;
+						searching = false;
+						currentFocus = nextFocus;
+						currentState = nextState;
+						currentStatePriority = nextStatePriority;
+					}
+				}
+				else if (agent.remainingDistance < 0.5f)
+				{
+					searchingSpot = false;
+				}
+				
+				if (searchTimer <= 0)
+				{
+					animator.SetBool("LookingAround", false);
+					searchTimer = 0;
+					searching = false;
+					currentFocus = nextFocus;
+					currentState = nextState;
+					currentStatePriority = nextStatePriority;
+				}
+			}
+		}
 	}
 
 	IEnumerator ScreamRoutine()
@@ -980,5 +1095,31 @@ public class AttractorAI : MonoBehaviour
 		{
 			agent.SetDestination(hit.position);
 		}
+	}
+
+	private Vector3 FindSearchSpot()
+	{
+		Vector3 newPos = Vector3.zero;
+		bool foundValidDestination = false;
+		int attempts = 0;
+		int maxAttempts = 10;
+
+		while (!foundValidDestination && attempts < maxAttempts)
+		{
+			Vector3 randomPoint = transform.position + Random.insideUnitSphere * searchRadius;
+			NavMeshHit hit;
+
+			if (NavMesh.SamplePosition(randomPoint, out hit, searchRadius, NavMesh.AllAreas))
+			{
+				if (!CheckConeVisibility(hit.position, senses[searchSenseIndex]))
+				{
+					newPos = hit.position;
+					foundValidDestination = true;
+				}
+			}
+			attempts++;
+		}
+
+		return newPos;
 	}
 }
