@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class AttractorAI : MonoBehaviour
 
 	[Tooltip("Between 0-100")]
 	public float currentDangerLevel = 0;
+	[SerializeField] private List<string> currentStatuses = new List<string>();
 	#endregion
 
 	#region States
@@ -52,6 +54,12 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	[System.Serializable]
+	public class EnemyStatusListWrapper
+	{
+		public List<string> statusRestrictions;
+	}
+
+	[System.Serializable]
 	public class EnemyStateListWrapper
 	{
 		public List<EnemyState> stateRestriction;
@@ -79,6 +87,14 @@ public class AttractorAI : MonoBehaviour
 		public float[] possibleMaxIntensityChanges;
 		public float maxIntensityLowerBoundDangerRange = 100;
 		public float maxIntensityUpperBoundDangerRange = 100;
+
+		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
+		public float statusRestrictionsLowerBoundDangerRange = 100;
+		public float statusRestrictionsUpperBoundDangerRange = 100;
+
+		public bool[] possibleAllStatusesRequiredChanges;
+		public float allStatusesRequiredLowerBoundDangerRange = 100;
+		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
 		public float stateRestrictionLowerBoundDangerRange = 100;
@@ -293,6 +309,13 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
+		public List<string> statusRestrictions = new List<string>();
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
+		public bool allStatusesRequired = false;
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		public EnemyState stateChange;
@@ -372,6 +395,24 @@ public class AttractorAI : MonoBehaviour
 
 				chosenReaction.maxIntensity = reactionEdits.possibleMaxIntensityChanges[Random.Range((int)(reactionEdits.possibleMaxIntensityChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleMaxIntensityChanges.Length * tempUpperBound))];
+			}
+			if (reactionEdits.possibleStatusRestrictionsChanges.Length > 0)
+			{
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.statusRestrictionsLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.statusRestrictionsUpperBoundDangerRange, 0, 100) / 100;
+
+				chosenReaction.statusRestrictions = reactionEdits.possibleStatusRestrictionsChanges[Random.Range((int)(
+					reactionEdits.possibleStatusRestrictionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
+						reactionEdits.possibleStatusRestrictionsChanges.Length * tempUpperBound))].statusRestrictions;
+			}
+			if (reactionEdits.possibleAllStatusesRequiredChanges.Length > 0)
+			{
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.allStatusesRequiredLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.allStatusesRequiredUpperBoundDangerRange, 0, 100) / 100;
+
+				chosenReaction.allStatusesRequired = reactionEdits.possibleAllStatusesRequiredChanges[Random.Range((int)(
+					reactionEdits.possibleAllStatusesRequiredChanges.Length * tempLowerBound), Mathf.CeilToInt(
+						reactionEdits.possibleAllStatusesRequiredChanges.Length * tempUpperBound))];
 			}
 			if (reactionEdits.possibleStateRestrictionChanges.Length > 0)
 			{
@@ -655,7 +696,9 @@ public class AttractorAI : MonoBehaviour
 		int tempPriority = 0;
 		foreach (EnemyReactions reaction in behaviourHierarchy)
 		{
-			if (reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState))
+			if ((reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState)) && (reaction.statusRestrictions.Count < 1 ||
+				reaction.allStatusesRequired ? currentStatuses.Intersect(reaction.statusRestrictions).Count() == currentStatuses.Count() :
+				reaction.statusRestrictions.Intersect(currentStatuses).Any()))
 			{
 				Transform tempFocus = defaultFocus; ;
 				float tempValue = -1;
