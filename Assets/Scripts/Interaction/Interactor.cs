@@ -16,7 +16,7 @@ public class Interactor : MonoBehaviour
         if (playerCamera == null)
             playerCamera = Camera.main;
         
-        interactionLayerMask = ~LayerMask.GetMask("SoundAttractor", "Ignore Raycast", "HIDDEN", "SightAttractor");
+        interactionLayerMask = ~LayerMask.GetMask("SoundAttractor", "Ignore Raycast", "HIDDEN", "SightAttractor", "PostProcess");
     }
     
     

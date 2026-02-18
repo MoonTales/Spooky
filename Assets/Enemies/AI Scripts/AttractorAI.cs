@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class AttractorAI : MonoBehaviour
 
 	[Tooltip("Between 0-100")]
 	public float currentDangerLevel = 0;
+	[SerializeField] private List<string> currentStatuses = new List<string>();
 	#endregion
 
 	#region States
@@ -23,7 +25,9 @@ public class AttractorAI : MonoBehaviour
 		RushOver,
 		Chase,
 		Attack,
-		Inspect
+		Inspect,
+		Search,
+		Flee
 	}
 	#endregion
 
@@ -48,7 +52,14 @@ public class AttractorAI : MonoBehaviour
 		TestFunction_floatF_boolB,
 		ReprogramReaction_REPROGRAM,
 		DeleteFocus,
-		ChangeStats_STATS
+		ChangeStats_STATS,
+		AddStatuses_LISTstringStatuses_boolRemove
+	}
+
+	[System.Serializable]
+	public class EnemyStatusListWrapper
+	{
+		public List<string> statusRestrictions;
 	}
 
 	[System.Serializable]
@@ -79,6 +90,14 @@ public class AttractorAI : MonoBehaviour
 		public float[] possibleMaxIntensityChanges;
 		public float maxIntensityLowerBoundDangerRange = 100;
 		public float maxIntensityUpperBoundDangerRange = 100;
+
+		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
+		public float statusRestrictionsLowerBoundDangerRange = 100;
+		public float statusRestrictionsUpperBoundDangerRange = 100;
+
+		public bool[] possibleAllStatusesRequiredChanges;
+		public float allStatusesRequiredLowerBoundDangerRange = 100;
+		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
 		public float stateRestrictionLowerBoundDangerRange = 100;
@@ -115,6 +134,7 @@ public class AttractorAI : MonoBehaviour
 	public class FunctionPicker
 	{
 		public FunctionType function;
+		[Header("Note: use spaces to seperate items in LISTs")]
 		public List<string> arguments;
 		[Tooltip("This is only for functions that reprogram reactions in the behaviour hierarchy. The array contains possible reactions to reprogram  based on" +
 			"their index in the list")]
@@ -145,8 +165,26 @@ public class AttractorAI : MonoBehaviour
 		}
 	}
 
+	public void AddStatuses(List<string> arguments)
+	{
+		List<string> Statuses = arguments[0].Split(' ', System.StringSplitOptions.RemoveEmptyEntries).ToList();
+		bool Remove = bool.Parse(arguments[1]);
+
+		if (Remove)
+		{
+			HashSet<string> valuesToRemove = new HashSet<string>(Statuses);
+			currentStatuses.RemoveAll(item => valuesToRemove.Contains(item));
+		}
+		else
+		{
+			IEnumerable<string> itemsToAdd = Statuses.Except(currentStatuses);
+			currentStatuses.AddRange(itemsToAdd);
+		}
+	}
+
 	public enum Stats
 	{
+		dangerLevel,
 		screamTime,
 
 		//Wander
@@ -177,7 +215,21 @@ public class AttractorAI : MonoBehaviour
 		attack_cooldownTime,
 
 		//Inspect
-		inspect_time
+		inspect_time,
+
+		//Search
+		search_speed,
+		search_radius,
+		search_minTimer,
+		search_maxTimer,
+
+		//Flee
+		flee_speed,
+		flee_minDistance,
+		flee_maxDistance,
+		flee_minTime,
+		flee_maxTime,
+		flee_targetAvoidanceRange
 	}
 	public enum Alteration
 	{
@@ -193,6 +245,9 @@ public class AttractorAI : MonoBehaviour
 		{
 			switch (stat)
 			{
+				case Stats.dangerLevel:
+					currentDangerLevel = DoAlterationCalculation(currentDangerLevel, changeBy, changeAmount);
+					break;
 				case Stats.screamTime:
 					screamTime = DoAlterationCalculation(screamTime, changeBy, changeAmount);
 					break;
@@ -262,6 +317,40 @@ public class AttractorAI : MonoBehaviour
 				case Stats.inspect_time:
 					inspectTime = DoAlterationCalculation(inspectTime, changeBy, changeAmount);
 					break;
+
+				//Search
+				case Stats.search_speed:
+					searchSpeed = DoAlterationCalculation(searchSpeed, changeBy, changeAmount);
+					break;
+				case Stats.search_radius:
+					searchRadius = DoAlterationCalculation(searchRadius, changeBy, changeAmount);
+					break;
+				case Stats.search_minTimer:
+					minSearchTimer = DoAlterationCalculation(minSearchTimer, changeBy, changeAmount);
+					break;
+				case Stats.search_maxTimer:
+					maxSearchTimer = DoAlterationCalculation(maxSearchTimer, changeBy, changeAmount);
+					break;
+
+				//Flee
+				case Stats.flee_speed:
+					fleeSpeed = DoAlterationCalculation(fleeSpeed, changeBy, changeAmount);
+					break;
+				case Stats.flee_minDistance:
+					minFleeDistance = DoAlterationCalculation(minFleeDistance, changeBy, changeAmount);
+					break;
+				case Stats.flee_maxDistance:
+					maxFleeDistance = DoAlterationCalculation(maxFleeDistance, changeBy, changeAmount);
+					break;
+				case Stats.flee_minTime:
+					minFleeTime = DoAlterationCalculation(minFleeTime, changeBy, changeAmount);
+					break;
+				case Stats.flee_maxTime:
+					maxFleeTime = DoAlterationCalculation(maxFleeTime, changeBy, changeAmount);
+					break;
+				case Stats.flee_targetAvoidanceRange:
+					fleeTargetAvoidanceRange = DoAlterationCalculation(fleeTargetAvoidanceRange, changeBy, changeAmount);
+					break;
 			}
 		}
 	}
@@ -292,6 +381,13 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
+		public List<string> statusRestrictions = new List<string>();
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
+		public bool allStatusesRequired = false;
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		public EnemyState stateChange;
@@ -350,32 +446,50 @@ public class AttractorAI : MonoBehaviour
 
 			if (reactionEdits.possibleAttractorTypeChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.attractorTypeLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.attractorTypeUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.attractorTypeLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.attractorTypeUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.attractorType = reactionEdits.possibleAttractorTypeChanges[Random.Range((int)(reactionEdits.possibleAttractorTypeChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleAttractorTypeChanges.Length * tempUpperBound))];
 			}
 			if (reactionEdits.possibleMinIntensityChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.minIntensityLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.minIntensityUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.minIntensityLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.minIntensityUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.minIntensity = reactionEdits.possibleMinIntensityChanges[Random.Range((int)(reactionEdits.possibleMinIntensityChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleMinIntensityChanges.Length * tempUpperBound))];
 			}
 			if (reactionEdits.possibleMaxIntensityChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.maxIntensityLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.maxIntensityUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.maxIntensityLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.maxIntensityUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.maxIntensity = reactionEdits.possibleMaxIntensityChanges[Random.Range((int)(reactionEdits.possibleMaxIntensityChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleMaxIntensityChanges.Length * tempUpperBound))];
 			}
+			if (reactionEdits.possibleStatusRestrictionsChanges.Length > 0)
+			{
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.statusRestrictionsLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.statusRestrictionsUpperBoundDangerRange, 0, 100) / 100;
+
+				chosenReaction.statusRestrictions = reactionEdits.possibleStatusRestrictionsChanges[Random.Range((int)(
+					reactionEdits.possibleStatusRestrictionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
+						reactionEdits.possibleStatusRestrictionsChanges.Length * tempUpperBound))].statusRestrictions;
+			}
+			if (reactionEdits.possibleAllStatusesRequiredChanges.Length > 0)
+			{
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.allStatusesRequiredLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.allStatusesRequiredUpperBoundDangerRange, 0, 100) / 100;
+
+				chosenReaction.allStatusesRequired = reactionEdits.possibleAllStatusesRequiredChanges[Random.Range((int)(
+					reactionEdits.possibleAllStatusesRequiredChanges.Length * tempLowerBound), Mathf.CeilToInt(
+						reactionEdits.possibleAllStatusesRequiredChanges.Length * tempUpperBound))];
+			}
 			if (reactionEdits.possibleStateRestrictionChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.stateRestrictionLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.stateRestrictionUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.stateRestrictionLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.stateRestrictionUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.stateRestriction = reactionEdits.possibleStateRestrictionChanges[Random.Range((int)(
 					reactionEdits.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleStateRestrictionChanges.Length *
@@ -383,8 +497,8 @@ public class AttractorAI : MonoBehaviour
 			}
 			if (reactionEdits.possibleFunctionExecutionsChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.functionExecutionsLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.functionExecutionsUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.functionExecutionsLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.functionExecutionsUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.functionExecutions = reactionEdits.possibleFunctionExecutionsChanges[Random.Range((int)(
 					reactionEdits.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
@@ -392,16 +506,16 @@ public class AttractorAI : MonoBehaviour
 			}
 			if (reactionEdits.possibleStateChangeChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.stateChangeLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.stateChangeUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.stateChangeLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.stateChangeUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.stateChange = reactionEdits.possibleStateChangeChanges[Random.Range((int)(reactionEdits.possibleStateChangeChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleStateChangeChanges.Length * tempUpperBound))];
 			}
 			if (reactionEdits.possibleTargetDetectedObjectChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.targetDetectedObjectLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.targetDetectedObjectUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.targetDetectedObjectLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.targetDetectedObjectUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.targetDetectedObject = reactionEdits.possibleTargetDetectedObjectChanges[Random.Range((int)(
 					reactionEdits.possibleTargetDetectedObjectChanges.Length * tempLowerBound), Mathf.CeilToInt(
@@ -409,8 +523,8 @@ public class AttractorAI : MonoBehaviour
 			}
 			if (reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.prioritizeDistanceInsteadOfIntensity = reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges[Random.Range((int)(
 					reactionEdits.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempLowerBound), Mathf.CeilToInt(
@@ -418,8 +532,8 @@ public class AttractorAI : MonoBehaviour
 			}
 			if (reactionEdits.possibleInvertPriorityChanges.Length > 0)
 			{
-				tempLowerBound = Mathf.Max(currentDangerLevel - reactionEdits.invertPriorityLowerBoundDangerRange, 0) / 100;
-				tempUpperBound = Mathf.Min(currentDangerLevel + reactionEdits.invertPriorityUpperBoundDangerRange, 100) / 100;
+				tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdits.invertPriorityLowerBoundDangerRange, 0, 100) / 100;
+				tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdits.invertPriorityUpperBoundDangerRange, 0, 100) / 100;
 
 				chosenReaction.invertPriority = reactionEdits.possibleInvertPriorityChanges[Random.Range((int)(reactionEdits.possibleInvertPriorityChanges.Length *
 					tempLowerBound), Mathf.CeilToInt(reactionEdits.possibleInvertPriorityChanges.Length * tempUpperBound))];
@@ -446,14 +560,14 @@ public class AttractorAI : MonoBehaviour
 
 	public EnemySense[] senses;
 
-	[Header("AnimationSetup")]
+	[Header("Animation Setup")]
 	[SerializeField] private Animator animator;
 	[Tooltip("How fast is navmesh speed per walk animation speed, for syncing up animations")]
 	[SerializeField] private float walkSpdAnimMult;
 	[SerializeField] private float screamTime = 1;
 	[SerializeField] private Collider attackBox;
 
-	[Header("WanderState")]
+	[Header("Wander State")]
 	[SerializeField] private float wanderSpeed;
 	[Tooltip("Maximum distance from current position that the enemy can choose to walk to")]
 	[SerializeField] private float patrolRadius;
@@ -464,20 +578,20 @@ public class AttractorAI : MonoBehaviour
 
 	private float patrolTimer;
 
-	[Header("InvestigateState")]
+	[Header("Investigate State")]
 	[SerializeField] private float investigateSpeed;
 	[Tooltip("How long does the enemy continue to track the actual object's position while it is not being sensed before it targets its last known location")]
 	[SerializeField] private float permanenceTime = 0;
 	[Tooltip("How long does the enemy continue to stay in the investigate state while it is not sensing any objects")]
 	[SerializeField] private float giveUpTime = 0;
 
-	[Header("RushOverState")]
+	[Header("Rush Over State")]
 	[SerializeField] private float rushOverSpeed;
 	[SerializeField] private float rushPermanenceTime = 0;
 	[SerializeField] private float rushGiveUpTime = 0;
 	[SerializeField] private bool screamBeforeRushOver = false;
 
-	[Header("ChaseState")]
+	[Header("Chase State")]
 	[SerializeField] private float chaseSpeed;
 	[SerializeField] private float chasePermanenceTime = 0;
 	[SerializeField] private float chaseGiveUpTime = 0;
@@ -490,7 +604,7 @@ public class AttractorAI : MonoBehaviour
 
 	private float investigateTimer;
 
-	[Header("AttackState")]
+	[Header("Attack State")]
 	[SerializeField] private float attackBufferTime = 0;
 	[SerializeField] private float attackSpeed = 0;
 	[SerializeField] private float attackTime = 0;
@@ -503,9 +617,45 @@ public class AttractorAI : MonoBehaviour
 	private bool aboutToAttack = true;
 	private bool finishedAttack = false;
 
-	[Header("InspectState")]
+	[Header("Inspect State")]
 	[SerializeField] private float inspectTime = 0;
 	private float currentInspect = 0;
+
+	[Header("Search State")]
+	[SerializeField] private float searchSpeed;
+	[Tooltip("Maximum distance from current position that the enemy can choose to search")]
+	[SerializeField] private float searchRadius;
+	[Tooltip("The shortest amount of time before the enemy decides to move to stop searching")]
+	[SerializeField] private float minSearchTimer;
+	[Tooltip("The longest amount of time before the enemy decides to move to a new location")]
+	[SerializeField] private float maxSearchTimer;
+	[Tooltip("The minimum amount of places the enemy could search")]
+	[SerializeField] private int minSearchAmount;
+	[Tooltip("The maximum amount of places the enemy could search")]
+	[SerializeField] private int maxSearchAmount;
+	[Tooltip("The enemy will only search areas that cannot be detected by the sense at this index in Enemy Senses")]
+	[SerializeField] private int searchSenseIndex;
+	[SerializeField] private bool screamInsteadOfLookAround = false;
+	[SerializeField] private bool dontScreamOrLookAround = false;
+
+	private float searchTimer;
+	private int searchAmount;
+	private List<Vector3> searchLocations = new List<Vector3>();
+	private bool searching = false;
+	private bool searchingSpot = false;
+
+	[Header("Flee State")]
+	[SerializeField] private float fleeSpeed;
+	[SerializeField] private float minFleeDistance;
+	[SerializeField] private float maxFleeDistance;
+	[SerializeField] private float minFleeTime;
+	[SerializeField] private float maxFleeTime;
+	[SerializeField] private bool avoidTarget = false;
+	[SerializeField] private float fleeTargetAvoidanceRange;
+
+	private float fleeTime;
+	private bool fleeing = false;
+	private NavMeshObstacle currentAvoidedTarget;
 
 	#endregion
 
@@ -559,7 +709,7 @@ public class AttractorAI : MonoBehaviour
 		{
 			Transform target = hitCollider.transform;
 
-			if (CheckConeVisibility(target, currentSense))
+			if (CheckConeVisibility(target.position, currentSense))
 			{
 				tempAttractorList.Add(target.GetComponent<Attractor>());
 			}
@@ -567,15 +717,15 @@ public class AttractorAI : MonoBehaviour
 		return tempAttractorList;
 	}
 
-	bool CheckConeVisibility(Transform target, EnemySense currentSense)
+	bool CheckConeVisibility(Vector3 targetPosition, EnemySense currentSense)
 	{
 		foreach (Transform organ in currentSense.senseOrgans)
 		{
-			Vector3 directionToTarget = (target.position - organ.position).normalized;
+			Vector3 directionToTarget = (targetPosition - organ.position).normalized;
 
 			if (Vector3.Angle(organ.forward, directionToTarget) < currentSense.detectionAngle)
 			{
-				float distanceToTarget = Vector3.Distance(organ.position, target.position);
+				float distanceToTarget = Vector3.Distance(organ.position, targetPosition);
 				RaycastHit hit;
 
 				if (Physics.Raycast(organ.position, directionToTarget, out hit, distanceToTarget, currentSense.obstacleLayer | currentSense.targetLayer))
@@ -627,6 +777,9 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.ChangeStats_STATS:
 				ChangeStats(function.statsToChange, function.changeStatsBy, function.statsChangeAmount);
 				break;
+			case FunctionType.AddStatuses_LISTstringStatuses_boolRemove:
+				AddStatuses(function.arguments);
+				break;
 		}
 	}
 
@@ -647,6 +800,21 @@ public class AttractorAI : MonoBehaviour
 			animator.SetBool("Inspecting", false);
 			currentInspect = 0;
 		}
+		if (!(currentState == EnemyState.Search))
+		{
+			animator.SetBool("LookingAround", false);
+			searchTimer = 0;
+			if (searchLocations.Count > 1)
+				searchLocations.Clear();
+			searching = false;
+		}
+		if (!(currentState == EnemyState.Flee))
+		{
+			fleeTime = 0;
+			fleeing = false;
+			if (currentAvoidedTarget != null)
+				currentAvoidedTarget.enabled = false;
+		}
 
 		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
 
@@ -654,7 +822,9 @@ public class AttractorAI : MonoBehaviour
 		int tempPriority = 0;
 		foreach (EnemyReactions reaction in behaviourHierarchy)
 		{
-			if (reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState))
+			if ((reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState)) && (reaction.statusRestrictions.Count < 1 ||
+				reaction.allStatusesRequired ? currentStatuses.Intersect(reaction.statusRestrictions).Count() == currentStatuses.Count() :
+				reaction.statusRestrictions.Intersect(currentStatuses).Any()))
 			{
 				Transform tempFocus = defaultFocus; ;
 				float tempValue = -1;
@@ -879,6 +1049,110 @@ public class AttractorAI : MonoBehaviour
 				currentStatePriority = nextStatePriority;
 			}
 		}
+		else if (currentState == EnemyState.Search)
+		{
+			agent.speed = searchSpeed;
+
+			if (!searching)
+			{
+				if (searchLocations.Count > 0)
+					searchLocations.Clear();
+				searchTimer = Random.Range(minSearchTimer, maxSearchTimer);
+				searchAmount = Random.Range(minSearchAmount, maxSearchAmount + 1);
+
+				for (int spots = 0; spots < searchAmount; spots++)
+				{
+					Vector3 searchSpot = FindSearchSpot();
+					if (searchSpot != Vector3.zero)
+						searchLocations.Add(searchSpot);
+					else
+						break;
+				}
+
+				searchingSpot = false;
+				searching = true;
+			}
+
+			else
+			{
+				searchTimer -= Time.deltaTime;
+
+				if (!searchingSpot)
+				{
+					if (searchLocations.Count > 0)
+					{
+						int lastIndex = searchLocations.Count - 1;
+						agent.SetDestination(searchLocations[lastIndex]);
+						searchLocations.RemoveAt(lastIndex);
+						searchingSpot = true;
+					}
+					else
+					{
+						animator.SetBool("LookingAround", false);
+						searchTimer = 0;
+						searching = false;
+						currentFocus = nextFocus;
+						currentState = nextState;
+						currentStatePriority = nextStatePriority;
+					}
+				}
+				else if (agent.remainingDistance < 0.5f)
+				{
+					searchingSpot = false;
+				}
+				
+				if (searchTimer <= 0)
+				{
+					animator.SetBool("LookingAround", false);
+					searchTimer = 0;
+					searching = false;
+					currentFocus = nextFocus;
+					currentState = nextState;
+					currentStatePriority = nextStatePriority;
+				}
+			}
+		}
+		else if (currentState == EnemyState.Flee)
+		{
+			agent.speed = fleeSpeed;
+
+			if (!fleeing)
+			{
+				fleeTime = Random.Range(minFleeTime, maxFleeTime);
+				Vector3 directionToFocus = transform.position - currentFocus.position;
+
+				// Normalize the direction to ensure consistent movement speed
+				Vector3 fleeDirection = directionToFocus.normalized;
+
+				float fleeDistance = Random.Range(minFleeDistance, maxFleeDistance);
+
+				Vector3 targetDestination = transform.position + fleeDirection * fleeDistance;
+
+				if (avoidTarget && currentFocus.TryGetComponent(out NavMeshObstacle obstacle))
+				{
+					obstacle.enabled = true;
+					obstacle.radius = fleeTargetAvoidanceRange;
+					currentAvoidedTarget = obstacle;
+				}
+
+				agent.SetDestination(targetDestination);
+				fleeing = true;
+			}
+			else
+			{
+				fleeTime -= Time.deltaTime;
+
+				if (fleeTime <= 0 || agent.remainingDistance < 0.5f)
+				{
+					fleeTime = 0;
+					fleeing = false;
+					currentAvoidedTarget.enabled = false;
+					currentFocus = nextFocus;
+					currentState = nextState;
+					currentStatePriority = nextStatePriority;
+				}
+			}
+		}
 	}
 
 	IEnumerator ScreamRoutine()
@@ -914,5 +1188,31 @@ public class AttractorAI : MonoBehaviour
 		{
 			agent.SetDestination(hit.position);
 		}
+	}
+
+	private Vector3 FindSearchSpot()
+	{
+		Vector3 newPos = Vector3.zero;
+		bool foundValidDestination = false;
+		int attempts = 0;
+		int maxAttempts = 10;
+
+		while (!foundValidDestination && attempts < maxAttempts)
+		{
+			Vector3 randomPoint = transform.position + Random.insideUnitSphere * searchRadius;
+			NavMeshHit hit;
+
+			if (NavMesh.SamplePosition(randomPoint, out hit, searchRadius, NavMesh.AllAreas))
+			{
+				if (!CheckConeVisibility(hit.position, senses[searchSenseIndex]))
+				{
+					newPos = hit.position;
+					foundValidDestination = true;
+				}
+			}
+			attempts++;
+		}
+
+		return newPos;
 	}
 }
