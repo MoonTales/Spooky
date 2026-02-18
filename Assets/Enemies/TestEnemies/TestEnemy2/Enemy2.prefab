@@ -1464,7 +1464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentDangerLevel: 0
   currentStatuses: []
-  defaultState: 1
+  defaultState: 7
   defaultFocus: {fileID: 0}
   behaviourHierarchy:
   - attractorType: 0
@@ -1782,6 +1782,15 @@ MonoBehaviour:
   attackRevertFocus: {fileID: 0}
   attackRevertPriority: 0
   inspectTime: 0
+  searchSpeed: 15
+  searchRadius: 30
+  minSearchTimer: 5
+  maxSearchTimer: 10
+  minSearchAmount: 1
+  maxSearchAmount: 2
+  searchSenseIndex: 0
+  screamInsteadOfLookAround: 0
+  dontScreamOrLookAround: 1
 --- !u!65 &7860541956605237910
 BoxCollider:
   m_ObjectHideFlags: 0
