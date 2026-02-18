@@ -26,7 +26,8 @@ public class AttractorAI : MonoBehaviour
 		Chase,
 		Attack,
 		Inspect,
-		Search
+		Search,
+		Flee
 	}
 	#endregion
 
@@ -220,7 +221,15 @@ public class AttractorAI : MonoBehaviour
 		search_speed,
 		search_radius,
 		search_minTimer,
-		search_maxTimer	
+		search_maxTimer,
+
+		//Flee
+		flee_speed,
+		flee_minDistance,
+		flee_maxDistance,
+		flee_minTime,
+		flee_maxTime,
+		flee_targetAvoidanceRange
 	}
 	public enum Alteration
 	{
@@ -318,6 +327,26 @@ public class AttractorAI : MonoBehaviour
 					break;
 				case Stats.search_maxTimer:
 					maxSearchTimer = DoAlterationCalculation(maxSearchTimer, changeBy, changeAmount);
+					break;
+
+				//Flee
+				case Stats.flee_speed:
+					fleeSpeed = DoAlterationCalculation(fleeSpeed, changeBy, changeAmount);
+					break;
+				case Stats.flee_minDistance:
+					minFleeDistance = DoAlterationCalculation(minFleeDistance, changeBy, changeAmount);
+					break;
+				case Stats.flee_maxDistance:
+					maxFleeDistance = DoAlterationCalculation(maxFleeDistance, changeBy, changeAmount);
+					break;
+				case Stats.flee_minTime:
+					minFleeTime = DoAlterationCalculation(minFleeTime, changeBy, changeAmount);
+					break;
+				case Stats.flee_maxTime:
+					maxFleeTime = DoAlterationCalculation(maxFleeTime, changeBy, changeAmount);
+					break;
+				case Stats.flee_targetAvoidanceRange:
+					fleeTargetAvoidanceRange = DoAlterationCalculation(fleeTargetAvoidanceRange, changeBy, changeAmount);
 					break;
 			}
 		}
@@ -528,14 +557,14 @@ public class AttractorAI : MonoBehaviour
 
 	public EnemySense[] senses;
 
-	[Header("AnimationSetup")]
+	[Header("Animation Setup")]
 	[SerializeField] private Animator animator;
 	[Tooltip("How fast is navmesh speed per walk animation speed, for syncing up animations")]
 	[SerializeField] private float walkSpdAnimMult;
 	[SerializeField] private float screamTime = 1;
 	[SerializeField] private Collider attackBox;
 
-	[Header("WanderState")]
+	[Header("Wander State")]
 	[SerializeField] private float wanderSpeed;
 	[Tooltip("Maximum distance from current position that the enemy can choose to walk to")]
 	[SerializeField] private float patrolRadius;
@@ -546,20 +575,20 @@ public class AttractorAI : MonoBehaviour
 
 	private float patrolTimer;
 
-	[Header("InvestigateState")]
+	[Header("Investigate State")]
 	[SerializeField] private float investigateSpeed;
 	[Tooltip("How long does the enemy continue to track the actual object's position while it is not being sensed before it targets its last known location")]
 	[SerializeField] private float permanenceTime = 0;
 	[Tooltip("How long does the enemy continue to stay in the investigate state while it is not sensing any objects")]
 	[SerializeField] private float giveUpTime = 0;
 
-	[Header("RushOverState")]
+	[Header("Rush Over State")]
 	[SerializeField] private float rushOverSpeed;
 	[SerializeField] private float rushPermanenceTime = 0;
 	[SerializeField] private float rushGiveUpTime = 0;
 	[SerializeField] private bool screamBeforeRushOver = false;
 
-	[Header("ChaseState")]
+	[Header("Chase State")]
 	[SerializeField] private float chaseSpeed;
 	[SerializeField] private float chasePermanenceTime = 0;
 	[SerializeField] private float chaseGiveUpTime = 0;
@@ -572,7 +601,7 @@ public class AttractorAI : MonoBehaviour
 
 	private float investigateTimer;
 
-	[Header("AttackState")]
+	[Header("Attack State")]
 	[SerializeField] private float attackBufferTime = 0;
 	[SerializeField] private float attackSpeed = 0;
 	[SerializeField] private float attackTime = 0;
@@ -585,11 +614,11 @@ public class AttractorAI : MonoBehaviour
 	private bool aboutToAttack = true;
 	private bool finishedAttack = false;
 
-	[Header("InspectState")]
+	[Header("Inspect State")]
 	[SerializeField] private float inspectTime = 0;
 	private float currentInspect = 0;
 
-	[Header("SearchState")]
+	[Header("Search State")]
 	[SerializeField] private float searchSpeed;
 	[Tooltip("Maximum distance from current position that the enemy can choose to search")]
 	[SerializeField] private float searchRadius;
@@ -611,6 +640,19 @@ public class AttractorAI : MonoBehaviour
 	private List<Vector3> searchLocations = new List<Vector3>();
 	private bool searching = false;
 	private bool searchingSpot = false;
+
+	[Header("Flee State")]
+	[SerializeField] private float fleeSpeed;
+	[SerializeField] private float minFleeDistance;
+	[SerializeField] private float maxFleeDistance;
+	[SerializeField] private float minFleeTime;
+	[SerializeField] private float maxFleeTime;
+	[SerializeField] private bool avoidTarget = false;
+	[SerializeField] private float fleeTargetAvoidanceRange;
+
+	private float fleeTime;
+	private bool fleeing = false;
+	private NavMeshObstacle currentAvoidedTarget;
 
 	#endregion
 
@@ -762,6 +804,13 @@ public class AttractorAI : MonoBehaviour
 			if (searchLocations.Count > 1)
 				searchLocations.Clear();
 			searching = false;
+		}
+		if (!(currentState == EnemyState.Flee))
+		{
+			fleeTime = 0;
+			fleeing = false;
+			if (currentAvoidedTarget != null)
+				currentAvoidedTarget.enabled = false;
 		}
 
 		Dictionary<AttractorType, List<Attractor>> tempDetectedAttractors = DetectedAttractors();
@@ -1054,6 +1103,47 @@ public class AttractorAI : MonoBehaviour
 					animator.SetBool("LookingAround", false);
 					searchTimer = 0;
 					searching = false;
+					currentFocus = nextFocus;
+					currentState = nextState;
+					currentStatePriority = nextStatePriority;
+				}
+			}
+		}
+		else if (currentState == EnemyState.Flee)
+		{
+			agent.speed = fleeSpeed;
+
+			if (!fleeing)
+			{
+				fleeTime = Random.Range(minFleeTime, maxFleeTime);
+				Vector3 directionToFocus = transform.position - currentFocus.position;
+
+				// Normalize the direction to ensure consistent movement speed
+				Vector3 fleeDirection = directionToFocus.normalized;
+
+				float fleeDistance = Random.Range(minFleeDistance, maxFleeDistance);
+
+				Vector3 targetDestination = transform.position + fleeDirection * fleeDistance;
+
+				if (avoidTarget && currentFocus.TryGetComponent(out NavMeshObstacle obstacle))
+				{
+					obstacle.enabled = true;
+					obstacle.radius = fleeTargetAvoidanceRange;
+					currentAvoidedTarget = obstacle;
+				}
+
+				agent.SetDestination(targetDestination);
+				fleeing = true;
+			}
+			else
+			{
+				fleeTime -= Time.deltaTime;
+
+				if (fleeTime <= 0 || agent.remainingDistance < 0.5f)
+				{
+					fleeTime = 0;
+					fleeing = false;
+					currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
 					currentStatePriority = nextStatePriority;
