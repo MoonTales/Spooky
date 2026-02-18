@@ -245,6 +245,9 @@ public class AttractorAI : MonoBehaviour
 		{
 			switch (stat)
 			{
+				case Stats.dangerLevel:
+					currentDangerLevel = DoAlterationCalculation(currentDangerLevel, changeBy, changeAmount);
+					break;
 				case Stats.screamTime:
 					screamTime = DoAlterationCalculation(screamTime, changeBy, changeAmount);
 					break;
