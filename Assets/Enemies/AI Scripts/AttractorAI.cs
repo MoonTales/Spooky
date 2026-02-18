@@ -50,7 +50,8 @@ public class AttractorAI : MonoBehaviour
 		TestFunction_floatF_boolB,
 		ReprogramReaction_REPROGRAM,
 		DeleteFocus,
-		ChangeStats_STATS
+		ChangeStats_STATS,
+		AddStatuses_LISTstringStatuses_boolRemove
 	}
 
 	[System.Serializable]
@@ -131,6 +132,7 @@ public class AttractorAI : MonoBehaviour
 	public class FunctionPicker
 	{
 		public FunctionType function;
+		[Header("Note: use spaces to seperate items in LISTs")]
 		public List<string> arguments;
 		[Tooltip("This is only for functions that reprogram reactions in the behaviour hierarchy. The array contains possible reactions to reprogram  based on" +
 			"their index in the list")]
@@ -158,6 +160,23 @@ public class AttractorAI : MonoBehaviour
 		if (nextFocus != Player.PlayerManager.Instance.GetPlayer().transform)
 		{
 			nextFocus.gameObject.SetActive(false);
+		}
+	}
+
+	public void AddStatuses(List<string> arguments)
+	{
+		List<string> Statuses = arguments[0].Split(' ', System.StringSplitOptions.RemoveEmptyEntries).ToList();
+		bool Remove = bool.Parse(arguments[1]);
+
+		if (Remove)
+		{
+			HashSet<string> valuesToRemove = new HashSet<string>(Statuses);
+			currentStatuses.RemoveAll(item => valuesToRemove.Contains(item));
+		}
+		else
+		{
+			IEnumerable<string> itemsToAdd = Statuses.Except(currentStatuses);
+			currentStatuses.AddRange(itemsToAdd);
 		}
 	}
 
@@ -668,6 +687,9 @@ public class AttractorAI : MonoBehaviour
 				break;
 			case FunctionType.ChangeStats_STATS:
 				ChangeStats(function.statsToChange, function.changeStatsBy, function.statsChangeAmount);
+				break;
+			case FunctionType.AddStatuses_LISTstringStatuses_boolRemove:
+				AddStatuses(function.arguments);
 				break;
 		}
 	}
