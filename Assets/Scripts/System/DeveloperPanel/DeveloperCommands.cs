@@ -171,6 +171,23 @@ namespace System
             RegisterCommand(KeyCode.Alpha1, () => SceneSwapper.Instance.SwapScene("Bedroom"), "Load Bedroom Scene", "Load the Bedroom Scene instantly");
             RegisterCommand(KeyCode.Alpha2, () => SceneSwapper.Instance.SwapScene("Nightmare1"), "Load Nightmare Scene", "Load the Nightmare 1 Scene instantly");
             RegisterCommand(KeyCode.Alpha3, () => SceneSwapper.Instance.SwapScene("Tutorial"), "Load Tutorial Scene", "Load the Tutorial Nightmare Scene instantly");
+            
+            // Frame Rate Commands
+            // get the current frame rate and display it in the console
+            // Increase Frame Rate by 10
+            RegisterCommand(KeyCode.Alpha4, ()=>SetFrameRate(10), "Set Low FPS", "Sets the target frame rate to 10");
+            // Set Frame Rate to 30
+            RegisterCommand(KeyCode.Alpha5, ()=>SetFrameRate(30), "Set Medium FPS", "Sets the target frame rate to 30");
+            // Set Frame Rate to 60
+            RegisterCommand(KeyCode.Alpha6, ()=>SetFrameRate(60), "Set High FPS", "Sets the target frame rate to 60");
+            // Set Frame Rate to 120
+            RegisterCommand(KeyCode.Alpha7, ()=>SetFrameRate(120), "Set Ultra FPS", "Sets the target frame rate to 120");
+        }
+        
+        private void SetFrameRate(int fps)
+        {
+            QualitySettings.vSyncCount = 0; // Disable VSync
+            Application.targetFrameRate = fps;
         }
 
         /// <summary>
