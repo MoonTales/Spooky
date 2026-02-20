@@ -31,6 +31,7 @@ public class SleepTracker : Singleton<SleepTracker>, IInteractable
     protected void Awake()
     {
         base.Awake();
+        
     }
 
     protected override void RegisterSubscriptions()
@@ -42,6 +43,7 @@ public class SleepTracker : Singleton<SleepTracker>, IInteractable
 
     private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
     {
+        if (worldLocation != Types.WorldLocation.Bedroom) { return; }
         // this will be called whenever the world location changed, and we will pull if it was a good or bad wakeup
         // ensure we are in the bedroom, as thats the only location of the sleeptracker is present
         if (_isGoodWakeup)
@@ -64,12 +66,14 @@ public class SleepTracker : Singleton<SleepTracker>, IInteractable
     // IInteractable
     // -------------------------------------------------------------------------
 
-    public TextKey PromptKey { get; }
+    [Header("Text Keys (CSV row pointers)")]
+    [SerializeField] private TextKey promptTextKey;
+    public TextKey PromptKey => _isSleepTrackerActive? promptTextKey: TextKey.Empty; // only show the prompt if the sleep tracker is active, otherwise we will just show nothing when we interact with it
 
     public bool CanInteract(Interactor interactor)
     {
         // Interactable only during Gameplay while the alarm is running.
-        return true; //GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay && _isSleepTrackerActive;
+        return GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay && _isSleepTrackerActive;
     }
 
     public void Interact(Interactor interactor)
@@ -83,7 +87,9 @@ public class SleepTracker : Singleton<SleepTracker>, IInteractable
     /// </summary>
     public void StartSleepTrackerFadeIn(float timeToFadeIn)
     {
-
+        // FOR NOW, WE WILL JUST INSTANTLY TURN ON THE ALARM, BUT THIS WILL BE CHANGED ONCE WE HAVE THE AUDIO IMPLEMENTED
+        DebugUtils.Log("Starting Sleep Tracker Fade In");
+        TurnSleepTrackerOn();
     }
 
     /// <summary>
@@ -102,6 +108,7 @@ public class SleepTracker : Singleton<SleepTracker>, IInteractable
         DebugUtils.Log("Turning Sleep Tracker Off");
         AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
         _isSleepTrackerActive = false;
+        
     }
 
     /// <summary>

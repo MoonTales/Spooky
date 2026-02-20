@@ -72,6 +72,7 @@ namespace Interaction
             SpawnInCollectedDrawingsOnTable();
             const int timeToFadeOut = 5; 
             //TODO: <SFX> Start an alarm sound fading in over "timToFadeOut"
+            SleepTracker.Instance.StartSleepTrackerFadeIn(timeToFadeOut);
             Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             data.Send();
 
