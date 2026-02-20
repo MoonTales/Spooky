@@ -131,6 +131,7 @@ namespace Player
                 if (panTilt != null)
                 {
                     panTilt.PanAxis.Value = yaw;
+                    panTilt.TiltAxis.Value = 0;
                 }
             }
 
