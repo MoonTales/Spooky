@@ -15,6 +15,9 @@ namespace UI
         private Canvas _hudCanvas;
         // Crosshair
         private Image _hudCrosshair;
+        // Panel
+        private Image _hudOverlay;
+
         // Textmeshpro Text ui
 
         private TMP_Text _hudInteractionPromptText;
@@ -42,6 +45,7 @@ namespace UI
         {
             _hudCanvas = GetComponent<Canvas>();
             _hudCrosshair = transform.Find("CrossHair").GetComponent<Image>();
+            _hudOverlay = transform.Find("Overlay").GetComponent<Image>();
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
             _hudItemNameText = transform.Find("ItemName").GetComponent<TMP_Text>();
             _hudItemDescriptionText = transform.Find("ItemDescription").GetComponent<TMP_Text>();
@@ -184,6 +188,7 @@ namespace UI
         {
             if (_hudItemNameText != null) _hudItemNameText.gameObject.SetActive(visible);
             if (_hudItemDescriptionText != null) _hudItemDescriptionText.gameObject.SetActive(visible);
+            if (_hudOverlay != null) _hudOverlay.enabled = visible;
         }
         private void SetInspectionText(string name, string desc)
         {
