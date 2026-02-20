@@ -36,13 +36,7 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
     private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
     {
         if (worldLocation != Types.WorldLocation.Bedroom) { return; }
-
-        // Edge case for if we are returning to the main menu
-        if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu)
-        {
-            TurnSleepTrackerOff();
-            return;
-        }
+        
         // this will be called whenever the world location changed, and we will pull if it was a good or bad wakeup
         // ensure we are in the bedroom, as thats the only location of the sleeptracker is present
         if (_isGoodWakeup)
@@ -59,6 +53,12 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
             // We want to just instantly Turn on the alarm, with no fade in
             TurnSleepTrackerOn();
         }
+    }
+
+    // edge case for returning to the main menu
+    protected override void OnGameRestarted()
+    {
+        TurnSleepTrackerOff();
     }
 
     // -------------------------------------------------------------------------
