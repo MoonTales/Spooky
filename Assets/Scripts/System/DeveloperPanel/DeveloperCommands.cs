@@ -153,7 +153,7 @@ namespace System
         private void RegisterCommands()
         {
             // Official Commands
-            RegisterCommand(KeyCode.G, () => EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay), "Force Gameplay State", "Send off a broadcast to force the game state to switch to Gameplay (this will also trigger all associated events that come with entering the gameplay state)");
+            RegisterCommand(KeyCode.G, () => ForceStartGameplay() , "Force Gameplay State", "Send off a broadcast to force the game state to switch to Gameplay (this will also trigger all associated events that come with entering the gameplay state)");
             RegisterCommand(KeyCode.Minus, () => EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f), "Hurt Player", "Send off a broadcasts to simulate the player taking 10 mental damage (this is the same as raising anxiety or sleep deprivation by 10 points)");
             RegisterCommand(KeyCode.Equals, () => EventBroadcaster.Broadcast_OnPlayerDamaged(-10.0f), "Heal Player", "Send off a broadcast to simulate the player healing 10 mental health (this is the same as lowering anxiety or sleep deprivation by 10 points)");
             RegisterCommand(KeyCode.Delete, () => EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Breakdown), "Kill Player", "Send off a broadcast to simulate the player's mental state breaking down and reaching 0");
@@ -183,7 +183,12 @@ namespace System
             // Set Frame Rate to 120
             RegisterCommand(KeyCode.Alpha7, ()=>SetFrameRate(120), "Set Ultra FPS", "Sets the target frame rate to 120");
         }
-        
+
+        private void ForceStartGameplay()
+        {
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            Flashlight.Instance.SetDoWePossessTheFlashlight(true);
+        }
         private void SetFrameRate(int fps)
         {
             QualitySettings.vSyncCount = 0; // Disable VSync

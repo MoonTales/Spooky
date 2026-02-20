@@ -61,6 +61,8 @@ namespace UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            //ensure the button is enabled
+            if (!_button.IsActive() || !_button.interactable) { return; }
             if (playHover)
             {
                 PlaySfx(hoverSfx);
