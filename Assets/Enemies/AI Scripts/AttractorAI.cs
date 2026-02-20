@@ -833,13 +833,14 @@ public class AttractorAI : MonoBehaviour
 			if (searchLocations.Count > 1)
 				searchLocations.Clear();
 			searching = false;
-			if (currentAvoidedTarget != null)
-				currentAvoidedTarget.enabled = false;
 		}
 		if (!(currentState == EnemyState.Flee))
 		{
 			fleeTime = 0;
 			fleeing = false;
+		}
+		if (!(currentState == EnemyState.Search || currentState == EnemyState.Flee))
+		{
 			if (currentAvoidedTarget != null)
 				currentAvoidedTarget.enabled = false;
 		}
@@ -1136,22 +1137,29 @@ public class AttractorAI : MonoBehaviour
 						currentStatePriority = nextStatePriority;
 					}
 				}
-				else if (agent.remainingDistance < 0.5f)
+				else if (!agent.pathPending && agent.remainingDistance < 0.5f)
 				{
 					if (hide)
 					{
 						if (CheckConeVisibility(transform.position, senses[searchSenseIndex]))
 						{
+							Debug.Log("what");
 							Vector3 searchSpot = FindSearchSpot(hideRadius);
 							if (searchSpot != Vector3.zero)
 							{
+								Debug.Log("what huh");
 								agent.SetDestination(searchSpot);
 							}
 							else
+							{
+
+								Debug.Log("what why");
 								searchingSpot = false;
+							}
 						}
 					}
-					searchingSpot = false;
+					else
+						searchingSpot = false;
 				}
 				
 				if (searchTimer <= 0)
