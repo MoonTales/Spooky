@@ -222,6 +222,8 @@ public class AttractorAI : MonoBehaviour
 		search_radius,
 		search_minTimer,
 		search_maxTimer,
+		search_hideRadius,
+		search_hideTargetAvoidanceRange,
 
 		//Flee
 		flee_speed,
@@ -330,6 +332,12 @@ public class AttractorAI : MonoBehaviour
 					break;
 				case Stats.search_maxTimer:
 					maxSearchTimer = DoAlterationCalculation(maxSearchTimer, changeBy, changeAmount);
+					break;
+				case Stats.search_hideRadius:
+					hideRadius = DoAlterationCalculation(hideRadius, changeBy, changeAmount);
+					break;
+				case Stats.search_hideTargetAvoidanceRange:
+					hideTargetAvoidanceRange = DoAlterationCalculation(hideTargetAvoidanceRange, changeBy, changeAmount);
 					break;
 
 				//Flee
@@ -549,6 +557,7 @@ public class AttractorAI : MonoBehaviour
 		public LayerMask targetLayer;
 		public LayerMask obstacleLayer;
 		public Transform[] senseOrgans;
+		public bool addPlayerCameraAsSenseOrgan = false;
 		[Tooltip("Attractors detected by this sense will instead be clasified as not detected, " +
 			"while every Attractor in the targetLayer NOT detected by this sense is considered detected (as of right now, this does nothing)")]
 		public bool invertDetection = false;  // finish this later
@@ -637,6 +646,10 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private int searchSenseIndex;
 	[SerializeField] private bool screamInsteadOfLookAround = false;
 	[SerializeField] private bool dontScreamOrLookAround = false;
+	[SerializeField] private bool hide = false;
+	[SerializeField] private float hideRadius;
+	[SerializeField] private bool avoidHideTarget = false;
+	[SerializeField] private float hideTargetAvoidanceRange;
 
 	private float searchTimer;
 	private int searchAmount;
@@ -659,6 +672,17 @@ public class AttractorAI : MonoBehaviour
 
 	#endregion
 
+	public void AddCameraSenses()
+	{
+		foreach (EnemySense sense in senses)
+		{
+			if (sense.addPlayerCameraAsSenseOrgan)
+			{
+				sense.senseOrgans.Append(Flashlight.Instance.GetComponentInParent<Transform>());
+			}
+		}
+	}
+
 	void Start()
 	{
 		if (defaultFocus == null)
@@ -670,6 +694,8 @@ public class AttractorAI : MonoBehaviour
 		currentStatePriority = lowestPriority;
 		agent = GetComponent<NavMeshAgent>();
 		patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
+
+		AddCameraSenses();
 	}
 
 	Dictionary<AttractorType, List<Attractor>> DetectedAttractors()
@@ -807,6 +833,8 @@ public class AttractorAI : MonoBehaviour
 			if (searchLocations.Count > 1)
 				searchLocations.Clear();
 			searching = false;
+			if (currentAvoidedTarget != null)
+				currentAvoidedTarget.enabled = false;
 		}
 		if (!(currentState == EnemyState.Flee))
 		{
@@ -1062,15 +1090,26 @@ public class AttractorAI : MonoBehaviour
 
 				for (int spots = 0; spots < searchAmount; spots++)
 				{
-					Vector3 searchSpot = FindSearchSpot();
+					Vector3 searchSpot = FindSearchSpot(searchRadius);
 					if (searchSpot != Vector3.zero)
+					{
 						searchLocations.Add(searchSpot);
+						if (hide)
+							break;
+					}
 					else
 						break;
 				}
 
 				searchingSpot = false;
 				searching = true;
+
+				if (avoidHideTarget && currentFocus.TryGetComponent(out NavMeshObstacle obstacle))
+				{
+					obstacle.enabled = true;
+					obstacle.radius = hideTargetAvoidanceRange;
+					currentAvoidedTarget = obstacle;
+				}
 			}
 
 			else
@@ -1091,6 +1130,7 @@ public class AttractorAI : MonoBehaviour
 						animator.SetBool("LookingAround", false);
 						searchTimer = 0;
 						searching = false;
+						currentAvoidedTarget.enabled = false;
 						currentFocus = nextFocus;
 						currentState = nextState;
 						currentStatePriority = nextStatePriority;
@@ -1098,6 +1138,19 @@ public class AttractorAI : MonoBehaviour
 				}
 				else if (agent.remainingDistance < 0.5f)
 				{
+					if (hide)
+					{
+						if (CheckConeVisibility(transform.position, senses[searchSenseIndex]))
+						{
+							Vector3 searchSpot = FindSearchSpot(hideRadius);
+							if (searchSpot != Vector3.zero)
+							{
+								agent.SetDestination(searchSpot);
+							}
+							else
+								searchingSpot = false;
+						}
+					}
 					searchingSpot = false;
 				}
 				
@@ -1106,6 +1159,7 @@ public class AttractorAI : MonoBehaviour
 					animator.SetBool("LookingAround", false);
 					searchTimer = 0;
 					searching = false;
+					currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
 					currentStatePriority = nextStatePriority;
@@ -1190,7 +1244,7 @@ public class AttractorAI : MonoBehaviour
 		}
 	}
 
-	private Vector3 FindSearchSpot()
+	private Vector3 FindSearchSpot(float theRadius)
 	{
 		Vector3 newPos = Vector3.zero;
 		bool foundValidDestination = false;
@@ -1199,10 +1253,10 @@ public class AttractorAI : MonoBehaviour
 
 		while (!foundValidDestination && attempts < maxAttempts)
 		{
-			Vector3 randomPoint = transform.position + Random.insideUnitSphere * searchRadius;
+			Vector3 randomPoint = transform.position + Random.insideUnitSphere * theRadius;
 			NavMeshHit hit;
 
-			if (NavMesh.SamplePosition(randomPoint, out hit, searchRadius, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(randomPoint, out hit, theRadius, NavMesh.AllAreas))
 			{
 				if (!CheckConeVisibility(hit.position, senses[searchSenseIndex]))
 				{
