@@ -11104,10 +11104,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2caf196c019001c4baf434d8cf077a2f, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1779160083}
+      addedObject: {fileID: 1779160086}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2caf196c019001c4baf434d8cf077a2f, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1779160086}
+      addedObject: {fileID: 1779160089}
   m_SourcePrefab: {fileID: 100100000, guid: 2caf196c019001c4baf434d8cf077a2f, type: 3}
 --- !u!43 &436942308
 Mesh:
@@ -44937,6 +44937,78 @@ Transform:
   m_Children: []
   m_Father: {fileID: 370119804}
   m_LocalEulerAnglesHint: {x: 0, y: -7.989, z: 0}
+--- !u!1 &1705564004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1705564007}
+  - component: {fileID: 1705564006}
+  - component: {fileID: 1705564005}
+  m_Layer: 0
+  m_Name: Sleep Teleport
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &1705564005
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705564004}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4, y: 0.47, z: 2.5}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1705564006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705564004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6738cf7bd45830479a42477de5f0f3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneName:
+    _sceneAsset: {fileID: 102900000, guid: d3c06b5c377c83242b3937286173af72, type: 3}
+    _sceneName: Nightmare1
+  promptTextKey:
+    place: prompt
+    id: sleep
+--- !u!4 &1705564007
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705564004}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.227, y: 1.57, z: 2.323}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1707378946
 Mesh:
   m_ObjectHideFlags: 0
@@ -46059,21 +46131,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2caf196c019001c4baf434d8cf077a2f, type: 3}
   m_PrefabInstance: {fileID: 435164136}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1779160083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1779160078}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da47cbcdedf22b14781ec1f59877a5f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  promptTextKey:
-    place: prompt
-    id: turn_off_tracker
 --- !u!65 &1779160086
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46095,6 +46152,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.4000003, y: 0.4105321, z: 0.8293711}
   m_Center: {x: -0.000000003863776, y: -0.032582004, z: 0.0024764934}
+--- !u!114 &1779160089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1779160078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d56dceac4a6be4fb5ae356ac30ba45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  promptTextKey:
+    place: prompt
+    id: turn_off_tracker
 --- !u!43 &1781855588
 Mesh:
   m_ObjectHideFlags: 0
@@ -62836,3 +62908,4 @@ SceneRoots:
   - {fileID: 1793904710727687816}
   - {fileID: 2644652268754422093}
   - {fileID: 4041184588521324499}
+  - {fileID: 1705564007}

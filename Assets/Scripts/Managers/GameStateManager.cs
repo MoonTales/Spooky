@@ -81,7 +81,7 @@ namespace Managers
                 {
                     // this means the player was anxious death (they were in the nightmare, and need to reset to bedroom)
 
-                    SleepTracker.Instance.SetIsGoodWakeup(false);
+                    SleepTrackerManager.Instance.SetIsGoodWakeup(false);
                     SceneSwapper.Instance.SwapScene("Bedroom");
                     // swap the core state to sleep deprived
                     PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
