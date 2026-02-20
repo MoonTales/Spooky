@@ -137,6 +137,7 @@ namespace Interaction
 
         private void FadeOutCompleted()
         {
+            SleepTracker.Instance.SetIsGoodWakeup(true);
             SceneSwapper.Instance.SwapScene(sceneName);
             GameStateManager.Instance.SetCurrentZoneId(-1);
         }
