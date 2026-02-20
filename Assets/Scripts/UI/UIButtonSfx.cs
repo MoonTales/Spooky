@@ -2,6 +2,7 @@ using Managers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Types = System.Types;
 
 namespace UI
 {
@@ -61,7 +62,7 @@ namespace UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (playHover)
+            if (playHover && CanPlayHover())
             {
                 PlaySfx(hoverSfx);
             }
@@ -69,7 +70,7 @@ namespace UI
 
         private void OnButtonClicked()
         {
-            if (playClick)
+            if (playClick && CanPlayClick())
             {
                 PlaySfx(clickSfx);
             }
@@ -79,8 +80,42 @@ namespace UI
         {
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySfx(sfxId);
+                if (sfxId == AudioManager.SfxId.UIHover)
+                {
+                    AudioManager.Instance.PlayUiHoverSfx();
+                }
+                else
+                {
+                    AudioManager.Instance.PlaySfx(sfxId);
+                }
             }
+        }
+
+        private static bool CanPlayHover()
+        {
+            return GameStateManager.Instance == null
+                   || (GameStateManager.Instance.GetCurrentGameState() != Types.GameState.Cutscene
+                       && !IsMainMenuFadeInProgress());
+        }
+
+        private static bool CanPlayClick()
+        {
+            return !IsMainMenuFadeInProgress();
+        }
+
+        private static bool IsMainMenuFadeInProgress()
+        {
+            if (!ScreenFadeManager.IsFadeInProgress)
+            {
+                return false;
+            }
+
+            if (GameStateManager.Instance == null)
+            {
+                return false;
+            }
+
+            return GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu;
         }
     }
 }

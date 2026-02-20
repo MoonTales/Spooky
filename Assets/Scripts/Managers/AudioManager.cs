@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using FMODUnity;
 using FMOD.Studio;
 using Types = System.Types;
@@ -38,6 +39,7 @@ namespace Managers
         private EventInstance _mainMenuMusicInstance;
         private EventInstance _heartbeatInstance;
         private EventInstance _terrorLoopInstance;
+        private EventInstance _uiHoverInstance;
         private bool _terrorLoopIsPlaying;
         private Transform _terrorSourceTransform;
         private EventInstance _pauseSnapshotInstance;
@@ -63,6 +65,12 @@ namespace Managers
         [Header("Player Sounds")]
         [SerializeField] private EventReference footstepPlayer;     // Parameterized footstep event with Surface label parameter.
         [SerializeField] private string playerMovementBusPath = "bus:/SFX/Player/Movement"; // Bus containing player movement events for quick stops.
+
+        [Header("Environment Sounds")]
+        [SerializeField] private bool autoAttachLampAudioOnSceneLoad = true;
+        [SerializeField] private EventReference lampHumLoopEvent;
+        [SerializeField] private string lampOnParameter = "LampOn";
+        [SerializeField] private EventReference lampBuzzOffEvent;
 
         [Header("Mental Audio")]
         [SerializeField] private string terrorDistortionParameter = "Terror";
@@ -105,6 +113,8 @@ namespace Managers
                 () => EventBroadcaster.OnTerrorIntensityChanged -= OnTerrorIntensityChanged);
             TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
                 () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+            TrackSubscription(() => SceneManager.sceneLoaded += OnSceneLoaded,
+                () => SceneManager.sceneLoaded -= OnSceneLoaded);
         }
 
         protected override void Awake()
@@ -114,10 +124,12 @@ namespace Managers
             BuildSfxMap();
             CachePlayerMovementBus();
             CacheSettingsBuses();
+            AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
         }
 
         protected override void OnDestroy()
         {
+            StopAndReleaseUiHover();
             StopAndReleaseHeartbeat();
             StopAndReleaseTerrorLoop();
             StopAndReleaseNightmareAmbience();
@@ -165,6 +177,11 @@ namespace Managers
             RefreshMentalAudio();
         }
 
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            AutoAttachLampAudioEmittersInScene(scene);
+        }
+
         protected override void OnGameStateChanged(Types.GameState newState)
         {
             base.OnGameStateChanged(newState);
@@ -192,6 +209,63 @@ namespace Managers
             instance.setParameterByNameWithLabel("Surface", surfaceLabel);
             instance.start();
             instance.release();
+        }
+
+        public bool TryStartLampHumLoop(Transform fromTransform, bool isOn, out EventInstance instance)
+        {
+            instance = default;
+
+            if (muteSFX || lampHumLoopEvent.IsNull)
+            {
+                return false;
+            }
+
+            instance = CreateEventInstance(lampHumLoopEvent, fromTransform);
+            SetLampHumLoopEnabled(instance, isOn);
+            instance.start();
+            return true;
+        }
+
+        public void SetLampHumLoopEnabled(EventInstance instance, bool isOn)
+        {
+            if (!instance.isValid() || string.IsNullOrWhiteSpace(lampOnParameter))
+            {
+                return;
+            }
+
+            instance.setParameterByName(lampOnParameter, isOn ? 1f : 0f);
+        }
+
+        public void UpdateEventInstanceTransform(EventInstance instance, Transform fromTransform)
+        {
+            if (!instance.isValid() || fromTransform == null)
+            {
+                return;
+            }
+
+            instance.set3DAttributes(RuntimeUtils.To3DAttributes(fromTransform.position));
+        }
+
+        public void StopAndReleaseEventInstance(ref EventInstance instance, bool immediate = false)
+        {
+            if (!instance.isValid())
+            {
+                return;
+            }
+
+            instance.stop(immediate ? FMOD.Studio.STOP_MODE.IMMEDIATE : FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            instance.release();
+            instance = default;
+        }
+
+        public void PlayLampBuzzOff(Transform fromTransform = null)
+        {
+            if (muteSFX || lampBuzzOffEvent.IsNull)
+            {
+                return;
+            }
+
+            PlayEvent(lampBuzzOffEvent, fromTransform);
         }
 
         public void StopFootstepsImmediate()
@@ -330,6 +404,32 @@ namespace Managers
             {
                 Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{sfxId}'.");
             }
+        }
+
+        public void PlayUiHoverSfx()
+        {
+            if (muteSFX)
+            {
+                return;
+            }
+
+            EventReference eventReference = GetSfxEvent(SfxId.UIHover);
+            if (eventReference.IsNull)
+            {
+                Debug.LogWarning("AudioManager: Missing FMOD EventReference for SfxId 'UIHover'.");
+                return;
+            }
+
+            if (!_uiHoverInstance.isValid())
+            {
+                _uiHoverInstance = CreateEventInstance(eventReference);
+            }
+            else
+            {
+                _uiHoverInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            }
+
+            _uiHoverInstance.start();
         }
         
         public void PlayPlayerJumping(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
@@ -608,6 +708,16 @@ namespace Managers
             }
         }
 
+        private void StopAndReleaseUiHover()
+        {
+            if (_uiHoverInstance.isValid())
+            {
+                _uiHoverInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                _uiHoverInstance.release();
+                _uiHoverInstance = default;
+            }
+        }
+
         private void LogAudioState(string message)
         {
             if (!debugAudioLogs)
@@ -678,6 +788,97 @@ namespace Managers
             {
                 _ambienceBus = RuntimeManager.GetBus(ambienceBusPath);
             }
+        }
+
+        private void AutoAttachLampAudioEmittersInScene(Scene scene)
+        {
+            if (!autoAttachLampAudioOnSceneLoad || !scene.IsValid() || !scene.isLoaded)
+            {
+                return;
+            }
+
+            int attachedCount = 0;
+            int configuredCount = 0;
+            HashSet<Transform> configuredRoots = new HashSet<Transform>();
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                Light[] lights = roots[i].GetComponentsInChildren<Light>(true);
+                for (int j = 0; j < lights.Length; j++)
+                {
+                    Light light = lights[j];
+                    if (!IsLampCandidate(light))
+                    {
+                        continue;
+                    }
+
+                    Transform emitterRoot = GetLampEmitterRoot(light.transform);
+                    if (!configuredRoots.Add(emitterRoot))
+                    {
+                        continue;
+                    }
+
+                    LampAudioEmitter emitter = emitterRoot.GetComponent<LampAudioEmitter>();
+                    if (emitter == null)
+                    {
+                        emitter = emitterRoot.gameObject.AddComponent<LampAudioEmitter>();
+                        attachedCount++;
+                    }
+
+                    bool playBuzzOnLightOff = IsLikelyFlickeringLamp(emitterRoot, light);
+                    emitter.Configure(light, playBuzzOnLightOff);
+                    configuredCount++;
+                }
+            }
+
+            LogAudioState($"Lamp audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
+        }
+
+        private static bool IsLampCandidate(Light light)
+        {
+            if (light == null)
+            {
+                return false;
+            }
+
+            Transform current = light.transform;
+            while (current != null)
+            {
+                if (current.name.IndexOf("lamp", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+                current = current.parent;
+            }
+
+            return false;
+        }
+
+        private static Transform GetLampEmitterRoot(Transform lightTransform)
+        {
+            Transform bestMatch = null;
+            Transform current = lightTransform;
+            while (current != null)
+            {
+                if (current.name.IndexOf("lamp", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    bestMatch = current;
+                }
+                current = current.parent;
+            }
+
+            return bestMatch != null ? bestMatch : lightTransform;
+        }
+
+        private static bool IsLikelyFlickeringLamp(Transform emitterRoot, Light light)
+        {
+            Animator animator = emitterRoot != null ? emitterRoot.GetComponent<Animator>() : null;
+            if (animator == null && light != null)
+            {
+                animator = light.GetComponentInParent<Animator>();
+            }
+
+            return animator != null && animator.enabled && animator.runtimeAnimatorController != null;
         }
     }
 }

@@ -5,6 +5,7 @@ using Managers;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using Random = Unity.Mathematics.Random;
 using Types = System.Types;
 
@@ -64,6 +65,10 @@ namespace Player
         private bool _lockedInput = false;
         private float _cameraBaseY;
         private float _currentSpeed;
+        [Header("Audio Guards")]
+        [SerializeField] private float landingSfxSuppressSecondsOnStateChange = 0.2f;
+        [SerializeField] private float landingSfxSuppressSecondsOnSceneLoad = 0.35f;
+        private float _landingSfxSuppressUntilUnscaledTime;
 
         
         // Local reference that the controller cares about
@@ -95,7 +100,8 @@ namespace Player
             _isGrounded = _characterController.isGrounded;
             bool isGameplayState = GameStateManager.Instance != null
                                    && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
-            if (isGameplayState && _isGrounded && !_wasGrounded)
+            bool landingSfxIsSuppressed = Time.unscaledTime < _landingSfxSuppressUntilUnscaledTime;
+            if (isGameplayState && _isGrounded && !_wasGrounded && !landingSfxIsSuppressed)
             {
                 AudioManager.Instance.PlaySfx(AudioManager.SfxId.Landing, transform);
             }
@@ -234,6 +240,8 @@ namespace Player
             base.RegisterSubscriptions();
             TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
                 () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+            TrackSubscription(() => SceneManager.sceneLoaded += OnSceneLoaded,
+                () => SceneManager.sceneLoaded -= OnSceneLoaded);
         }
 
         private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
@@ -242,6 +250,11 @@ namespace Player
             {
                 ForceCrouch();
             }
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            SuppressLandingSfx(landingSfxSuppressSecondsOnSceneLoad);
         }
         
 
@@ -512,6 +525,11 @@ namespace Player
                     break;
                 // handle other game states as needed
             }
+
+            if (newState == Types.GameState.Gameplay)
+            {
+                SuppressLandingSfx(landingSfxSuppressSecondsOnStateChange);
+            }
         }
 
         private void HandleMainMenuState()
@@ -608,6 +626,13 @@ namespace Player
             _cachedSprintState = false;
             _isSprinting = false;
             _moveInput = Vector2.zero;
+        }
+
+        private void SuppressLandingSfx(float seconds)
+        {
+            float clampedDuration = Mathf.Max(0f, seconds);
+            _landingSfxSuppressUntilUnscaledTime = Mathf.Max(_landingSfxSuppressUntilUnscaledTime, Time.unscaledTime + clampedDuration);
+            _wasGrounded = _characterController != null && _characterController.isGrounded;
         }
         
         
