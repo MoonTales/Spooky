@@ -40,7 +40,17 @@ namespace UI
             
             // check if this object has already been fired, and in our hashtable, if it has, we should ignore it.
             // we will key based on the message override (for now)
-            string notificationKey = notificationData.messageOverride ?? notificationData.messageKey.ToString();
+            // if we have a valid text key, use the TextKey.id as they key
+            string notificationKey = "";
+            if (!string.IsNullOrEmpty(notificationData.messageKey.id))
+            {
+                notificationKey = notificationData.messageKey.ToString();
+            }
+            else
+            {
+                notificationKey = notificationData.messageOverride ?? notificationData.messageKey.ToString();
+            }
+            
             if (_activeNotifications.ContainsKey(notificationKey))
             {
                 // if we have already shown this notification, we should ignore it
