@@ -1137,10 +1137,11 @@ public class AttractorAI : MonoBehaviour
 						currentStatePriority = nextStatePriority;
 					}
 				}
-				else if (!agent.pathPending && agent.remainingDistance < 0.5f)
+				else if (!agent.pathPending && agent.remainingDistance < agent.stoppingDistance + 1f)
 				{
 					if (hide)
 					{
+						Debug.Log("What What");
 						if (CheckConeVisibility(transform.position, senses[searchSenseIndex]))
 						{
 							Debug.Log("what");
