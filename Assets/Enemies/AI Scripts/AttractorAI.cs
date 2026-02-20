@@ -656,6 +656,8 @@ public class AttractorAI : MonoBehaviour
 	private List<Vector3> searchLocations = new List<Vector3>();
 	private bool searching = false;
 	private bool searchingSpot = false;
+	private bool hiding = false;
+	private bool hiddenStationary = false;
 
 	[Header("Flee State")]
 	[SerializeField] private float fleeSpeed;
@@ -833,6 +835,8 @@ public class AttractorAI : MonoBehaviour
 			if (searchLocations.Count > 1)
 				searchLocations.Clear();
 			searching = false;
+			hiding = false;
+			hiddenStationary = false;
 		}
 		if (!(currentState == EnemyState.Flee))
 		{
@@ -1132,31 +1136,36 @@ public class AttractorAI : MonoBehaviour
 						searchTimer = 0;
 						searching = false;
 						currentAvoidedTarget.enabled = false;
+						hiddenStationary = false;
+						hiding = false;
 						currentFocus = nextFocus;
 						currentState = nextState;
 						currentStatePriority = nextStatePriority;
 					}
 				}
-				else if (!agent.pathPending && agent.remainingDistance < agent.stoppingDistance + 1f)
+				else if (hiddenStationary || agent.remainingDistance < agent.stoppingDistance)
 				{
+					agent.ResetPath();
 					if (hide)
 					{
-						Debug.Log("What What");
+						hiddenStationary = true;
 						if (CheckConeVisibility(transform.position, senses[searchSenseIndex]))
 						{
-							Debug.Log("what");
+							hiding = false;
 							Vector3 searchSpot = FindSearchSpot(hideRadius);
 							if (searchSpot != Vector3.zero)
 							{
-								Debug.Log("what huh");
 								agent.SetDestination(searchSpot);
 							}
 							else
 							{
-
-								Debug.Log("what why");
 								searchingSpot = false;
+								hiddenStationary = false;
 							}
+						}
+						else
+						{
+							hiding = true;
 						}
 					}
 					else
@@ -1168,6 +1177,8 @@ public class AttractorAI : MonoBehaviour
 					animator.SetBool("LookingAround", false);
 					searchTimer = 0;
 					searching = false;
+					hiddenStationary = false;
+					hiding = false;
 					currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
