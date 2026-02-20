@@ -9,6 +9,8 @@ using UnityEngine;
 /// The sleep tracker will be a singleton class, so it can persist across all the scenes, for the different styles of wakeup.
 ///
 /// Audio is loaded from Resources and faded in/out via coroutines.
+///
+/// This will also look for an object in the scene with the SleepTracker tag
 /// TODO: Connect to FMOD when ready.
 /// </summary>
 public class SleepTracker : Singleton<SleepTracker>, IInteractable
