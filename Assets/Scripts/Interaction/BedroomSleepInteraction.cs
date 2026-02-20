@@ -38,11 +38,13 @@ namespace Interaction
             const int timeToFadeOut = 5; 
             Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             fadeData.Send();
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
         }
 
         private void FadeOutCompleted()
         {
             SceneSwapper.Instance.SwapScene(sceneName);
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
             GameStateManager.Instance.SetCurrentZoneId(-1);
         }
     }
