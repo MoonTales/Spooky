@@ -16,7 +16,8 @@ namespace Interaction.Letters
         private Types.LetterType _letterType; public void SetLetterType(Types.LetterType letterType) { _letterType = letterType; } public Types.LetterType GetLetterType() { return _letterType; }
         private bool _hasBeenWrittenOn = false; public void SetHasBeenWrittenOn(bool value) { _hasBeenWrittenOn = value; } public bool GetHasBeenWrittenOn() { return _hasBeenWrittenOn; }
         
-        
+        // Expose the material to be set for the fade script
+        public Material[] materialArray;
 
         private void Start()
         {
@@ -71,9 +72,68 @@ namespace Interaction.Letters
         private void HandleFinishedFriendLetter()
         {
             // due to this being a "fake" letter, we want to have it "vanish"
-            Destroy(gameObject);
+
+            StartCoroutine(FadeOut());
+
+
         }
 
+
+    private IEnumerator FadeOut()
+    {
+        // Get ALL mesh renderers (this object + all children)
+        MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
+        Debug.Log(renderers.Length);
+        Debug.Log(materialArray.Length);
+
+        // Replace material element 0 on all renderers with its transparent material counterpart
+        Material[] fadeMats = new Material[renderers.Length];
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            Material[] mats = renderers[i].materials;
+            mats[0] = materialArray[i];   // array of transparent materials
+            renderers[i].materials = mats;     // apply back
+
+            // store for alpha fading
+            fadeMats[i] = renderers[i].materials[0];
+        }
+
+        // Prepare fade variables
+        Color color = fadeMats[0].GetColor("_Base_Color");
+        float duration = 10f;
+        float elapsedTime = 0f;
+        float startAlpha = color.a;
+        float targetAlpha = 0f;
+
+        // Fade all materials smoothly using Lerp to interpolate
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration;
+            float newAlpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+
+            for (int i = 0; i < fadeMats.Length; i++)
+            {
+                Color c = fadeMats[i].GetColor("_Base_Color");
+                c.a = newAlpha;
+                fadeMats[i].SetColor("_Base_Color", c);
+            }
+
+            yield return null;
+        }
+
+        // Ensure final alpha = 0 so that its smooth
+        for (int i = 0; i < fadeMats.Length; i++)
+        {
+            Color c = fadeMats[i].GetColor("_Base_Color");
+            c.a = 0f;
+            fadeMats[i].SetColor("_Base_Color", c);
+        }
+
+        // Finally, destroy the whole object
+        Destroy(gameObject);
+    }
 
     }
 }
