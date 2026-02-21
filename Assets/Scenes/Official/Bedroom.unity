@@ -44111,6 +44111,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1715929742}
+  - component: {fileID: 1715929743}
   m_Layer: 0
   m_Name: THHEDOORRR
   m_TagString: Untagged
@@ -44136,6 +44137,34 @@ Transform:
   - {fileID: 34826336}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1715929743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1715929741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cbee8c121c266a8901daac7ee18871, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  passbyEvent:
+    Guid:
+      Data1: -1557052227
+      Data2: 1323541348
+      Data3: -164334156
+      Data4: -1714875230
+    Path: event:/amb/environment/bedroom/door-walk-by
+  allowedSceneName: Bedroom
+  requireGameplayState: 1
+  intervalRange: {x: 15, y: 45}
+  maxPlays: 1
+  duration: 13
+  sideDistance: 6.5
+  pathHalfWidth: 6.5
+  height: 1.7
+  listenerOverride: {fileID: 0}
 --- !u!1 &1723251358
 GameObject:
   m_ObjectHideFlags: 0
