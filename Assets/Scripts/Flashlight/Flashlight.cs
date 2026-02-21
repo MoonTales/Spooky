@@ -76,6 +76,7 @@ public class Flashlight : Singleton<Flashlight>
     private float _batteryLife = 100f; // percentage
     private Coroutine _batteryDrainCoroutine;
     private Coroutine _batteryRechargeCoroutine;
+    private bool _doWePossessTheFlashlight = false; public bool DoWePossessTheFlashlight() { return _doWePossessTheFlashlight; } public void SetDoWePossessTheFlashlight(bool value) { _doWePossessTheFlashlight = value; }
     
     
     // Internal Variables
@@ -122,10 +123,14 @@ public class Flashlight : Singleton<Flashlight>
             _currentPan = panTilt.PanAxis.Value;
             _currentTilt = panTilt.TiltAxis.Value;
         }
+        
+        HandleFlashlightOff(playSfx: false);
+        _isOn = false; // Ensure flashlight starts off
     }
     
     private void Update()
     {
+        if (!_doWePossessTheFlashlight){return;}
         if (_isOn && !_isFlickering)
         {
             CheckForEnemy();
@@ -134,6 +139,7 @@ public class Flashlight : Singleton<Flashlight>
 
     private void LateUpdate()
     {
+        if (!_doWePossessTheFlashlight){return;}
         if (CinemaCamera == null)
         {
             CinemaCamera = PlayerManager.Instance.GetCinemachineCamera();
@@ -202,7 +208,7 @@ public class Flashlight : Singleton<Flashlight>
     
     private void OnFlashlightToggled(bool isOn, bool playSfx = true)
     {
-        
+        if (!_doWePossessTheFlashlight){return;}
         
         // Handle flashlight toggle event
         if (isOn)

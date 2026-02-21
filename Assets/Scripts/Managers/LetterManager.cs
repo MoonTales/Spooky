@@ -30,7 +30,25 @@ namespace Managers
         [Header("Rotation Settings")]
         [SerializeField] private float maxRotationAngle = 15f; // Max degrees to rotate left or right (Y-axis)
 
-
+        
+        // we will hold a little reference of what letters the player has read, and only spawn ones they havent read yet.
+        //these options are:
+        // Act1: Researcher Letter
+        // Act1: Friend Letter
+        // Act2: Researcher Letter
+        // Act2: Friend Letter
+        // Act3: Researcher Letter
+        // Act3: Friend Letter
+        private bool _hasReadAct1ResearcherLetter = false;
+        private bool _hasReadAct1FriendLetter = false;
+        private bool _hasReadAct2ResearcherLetter = false;
+        private bool _hasReadAct2FriendLetter = false;
+        private bool _hasReadAct3ResearcherLetter = false;
+        private bool _hasReadAct3FriendLetter = false;
+        
+        
+        
+        
         protected override void Awake()
         {
             base.Awake();
@@ -52,6 +70,17 @@ namespace Managers
             }
         }
 
+        public void HandleLetterRead(string id)
+        {
+            // brute force for now LOL
+            if(id == "fren_letter_1"){ _hasReadAct1FriendLetter = true;}
+            else if(id == "res_letter_1"){ _hasReadAct1ResearcherLetter = true;}
+            else if(id == "fren_letter_2"){ _hasReadAct2FriendLetter = true;}
+            else if(id == "res_letter_2"){ _hasReadAct2ResearcherLetter = true;}
+            else if(id == "fren_letter_3"){ _hasReadAct3FriendLetter = true;}
+            else if(id == "res_letter_3"){ _hasReadAct3ResearcherLetter = true;}
+        }
+
 
 
 
@@ -68,22 +97,67 @@ namespace Managers
                 GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
                 // spawn the note prefab at the location of the "NoteSpawnLocation" object
                 if (!spawnLocation) { return;}
-                
-                _currentNoteResearcher = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
-                // cast to a Letter and set the letter type to researcher
-                _currentNoteResearcher.GetComponent<Letter>().SetLetterType(Types.LetterType.Researcher);
-                // Start the sliding coroutine
-                StartCoroutine(SlideNote(_currentNoteResearcher));
-                
-                // now we will also send a friend letter, but we will delay it by a few seconds and have it slide in after the researcher letter
-                _currentNoteFriend = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
-                _currentNoteFriend.GetComponent<Letter>().SetLetterType(Types.LetterType.Friend);
-                StartCoroutine(DelayedSlideNote(_currentNoteFriend, 2f)); // Delay of 2 second before sliding in the friend note
-                
+
+                if (currentAct == 1)
+                {
+                    if (!_hasReadAct1ResearcherLetter)
+                    {
+                        // spawn the researcher letter for act 1
+                        SpawnResearcherLetter(spawnLocation);
+                    }
+                    if (!_hasReadAct1FriendLetter)
+                    {
+                        SpawnFriendLetter(spawnLocation);
+                    }
+                }
+                if (currentAct == 2)
+                {
+                    if (!_hasReadAct2ResearcherLetter)
+                    {
+                        // spawn the researcher letter for act 2
+                        SpawnResearcherLetter(spawnLocation);
+                    }
+                    if (!_hasReadAct2FriendLetter)
+                    {
+                        SpawnFriendLetter(spawnLocation);
+                    }
+                }
+
+                if (currentAct == 3)
+                {
+                    if (!_hasReadAct3ResearcherLetter)
+                    {
+                        // spawn the researcher letter for act 3
+                        SpawnResearcherLetter(spawnLocation);
+                    }
+
+                    if (!_hasReadAct3FriendLetter)
+                    {
+                        SpawnFriendLetter(spawnLocation);
+                    }
+                }
+
             }
             
         }
-        
+
+        private void SpawnFriendLetter(GameObject spawnLocation)
+        {
+            // now we will also send a friend letter, but we will delay it by a few seconds and have it slide in after the researcher letter
+            _currentNoteFriend = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
+            _currentNoteFriend.GetComponent<Letter>().SetLetterType(Types.LetterType.Friend);
+            StartCoroutine(DelayedSlideNote(_currentNoteFriend, 2f)); // Delay of 2 second before sliding in the friend note
+        }
+
+        private void SpawnResearcherLetter(GameObject spawnLocation)
+        {
+            _currentNoteResearcher = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
+            // cast to a Letter and set the letter type to researcher
+            _currentNoteResearcher.GetComponent<Letter>().SetLetterType(Types.LetterType.Researcher);
+            // Start the sliding coroutine
+            StartCoroutine(SlideNote(_currentNoteResearcher));
+        }
+
         private IEnumerator DelayedSlideNote(GameObject note, float delay)
         {
             yield return new WaitForSeconds(delay);

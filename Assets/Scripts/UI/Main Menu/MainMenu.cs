@@ -31,24 +31,33 @@ namespace UI.Main_Menu
                 {
                     _playButton = button;
                     _playButton.onClick.AddListener(OnPlayerButtonClicked);
+                    _playButton.enabled = true;
                 }
                 else if (button.name == "Settings")
                 {
                     _settingsButton = button;
                     _settingsButton.onClick.AddListener(OnSettingsButtonClicked);
+                    _settingsButton.enabled = true;
                 }
                 else if (button.name == "Quit")
                 {
                     _quitButton = button;
                     _quitButton.onClick.AddListener(OnQuitButtonClicked);
+                    _quitButton.enabled = true;
                 }
             }
         }
         // Button connections
         private void OnPlayerButtonClicked()
         {
-            new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToGame
-            ).Send();
+            // we will just disable all of the buttons, so that nothing can be clicked while we fade in
+            _playButton.enabled = false;
+            _playButton.interactable = false;
+            _settingsButton.enabled = false;
+            _settingsButton.interactable = false;
+            _quitButton.enabled = false;
+            _quitButton.interactable = false;
+            new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToGame).Send();
             
         }
 
