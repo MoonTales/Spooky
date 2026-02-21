@@ -475,6 +475,7 @@ public class AttractorAI : MonoBehaviour
 		public bool invertPriority = false;
 	}
 
+	[System.Serializable]
 	public class ThoughtProcess
 	{
 		public AttractorType attractorType;
