@@ -59,7 +59,8 @@ namespace Interaction
             Types.NotificationData data = new(
                 duration: 1, 
                 messageKey: new TextKey(),
-                messageOverride: "You feel like you haven't done enough tonight. Maybe you should explore a bit more?"
+                messageOverride: "You feel like you haven't done enough tonight. Maybe you should explore a bit more?",
+                shouldOnlyShowOnce:false
             );
             data.Send();
             

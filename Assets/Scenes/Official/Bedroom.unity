@@ -490,7 +490,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 4
 --- !u!1 &9139715
 GameObject:
   m_ObjectHideFlags: 0
@@ -3368,11 +3368,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: pencase
   promptKey:
-    place: 
-    id: 
+    place: bedroom
+    id: pencase
   requiredHour: -1
 --- !u!1001 &171580740
 PrefabInstance:
@@ -3441,7 +3441,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2005370240}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2005370241}
   m_SourcePrefab: {fileID: 100100000, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
 --- !u!43 &172416134
 Mesh:
@@ -3979,7 +3985,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 3
 --- !u!1001 &197268917
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13491,11 +13497,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: notebook
   promptKey:
-    place: 
-    id: 
+    place: bedroom
+    id: notebook
   requiredHour: -1
 --- !u!1 &527026345
 GameObject:
@@ -14703,7 +14709,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 4
 --- !u!1 &570293097
 GameObject:
   m_ObjectHideFlags: 0
@@ -18366,11 +18372,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: chess
   promptKey:
-    place: 
-    id: 
+    place: bedroom
+    id: chess
   requiredHour: -1
 --- !u!1001 &736914600
 PrefabInstance:
@@ -18820,11 +18826,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: book4
   promptKey:
-    place: 
-    id: 
+    place: bedroom
+    id: books
   requiredHour: -1
 --- !u!43 &771622914
 Mesh:
@@ -25185,7 +25191,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 2
 --- !u!1001 &1067663903
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27166,7 +27172,7 @@ MonoBehaviour:
   promptKey:
     place: bedroom
     id: books
-  requiredHour: -1
+  requiredHour: 2
 --- !u!1001 &1128978148
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28208,7 +28214,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 3
 --- !u!1001 &1184220029
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30732,7 +30738,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 2
 --- !u!1 &1282249620
 GameObject:
   m_ObjectHideFlags: 0
@@ -31456,7 +31462,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 2
 --- !u!43 &1314108449
 Mesh:
   m_ObjectHideFlags: 0
@@ -33027,7 +33033,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 2
 --- !u!1 &1364552362
 GameObject:
   m_ObjectHideFlags: 0
@@ -34245,7 +34251,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 2
 --- !u!1001 &1396303491
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37206,11 +37212,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: book2
   promptKey:
-    place: 
-    id: 
+    place: bedroom
+    id: books
   requiredHour: -1
 --- !u!43 &1496688797
 Mesh:
@@ -39408,11 +39414,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: book1
   promptKey:
-    place: 
-    id: 
+    place: bedroom
+    id: books
   requiredHour: -1
 --- !u!43 &1561533981
 Mesh:
@@ -41455,7 +41461,7 @@ MonoBehaviour:
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 3
 --- !u!43 &1669825324
 Mesh:
   m_ObjectHideFlags: 0
@@ -50095,6 +50101,52 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &2005370236 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
+  m_PrefabInstance: {fileID: 171580740}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2005370240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005370236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f043030ab1caa1045b881c4eac8aba0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rowKey:
+    place: bedroom
+    id: frame
+  promptKey:
+    place: bedroom
+    id: frame
+  requiredHour: -1
+--- !u!64 &2005370241
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005370236}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5967015882926672287, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
 --- !u!43 &2013530101
 Mesh:
   m_ObjectHideFlags: 0
@@ -53687,11 +53739,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: book3
   promptKey:
-    place: 
-    id: 
+    place: bedroom
+    id: books
   requiredHour: -1
 --- !u!43 &2132679499
 Mesh:
