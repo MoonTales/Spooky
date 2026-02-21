@@ -83,7 +83,7 @@ namespace Player
         // Local reference that the controller cares about
         private Types.PlayerMentalState _currentPlayerMentalState;
         private Types.PlayerMovementState _playerMovementState;
-        private void Update()
+        private void FixedUpdate()
         {
             
             // debug print if input is locked
@@ -277,6 +277,8 @@ namespace Player
         private void OnFlashlightToggle(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
+
+            if (GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Nightmare && GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Tutorial) { return;}
             // Logic to toggle flashlight
             // we can just do a check here, to make sure we are not in the pause meny gamestate
             // there is other places this can go, but this works and its easy
@@ -392,7 +394,7 @@ namespace Player
                 return;
             }
             // perform the transition
-            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
+            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.fixedDeltaTime);
             _characterController.height = newHeight;
             _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
             
@@ -401,7 +403,7 @@ namespace Player
             _cameraBaseY = Mathf.Lerp(
                 _cameraBaseY,
                 targetCameraBaseY,
-                crouchTransitionSpeed * Time.deltaTime
+                crouchTransitionSpeed * Time.fixedDeltaTime
             );
             
             cameraEffects.UpdateCameraBaseY(_cameraBaseY);
@@ -452,11 +454,11 @@ namespace Player
             float targetSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
 
             // Smoothly interpolate speed
-            _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.deltaTime);
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.fixedDeltaTime);
 
             Vector3 velocity = moveDirection * _currentSpeed; velocity.y = _verticalVelocity;
 
-            CollisionFlags collisions = _characterController.Move(velocity * Time.deltaTime);
+            CollisionFlags collisions = _characterController.Move(velocity * Time.fixedDeltaTime);
 
             if ((collisions & CollisionFlags.Above) != 0 && _verticalVelocity > 0)
             {

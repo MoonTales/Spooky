@@ -70,9 +70,10 @@ namespace Interaction
             // Disable the collider so that we cant interact with this again while the fadeout is happening
             GetComponent<Collider>().enabled = false;
             SpawnInCollectedDrawingsOnTable();
-            const int timeToFadeOut = 5; 
+            const int timeToFadeOut = 5;
             // Start alarm one-shot for wakeup transition. Any fade behavior should be authored in FMOD.
             AudioManager.Instance?.PlaySfx(AudioManager.SfxId.AlarmClock, transform);
+            SleepTrackerManager.Instance.StartSleepTrackerFadeIn(timeToFadeOut);
             Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             data.Send();
 
@@ -138,6 +139,7 @@ namespace Interaction
 
         private void FadeOutCompleted()
         {
+            SleepTrackerManager.Instance.SetIsGoodWakeup(true);
             SceneSwapper.Instance.SwapScene(sceneName);
             GameStateManager.Instance.SetCurrentZoneId(-1);
         }

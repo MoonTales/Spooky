@@ -36,6 +36,7 @@ namespace System
             gameObject.AddComponent<LetterManager>();
             gameObject.AddComponent<SpawnAnchorManager>();
             gameObject.AddComponent<ScreenFadeManager>();
+            gameObject.AddComponent<SleepTrackerManager>();
 
             
             
