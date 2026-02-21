@@ -209,12 +209,14 @@ namespace System
             private float _duration; public float duration { get { return _duration; } }
             private TextKey _messageKey; public TextKey messageKey { get { return _messageKey; } }
             private string _messageOverride; public string messageOverride { get { return _messageOverride; } }
+            private bool _shouldOnlyShowOnce; public bool shouldOnlyShowOnce { get { return _shouldOnlyShowOnce; } }
 
-            public NotificationData(float duration, TextKey messageKey, string messageOverride = "")
+            public NotificationData(float duration, TextKey messageKey, string messageOverride = "", bool shouldOnlyShowOnce = true)
             {
                 _duration = duration;
                 _messageKey = messageKey;
                 _messageOverride = messageOverride;
+                _shouldOnlyShowOnce = shouldOnlyShowOnce;
             }
 
             public void Send()
