@@ -466,16 +466,13 @@ public class AttractorAI : MonoBehaviour
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+
+		public float repeatBuffer = 1;
+		private float timer = 0;
 	}
 
 	public List<EnemyReactions> behaviourHierarchy;
 	public List<ThoughtProcess> Thoughts;
-	// <RR> REFACTOR REMOVED
-	// private bool forceCurrentStateBuffer = false;
-	// private bool awaitingStateWithForcedBuffer = false;
-	// private bool forceSkipCurrentStateBuffer = false;
-	// private bool awaitingStateWithSkippedBuffer = false;
-	// <RR> REFACTOR REMOVED END
 
 	private Transform currentFocus;
 	private Transform nextFocus;
