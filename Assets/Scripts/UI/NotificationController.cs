@@ -20,6 +20,9 @@ namespace UI
         private float _fadeInTimer = 1f;  // Duration of fade in
         private float _fadeOutTimer = 1f; // Duration of fade out
         
+        // create a hashtable, so we can track notifications by their gameObject. so that way we can make stuff only activate once, even when a scene is loaded multiple times.
+        private Hashtable _activeNotifications = new Hashtable();
+        
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
@@ -34,6 +37,34 @@ namespace UI
             if (!_notificationText) { _notificationText = PlayerHUDController.Instance.GetNotificationText(); }
             // if its still null we have a problem
             if (!_notificationText){DebugUtils.LogError("NotificationController could not find the notification text on the HUD!"); return;}
+            
+            // check if this object has already been fired, and in our hashtable, if it has, we should ignore it.
+            // we will key based on the message override (for now)
+            // if we have a valid text key, use the TextKey.id as they key
+            string notificationKey = "";
+            if (!string.IsNullOrEmpty(notificationData.messageKey.id))
+            {
+                notificationKey = notificationData.messageKey.ToString();
+            }
+            else
+            {
+                notificationKey = notificationData.messageOverride ?? notificationData.messageKey.ToString();
+            }
+            
+            if (_activeNotifications.ContainsKey(notificationKey))
+            {
+                // if we have already shown this notification, we should ignore it
+                DebugUtils.Log($"NotificationController received a notification that has already been shown: {notificationKey}. Ignoring.");
+                return;
+            }
+            else
+            {
+                // otherwise, we need to add it to the hashtable so we know not to show it again.
+                if (notificationData.shouldOnlyShowOnce)
+                {
+                    _activeNotifications.Add(notificationKey, true);
+                }
+            }
             
             // Stop any existing notification coroutine
             StopAllCoroutines();
