@@ -3445,6 +3445,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2005370240}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2005370241}
   m_SourcePrefab: {fileID: 100100000, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
 --- !u!43 &172416134
 Mesh:
@@ -50122,6 +50125,28 @@ MonoBehaviour:
     place: bedroom
     id: frame
   requiredHour: -1
+--- !u!64 &2005370241
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005370236}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5967015882926672287, guid: f9f8625a9ade1a84d8a09eb4d7d502fc, type: 3}
 --- !u!43 &2013530101
 Mesh:
   m_ObjectHideFlags: 0
