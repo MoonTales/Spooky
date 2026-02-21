@@ -49,8 +49,10 @@ namespace Player
         
         [Space(10)]
         [Header("Audio Guards")]
-        [SerializeField] private float landingMinAirborneTimeForSfx = 0.05f; // Minimum airborne time before a grounded edge is treated as a real landing.
+        [SerializeField] private float landingMinAirborneTimeForSfx = 0.5f; // Minimum airborne time before a grounded edge is treated as a real landing.
+        [SerializeField] private float landingMinDropDistanceForSfx = 0.5f; // Minimum vertical drop to suppress rapid stair-step landing retriggers.
 
+        [Space(10)]
         [SerializeField] private Transform _cameraTransform;
         [SerializeField] private Transform head;
         [Header("Camera Effects")]
@@ -78,6 +80,7 @@ namespace Player
         private bool _landingAudioArmed;
         private bool _hasGameplayAirborneToken;
         private float _gameplayAirborneTime;
+        private float _gameplayAirbornePeakY;
         private bool _suppressNextLandingAfterPause;
 
         // Local reference that the controller cares about
@@ -558,8 +561,13 @@ namespace Player
                 }
 
                 // Cache airborne state to validate real landings.
+                if (!_hasGameplayAirborneToken)
+                {
+                    _gameplayAirbornePeakY = transform.position.y;
+                }
                 _hasGameplayAirborneToken = true;
                 _gameplayAirborneTime += Time.deltaTime;
+                _gameplayAirbornePeakY = Mathf.Max(_gameplayAirbornePeakY, transform.position.y);
                 return;
             }
 
@@ -575,15 +583,19 @@ namespace Player
                 }
 
                 bool hadMeaningfulAirborneTime = _gameplayAirborneTime >= Mathf.Max(0f, landingMinAirborneTimeForSfx);
+                float dropDistance = _gameplayAirbornePeakY - transform.position.y;
+                bool hadMeaningfulDropDistance = dropDistance >= Mathf.Max(0f, landingMinDropDistanceForSfx);
                 
-                if (_hasGameplayAirborneToken && hadMeaningfulAirborneTime)
+                if (_hasGameplayAirborneToken && hadMeaningfulAirborneTime && hadMeaningfulDropDistance)
                 {
+                    Debug.Log("PlayerAudio: Landing SFX");
                     AudioManager.Instance.PlaySfx(AudioManager.SfxId.Landing, transform);
                 }
 
                 // Landing edge consumed; reset airborne tracking for the next jump/fall cycle.
                 _hasGameplayAirborneToken = false;
                 _gameplayAirborneTime = 0f;
+                _gameplayAirbornePeakY = transform.position.y;
             }
         }
 
@@ -594,6 +606,7 @@ namespace Player
             _landingAudioArmed = true;
             _hasGameplayAirborneToken = true;
             _gameplayAirborneTime = 0f;
+            _gameplayAirbornePeakY = transform.position.y;
         }
 
         private void SyncJumpAudioTracking(Types.GameState currentGameState)
@@ -636,6 +649,7 @@ namespace Player
             // Valid gameplay jump: apply velocity, mark airborne token for landing validation, and emit jump SFX once.
             BeginGameplayAirborneToken();
             _verticalVelocity = jumpForce;
+            Debug.Log("PlayerAudio: Jump SFX");
             AudioManager.Instance.PlayPlayerJumping(fromTransform: transform);
             _jumpSfxArmed = false;
         }
@@ -664,6 +678,7 @@ namespace Player
             _landingAudioArmed = !disarmUntilGrounded && _isGrounded;
             _hasGameplayAirborneToken = false;
             _gameplayAirborneTime = 0f;
+            _gameplayAirbornePeakY = transform.position.y;
             _wasGrounded = _characterController != null && _characterController.isGrounded;
         }
 
@@ -683,11 +698,13 @@ namespace Player
                 {
                     _hasGameplayAirborneToken = false;
                     _gameplayAirborneTime = 0f;
+                    _gameplayAirbornePeakY = transform.position.y;
                 }
                 else if (!_hasGameplayAirborneToken)
                 {
                     // Resume while airborne still needs a token so the eventual grounded edge can be treated as a real landing.
                     _hasGameplayAirborneToken = true;
+                    _gameplayAirbornePeakY = transform.position.y;
                 }
 
                 return;
