@@ -26,7 +26,9 @@ namespace Interaction
                 // otherwise, we cant return yet
                 Types.NotificationData data = new(
                     duration: 1, 
-                    messageKey: new TextKey { place = "prompt", id = "tracker_not_off" }
+                    messageKey: new TextKey { place = "prompt", id = "tracker_not_off" },
+                    messageOverride: "",
+                    shouldOnlyShowOnce:false
                 );
                 data.Send();
                 return;
@@ -36,7 +38,7 @@ namespace Interaction
             GetComponent<Collider>().enabled = false;
 
             const int timeToFadeOut = 3; 
-            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 2, fadeOutDuration:timeToFadeOut, FadeInCompleted, FadeOutCompleted);
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 1.5f, fadeOutDuration:timeToFadeOut, FadeInCompleted, FadeOutCompleted);
 
             fadeData.Send();
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
@@ -47,7 +49,7 @@ namespace Interaction
             SceneSwapper.Instance.SwapScene(sceneName);
             // Display the notification here!
             Types.NotificationData data = new(
-                duration: 2, 
+                duration: 3, 
                 messageKey: new TextKey { place = "cutscene", id = "act1" }
             );
             data.Send();
