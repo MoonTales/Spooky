@@ -22,7 +22,11 @@ namespace UI
 
         private TMP_Text _hudInteractionPromptText;
         private TMP_Text _hudItemNameText;
+
+        // scroll view for the description text
+        private ScrollRect _hudItemDescriptionScrollRect;
         private TMP_Text _hudItemDescriptionText;
+
         // notificationText is handled via the NotificationController
         private TMP_Text _hudNotificationText; public TMP_Text GetNotificationText() { return _hudNotificationText; }
 
@@ -48,7 +52,13 @@ namespace UI
             _hudOverlay = transform.Find("Overlay").GetComponent<Image>();
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
             _hudItemNameText = transform.Find("ItemName").GetComponent<TMP_Text>();
-            _hudItemDescriptionText = transform.Find("ItemDescription").GetComponent<TMP_Text>();
+
+            // ItemDescription is now a Scroll View root (with ScrollRect)
+            Transform itemDescRoot = transform.Find("ItemDescription");
+            _hudItemDescriptionScrollRect = itemDescRoot.GetComponent<ScrollRect>();
+            // TMP text lives under Content basically
+             _hudItemDescriptionText = itemDescRoot.Find("Viewport/Content/ItemDescription").GetComponent<TMP_Text>();
+
             _hudNotificationText = transform.Find("NotificationText").GetComponent<TMP_Text>();
             _hudNotificationText.gameObject.SetActive(false);
             SetPrompt("");
@@ -187,13 +197,19 @@ namespace UI
         private void SetInspectionTextVisible(bool visible)
         {
             if (_hudItemNameText != null) _hudItemNameText.gameObject.SetActive(visible);
-            if (_hudItemDescriptionText != null) _hudItemDescriptionText.gameObject.SetActive(visible);
+            if (_hudItemDescriptionScrollRect != null) _hudItemDescriptionScrollRect.gameObject.SetActive(visible);
             if (_hudOverlay != null) _hudOverlay.enabled = visible;
         }
         private void SetInspectionText(string name, string desc)
         {
             if (_hudItemNameText != null) _hudItemNameText.text = name ?? "";
             if (_hudItemDescriptionText != null) _hudItemDescriptionText.text = desc ?? "";
+
+            if (_hudItemDescriptionScrollRect != null)
+            {
+                Canvas.ForceUpdateCanvases(); // layoout update force - wanna put scroll back on top
+                _hudItemDescriptionScrollRect.verticalNormalizedPosition = 1f;
+            }
         }
     }
 }
