@@ -135,6 +135,17 @@ namespace Player
                 DebugUtils.Log($"- Drawing ID: {drawingID}");
             }
         }
+
+        public void DebugAdjustDrawingsThisNight(int delta)
+        {
+            if (delta == 0)
+            {
+                return;
+            }
+
+            _currentDrawingsThisNight = Mathf.Clamp(_currentDrawingsThisNight + delta, 0, _maxDrawingsPerNight);
+            DebugUtils.Log($"Debug: Current drawings this night set to {_currentDrawingsThisNight}/{_maxDrawingsPerNight}.");
+        }
         
     }
 }

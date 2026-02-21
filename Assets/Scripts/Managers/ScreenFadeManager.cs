@@ -15,6 +15,7 @@ namespace Managers
     
     public class ScreenFadeManager : Singleton<ScreenFadeManager>
     {
+        public static bool IsFadeInProgress { get; private set; }
         
         // this will load in a "canvas" from the resources folder, which will be used to fade the screen in and out
         private GameObject _screenFadeCanvas;
@@ -55,6 +56,7 @@ namespace Managers
         private IEnumerator FadeSequence(Types.ScreenFadeData fadeData)
         {
             _isFading = true;
+            IsFadeInProgress = true;
 
             // Fade to black (Fade Out)
             yield return StartCoroutine(FadeToBlack(fadeData.GetFadeOutDuration()));
@@ -68,6 +70,13 @@ namespace Managers
             OnScreenFadeInComplete(fadeData.GetOnFadeInComplete());
 
             _isFading = false;
+            IsFadeInProgress = false;
+        }
+
+        protected override void OnDestroy()
+        {
+            IsFadeInProgress = false;
+            base.OnDestroy();
         }
 
         private IEnumerator FadeToBlack(float duration)
