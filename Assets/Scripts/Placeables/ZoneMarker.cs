@@ -39,8 +39,8 @@ namespace Placeables
             // create our notification data
             Types.NotificationData data = new(
                 duration: 1, 
-                messageKey: new TextKey(),
-                messageOverride: "You just entered the zone: " + zoneID
+                messageKey: new TextKey()
+                //messageOverride: "You just entered the zone: " + zoneID
             );
             data.Send();
             
@@ -61,8 +61,8 @@ namespace Placeables
                 // create our notification data
                 Types.NotificationData data = new(
                     duration: 1, 
-                    messageKey: new TextKey(),
-                    messageOverride: "You just entered the zone: " + previousZoneID
+                    messageKey: new TextKey()
+                    //messageOverride: "You just entered the zone: " + previousZoneID
                 );
                 data.Send();
                 GameStateManager.Instance.SetCurrentZoneId(previousZoneID);
