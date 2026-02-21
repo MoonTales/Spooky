@@ -227,6 +227,22 @@
 		</property>
 	</object>
 	<object class="MixerBusFader" id="{7517fe65-83f7-4684-b799-1bc35a9792c7}" />
-	<object class="SpatialiserEffect" id="{65bc5d9c-451f-4d39-a6cb-659294ba4c70}" />
+	<object class="SpatialiserEffect" id="{65bc5d9c-451f-4d39-a6cb-659294ba4c70}">
+		<property name="distanceRolloffType">
+			<value>2</value>
+		</property>
+		<property name="minimumDistance">
+			<value>0.0500000007</value>
+		</property>
+		<property name="maximumDistance">
+			<value>2</value>
+		</property>
+		<property name="overrideRange">
+			<value>true</value>
+		</property>
+		<property name="soundSize">
+			<value>0.5</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{5aab0735-1b17-4caf-9ae1-f8b16a50e94c}" />
 </objects>

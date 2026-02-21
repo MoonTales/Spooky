@@ -17,6 +17,7 @@ namespace Managers
             // Player
             Jump, Landing, Flashlight, // CrouchIn, CrouchOut, PeekIn, PeekOut, TippytoeIn, TippytoeOut,
             // Interaction
+            LetterSlide,
             LetterScribble,
             AlarmClock,
             // UI
@@ -94,7 +95,7 @@ namespace Managers
 
         [Header("World Ambience")]
         [SerializeField] private EventReference bedroomAmbLoopEvent;
-        [SerializeField] private bool bedroomAmbienceRequiresGameplay = false;
+        [SerializeField] private bool bedroomAmbienceRequiresGameplay = true;
 
         [Header("Settings Menu Audio")]
         [SerializeField] private EventReference mainMenuMusicEvent;

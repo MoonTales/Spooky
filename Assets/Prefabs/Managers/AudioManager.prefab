@@ -77,7 +77,7 @@ MonoBehaviour:
         Data3: 858536617
         Data4: 2120149737
       Path: event:/sfx/player/movement/land
-  - id: 3
+  - id: 4
     eventRef:
       Guid:
         Data1: 308712568
@@ -85,7 +85,7 @@ MonoBehaviour:
         Data3: -1279461214
         Data4: -1045431688
       Path: event:/sfx/interactable/bedroom/scribble
-  - id: 4
+  - id: 5
     eventRef:
       Guid:
         Data1: 1949340520
@@ -93,7 +93,15 @@ MonoBehaviour:
         Data3: 1073144453
         Data4: 123186211
       Path: event:/amb/environment/nightmare/alarm
-  debugAudioLogs: 1
+  - id: 3
+    eventRef:
+      Guid:
+        Data1: 851541296
+        Data2: 1207363628
+        Data3: 2054426510
+        Data4: 988299289
+      Path: event:/sfx/interactable/bedroom/letter-slide
+  debugAudioLogs: 0
   footstepPlayer:
     Guid:
       Data1: 1793541463
@@ -156,7 +164,7 @@ MonoBehaviour:
       Data3: 1465847740
       Data4: 1382995033
     Path: event:/amb/environment/bedroom/bed-bg
-  bedroomAmbienceRequiresGameplay: 0
+  bedroomAmbienceRequiresGameplay: 1
   mainMenuMusicEvent:
     Guid:
       Data1: -578515550

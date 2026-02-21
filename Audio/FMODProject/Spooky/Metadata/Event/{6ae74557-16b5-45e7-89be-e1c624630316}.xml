@@ -224,6 +224,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{8fe387fe-30dc-4d43-b6dc-333daa5a6509}">
+		<property name="volume">
+			<value>-4</value>
+		</property>
 		<property name="name">
 			<value>Concrete</value>
 		</property>
@@ -326,6 +329,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{07e1cb53-4c80-47bd-8443-4df8478c5982}">
+		<property name="volume">
+			<value>-10</value>
+		</property>
 		<property name="name">
 			<value>Metal</value>
 		</property>
@@ -504,6 +510,7 @@
 	<object class="MixerBusEffectChain" id="{72ee98df-24e1-4f4d-add1-25621a9aff2c}">
 		<relationship name="effects">
 			<destination>{ae232312-0e6a-499f-91ec-2d830e199e29}</destination>
+			<destination>{56503740-98d1-47c9-9543-2e3a1e3eb10f}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{7090a2d1-ea08-4345-b66d-3a354314fab0}" />
@@ -678,6 +685,7 @@
 	<object class="MixerBusEffectChain" id="{eed553e1-cbc0-4819-9d75-3021b3197007}">
 		<relationship name="effects">
 			<destination>{1ed0fc44-1ee2-4c3c-af95-29572a43a0f4}</destination>
+			<destination>{81d648af-c018-4805-9750-0586ee306667}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{e645188d-9b80-489f-8806-3bf98fd4d911}" />
@@ -709,7 +717,23 @@
 	<object class="MixerBusFader" id="{ce6752b6-f44e-4a17-ba9a-313f90afe098}" />
 	<object class="MixerBusFader" id="{9a718368-9997-490e-8a33-e7606df91178}" />
 	<object class="MixerBusFader" id="{ae232312-0e6a-499f-91ec-2d830e199e29}" />
+	<object class="MultibandEqEffect" id="{56503740-98d1-47c9-9543-2e3a1e3eb10f}">
+		<property name="frequencyA">
+			<value>4949.39258</value>
+		</property>
+		<property name="qualityA">
+			<value>0.360131115</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{92bc187e-e82f-40f8-b38b-613d74208e44}" />
 	<object class="MixerBusFader" id="{b9d36a5c-0514-47c2-a25b-8b869c67449c}" />
 	<object class="MixerBusFader" id="{1ed0fc44-1ee2-4c3c-af95-29572a43a0f4}" />
+	<object class="MultibandEqEffect" id="{81d648af-c018-4805-9750-0586ee306667}">
+		<property name="frequencyA">
+			<value>5489.62793</value>
+		</property>
+		<property name="qualityA">
+			<value>0.486414731</value>
+		</property>
+	</object>
 </objects>
