@@ -26,8 +26,7 @@ namespace Interaction
                 // otherwise, we cant return yet
                 Types.NotificationData data = new(
                     duration: 1, 
-                    messageKey: new TextKey(),
-                    messageOverride: "You feel like there is something you need to do before you can sleep. Maybe you should explore a bit more?"
+                    messageKey: new TextKey { place = "prompt", id = "tracker_not_off" }
                 );
                 data.Send();
                 return;
@@ -35,7 +34,7 @@ namespace Interaction
         
             // we are good to sleep!
             GetComponent<Collider>().enabled = false;
-            const int timeToFadeOut = 5; 
+            const int timeToFadeOut = 3; 
             Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             fadeData.Send();
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
