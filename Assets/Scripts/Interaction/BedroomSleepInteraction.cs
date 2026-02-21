@@ -34,8 +34,10 @@ namespace Interaction
         
             // we are good to sleep!
             GetComponent<Collider>().enabled = false;
+
             const int timeToFadeOut = 3; 
-            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 2, fadeOutDuration:timeToFadeOut, FadeInCompleted, FadeOutCompleted);
+
             fadeData.Send();
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
         }
@@ -43,8 +45,19 @@ namespace Interaction
         private void FadeOutCompleted()
         {
             SceneSwapper.Instance.SwapScene(sceneName);
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            // Display the notification here!
+            Types.NotificationData data = new(
+                duration: 2, 
+                messageKey: new TextKey { place = "cutscene", id = "act1" }
+            );
+            data.Send();
             GameStateManager.Instance.SetCurrentZoneId(-1);
+        }
+
+        private void FadeInCompleted()
+        {
+            // lock all movement untill we finish the fade in
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
     }
 }

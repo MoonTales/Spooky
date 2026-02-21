@@ -42,9 +42,9 @@ namespace UI
             // we will key based on the message override (for now)
             // if we have a valid text key, use the TextKey.id as they key
             string notificationKey = "";
-            if (!string.IsNullOrEmpty(notificationData.messageKey.id))
+            if (!string.IsNullOrEmpty(notificationData.messageKey.place))
             {
-                notificationKey = notificationData.messageKey.ToString();
+                notificationKey = notificationData.messageKey.ToString() + (string.IsNullOrEmpty(notificationData.messageOverride) ? "" : $"_{notificationData.messageOverride}");
             }
             else
             {
@@ -90,8 +90,9 @@ namespace UI
             // double check we have some text to show
             if (string.IsNullOrEmpty(_notificationText.text))
             {
-                DebugUtils.LogError("NotificationController received a notification with no message to display!");
-                _notificationText.text = "[ERROR: No Notification Message]";
+                DebugUtils.LogWarning("NotificationController received a notification with no message to display!");
+                _notificationText.text = "";
+                return;
             }
             
             // Start the full notification sequence
