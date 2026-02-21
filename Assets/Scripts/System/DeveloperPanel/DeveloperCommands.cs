@@ -162,6 +162,8 @@ namespace System
             RegisterCommand(KeyCode.Comma, () => GameStateManager.Instance.CycleWorldLocation(-1), "Prev World Location", "Cycle to the previous world location enum value");
             RegisterCommand(KeyCode.Period, () => GameStateManager.Instance.CycleWorldLocation(1), "Next World Location", "Cycle to the next world location enum value");
             RegisterCommand(KeyCode.Semicolon, () => EventBroadcaster.Broadcast_GameRestarted(), "Emulate Game Restart", "Send off a broadcast to emulate the game being restarted (this simulates if we did return to main menu.)");
+            RegisterCommand(KeyCode.LeftArrow, () => PlayerInventory.Instance.DebugAdjustDrawingsThisNight(-1), "Decrease Drawings", "Decrease current drawings collected this night by 1 (min 0).");
+            RegisterCommand(KeyCode.RightArrow, () => PlayerInventory.Instance.DebugAdjustDrawingsThisNight(1), "Increase Drawings", "Increase current drawings collected this night by 1 (max per night).");
             
             // Cutscenes
             RegisterCommand(KeyCode.Alpha0, () => CutsceneManager.Instance.OnRequestSkipCutscene(), "Skip Cutscene", "Send off a broadcast to skip the current cutscene (if any is playing)");
