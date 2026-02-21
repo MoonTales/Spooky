@@ -111,9 +111,11 @@ public class LampAudioEmitter : MonoBehaviour
 
     private void StopHumLoopImmediate()
     {
-        if (AudioManager.Instance != null)
+        // Avoid Singleton.Instance here: during scene teardown AudioManager may already be destroyed.
+        AudioManager audioManager = Object.FindAnyObjectByType<AudioManager>();
+        if (audioManager != null)
         {
-            AudioManager.Instance.StopAndReleaseEventInstance(ref _humLoopInstance, immediate: true);
+            audioManager.StopAndReleaseEventInstance(ref _humLoopInstance, immediate: true);
         }
         else if (_humLoopInstance.isValid())
         {
