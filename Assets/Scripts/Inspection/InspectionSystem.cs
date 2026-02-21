@@ -251,7 +251,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
         if (GameStateManager.Instance != null
             && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom)
         {
-            //TODO: <SFX> Play bedroom letter-writing scribble one-shot from AudioManager.
+            // Play bedroom letter-writing scribble one-shot from AudioManager.
             AudioManager.Instance?.PlaySfx(
                 AudioManager.SfxId.LetterScribble,
                 _currentInspectedObject != null ? _currentInspectedObject.transform : transform);

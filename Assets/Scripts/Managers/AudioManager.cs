@@ -39,6 +39,7 @@ namespace Managers
 
         private EventInstance _nightmareAmbienceInstance;
         private EventInstance _mainMenuMusicInstance;
+        private EventInstance _bedroomAmbienceInstance;
         private EventInstance _heartbeatInstance;
         private EventInstance _terrorLoopInstance;
         private EventInstance _uiHoverInstance;
@@ -90,6 +91,10 @@ namespace Managers
         [SerializeField] private bool heartbeatMentalHealthParameterIsGlobal = true;
         [SerializeField] private bool logTerrorParameterValue = false;
 
+        [Header("World Ambience")]
+        [SerializeField] private EventReference bedroomAmbLoopEvent;
+        [SerializeField] private bool bedroomAmbienceRequiresGameplay = false;
+
         [Header("Settings Menu Audio")]
         [SerializeField] private EventReference mainMenuMusicEvent;
         [SerializeField] private string masterBusPath = "bus:/";
@@ -129,6 +134,7 @@ namespace Managers
             CachePlayerMovementBus();
             CacheSettingsBuses();
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
+            ApplyBedroomAmbience();
         }
 
         protected override void OnDestroy()
@@ -137,6 +143,7 @@ namespace Managers
             StopAndReleaseHeartbeat();
             StopAndReleaseTerrorLoop();
             StopAndReleaseNightmareAmbience();
+            StopAndReleaseBedroomAmbience();
             StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
@@ -172,18 +179,20 @@ namespace Managers
 
         private void OnWorldLocationChanged(Types.WorldLocation newLocation)
         {
-            LogAudioState($"World location changed -> {newLocation}. Expected: nightmare ambience/terror/heartbeat only play in Nightmare.");
+            LogAudioState($"World location changed -> {newLocation}. Expected: nightmare stack in Nightmare, bedroom ambience in Bedroom.");
             if (newLocation != Types.WorldLocation.Nightmare)
             {
                 _terrorSeverity = 0f;
                 _terrorSourceTransform = null;
             }
             RefreshMentalAudio();
+            ApplyBedroomAmbience();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             AutoAttachLampAudioEmittersInScene(scene);
+            ApplyBedroomAmbience();
         }
 
         protected override void OnGameStateChanged(Types.GameState newState)
@@ -200,6 +209,8 @@ namespace Managers
             {
                 StopMainMenuMusic(true);
             }
+
+            ApplyBedroomAmbience();
         }
 
         // Public API: gameplay-triggered SFX
@@ -248,6 +259,35 @@ namespace Managers
             }
 
             instance.set3DAttributes(RuntimeUtils.To3DAttributes(fromTransform.position));
+        }
+
+        public void UpdateEventInstancePosition(EventInstance instance, Vector3 worldPosition)
+        {
+            if (!instance.isValid())
+            {
+                return;
+            }
+
+            instance.set3DAttributes(RuntimeUtils.To3DAttributes(worldPosition));
+        }
+
+        public bool TryStartSfxEventInstance(EventReference eventReference, Vector3 worldPosition, out EventInstance instance)
+        {
+            instance = default;
+
+            if (muteSFX || eventReference.IsNull)
+            {
+                return false;
+            }
+
+            instance = RuntimeManager.CreateInstance(eventReference);
+            if (EventInstanceIs3D(instance))
+            {
+                instance.set3DAttributes(RuntimeUtils.To3DAttributes(worldPosition));
+            }
+
+            instance.start();
+            return true;
         }
 
         public void StopAndReleaseEventInstance(ref EventInstance instance, bool immediate = false)
@@ -477,6 +517,29 @@ namespace Managers
             LogAudioState("Main menu music started.");
         }
 
+        private void ApplyBedroomAmbience()
+        {
+            if (!ShouldPlayBedroomAmbience())
+            {
+                StopAndReleaseBedroomAmbience();
+                return;
+            }
+
+            if (bedroomAmbLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            if (_bedroomAmbienceInstance.isValid())
+            {
+                return;
+            }
+
+            _bedroomAmbienceInstance = CreateEventInstance(bedroomAmbLoopEvent);
+            _bedroomAmbienceInstance.start();
+            LogAudioState("Bedroom ambience started.");
+        }
+
         private void StopMainMenuMusic(bool allowFadeout)
         {
             if (!_mainMenuMusicInstance.isValid())
@@ -635,6 +698,26 @@ namespace Managers
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare;
         }
 
+        private bool ShouldPlayBedroomAmbience()
+        {
+            if (GameStateManager.Instance == null)
+            {
+                return false;
+            }
+
+            if (GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Bedroom)
+            {
+                return false;
+            }
+
+            if (!bedroomAmbienceRequiresGameplay)
+            {
+                return true;
+            }
+
+            return GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
+        }
+
         private void PlayEvent(EventReference eventReference, Transform fromTransform)
         {
             if (muteSFX) return;
@@ -709,6 +792,17 @@ namespace Managers
                 _nightmareAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 _nightmareAmbienceInstance.release();
                 LogAudioState("Nightmare ambience stopped.");
+            }
+        }
+
+        private void StopAndReleaseBedroomAmbience()
+        {
+            if (_bedroomAmbienceInstance.isValid())
+            {
+                _bedroomAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _bedroomAmbienceInstance.release();
+                _bedroomAmbienceInstance = default;
+                LogAudioState("Bedroom ambience stopped.");
             }
         }
 

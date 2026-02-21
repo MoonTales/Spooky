@@ -53,7 +53,7 @@ MonoBehaviour:
         Data3: 316999592
         Data4: 2026019272
       Path: event:/sfx/switches/flashlight
-  - id: 10
+  - id: 4
     eventRef:
       Guid:
         Data1: -589383920
@@ -95,6 +95,7 @@ MonoBehaviour:
     Path: event:/sfx/player/movement/footstep
   playerMovementBusPath: bus:/SFX/StopOnPause/Player/Movement
   autoAttachLampAudioOnSceneLoad: 1
+  lampAudioAutoAttachSceneName: Tutorial
   lampHumLoopEvent:
     Guid:
       Data1: -904938069
@@ -140,6 +141,14 @@ MonoBehaviour:
   heartbeatTerrorParameterIsGlobal: 1
   heartbeatMentalHealthParameterIsGlobal: 1
   logTerrorParameterValue: 0
+  bedroomAmbLoopEvent:
+    Guid:
+      Data1: -2122210753
+      Data2: 1147047463
+      Data3: 1465847740
+      Data4: 1382995033
+    Path: event:/amb/environment/bedroom/bed-bg
+  bedroomAmbienceRequiresGameplay: 0
   mainMenuMusicEvent:
     Guid:
       Data1: -578515550
