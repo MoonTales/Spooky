@@ -961,6 +961,15 @@ public class AttractorAI : MonoBehaviour
 
 					if (conditionsMet)
 					{
+						nextStatePriority = tempPriority;
+						if (nextStatePriority < currentStatePriority)
+						{
+							foreach (FunctionPicker function in reaction.functionExecutions)
+							{
+								HandleFunctionCalling(function);
+							}
+						}
+
 						if (!reaction.targetDetectedObject)
 						{
 							nextFocus = defaultFocus;
@@ -970,16 +979,11 @@ public class AttractorAI : MonoBehaviour
 							nextFocus = tempFocus;
 						}
 
-						nextStatePriority = tempPriority;
 						nextState = reaction.stateChange;
 						if (nextStatePriority < currentStatePriority)
 						{
 							currentFocus = nextFocus;
 							currentState = nextState;
-							foreach (FunctionPicker function in reaction.functionExecutions)
-							{
-								HandleFunctionCalling(function);
-							}
 							currentStatePriority = nextStatePriority;
 						}
 
@@ -996,18 +1000,22 @@ public class AttractorAI : MonoBehaviour
 						(reaction.reactionConditions.intConditions.Count > 0 &&
 						reaction.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any()))
 					{
-						nextFocus = defaultFocus;
-
 						nextStatePriority = tempPriority;
-						nextState = reaction.stateChange;
 						if (nextStatePriority < currentStatePriority)
 						{
-							currentFocus = nextFocus;
-							currentState = nextState;
 							foreach (FunctionPicker function in reaction.functionExecutions)
 							{
 								HandleFunctionCalling(function);
 							}
+						}
+
+						nextFocus = defaultFocus;
+						nextState = reaction.stateChange;
+
+						if (nextStatePriority < currentStatePriority)
+						{
+							currentFocus = nextFocus;
+							currentState = nextState;
 							currentStatePriority = nextStatePriority;
 						}
 
