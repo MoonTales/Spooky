@@ -1381,7 +1381,8 @@ public class AttractorAI : MonoBehaviour
 						animator.SetBool("LookingAround", false);
 						searchTimer = 0;
 						searching = false;
-						currentAvoidedTarget.enabled = false;
+						if (currentAvoidedTarget != null)
+							currentAvoidedTarget.enabled = false;
 						hiddenStationary = false;
 						hiding = false;
 						currentFocus = nextFocus;
@@ -1425,7 +1426,8 @@ public class AttractorAI : MonoBehaviour
 					searching = false;
 					hiddenStationary = false;
 					hiding = false;
-					currentAvoidedTarget.enabled = false;
+					if (currentAvoidedTarget != null)
+						currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
 					currentStatePriority = nextStatePriority;
@@ -1466,7 +1468,8 @@ public class AttractorAI : MonoBehaviour
 				{
 					fleeTime = 0;
 					fleeing = false;
-					currentAvoidedTarget.enabled = false;
+					if (currentAvoidedTarget != null)
+						currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
 					currentStatePriority = nextStatePriority;
