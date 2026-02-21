@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{b226d868-1888-42be-a0c3-a83b1536ab93}">
+		<property name="name">
+			<value>WorldClock</value>
+		</property>
+		<relationship name="folder">
+			<destination>{49b9f779-de73-4858-a9e5-9d27375712e5}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{7a4e900a-65f6-41ab-85a8-60b0929669b4}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{7a4e900a-65f6-41ab-85a8-60b0929669b4}">
+		<property name="parameterType">
+			<value>1</value>
+		</property>
+		<property name="maximum">
+			<value>3</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

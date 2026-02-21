@@ -70,8 +70,7 @@ namespace Interaction
             // Disable the collider so that we cant interact with this again while the fadeout is happening
             GetComponent<Collider>().enabled = false;
             SpawnInCollectedDrawingsOnTable();
-            const int timeToFadeOut = 5; 
-            //TODO: <SFX> Start an alarm sound fading in over "timToFadeOut"
+            const int timeToFadeOut = 5;
             SleepTrackerManager.Instance.StartSleepTrackerFadeIn(timeToFadeOut);
             Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             data.Send();

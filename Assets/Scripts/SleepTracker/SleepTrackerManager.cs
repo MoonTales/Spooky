@@ -100,7 +100,6 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
     public void TurnSleepTrackerOff()
     {
         DebugUtils.Log("Turning Sleep Tracker Off");
-        AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
         _isSleepTrackerActive = false;
         
     }
@@ -111,25 +110,8 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
     public void TurnSleepTrackerOn()
     {
         DebugUtils.Log("Turning Sleep Tracker On");
+        AudioManager.Instance.PlaySfx(AudioManager.SfxId.AlarmClock, transform);
         _isSleepTrackerActive = true;
     }
-    
-    // TEMPORARY !!!
-    float _timer = 0;
-    public void Update()
-    {
-        // as long as we are active, loop a sound every 1 second
-        if (_isSleepTrackerActive)
-        {
-            //TODO: Replace with actual alarm sound, and remove this temporary code
-            _timer += Time.deltaTime;
-            if (_timer >= 0.25f)
-            {
-                _timer = 0f;
-                AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
-            }
-        }
-    }
-    
 
 }
