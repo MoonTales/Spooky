@@ -15,7 +15,9 @@ namespace Managers
         public enum SfxId
         {
             // Player
-            Jump, Landing, Flashlight, CrouchIn, CrouchOut, PeekIn, PeekOut, TippytoeIn, TippytoeOut,
+            Jump, Landing, Flashlight, // CrouchIn, CrouchOut, PeekIn, PeekOut, TippytoeIn, TippytoeOut,
+            // Interaction
+            LetterScribble,
             // UI
             UIHover,
         }
@@ -40,6 +42,7 @@ namespace Managers
         private EventInstance _heartbeatInstance;
         private EventInstance _terrorLoopInstance;
         private EventInstance _uiHoverInstance;
+        private EventInstance _letterScribbleInstance;
         private bool _terrorLoopIsPlaying;
         private Transform _terrorSourceTransform;
         private EventInstance _pauseSnapshotInstance;
