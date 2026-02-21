@@ -44,7 +44,8 @@ public class AttractorAI : MonoBehaviour
 		visual,
 		audio,
 		attackRange,
-		self
+		self,
+		NONE
 	}
 
 	public enum FunctionType
@@ -382,6 +383,34 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	[System.Serializable]
+	public class BoolCondition
+	{
+		public string boolName;
+		public bool boolValue;
+	}
+	[System.Serializable]
+	public class FloatCondition
+	{
+		public string floatName;
+		public float floatValue;
+	}
+	[System.Serializable]
+	public class IntCondition
+	{
+		public string intName;
+		public int intValue;
+	}
+	[System.Serializable]
+	public class ReactConditions
+	{
+		public List<BoolCondition> boolConditions = new List<BoolCondition>();
+		public List<FloatCondition> floatConditions = new List<FloatCondition>();
+		public List<IntCondition> intConditions = new List<IntCondition>();
+	}
+
+	public ReactConditions currentConditions;
+
+	[System.Serializable]
 	public class EnemyReactions
 	{
 		public AttractorType attractorType;
@@ -389,6 +418,8 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
+		public ReactConditions reactionConditions;
+		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
 		public List<string> statusRestrictions = new List<string>();
@@ -417,9 +448,28 @@ public class AttractorAI : MonoBehaviour
 		public bool invertPriority = false;
 	}
 
-	
+	public class ThoughtProcess
+	{
+		public AttractorType attractorType;
+		[Tooltip("Inclusve")]
+		public float minIntensity;
+		[Tooltip("Non-inclusve")]
+		public float maxIntensity;
+		public ReactConditions reactionConditions;
+		public bool allConditionsRequired = false;
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
+		public List<string> statusRestrictions = new List<string>();
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
+		public bool allStatusesRequired = false;
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
+		public List<EnemyState> stateRestriction = new List<EnemyState>();
+		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+	}
 
 	public List<EnemyReactions> behaviourHierarchy;
+	public List<ThoughtProcess> Thoughts;
 	// <RR> REFACTOR REMOVED
 	// private bool forceCurrentStateBuffer = false;
 	// private bool awaitingStateWithForcedBuffer = false;
@@ -859,10 +909,10 @@ public class AttractorAI : MonoBehaviour
 				reaction.allStatusesRequired ? currentStatuses.Intersect(reaction.statusRestrictions).Count() == currentStatuses.Count() :
 				reaction.statusRestrictions.Intersect(currentStatuses).Any()))
 			{
-				Transform tempFocus = defaultFocus; ;
+				Transform tempFocus = defaultFocus;
 				float tempValue = -1;
 				List<Attractor> tempAttractors = new List<Attractor>();
-				if (tempDetectedAttractors.ContainsKey(reaction.attractorType))
+				if (reaction.attractorType != AttractorType.NONE && tempDetectedAttractors.ContainsKey(reaction.attractorType))
 				{
 					foreach (Attractor attractor in tempDetectedAttractors[reaction.attractorType])
 					{
@@ -881,32 +931,89 @@ public class AttractorAI : MonoBehaviour
 					}
 				}
 
-				if (tempAttractors.Count > 0)
+				if (reaction.attractorType == AttractorType.NONE || tempAttractors.Count > 0)
 				{
-					if (!reaction.targetDetectedObject)
+					bool conditionsMet = true;
+					if (reaction.allConditionsRequired)
+					{
+
+						//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
+						//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+						if (reaction.reactionConditions.boolConditions.Count > 0 &&
+							!(currentConditions.boolConditions.Intersect(reaction.reactionConditions.boolConditions).Count() ==
+							currentConditions.boolConditions.Count()))
+						{
+							conditionsMet = false;
+						}
+						else if (reaction.reactionConditions.floatConditions.Count > 0 &&
+							!(currentConditions.floatConditions.Intersect(reaction.reactionConditions.floatConditions).Count() ==
+							currentConditions.floatConditions.Count()))
+						{
+							conditionsMet = false;
+						}
+						else if (reaction.reactionConditions.intConditions.Count > 0 &&
+							!(currentConditions.intConditions.Intersect(reaction.reactionConditions.intConditions).Count() ==
+							currentConditions.intConditions.Count()))
+						{
+							conditionsMet = false;
+						}
+					}
+
+					if (conditionsMet)
+					{
+						if (!reaction.targetDetectedObject)
+						{
+							nextFocus = defaultFocus;
+						}
+						else
+						{
+							nextFocus = tempFocus;
+						}
+
+						nextStatePriority = tempPriority;
+						nextState = reaction.stateChange;
+						if (nextStatePriority < currentStatePriority)
+						{
+							currentFocus = nextFocus;
+							currentState = nextState;
+							foreach (FunctionPicker function in reaction.functionExecutions)
+							{
+								HandleFunctionCalling(function);
+							}
+							currentStatePriority = nextStatePriority;
+						}
+
+						tempCheck = true;
+						break;
+					}
+				}
+				else if (!reaction.allConditionsRequired)
+				{
+					if ((reaction.reactionConditions.boolConditions.Count > 0 &&
+						reaction.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
+						(reaction.reactionConditions.floatConditions.Count > 0 &&
+						reaction.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any()) ||
+						(reaction.reactionConditions.intConditions.Count > 0 &&
+						reaction.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any()))
 					{
 						nextFocus = defaultFocus;
-					}
-					else
-					{
-						nextFocus = tempFocus;
-					}
 
-					nextStatePriority = tempPriority;
-					nextState = reaction.stateChange;
-					if (nextStatePriority < currentStatePriority)
-					{
-						currentFocus = nextFocus;
-						currentState = nextState;
-						foreach (FunctionPicker function in reaction.functionExecutions)
+						nextStatePriority = tempPriority;
+						nextState = reaction.stateChange;
+						if (nextStatePriority < currentStatePriority)
 						{
-							HandleFunctionCalling(function);
+							currentFocus = nextFocus;
+							currentState = nextState;
+							foreach (FunctionPicker function in reaction.functionExecutions)
+							{
+								HandleFunctionCalling(function);
+							}
+							currentStatePriority = nextStatePriority;
 						}
-						currentStatePriority = nextStatePriority;
-					}
 
-					tempCheck = true;
-					break;
+						tempCheck = true;
+						break;
+					}
 				}
 			}
 			tempPriority++;
