@@ -64,6 +64,7 @@ namespace Player
         private bool _lockedInput = false;
         private float _cameraBaseY;
         private float _currentSpeed;
+        private bool _isInspecting = false;
 
         
         // Local reference that the controller cares about
@@ -532,6 +533,7 @@ namespace Player
         }
         private void HandleGameplayState()
         {
+            _isInspecting = false;
             // Return to basic player controls
             _lockedInput = false;
             for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
@@ -559,6 +561,7 @@ namespace Player
 
         private void HandleInspectionState()
         {
+            _isInspecting = true;
             // Disable player controls for cutscene
             _lockedInput = true;
             // disable the head so its hidden
@@ -603,6 +606,10 @@ namespace Player
         public float GetDistanceToPlayer(Vector3 position)
         {
             return Vector3.Distance(position, transform.position);
+        }
+        public bool IsPlayerInspecting()
+        {
+            return _isInspecting;
         }
 
         private void StopAllPlayerMovement()
