@@ -71,6 +71,7 @@ namespace Managers
 
         [Header("Environment Sounds")]
         [SerializeField] private bool autoAttachLampAudioOnSceneLoad = true;
+        [SerializeField] private string lampAudioAutoAttachSceneName = "Tutorial";
         [SerializeField] private EventReference lampHumLoopEvent;
         [SerializeField] private string lampOnParameter = "LampOn";
         [SerializeField] private EventReference lampBuzzOffEvent;
@@ -796,6 +797,12 @@ namespace Managers
         private void AutoAttachLampAudioEmittersInScene(Scene scene)
         {
             if (!autoAttachLampAudioOnSceneLoad || !scene.IsValid() || !scene.isLoaded)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(lampAudioAutoAttachSceneName)
+                && !string.Equals(scene.name, lampAudioAutoAttachSceneName, StringComparison.Ordinal))
             {
                 return;
             }
