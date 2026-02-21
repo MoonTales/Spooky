@@ -9,6 +9,8 @@ using UnityEngine.AI;
 public class AttractorAI : MonoBehaviour
 {
 	#region InitialSetup
+	public bool tracksDrawingCount = false;
+	public List<Vector3> teleportLocations = new List<Vector3>();
 	private NavMeshAgent agent;
 
 	[Tooltip("Between 0-100")]
@@ -53,8 +55,10 @@ public class AttractorAI : MonoBehaviour
 		TestFunction_floatF_boolB,
 		ReprogramReaction_REPROGRAM,
 		DeleteFocus,
+		EnemyVisible_boolVisible,
 		ChangeStats_STATS,
-		AddStatuses_LISTstringStatuses_boolRemove
+		AddStatuses_LISTstringStatuses_boolRemove,
+		Teleport_floatX_floatY_floatZ
 	}
 
 	[System.Serializable]
@@ -91,6 +95,14 @@ public class AttractorAI : MonoBehaviour
 		public float[] possibleMaxIntensityChanges;
 		public float maxIntensityLowerBoundDangerRange = 100;
 		public float maxIntensityUpperBoundDangerRange = 100;
+
+		public ReactConditions[] possibleReactionConditionsChanges;
+		public float reactionConditionsLowerBoundDangerRange = 100;
+		public float reactionConditionsUpperBoundDangerRange = 100;
+
+		public bool[] possibleAllConditionsRequiredChanges;
+		public float allConditionsRequiredLowerBoundDangerRange = 100;
+		public float allConditionsRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
 		public float statusRestrictionsLowerBoundDangerRange = 100;
@@ -165,6 +177,12 @@ public class AttractorAI : MonoBehaviour
 			nextFocus.gameObject.SetActive(false);
 		}
 	}
+	public void EnemyVisible(List<string> arguments)
+	{
+		bool visible = bool.Parse(arguments[0]);
+
+		animator.gameObject.SetActive(visible);
+	}
 
 	public void AddStatuses(List<string> arguments)
 	{
@@ -181,6 +199,15 @@ public class AttractorAI : MonoBehaviour
 			IEnumerable<string> itemsToAdd = Statuses.Except(currentStatuses);
 			currentStatuses.AddRange(itemsToAdd);
 		}
+	}
+	public void Teleport(List<string> arguments)
+	{
+		float x = float.Parse(arguments[0]);
+		float y = float.Parse(arguments[1]);
+		float z = float.Parse(arguments[2]);
+		Vector3 location = new Vector3(x, y, z);
+
+		transform.position = location;
 	}
 
 	public enum Stats
@@ -850,17 +877,28 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.DeleteFocus:
 				DeleteFocus();
 				break;
+			case FunctionType.EnemyVisible_boolVisible:
+				EnemyVisible(function.arguments);
+				break;
 			case FunctionType.ChangeStats_STATS:
 				ChangeStats(function.statsToChange, function.changeStatsBy, function.statsChangeAmount);
 				break;
 			case FunctionType.AddStatuses_LISTstringStatuses_boolRemove:
 				AddStatuses(function.arguments);
 				break;
+			case FunctionType.Teleport_floatX_floatY_floatZ:
+				Teleport(function.arguments);
+				break;
 		}
 	}
 
 	void Update()
 	{
+		if (tracksDrawingCount)
+		{
+			currentConditions.intConditions[0].intValue = Player.PlayerInventory.Instance.GetDrawingCount();
+		}
+
 		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);  // this keeps the animation in sync with the enemy speed
 
 		if (!(currentState == EnemyState.RushOver))
