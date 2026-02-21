@@ -248,8 +248,15 @@ public class InspectionSystem : Singleton<InspectionSystem>
     private void HandleScribbleNote()
     {
         // at this point, we should play the scribble sounds and swap the letter model to the one with the writing on it, then fade back in
-        //TODO: <SFX> Add scribble sound effects here
-        AudioManager.Instance.PlayFootstep("metal", transform);
+        if (GameStateManager.Instance != null
+            && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom)
+        {
+            // Play bedroom letter-writing scribble one-shot from AudioManager.
+            AudioManager.Instance?.PlaySfx(
+                AudioManager.SfxId.LetterScribble,
+                _currentInspectedObject != null ? _currentInspectedObject.transform : transform);
+        }
+
         Letter letter = _currentInspectedObject.GetComponent<Letter>();
         letter.SetResponseTextKey();
         PlayerHUDController.Instance.RefreshInspectionText();

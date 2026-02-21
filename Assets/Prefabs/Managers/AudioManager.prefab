@@ -53,7 +53,7 @@ MonoBehaviour:
         Data3: 316999592
         Data4: 2026019272
       Path: event:/sfx/switches/flashlight
-  - id: 9
+  - id: 4
     eventRef:
       Guid:
         Data1: -589383920
@@ -77,6 +77,30 @@ MonoBehaviour:
         Data3: 858536617
         Data4: 2120149737
       Path: event:/sfx/player/movement/land
+  - id: 4
+    eventRef:
+      Guid:
+        Data1: 308712568
+        Data2: 1257233277
+        Data3: -1279461214
+        Data4: -1045431688
+      Path: event:/sfx/interactable/bedroom/scribble
+  - id: 5
+    eventRef:
+      Guid:
+        Data1: 1949340520
+        Data2: 1151211844
+        Data3: 1073144453
+        Data4: 123186211
+      Path: event:/amb/environment/nightmare/alarm
+  - id: 3
+    eventRef:
+      Guid:
+        Data1: 851541296
+        Data2: 1207363628
+        Data3: 2054426510
+        Data4: 988299289
+      Path: event:/sfx/interactable/bedroom/letter-slide
   debugAudioLogs: 0
   footstepPlayer:
     Guid:
@@ -86,6 +110,23 @@ MonoBehaviour:
       Data4: 369320740
     Path: event:/sfx/player/movement/footstep
   playerMovementBusPath: bus:/SFX/StopOnPause/Player/Movement
+  autoAttachLampAudioOnSceneLoad: 1
+  lampAudioAutoAttachSceneName: Tutorial
+  lampHumLoopEvent:
+    Guid:
+      Data1: -904938069
+      Data2: 1098275312
+      Data3: 469348779
+      Data4: 700184121
+    Path: event:/amb/environment/tutorial/lights/lights-flourescent
+  lampOnParameter: LampOn
+  lampBuzzOffEvent:
+    Guid:
+      Data1: 1492966471
+      Data2: 1129197044
+      Data3: 1126607750
+      Data4: 752480140
+    Path: event:/amb/environment/tutorial/lights/lights-flourescent-buzz-off
   terrorDistortionParameter: Terror
   mentalHealthDistortionParameter: MentalHealth
   terrorParameterIsGlobal: 1
@@ -116,6 +157,14 @@ MonoBehaviour:
   heartbeatTerrorParameterIsGlobal: 1
   heartbeatMentalHealthParameterIsGlobal: 1
   logTerrorParameterValue: 0
+  bedroomAmbLoopEvent:
+    Guid:
+      Data1: -2122210753
+      Data2: 1147047463
+      Data3: 1465847740
+      Data4: 1382995033
+    Path: event:/amb/environment/bedroom/bed-bg
+  bedroomAmbienceRequiresGameplay: 1
   mainMenuMusicEvent:
     Guid:
       Data1: -578515550

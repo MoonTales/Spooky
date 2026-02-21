@@ -166,6 +166,7 @@ namespace Managers
         private IEnumerator SlideNote(GameObject note)
         {
             if (note == null){ yield break;}
+            AudioManager.Instance?.PlaySfx(AudioManager.SfxId.LetterSlide, note.transform);
             
             // Start at the spawn location (center of door)
             Vector3 startPosition = note.transform.position;
