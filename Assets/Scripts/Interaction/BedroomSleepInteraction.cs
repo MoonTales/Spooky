@@ -26,8 +26,9 @@ namespace Interaction
                 // otherwise, we cant return yet
                 Types.NotificationData data = new(
                     duration: 1, 
-                    messageKey: new TextKey(),
-                    messageOverride: "You feel like there is something you need to do before you can sleep. Maybe you should explore a bit more?"
+                    messageKey: new TextKey { place = "prompt", id = "tracker_not_off" },
+                    messageOverride: "",
+                    shouldOnlyShowOnce:false
                 );
                 data.Send();
                 return;
@@ -35,8 +36,10 @@ namespace Interaction
         
             // we are good to sleep!
             GetComponent<Collider>().enabled = false;
-            const int timeToFadeOut = 5; 
-            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
+
+            const int timeToFadeOut = 3; 
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 1.5f, fadeOutDuration:timeToFadeOut, FadeInCompleted, FadeOutCompleted);
+
             fadeData.Send();
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
         }
@@ -44,8 +47,19 @@ namespace Interaction
         private void FadeOutCompleted()
         {
             SceneSwapper.Instance.SwapScene(sceneName);
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            // Display the notification here!
+            Types.NotificationData data = new(
+                duration: 3, 
+                messageKey: new TextKey { place = "cutscene", id = "act1" }
+            );
+            data.Send();
             GameStateManager.Instance.SetCurrentZoneId(-1);
+        }
+
+        private void FadeInCompleted()
+        {
+            // lock all movement untill we finish the fade in
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
     }
 }
