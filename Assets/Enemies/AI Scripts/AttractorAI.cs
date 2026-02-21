@@ -455,7 +455,7 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
-		public ReactConditions reactionConditions;
+		public ReactConditions thoughtConditions;
 		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
@@ -468,11 +468,12 @@ public class AttractorAI : MonoBehaviour
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 
 		public float repeatBuffer = 1;
-		private float timer = 0;
+		public bool forceBuffer = false;
+		[HideInInspector]public float timer = 0;
 	}
 
 	public List<EnemyReactions> behaviourHierarchy;
-	public List<ThoughtProcess> Thoughts;
+	public List<ThoughtProcess> thoughts;
 
 	private Transform currentFocus;
 	private Transform nextFocus;
@@ -900,6 +901,100 @@ public class AttractorAI : MonoBehaviour
 
 		bool tempCheck = false;
 		int tempPriority = 0;
+
+		foreach (ThoughtProcess thought in thoughts)
+		{
+			if ((thought.stateRestriction.Count < 1 || thought.stateRestriction.Contains(currentState)) && (thought.statusRestrictions.Count < 1 ||
+				thought.allStatusesRequired ? currentStatuses.Intersect(thought.statusRestrictions).Count() == currentStatuses.Count() :
+				thought.statusRestrictions.Intersect(currentStatuses).Any()))
+			{
+				List<Attractor> tempAttractors = new List<Attractor>();
+				if (thought.attractorType != AttractorType.NONE && tempDetectedAttractors.ContainsKey(thought.attractorType))
+				{
+					foreach (Attractor attractor in tempDetectedAttractors[thought.attractorType])
+					{
+						if (thought.minIntensity <= attractor.intensity && attractor.intensity < thought.maxIntensity)
+						{
+							tempAttractors.Add(attractor);
+						}
+					}
+				}
+
+				if (thought.attractorType == AttractorType.NONE || tempAttractors.Count > 0)
+				{
+					bool conditionsMet = true;
+					if (thought.allConditionsRequired)
+					{
+
+						//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
+						//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+						if (thought.thoughtConditions.boolConditions.Count > 0 &&
+							!(currentConditions.boolConditions.Intersect(thought.thoughtConditions.boolConditions).Count() ==
+							currentConditions.boolConditions.Count()))
+						{
+							conditionsMet = false;
+						}
+						else if (thought.thoughtConditions.floatConditions.Count > 0 &&
+							!(currentConditions.floatConditions.Intersect(thought.thoughtConditions.floatConditions).Count() ==
+							currentConditions.floatConditions.Count()))
+						{
+							conditionsMet = false;
+						}
+						else if (thought.thoughtConditions.intConditions.Count > 0 &&
+							!(currentConditions.intConditions.Intersect(thought.thoughtConditions.intConditions).Count() ==
+							currentConditions.intConditions.Count()))
+						{
+							conditionsMet = false;
+						}
+					}
+
+					if (conditionsMet)
+					{
+						thought.timer -= Time.deltaTime;
+
+						if (thought.timer <= 0)
+						{
+							thought.timer = thought.repeatBuffer;
+							foreach (FunctionPicker function in thought.functionExecutions)
+							{
+								HandleFunctionCalling(function);
+							}
+						}
+					}
+					else if (!thought.forceBuffer)
+					{
+						thought.timer = 0;
+					}
+				}
+				else if (!thought.allConditionsRequired)
+				{
+					if ((thought.thoughtConditions.boolConditions.Count > 0 &&
+						thought.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
+						(thought.thoughtConditions.floatConditions.Count > 0 &&
+						thought.thoughtConditions.floatConditions.Intersect(currentConditions.floatConditions).Any()) ||
+						(thought.thoughtConditions.intConditions.Count > 0 &&
+						thought.thoughtConditions.intConditions.Intersect(currentConditions.intConditions).Any()))
+					{
+						thought.timer -= Time.deltaTime;
+
+						if (thought.timer <= 0)
+						{
+							thought.timer = thought.repeatBuffer;
+							foreach (FunctionPicker function in thought.functionExecutions)
+							{
+								HandleFunctionCalling(function);
+							}
+						}
+					}
+					else if(!thought.forceBuffer)
+					{
+						thought.timer = 0;
+					}
+				}
+			}
+			tempPriority++;
+		}
+
 		foreach (EnemyReactions reaction in behaviourHierarchy)
 		{
 			if ((reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState)) && (reaction.statusRestrictions.Count < 1 ||
