@@ -44,6 +44,9 @@ namespace Interaction.Letters
         public new void Interact(Interactor interactor)
         {
             InspectionSystem.Instance.StartInspection(gameObject);
+            // Tell the letter system that we have been read
+            var id = (_letterType == Types.LetterType.Researcher ? "res_letter_" : "fren_letter_") + GameStateManager.Instance.GetCurrentWorldClockHour();            
+            LetterManager.Instance.HandleLetterRead(id);
         }
         
         public override void OnReturnedToOriginalPosition()
