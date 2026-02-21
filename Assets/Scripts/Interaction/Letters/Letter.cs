@@ -17,7 +17,7 @@ namespace Interaction.Letters
         private bool _hasBeenWrittenOn = false; public void SetHasBeenWrittenOn(bool value) { _hasBeenWrittenOn = value; } public bool GetHasBeenWrittenOn() { return _hasBeenWrittenOn; }
         
         // Expose the material to be set for the fade script
-        public Material transparentLetterBase;
+        public Material[] materialArray;
 
         private void Start()
         {
@@ -79,42 +79,61 @@ namespace Interaction.Letters
         }
 
 
-        private IEnumerator FadeOut()
+    private IEnumerator FadeOut()
+    {
+        // Get ALL mesh renderers (this object + all children)
+        MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
+        Debug.Log(renderers.Length);
+        Debug.Log(materialArray.Length);
+
+        // Replace material element 0 on all renderers with its transparent material counterpart
+        Material[] fadeMats = new Material[renderers.Length];
+
+        for (int i = 0; i < renderers.Length; i++)
         {
+            Material[] mats = renderers[i].materials;
+            mats[0] = materialArray[i];   // array of transparent materials
+            renderers[i].materials = mats;     // apply back
 
-        // Set the material to its transparent shader graph counterpart
-        Renderer renderer = GetComponent<MeshRenderer>();
-        Material[] mats = renderer.materials;
-        mats[0] = transparentLetterBase;
+            // store for alpha fading
+            fadeMats[i] = renderers[i].materials[0];
+        }
 
-        renderer.materials = mats;
-
-        // Initialize variables to be altered
-        Renderer objectRenderer = GetComponent<Renderer>();
-        Color color = objectRenderer.material.GetColor("_Base_Color");
-        Material mat = objectRenderer.material;
-
-        float elapsedTime = 0f;
+        // Prepare fade variables
+        Color color = fadeMats[0].GetColor("_Base_Color");
         float duration = 10f;
+        float elapsedTime = 0f;
         float startAlpha = color.a;
         float targetAlpha = 0f;
 
-        // Calculate a smoothed descending alpha value using lerp and replace the old one
+        // Fade all materials smoothly using Lerp to interpolate
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            float newAlpha = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / duration);
-            color.a = newAlpha;
-            mat.SetColor("_Base_Color", color);
+            float t = elapsedTime / duration;
+            float newAlpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+
+            for (int i = 0; i < fadeMats.Length; i++)
+            {
+                Color c = fadeMats[i].GetColor("_Base_Color");
+                c.a = newAlpha;
+                fadeMats[i].SetColor("_Base_Color", c);
+            }
+
             yield return null;
         }
-        //Ensure we are at 0 alpha by the end of the script
-        color.a = targetAlpha;
-        mat.SetColor("_Base_Color", color);
 
-        //Finally, destroy the game object
-        Destroy(gameObject);
+        // Ensure final alpha = 0 so that its smooth
+        for (int i = 0; i < fadeMats.Length; i++)
+        {
+            Color c = fadeMats[i].GetColor("_Base_Color");
+            c.a = 0f;
+            fadeMats[i].SetColor("_Base_Color", c);
         }
+
+        // Finally, destroy the whole object
+        Destroy(gameObject);
+    }
 
     }
 }
