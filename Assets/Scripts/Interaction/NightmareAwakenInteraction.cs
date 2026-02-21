@@ -71,7 +71,8 @@ namespace Interaction
             GetComponent<Collider>().enabled = false;
             SpawnInCollectedDrawingsOnTable();
             const int timeToFadeOut = 5; 
-            //TODO: <SFX> Start an alarm sound fading in over "timToFadeOut"
+            // Start alarm one-shot for wakeup transition. Any fade behavior should be authored in FMOD.
+            AudioManager.Instance?.PlaySfx(AudioManager.SfxId.AlarmClock, transform);
             Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             data.Send();
 

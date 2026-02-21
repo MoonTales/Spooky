@@ -11,7 +11,7 @@ public class AlarmClock : MonoBehaviour
     
     private void PlayAlarm()
     {
-        AudioManager.Instance.PlayFootstep("metal", transform);
+        AudioManager.Instance?.PlaySfx(AudioManager.SfxId.AlarmClock, transform);
     }
     // Update is called once per frame
     void Update()

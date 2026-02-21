@@ -18,6 +18,7 @@ namespace Managers
             Jump, Landing, Flashlight, // CrouchIn, CrouchOut, PeekIn, PeekOut, TippytoeIn, TippytoeOut,
             // Interaction
             LetterScribble,
+            AlarmClock,
             // UI
             UIHover,
         }
