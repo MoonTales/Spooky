@@ -4947,6 +4947,8 @@ MonoBehaviour:
   ObjectsToDisableOnCutscene:
   - {fileID: 5097885158666946118}
   - {fileID: 3116418875828397516}
+  landingMinAirborneTimeForSfx: 0.5
+  landingMinDropDistanceForSfx: 0.5
   _cameraTransform: {fileID: 2427465421472302248}
   head: {fileID: 1439800706131837371}
   cameraEffects: {fileID: 7827965959660100850}
@@ -6758,6 +6760,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4789858135206056223, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789858135206056223, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6009926344767208296, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
       propertyPath: m_Color.a
       value: 0
@@ -6765,6 +6775,26 @@ PrefabInstance:
     - target: {fileID: 6374498065377707766, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
       propertyPath: m_Name
       value: HUD
+      objectReference: {fileID: 0}
+    - target: {fileID: 7697698015946321109, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7697698015946321109, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7998073413353777362, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7998073413353777362, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7998073413353777362, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

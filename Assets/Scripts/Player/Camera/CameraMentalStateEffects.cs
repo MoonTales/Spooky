@@ -349,7 +349,12 @@ namespace Player.Camera
 
         private void SetChromaticAberrationIntensity(float amount)
         {
-            if (!_postProcessVolume || !_chromaticAberration) { return; }
+            if (!_postProcessVolume || !_chromaticAberration)
+            {
+                Debug.LogWarning("Cannot set chromatic aberration intensity: PostProcessVolume or ChromaticAberration effect is missing.");
+                return;
+            }
+            Debug.Log($"Setting chromatic aberration intensity to {amount}");
             _chromaticAberration.intensity.Override(amount);
         }
         
@@ -360,8 +365,14 @@ namespace Player.Camera
             // Searches for a post process volume on this object, and creates one if none exists
             if (_postProcessVolume == null)
             {
-                _postProcessVolume = GetComponent<Volume>();
-
+                
+                // try to get a post processing volume from this scene, and if we cant find one, add one to this object
+                // if we are in the bedroom, the object is called "RoomPostProcess"
+                if (_postProcessVolume == null)
+                {
+                    _postProcessVolume = FindObjectOfType<Volume>();
+                }
+                
                 if (_postProcessVolume == null)
                 {
                     _postProcessVolume = gameObject.AddComponent<Volume>();
@@ -370,6 +381,17 @@ namespace Player.Camera
                     _postProcessVolume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
                 }
             }
+            
+            
+            // print the name of the post process volume for debugging
+                if (_postProcessVolume != null)
+                {
+                    Debug.Log($"PostProcessVolume found: {_postProcessVolume.name}");
+                }
+                else
+                {
+                    Debug.LogWarning("No PostProcessVolume found or created on CameraMentalStateEffects object.");
+                }
         }
         
         private void TrySetChromaticAberration()
