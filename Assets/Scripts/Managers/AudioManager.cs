@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -45,11 +46,15 @@ namespace Managers
         private EventInstance _heartbeatInstance;
         private EventInstance _terrorLoopInstance;
         private EventInstance _sleepTrackerAlarmInstance;
+        private EventInstance _goodWakeupTransitionInstance;
         private EventInstance _uiHoverInstance;
         private EventInstance _letterScribbleInstance;
+        private Coroutine _goodWakeupTransitionCoroutine;
         private bool _terrorLoopIsPlaying;
         private bool _sleepTrackerAlarmIsGoodVariant;
         private bool _hasSleepTrackerAlarmVariant;
+        private bool _goodWakeupTransitionRequested;
+        private bool _goodWakeupHasBedroomSourceTransform;
         private Transform _terrorSourceTransform;
         private EventInstance _pauseSnapshotInstance;
         private bool _pauseSnapshotActive;
@@ -113,6 +118,11 @@ namespace Managers
 
         [Header("Sleep Tracker Audio")]
         [SerializeField] private string sleepTrackerActiveParameter = "SleepTracker";
+        [SerializeField] private EventReference goodWakeupTransitionEvent;
+        [SerializeField] private string goodWakeupTransitionParameter = "TransitionBlend";
+        [SerializeField] private float goodWakeupCrossfadeFractionOfFadeOut = 0.2f;
+        [SerializeField] private float goodWakeupCrossfadeMinSeconds = 0.4f;
+        [SerializeField] private float goodWakeupCrossfadeMaxSeconds = 1.5f;
 
         [Header("World Ambience")]
         [SerializeField] private EventReference bedroomAmbLoopEvent;
@@ -152,6 +162,9 @@ namespace Managers
             TrackSubscription(
                 () => EventBroadcaster.OnSleepTrackerAudioStateChanged += OnSleepTrackerAudioStateChanged,
                 () => EventBroadcaster.OnSleepTrackerAudioStateChanged -= OnSleepTrackerAudioStateChanged);
+            TrackSubscription(
+                () => EventBroadcaster.OnRequestScreenFade += OnRequestScreenFade,
+                () => EventBroadcaster.OnRequestScreenFade -= OnRequestScreenFade);
 
             // Scene/world transitions that affect persistent loops.
             TrackSubscription(
@@ -180,6 +193,7 @@ namespace Managers
             StopAndReleaseTerrorLoop();
             StopAndReleaseNightmareAmbience();
             StopAndReleaseSleepTrackerAlarm(true);
+            StopAndReleaseGoodWakeupTransition(true);
             StopAndReleaseBedroomAmbience();
             StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
@@ -216,8 +230,27 @@ namespace Managers
 
         private void OnSleepTrackerAudioStateChanged(bool isActive, bool isGoodWakeup, Transform sourceTransform)
         {
-            Debug.Log($"AudioManager: SleepTracker broadcast received | active={isActive}, goodWakeup={isGoodWakeup}, source={(sourceTransform != null ? sourceTransform.name : "null")}");
             ApplySleepTrackerAlarmState(isActive, isGoodWakeup, sourceTransform);
+        }
+
+        private void OnRequestScreenFade(Types.ScreenFadeData screenFadeData)
+        {
+            if (!_goodWakeupTransitionRequested)
+            {
+                return;
+            }
+
+            if (goodWakeupTransitionEvent.IsNull)
+            {
+                return;
+            }
+
+            if (_goodWakeupTransitionCoroutine != null)
+            {
+                StopCoroutine(_goodWakeupTransitionCoroutine);
+            }
+
+            _goodWakeupTransitionCoroutine = StartCoroutine(CrossfadeGoodWakeupTransition(screenFadeData));
         }
 
         private void OnWorldLocationChanged(Types.WorldLocation newLocation)
@@ -232,6 +265,7 @@ namespace Managers
             if (newLocation != Types.WorldLocation.Bedroom)
             {
                 StopAndReleaseSleepTrackerAlarm(true);
+                StopAndReleaseGoodWakeupTransition(true);
             }
             RefreshMentalAudio();
             ApplyBedroomAmbience();
@@ -253,6 +287,7 @@ namespace Managers
             {
                 PlayMainMenuMusicIfNeeded();
                 StopAndReleaseSleepTrackerAlarm(true);
+                StopAndReleaseGoodWakeupTransition(true);
             }
             else
             {
@@ -263,6 +298,33 @@ namespace Managers
         }
 
         // Public API: gameplay-triggered SFX
+        public void BeginGoodWakeupAlarmTransition()
+        {
+            _goodWakeupTransitionRequested = true;
+            _goodWakeupHasBedroomSourceTransform = false;
+
+            if (goodWakeupTransitionEvent.IsNull)
+            {
+                return;
+            }
+
+            if (!_goodWakeupTransitionInstance.isValid())
+            {
+                _goodWakeupTransitionInstance = CreateEventInstance(goodWakeupTransitionEvent);
+                _goodWakeupTransitionInstance.start();
+            }
+
+            if (!string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
+            {
+                _goodWakeupTransitionInstance.setParameterByName(sleepTrackerActiveParameter, 1f);
+            }
+
+            if (!string.IsNullOrWhiteSpace(goodWakeupTransitionParameter))
+            {
+                _goodWakeupTransitionInstance.setParameterByName(goodWakeupTransitionParameter, 0f);
+            }
+        }
+
         public void PlayFootstep(string surfaceLabel, Transform fromTransform = null)
         {
             if (muteSFX) return;
@@ -533,17 +595,54 @@ namespace Managers
 
         private void ApplySleepTrackerAlarmState(bool isActive, bool isGoodWakeup, Transform sourceTransform)
         {
-            if (GameStateManager.Instance == null
-                || GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Bedroom)
+            if (GameStateManager.Instance == null)
             {
+                StopAndReleaseSleepTrackerAlarm(true);
+                StopAndReleaseGoodWakeupTransition(true);
+                return;
+            }
+
+            Types.WorldLocation worldLocation = GameStateManager.Instance.GetCurrentWorldLocation();
+            bool inBedroom = worldLocation == Types.WorldLocation.Bedroom;
+            if (!inBedroom)
+            {
+                StopAndReleaseSleepTrackerAlarm(true);
+                SetGoodWakeupTransitionActiveParameter(isActive);
+                return;
+            }
+
+            if (isGoodWakeup)
+            {
+                if (goodWakeupTransitionEvent.IsNull)
+                {
+                    Debug.LogWarning("AudioManager: Missing goodWakeupTransitionEvent reference for good wakeup alarm.");
+                    return;
+                }
+
+                if (!_goodWakeupTransitionInstance.isValid())
+                {
+                    _goodWakeupTransitionInstance = CreateEventInstance(goodWakeupTransitionEvent, sourceTransform);
+                    _goodWakeupTransitionInstance.start();
+                }
+
+                if (inBedroom && sourceTransform != null)
+                {
+                    _goodWakeupHasBedroomSourceTransform = true;
+                    if (EventInstanceIs3D(_goodWakeupTransitionInstance))
+                    {
+                        _goodWakeupTransitionInstance.set3DAttributes(RuntimeUtils.To3DAttributes(sourceTransform.position));
+                    }
+                }
+
+                SetGoodWakeupTransitionActiveParameter(isActive);
                 StopAndReleaseSleepTrackerAlarm(true);
                 return;
             }
 
-            EventReference alarmEvent = GetSfxEvent(isGoodWakeup ? SfxId.AlarmGood : SfxId.AlarmBad);
+            EventReference alarmEvent = GetSfxEvent(SfxId.AlarmBad);
             if (alarmEvent.IsNull)
             {
-                Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{(isGoodWakeup ? SfxId.AlarmGood : SfxId.AlarmBad)}'.");
+                Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{SfxId.AlarmBad}'.");
                 return;
             }
 
@@ -552,6 +651,10 @@ namespace Managers
             {
                 StopAndReleaseSleepTrackerAlarm(true);
                 _sleepTrackerAlarmInstance = CreateEventInstance(alarmEvent, sourceTransform);
+                if (!string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
+                {
+                    _sleepTrackerAlarmInstance.setParameterByName(sleepTrackerActiveParameter, isActive ? 1f : 0f);
+                }
                 _sleepTrackerAlarmInstance.start();
                 _sleepTrackerAlarmIsGoodVariant = isGoodWakeup;
                 _hasSleepTrackerAlarmVariant = true;
@@ -565,6 +668,78 @@ namespace Managers
             if (_sleepTrackerAlarmInstance.isValid() && !string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
             {
                 _sleepTrackerAlarmInstance.setParameterByName(sleepTrackerActiveParameter, isActive ? 1f : 0f);
+            }
+        }
+
+        private IEnumerator CrossfadeGoodWakeupTransition(Types.ScreenFadeData screenFadeData)
+        {
+            float fadeOutDuration = Mathf.Max(0f, screenFadeData.GetFadeOutDuration());
+            float crossfadeDuration = Mathf.Clamp(
+                fadeOutDuration * Mathf.Max(0f, goodWakeupCrossfadeFractionOfFadeOut),
+                Mathf.Max(0.01f, goodWakeupCrossfadeMinSeconds),
+                Mathf.Max(goodWakeupCrossfadeMinSeconds, goodWakeupCrossfadeMaxSeconds));
+            float crossfadeStartDelay = Mathf.Max(0f, fadeOutDuration - crossfadeDuration);
+
+            if (crossfadeStartDelay > 0f)
+            {
+                yield return new WaitForSeconds(crossfadeStartDelay);
+            }
+
+            if (!_goodWakeupTransitionInstance.isValid())
+            {
+                _goodWakeupTransitionCoroutine = null;
+                yield break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
+            {
+                _goodWakeupTransitionInstance.setParameterByName(sleepTrackerActiveParameter, 1f);
+            }
+
+            if (string.IsNullOrWhiteSpace(goodWakeupTransitionParameter))
+            {
+                _goodWakeupTransitionRequested = false;
+                _goodWakeupTransitionCoroutine = null;
+                yield break;
+            }
+
+            // Delay blend-to-world until the in-bedroom SleepTracker transform is known.
+            while (!_goodWakeupHasBedroomSourceTransform)
+            {
+                yield return null;
+            }
+
+            float elapsed = 0f;
+            while (elapsed < crossfadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Clamp01(elapsed / crossfadeDuration);
+                _goodWakeupTransitionInstance.setParameterByName(goodWakeupTransitionParameter, alpha);
+                if (debugAudioLogs)
+                {
+                    Debug.Log($"AudioManager: {goodWakeupTransitionParameter}={alpha:0.000}");
+                }
+
+                yield return null;
+            }
+
+            _goodWakeupTransitionInstance.setParameterByName(goodWakeupTransitionParameter, 1f);
+
+            _goodWakeupTransitionRequested = false;
+            _goodWakeupTransitionCoroutine = null;
+        }
+
+        private void SetGoodWakeupTransitionActiveParameter(bool isActive)
+        {
+            if (string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
+            {
+                return;
+            }
+
+            float parameterValue = isActive ? 1f : 0f;
+            if (_goodWakeupTransitionInstance.isValid())
+            {
+                _goodWakeupTransitionInstance.setParameterByName(sleepTrackerActiveParameter, parameterValue);
             }
         }
 
@@ -871,6 +1046,25 @@ namespace Managers
             }
 
             _hasSleepTrackerAlarmVariant = false;
+        }
+
+        private void StopAndReleaseGoodWakeupTransition(bool immediate)
+        {
+            if (_goodWakeupTransitionCoroutine != null)
+            {
+                StopCoroutine(_goodWakeupTransitionCoroutine);
+                _goodWakeupTransitionCoroutine = null;
+            }
+
+            if (_goodWakeupTransitionInstance.isValid())
+            {
+                _goodWakeupTransitionInstance.stop(immediate ? FMOD.Studio.STOP_MODE.IMMEDIATE : FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _goodWakeupTransitionInstance.release();
+                _goodWakeupTransitionInstance = default;
+            }
+
+            _goodWakeupTransitionRequested = false;
+            _goodWakeupHasBedroomSourceTransform = false;
         }
 
         private void StopAndReleaseTerrorLoop()

@@ -12,6 +12,8 @@ public class SleepTracker : MonoBehaviour, IInteractable
     
     // internal Glowly
     private GameObject glowy;
+    // Keep inactive prompt wiring in place for future toggle behavior, even though
+    // current interaction rules only allow turning the tracker off.
     public TextKey PromptKey =>
         SleepTrackerManager.Instance.GetIsSleepTrackerActive()
             ? promptTextKey
@@ -31,6 +33,7 @@ public class SleepTracker : MonoBehaviour, IInteractable
     {
         // find the child object called "Glowly" and store a reference to it, so we can enable/disable it when the sleep tracker is active/inactive
         glowy = transform.Find("Glowy").gameObject;
+        SleepTrackerManager.Instance.RegisterSleepTrackerSourceTransform(transform);
         glowy.SetActive(SleepTrackerManager.Instance.GetIsSleepTrackerActive());
     }
 }

@@ -85,14 +85,6 @@ MonoBehaviour:
         Data3: -1279461214
         Data4: -1045431688
       Path: event:/sfx/interactable/bedroom/scribble
-  - id: 5
-    eventRef:
-      Guid:
-        Data1: 1949340520
-        Data2: 1151211844
-        Data3: 1073144453
-        Data4: 123186211
-      Path: event:/sfx/interactable/bedroom/alarm-good
   - id: 6
     eventRef:
       Guid:
@@ -166,6 +158,17 @@ MonoBehaviour:
   heartbeatMentalHealthParameterIsGlobal: 1
   logTerrorParameterValue: 0
   sleepTrackerActiveParameter: SleepTracker
+  goodWakeupTransitionEvent:
+    Guid:
+      Data1: -487564662
+      Data2: 1167357698
+      Data3: -195426905
+      Data4: -284838725
+    Path: event:/sfx/interactable/bedroom/alarm-good
+  goodWakeupTransitionParameter: TransitionBlend
+  goodWakeupCrossfadeFractionOfFadeOut: 0.4
+  goodWakeupCrossfadeMinSeconds: 0.4
+  goodWakeupCrossfadeMaxSeconds: 1.5
   bedroomAmbLoopEvent:
     Guid:
       Data1: -2122210753

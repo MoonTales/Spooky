@@ -72,6 +72,9 @@ namespace Interaction
             GetComponent<Collider>().enabled = false;
             SpawnInCollectedDrawingsOnTable();
             const int timeToFadeOut = 5;
+            // Mark as good wakeup before turning the tracker on so the correct variant starts immediately.
+            SleepTrackerManager.Instance.SetIsGoodWakeup(true);
+            AudioManager.Instance.BeginGoodWakeupAlarmTransition();
             SleepTrackerManager.Instance.TurnSleepTrackerOn();
             Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             data.Send();
