@@ -72,7 +72,7 @@ namespace Interaction
             GetComponent<Collider>().enabled = false;
             SpawnInCollectedDrawingsOnTable();
             const int timeToFadeOut = 5;
-            SleepTrackerManager.Instance.StartSleepTrackerFadeIn(timeToFadeOut);
+            SleepTrackerManager.Instance.TurnSleepTrackerOn();
             Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             data.Send();
 

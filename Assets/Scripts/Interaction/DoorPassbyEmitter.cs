@@ -35,6 +35,7 @@ public class DoorPassbyEmitter : MonoBehaviour
     private EventInstance _activeInstance;
     private bool _isPlaying;
     private int _playsStarted;
+    private AudioManager _audioManager;
 
     private void OnEnable()
     {
@@ -85,8 +86,7 @@ public class DoorPassbyEmitter : MonoBehaviour
     {
         _isPlaying = true;
 
-        AudioManager audioManager = AudioManager.Instance;
-        if (audioManager == null || passbyEvent.IsNull)
+        if (!TryGetAudioManager(out AudioManager audioManager) || passbyEvent.IsNull)
         {
             _isPlaying = false;
             _passbyCoroutine = null;
@@ -154,7 +154,7 @@ public class DoorPassbyEmitter : MonoBehaviour
             return false;
         }
 
-        if (passbyEvent.IsNull || AudioManager.Instance == null)
+        if (passbyEvent.IsNull || !TryGetAudioManager(out _))
         {
             return false;
         }
@@ -208,9 +208,9 @@ public class DoorPassbyEmitter : MonoBehaviour
 
     private void StopActiveInstanceImmediate()
     {
-        if (AudioManager.Instance != null)
+        if (TryGetAudioManager(out AudioManager audioManager))
         {
-            AudioManager.Instance.StopAndReleaseEventInstance(ref _activeInstance, immediate: true);
+            audioManager.StopAndReleaseEventInstance(ref _activeInstance, immediate: true);
             return;
         }
 
@@ -225,5 +225,19 @@ public class DoorPassbyEmitter : MonoBehaviour
     public void ResetPlayCount()
     {
         _playsStarted = 0;
+    }
+
+    private bool TryGetAudioManager(out AudioManager audioManager)
+    {
+        if (_audioManager != null)
+        {
+            audioManager = _audioManager;
+            return true;
+        }
+
+        // Avoid Singleton.Instance here to prevent unload-time warning spam.
+        _audioManager = FindAnyObjectByType<AudioManager>();
+        audioManager = _audioManager;
+        return audioManager != null;
     }
 }

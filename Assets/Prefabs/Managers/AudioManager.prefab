@@ -45,22 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sfxEvents:
-  - id: 2
-    eventRef:
-      Guid:
-        Data1: 739701894
-        Data2: 1274669532
-        Data3: 316999592
-        Data4: 2026019272
-      Path: event:/sfx/switches/flashlight
-  - id: 4
-    eventRef:
-      Guid:
-        Data1: -589383920
-        Data2: 1194023304
-        Data3: 511347899
-        Data4: 2074030138
-      Path: event:/sfx/UI/button-on-hover
   - id: 0
     eventRef:
       Guid:
@@ -77,6 +61,22 @@ MonoBehaviour:
         Data3: 858536617
         Data4: 2120149737
       Path: event:/sfx/player/movement/land
+  - id: 2
+    eventRef:
+      Guid:
+        Data1: 739701894
+        Data2: 1274669532
+        Data3: 316999592
+        Data4: 2026019272
+      Path: event:/sfx/switches/flashlight
+  - id: 3
+    eventRef:
+      Guid:
+        Data1: 851541296
+        Data2: 1207363628
+        Data3: 2054426510
+        Data4: 988299289
+      Path: event:/sfx/interactable/bedroom/letter-slide
   - id: 4
     eventRef:
       Guid:
@@ -92,16 +92,16 @@ MonoBehaviour:
         Data2: 1151211844
         Data3: 1073144453
         Data4: 123186211
-      Path: event:/amb/environment/nightmare/alarm
-  - id: 3
+      Path: event:/sfx/interactable/bedroom/alarm-good
+  - id: 6
     eventRef:
       Guid:
-        Data1: 851541296
-        Data2: 1207363628
-        Data3: 2054426510
-        Data4: 988299289
-      Path: event:/sfx/interactable/bedroom/letter-slide
-  - id: 6
+        Data1: -1719849088
+        Data2: 1114230528
+        Data3: 1032617629
+        Data4: 147325942
+      Path: event:/sfx/interactable/bedroom/alarm-bad
+  - id: 8
     eventRef:
       Guid:
         Data1: -589383920
@@ -165,6 +165,7 @@ MonoBehaviour:
   heartbeatTerrorParameterIsGlobal: 1
   heartbeatMentalHealthParameterIsGlobal: 1
   logTerrorParameterValue: 0
+  sleepTrackerActiveParameter: SleepTracker
   bedroomAmbLoopEvent:
     Guid:
       Data1: -2122210753

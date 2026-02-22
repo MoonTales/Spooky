@@ -8,10 +8,14 @@ public class SleepTracker : MonoBehaviour, IInteractable
     
     [Header("Text Keys (CSV row pointers)")]
     [SerializeField] private TextKey promptTextKey;
+    [SerializeField] private TextKey promptWhenInactiveKey;
     
     // internal Glowly
     private GameObject glowy;
-    public TextKey PromptKey => SleepTrackerManager.Instance.GetIsSleepTrackerActive() ? promptTextKey: TextKey.Empty; // only show the prompt if the sleep tracker is active, otherwise we will just show nothing when we interact with it
+    public TextKey PromptKey =>
+        SleepTrackerManager.Instance.GetIsSleepTrackerActive()
+            ? promptTextKey
+            : (promptWhenInactiveKey.IsValid ? promptWhenInactiveKey : promptTextKey);
     public bool CanInteract(Interactor interactor)
     {
         return SleepTrackerManager.Instance.CanInteract(interactor);
@@ -20,7 +24,7 @@ public class SleepTracker : MonoBehaviour, IInteractable
     public void Interact(Interactor interactor)
     {
         SleepTrackerManager.Instance.Interact(interactor);
-        glowy.SetActive(false);
+        glowy.SetActive(SleepTrackerManager.Instance.GetIsSleepTrackerActive());
     }
 
     public void Start()
