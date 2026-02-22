@@ -108,6 +108,10 @@ namespace Player.Camera
             base.RegisterSubscriptions();
             TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerMentalStateChanged,
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerMentalStateChanged);
+            TrackSubscription(() => EventBroadcaster.OnGameRestarted += HandleNormalStateEffects,
+                () => EventBroadcaster.OnGameRestarted -= HandleNormalStateEffects);
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
         }
 
         private void Start()
@@ -118,6 +122,14 @@ namespace Player.Camera
             OnPlayerMentalStateChanged(_currentMentalState); // sets our initial state, incase we have "normal" logic
             InitializePostProcessing();
         }
+
+        private void OnWorldLocationChanged(Types.WorldLocation newLocation)
+        {
+            // re-get the post processing volume, in case we have different ones in different scenes (like the bedroom)
+            InitializePostProcessing();
+        }
+        
+        
 
         private void Update()
         {
