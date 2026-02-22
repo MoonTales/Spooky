@@ -101,7 +101,7 @@ namespace Interaction.Letters
 
         // Prepare fade variables
         Color color = fadeMats[0].GetColor("_Base_Color");
-        float duration = 10f;
+        float duration = 2f;
         float elapsedTime = 0f;
         float startAlpha = color.a;
         float targetAlpha = 0f;
