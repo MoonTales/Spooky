@@ -25,8 +25,8 @@ namespace Player
         [Space(10)]
         [Header("Cutoffs for each Mental Health State")]
         // Anxious Mental Health Cutoffs
-        private float MildlyAnxiousMentalHealthCutoff = 0.5f;
-        private float ModeratlyAnxiousMentalHealthCutoff = 0.35f;
+        private float MildlyAnxiousMentalHealthCutoff = 0.75f;
+        private float ModeratlyAnxiousMentalHealthCutoff = 0.4f;
         private float SeverlyAnxiousMentalHealthCutoff = 0.20f;
         private float PanicMentalHealthCutoff = 0.1f;
         // Sleep Deprived Mental Health Cutoffs
