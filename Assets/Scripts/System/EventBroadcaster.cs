@@ -107,6 +107,13 @@ namespace System
         public delegate void OnTerrorIntensityChangedHandler(float normalizedIntensity, Transform terrorSourceTransform);
         public static event OnTerrorIntensityChangedHandler OnTerrorIntensityChanged;
         public static void Broadcast_OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform) { OnTerrorIntensityChanged?.Invoke(normalizedIntensity, terrorSourceTransform); }
+
+        public delegate void OnSleepTrackerAudioStateChangedHandler(bool isActive, bool isGoodWakeup, Transform sourceTransform);
+        public static event OnSleepTrackerAudioStateChangedHandler OnSleepTrackerAudioStateChanged;
+        public static void Broadcast_OnSleepTrackerAudioStateChanged(bool isActive, bool isGoodWakeup, Transform sourceTransform)
+        {
+            OnSleepTrackerAudioStateChanged?.Invoke(isActive, isGoodWakeup, sourceTransform);
+        }
         
         
         public delegate void OnFlashlightToggledHandler(bool isOn);

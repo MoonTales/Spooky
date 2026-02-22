@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="ParameterPreset" id="{c4babebb-dc87-46ed-bd76-9910a99278b6}">
+		<property name="name">
+			<value>SleepTracker</value>
+		</property>
+		<relationship name="folder">
+			<destination>{49b9f779-de73-4858-a9e5-9d27375712e5}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{a5255d47-2583-40d5-8dc2-731cfd3a2776}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{a5255d47-2583-40d5-8dc2-731cfd3a2776}">
+		<property name="parameterType">
+			<value>1</value>
+		</property>
+		<property name="maximum">
+			<value>2</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>
