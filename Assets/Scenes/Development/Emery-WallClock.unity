@@ -2401,6 +2401,8 @@ MonoBehaviour:
   hourHand: {fileID: 1842539557}
   timeToExit: 600
   FastForwardSpeed: 3
+  elapsedTime: 0
+  ClockSpeed: 0
 --- !u!1 &936765941
 GameObject:
   m_ObjectHideFlags: 0
@@ -7393,6 +7395,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Clock
       objectReference: {fileID: 0}
+    - target: {fileID: 5894310468538085193, guid: d38dcc86a6cc4a74c9072b174aa84405, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 236fb7174cc80194787857e041c8c37d, type: 2}
+    - target: {fileID: 6546718177671185909, guid: d38dcc86a6cc4a74c9072b174aa84405, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 236fb7174cc80194787857e041c8c37d, type: 2}
     - target: {fileID: 7240360135171099274, guid: d38dcc86a6cc4a74c9072b174aa84405, type: 3}
       propertyPath: m_LocalPosition.x
       value: -7.187
