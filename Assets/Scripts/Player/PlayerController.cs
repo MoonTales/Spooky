@@ -823,7 +823,6 @@ namespace Player
             _lockedInput = true;
             StopAllPlayerMovement();
             SyncLandingTrackingForStateTransition();
-            AudioManager.Instance?.StopFootstepsImmediate();
         }
 
         

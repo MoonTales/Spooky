@@ -43,6 +43,7 @@ namespace Managers
         private EventInstance _nightmareAmbienceInstance;
         private EventInstance _mainMenuMusicInstance;
         private EventInstance _bedroomAmbienceInstance;
+        private EventInstance _tutorialAmbienceInstance;
         private EventInstance _heartbeatInstance;
         private EventInstance _terrorLoopInstance;
         private EventInstance _sleepTrackerAlarmInstance;
@@ -127,6 +128,8 @@ namespace Managers
         [Header("World Ambience")]
         [SerializeField] private EventReference bedroomAmbLoopEvent;
         [SerializeField] private bool bedroomAmbienceRequiresGameplay = true;
+        [SerializeField] private EventReference tutorialAmbLoopEvent;
+        [SerializeField] private bool tutorialAmbienceRequiresGameplay = true;
 
         [Header("Settings Menu Audio")]
         [SerializeField] private EventReference mainMenuMusicEvent;
@@ -163,6 +166,12 @@ namespace Managers
                 () => EventBroadcaster.OnSleepTrackerAudioStateChanged += OnSleepTrackerAudioStateChanged,
                 () => EventBroadcaster.OnSleepTrackerAudioStateChanged -= OnSleepTrackerAudioStateChanged);
             TrackSubscription(
+                () => EventBroadcaster.OnLetterSlide += OnLetterSlide,
+                () => EventBroadcaster.OnLetterSlide -= OnLetterSlide);
+            TrackSubscription(
+                () => EventBroadcaster.OnLetterScribble += OnLetterScribble,
+                () => EventBroadcaster.OnLetterScribble -= OnLetterScribble);
+            TrackSubscription(
                 () => EventBroadcaster.OnRequestScreenFade += OnRequestScreenFade,
                 () => EventBroadcaster.OnRequestScreenFade -= OnRequestScreenFade);
 
@@ -184,6 +193,7 @@ namespace Managers
             CacheSettingsBuses();
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
             ApplyBedroomAmbience();
+            ApplyTutorialAmbience();
         }
 
         protected override void OnDestroy()
@@ -195,6 +205,7 @@ namespace Managers
             StopAndReleaseSleepTrackerAlarm(true);
             StopAndReleaseGoodWakeupTransition(true);
             StopAndReleaseBedroomAmbience();
+            StopAndReleaseTutorialAmbience();
             StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
@@ -233,6 +244,22 @@ namespace Managers
             ApplySleepTrackerAlarmState(isActive, isGoodWakeup, sourceTransform);
         }
 
+        private void OnLetterSlide(Transform sourceTransform)
+        {
+            PlaySfx(SfxId.LetterSlide, sourceTransform);
+        }
+
+        private void OnLetterScribble(Transform sourceTransform)
+        {
+            if (GameStateManager.Instance == null
+                || GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Bedroom)
+            {
+                return;
+            }
+
+            PlaySfx(SfxId.LetterScribble, sourceTransform);
+        }
+
         private void OnRequestScreenFade(Types.ScreenFadeData screenFadeData)
         {
             if (!_goodWakeupTransitionRequested)
@@ -269,12 +296,14 @@ namespace Managers
             }
             RefreshMentalAudio();
             ApplyBedroomAmbience();
+            ApplyTutorialAmbience();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             AutoAttachLampAudioEmittersInScene(scene);
             ApplyBedroomAmbience();
+            ApplyTutorialAmbience();
         }
 
         protected override void OnGameStateChanged(Types.GameState newState)
@@ -282,6 +311,11 @@ namespace Managers
             base.OnGameStateChanged(newState);
             LogAudioState($"Game state changed -> {newState}. Expected: pause snapshot {(newState == Types.GameState.Paused ? "enabled" : "disabled")}.");
             SetPauseSnapshotEnabled(newState == Types.GameState.Paused);
+
+            if (newState == Types.GameState.Paused)
+            {
+                StopFootstepsImmediate();
+            }
 
             if (newState == Types.GameState.MainMenu)
             {
@@ -295,6 +329,7 @@ namespace Managers
             }
 
             ApplyBedroomAmbience();
+            ApplyTutorialAmbience();
         }
 
         // Public API: gameplay-triggered SFX
@@ -715,10 +750,6 @@ namespace Managers
                 elapsed += Time.deltaTime;
                 float alpha = Mathf.Clamp01(elapsed / crossfadeDuration);
                 _goodWakeupTransitionInstance.setParameterByName(goodWakeupTransitionParameter, alpha);
-                if (debugAudioLogs)
-                {
-                    Debug.Log($"AudioManager: {goodWakeupTransitionParameter}={alpha:0.000}");
-                }
 
                 yield return null;
             }
@@ -799,6 +830,29 @@ namespace Managers
             _bedroomAmbienceInstance = CreateEventInstance(bedroomAmbLoopEvent);
             _bedroomAmbienceInstance.start();
             LogAudioState("Bedroom ambience started.");
+        }
+
+        private void ApplyTutorialAmbience()
+        {
+            if (!ShouldPlayTutorialAmbience())
+            {
+                StopAndReleaseTutorialAmbience();
+                return;
+            }
+
+            if (tutorialAmbLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            if (_tutorialAmbienceInstance.isValid())
+            {
+                return;
+            }
+
+            _tutorialAmbienceInstance = CreateEventInstance(tutorialAmbLoopEvent);
+            _tutorialAmbienceInstance.start();
+            LogAudioState("Tutorial ambience started.");
         }
 
         private void StopMainMenuMusic(bool allowFadeout)
@@ -979,6 +1033,26 @@ namespace Managers
             return GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
         }
 
+        private bool ShouldPlayTutorialAmbience()
+        {
+            if (GameStateManager.Instance == null)
+            {
+                return false;
+            }
+
+            if (GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Tutorial)
+            {
+                return false;
+            }
+
+            if (!tutorialAmbienceRequiresGameplay)
+            {
+                return true;
+            }
+
+            return GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
+        }
+
         private void PlayEvent(EventReference eventReference, Transform fromTransform)
         {
             if (muteSFX) return;
@@ -1096,6 +1170,17 @@ namespace Managers
                 _bedroomAmbienceInstance.release();
                 _bedroomAmbienceInstance = default;
                 LogAudioState("Bedroom ambience stopped.");
+            }
+        }
+
+        private void StopAndReleaseTutorialAmbience()
+        {
+            if (_tutorialAmbienceInstance.isValid())
+            {
+                _tutorialAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _tutorialAmbienceInstance.release();
+                _tutorialAmbienceInstance = default;
+                LogAudioState("Tutorial ambience stopped.");
             }
         }
 

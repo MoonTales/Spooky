@@ -114,6 +114,23 @@ namespace System
         {
             OnSleepTrackerAudioStateChanged?.Invoke(isActive, isGoodWakeup, sourceTransform);
         }
+
+        public delegate void OnLetterSlideHandler(Transform sourceTransform);
+        public static event OnLetterSlideHandler OnLetterSlide;
+        public static void Broadcast_OnLetterSlide(Transform sourceTransform) { OnLetterSlide?.Invoke(sourceTransform); }
+
+        public delegate void OnLetterScribbleHandler(Transform sourceTransform);
+        public static event OnLetterScribbleHandler OnLetterScribble;
+        public static bool Broadcast_OnLetterScribble(Transform sourceTransform)
+        {
+            if (OnLetterScribble == null)
+            {
+                return false;
+            }
+
+            OnLetterScribble.Invoke(sourceTransform);
+            return true;
+        }
         
         
         public delegate void OnFlashlightToggledHandler(bool isOn);
