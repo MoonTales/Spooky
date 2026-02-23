@@ -589,8 +589,8 @@ namespace Player
                 
                 if (_hasGameplayAirborneToken && hadMeaningfulAirborneTime && hadMeaningfulDropDistance)
                 {
-                    Debug.Log("PlayerAudio: Landing SFX");
-                    AudioManager.Instance.PlaySfx(AudioManager.SfxId.Landing, transform);
+                    float impactDownwardSpeed = Mathf.Max(0f, -_verticalVelocity);
+                    AudioManager.Instance.PlayPlayerLanding(impactDownwardSpeed, _gameplayAirborneTime, transform);
                 }
 
                 // Landing edge consumed; reset airborne tracking for the next jump/fall cycle.
@@ -823,7 +823,6 @@ namespace Player
             _lockedInput = true;
             StopAllPlayerMovement();
             SyncLandingTrackingForStateTransition();
-            AudioManager.Instance?.StopFootstepsImmediate();
         }
 
         

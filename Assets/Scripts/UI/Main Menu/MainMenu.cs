@@ -57,6 +57,12 @@ namespace UI.Main_Menu
             _settingsButton.interactable = false;
             _quitButton.enabled = false;
             _quitButton.interactable = false;
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.TriggerMainMenuMusicTransition();
+            }
+
             new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToGame).Send();
             
         }
