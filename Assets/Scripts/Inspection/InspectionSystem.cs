@@ -126,8 +126,8 @@ public class InspectionSystem : Singleton<InspectionSystem>
         {
             Types.NotificationData data = new(
                 duration: 3, 
-                messageKey: new TextKey { place = "cutscene", id = "act1" },
-                messageOverride: "You can rotate the object by dragging with the left mouse button, zoom in and out with the scroll wheel, and exit inspection with right click or F.",
+                messageKey: new TextKey { place = "tutorial", id = "inspect" },
+                messageOverride: "Click and drag mouse to view object. F or RMB to exit.",
                 shouldOnlyShowOnce: true
             );
             data.Send();
