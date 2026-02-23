@@ -34,7 +34,7 @@ namespace UI
         private void OnNotificationSent(Types.NotificationData notificationData)
         {
             // get access to the hud notification text
-            if (!_notificationText) { _notificationText = PlayerHUDController.Instance.GetNotificationText(); }
+            if (!_notificationText) { _notificationText = NotificationHUD.Instance.GetNotificationText(); }
             // if its still null we have a problem
             if (!_notificationText){DebugUtils.LogError("NotificationController could not find the notification text on the HUD!"); return;}
             
