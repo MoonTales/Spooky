@@ -7,11 +7,14 @@ using FMODUnity;
 using FMOD.Studio;
 using Types = System.Types;
 
-// TODO: Reorganize inspector organization
 namespace Managers
 {
     public class AudioManager : Singleton<AudioManager>
     {
+    //------------------//
+        #region Types
+    //------------------//
+
         // IDs for unparameterized SFX event mappings.
         public enum SfxId
         {
@@ -32,33 +35,6 @@ namespace Managers
             public SfxId id;
             public EventReference eventRef;
         }
-
-        // Runtime state
-        [SerializeField] private SfxEntry[] sfxEvents;      // Inspector-assigned map of SfxId -> FMOD EventReference.
-        private Dictionary<SfxId, EventReference> _sfxMap;  // Runtime lookup built from sfxEvents for fast access.
-        private Bus _playerMovementBus;
-        private float _mentalStateSeverity;
-        private float _terrorSeverity;
-
-        private EventInstance _nightmareAmbienceInstance;
-        private EventInstance _mainMenuMusicInstance;
-        private EventInstance _bedroomAmbienceInstance;
-        private EventInstance _tutorialAmbienceInstance;
-        private EventInstance _heartbeatInstance;
-        private EventInstance _terrorLoopInstance;
-        private EventInstance _sleepTrackerAlarmInstance;
-        private EventInstance _goodWakeupTransitionInstance;
-        private EventInstance _uiHoverInstance;
-        private EventInstance _letterScribbleInstance;
-        private Coroutine _goodWakeupTransitionCoroutine;
-        private bool _terrorLoopIsPlaying;
-        private bool _sleepTrackerAlarmIsGoodVariant;
-        private bool _hasSleepTrackerAlarmVariant;
-        private bool _goodWakeupTransitionRequested;
-        private bool _goodWakeupHasBedroomSourceTransform;
-        private Transform _terrorSourceTransform;
-        private EventInstance _pauseSnapshotInstance;
-        private bool _pauseSnapshotActive;
 
         // Per-call parameter payload for FMOD events.
         public readonly struct SfxParam
@@ -87,22 +63,45 @@ namespace Managers
                 return new SfxParam(name, floatValue);
             }
         }
+        #endregion
 
+    //----------------------//
+        #region Inspector
+    //----------------------//
+
+        #region Core and Debug
+
+        [Space(10)]
+        [Header("SFX Event Map")]
+        [SerializeField] private SfxEntry[] sfxEvents;      // Inspector-assigned map of SfxId -> FMOD EventReference.
+
+        [Space(10)]
         [Header("Debug")]
         [SerializeField] private bool debugAudioLogs = false;
+        #endregion
 
-        // Serialized FMOD event references and parameters.
-        [Header("Player Sounds")]
+        #region Player Audio
+
+        [Space(10)]
+        [Header("Player Audio")]
         [SerializeField] private EventReference footstepPlayer;     // Parameterized footstep event with Surface label parameter.
         [SerializeField] private string playerMovementBusPath = "bus:/SFX/Player/Movement"; // Bus containing player movement events for quick stops.
+        #endregion
 
-        [Header("Environment Sounds")]
+        #region Environment Audio
+
+        [Space(10)]
+        [Header("Environment Audio (Lamps)")]
         [SerializeField] private bool autoAttachLampAudioOnSceneLoad = true;
         [SerializeField] private string lampAudioAutoAttachSceneName = "Tutorial";
         [SerializeField] private EventReference lampHumLoopEvent;
         [SerializeField] private string lampOnParameter = "LampOn";
         [SerializeField] private EventReference lampBuzzOffEvent;
+        #endregion
 
+        #region Mental Audio
+
+        [Space(10)]
         [Header("Mental Audio")]
         [SerializeField] private string terrorDistortionParameter = "Terror";
         [SerializeField] private string mentalHealthDistortionParameter = "MentalHealth";
@@ -116,7 +115,11 @@ namespace Managers
         [SerializeField] private bool heartbeatTerrorParameterIsGlobal = true;
         [SerializeField] private bool heartbeatMentalHealthParameterIsGlobal = true;
         [SerializeField] private bool logTerrorParameterValue = false;
+        #endregion
 
+        #region Sleep Tracker Audio
+
+        [Space(10)]
         [Header("Sleep Tracker Audio")]
         [SerializeField] private string sleepTrackerActiveParameter = "SleepTracker";
         [SerializeField] private EventReference goodWakeupTransitionEvent;
@@ -124,31 +127,88 @@ namespace Managers
         [SerializeField] private float goodWakeupCrossfadeFractionOfFadeOut = 0.2f;
         [SerializeField] private float goodWakeupCrossfadeMinSeconds = 0.4f;
         [SerializeField] private float goodWakeupCrossfadeMaxSeconds = 1.5f;
+        #endregion
 
+        #region World Ambience
+
+        [Space(10)]
         [Header("World Ambience")]
         [SerializeField] private EventReference bedroomAmbLoopEvent;
         [SerializeField] private bool bedroomAmbienceRequiresGameplay = true;
         [SerializeField] private EventReference tutorialAmbLoopEvent;
         [SerializeField] private bool tutorialAmbienceRequiresGameplay = true;
+        #endregion
 
-        [Header("Settings Menu Audio")]
+        #region Menu and Mix
+
+        [Space(10)]
+        [Header("Menu and Snapshot Audio")]
         [SerializeField] private EventReference mainMenuMusicEvent;
+        [SerializeField] private EventReference pauseSnapshotEvent;
+
+        [Space(10)]
+        [Header("Mixer Bus Paths")]
         [SerializeField] private string masterBusPath = "bus:/";
         [SerializeField] private string sfxBusPath = "bus:/SFX";
         [SerializeField] private string musicBusPath = "bus:/Music";
         [SerializeField] private string ambienceBusPath = "bus:/Ambience";
-        [SerializeField] private EventReference pauseSnapshotEvent;
 
+        [Space(10)]
+        [Header("Runtime Mutes")]
+        public bool muteSFX = false;
+        public bool muteMusic = false;
+        #endregion
+        #endregion
+
+    //-------------------------//
+        #region Runtime State
+    //-------------------------//
+
+        // Runtime lookups and bus cache.
+        private Dictionary<SfxId, EventReference> _sfxMap;
+        private Bus _playerMovementBus;
         private Bus _masterBus;
         private Bus _sfxBus;
         private Bus _musicBus;
         private Bus _ambienceBus;
-        
-        [Header("Mutes")]
-        public bool muteSFX = false;
-        public bool muteMusic = false;
-        
-        // Lifecycle
+
+        // Persistent FMOD instances - UI/menu and mix control.
+        private EventInstance _mainMenuMusicInstance;
+        private EventInstance _pauseSnapshotInstance;
+        private EventInstance _uiHoverInstance;
+
+        // Persistent FMOD instances - world ambience and mental stack.
+        private EventInstance _bedroomAmbienceInstance;
+        private EventInstance _tutorialAmbienceInstance;
+        private EventInstance _nightmareAmbienceInstance;
+        private EventInstance _terrorLoopInstance;
+        private EventInstance _heartbeatInstance;
+
+        // Persistent FMOD instances - sleep tracker/alarm flow.
+        private EventInstance _sleepTrackerAlarmInstance;
+        private EventInstance _goodWakeupTransitionInstance;
+
+        // Runtime audio state - mental stack.
+        private float _mentalStateSeverity;
+        private float _terrorSeverity;
+        private Transform _terrorSourceTransform;
+        private bool _terrorLoopIsPlaying;
+
+        // Runtime audio state - sleep tracker flow.
+        private Coroutine _goodWakeupTransitionCoroutine;
+        private bool _sleepTrackerAlarmIsGoodVariant;
+        private bool _hasSleepTrackerAlarmVariant;
+        private bool _goodWakeupTransitionRequested;
+        private bool _goodWakeupHasBedroomSourceTransform;
+
+        // Runtime audio state - snapshot control.
+        private bool _pauseSnapshotActive;
+        #endregion
+
+    //---------------------------------------//
+        #region Lifecycle and Subscriptions
+    //---------------------------------------//
+
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
@@ -210,56 +270,15 @@ namespace Managers
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
         }
-        
-        // Event handlers
-        private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
-        {
-            _mentalStateSeverity = GetMentalStateSeverity(newMentalState);
-            LogAudioState($"Mental state changed -> {newMentalState} ({_mentalStateSeverity:0.00}). Expected: nightmare ambience/heartbeat parameters update.");
-            RefreshMentalAudio();
-        }
+        #endregion
 
-        private void OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform)
-        {
-            if (!IsNightmareWorldLocation())
-            {
-                _terrorSeverity = 0f;
-                _terrorSourceTransform = null;
-                RefreshMentalAudio();
-                return;
-            }
+    //-------------------------//
+        #region Event Handlers
+    //-------------------------//
 
-            _terrorSeverity = Mathf.Clamp01(normalizedIntensity);
-            _terrorSourceTransform = terrorSourceTransform;
-            if (debugAudioLogs && logTerrorParameterValue)
-            {
-                Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
-            }
-            LogAudioState($"Terror changed -> {_terrorSeverity:0.00} (source={(terrorSourceTransform != null ? terrorSourceTransform.name : "null")}). Expected: terror loop follows source in Nightmare.");
-            RefreshMentalAudio();
-        }
-
-        private void OnSleepTrackerAudioStateChanged(bool isActive, bool isGoodWakeup, Transform sourceTransform)
-        {
-            ApplySleepTrackerAlarmState(isActive, isGoodWakeup, sourceTransform);
-        }
-
-        private void OnLetterSlide(Transform sourceTransform)
-        {
-            PlaySfx(SfxId.LetterSlide, sourceTransform);
-        }
-
-        private void OnLetterScribble(Transform sourceTransform)
-        {
-            if (GameStateManager.Instance == null
-                || GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Bedroom)
-            {
-                return;
-            }
-
-            PlaySfx(SfxId.LetterScribble, sourceTransform);
-        }
-
+          //--------------//
+         //    Global    //
+        //--------------//
         private void OnRequestScreenFade(Types.ScreenFadeData screenFadeData)
         {
             if (!_goodWakeupTransitionRequested)
@@ -332,7 +351,142 @@ namespace Managers
             ApplyTutorialAmbience();
         }
 
-        // Public API: gameplay-triggered SFX
+          //---------------//
+         //    Bedroom    //
+        //---------------//
+        private void OnLetterSlide(Transform sourceTransform)
+        {
+            PlaySfx(SfxId.LetterSlide, sourceTransform);
+        }
+
+        private void OnLetterScribble(Transform sourceTransform)
+        {
+            if (GameStateManager.Instance == null
+                || GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Bedroom)
+            {
+                return;
+            }
+
+            PlaySfx(SfxId.LetterScribble, sourceTransform);
+        }
+
+        private void OnSleepTrackerAudioStateChanged(bool isActive, bool isGoodWakeup, Transform sourceTransform)
+        {
+            if (GameStateManager.Instance == null)
+            {
+                StopAndReleaseSleepTrackerAlarm(true);
+                StopAndReleaseGoodWakeupTransition(true);
+                return;
+            }
+
+            Types.WorldLocation worldLocation = GameStateManager.Instance.GetCurrentWorldLocation();
+            bool inBedroom = worldLocation == Types.WorldLocation.Bedroom;
+            if (!inBedroom)
+            {
+                StopAndReleaseSleepTrackerAlarm(true);
+                SetGoodWakeupTransitionActiveParameter(isActive);
+                return;
+            }
+
+            if (isGoodWakeup)
+            {
+                if (goodWakeupTransitionEvent.IsNull)
+                {
+                    Debug.LogWarning("AudioManager: Missing goodWakeupTransitionEvent reference for good wakeup alarm.");
+                    return;
+                }
+
+                if (!_goodWakeupTransitionInstance.isValid())
+                {
+                    _goodWakeupTransitionInstance = CreateEventInstance(goodWakeupTransitionEvent, sourceTransform);
+                    _goodWakeupTransitionInstance.start();
+                }
+
+                if (inBedroom && sourceTransform != null)
+                {
+                    _goodWakeupHasBedroomSourceTransform = true;
+                    if (EventInstanceIs3D(_goodWakeupTransitionInstance))
+                    {
+                        _goodWakeupTransitionInstance.set3DAttributes(RuntimeUtils.To3DAttributes(sourceTransform.position));
+                    }
+                }
+
+                SetGoodWakeupTransitionActiveParameter(isActive);
+                StopAndReleaseSleepTrackerAlarm(true);
+                return;
+            }
+
+            EventReference alarmEvent = GetSfxEvent(SfxId.AlarmBad);
+            if (alarmEvent.IsNull)
+            {
+                Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{SfxId.AlarmBad}'.");
+                return;
+            }
+
+            bool variantChanged = !_hasSleepTrackerAlarmVariant || _sleepTrackerAlarmIsGoodVariant != isGoodWakeup;
+            if (variantChanged || !_sleepTrackerAlarmInstance.isValid())
+            {
+                StopAndReleaseSleepTrackerAlarm(true);
+                _sleepTrackerAlarmInstance = CreateEventInstance(alarmEvent, sourceTransform);
+                if (!string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
+                {
+                    _sleepTrackerAlarmInstance.setParameterByName(sleepTrackerActiveParameter, isActive ? 1f : 0f);
+                }
+                _sleepTrackerAlarmInstance.start();
+                _sleepTrackerAlarmIsGoodVariant = isGoodWakeup;
+                _hasSleepTrackerAlarmVariant = true;
+                LogAudioState($"Sleep tracker alarm started ({(isGoodWakeup ? "good" : "bad")} wakeup).");
+            }
+            else if (sourceTransform != null && EventInstanceIs3D(_sleepTrackerAlarmInstance))
+            {
+                _sleepTrackerAlarmInstance.set3DAttributes(RuntimeUtils.To3DAttributes(sourceTransform.position));
+            }
+
+            if (_sleepTrackerAlarmInstance.isValid() && !string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
+            {
+                _sleepTrackerAlarmInstance.setParameterByName(sleepTrackerActiveParameter, isActive ? 1f : 0f);
+            }
+        }
+
+          //----------------//
+         //    Nightmare   //
+        //----------------//
+        private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
+        {
+            _mentalStateSeverity = GetMentalStateSeverity(newMentalState);
+            LogAudioState($"Mental state changed -> {newMentalState} ({_mentalStateSeverity:0.00}). Expected: nightmare ambience/heartbeat parameters update.");
+            RefreshMentalAudio();
+        }
+
+        private void OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform)
+        {
+            if (!IsNightmareWorldLocation())
+            {
+                _terrorSeverity = 0f;
+                _terrorSourceTransform = null;
+                RefreshMentalAudio();
+                return;
+            }
+
+            _terrorSeverity = Mathf.Clamp01(normalizedIntensity);
+            _terrorSourceTransform = terrorSourceTransform;
+            if (debugAudioLogs && logTerrorParameterValue)
+            {
+                Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
+            }
+            LogAudioState($"Terror changed -> {_terrorSeverity:0.00} (source={(terrorSourceTransform != null ? terrorSourceTransform.name : "null")}). Expected: terror loop follows source in Nightmare.");
+            RefreshMentalAudio();
+        }
+        #endregion
+
+
+    //------------------------//
+        #region Public API
+    //-----------------------//
+
+
+        #region Gameplay SFX
+
         public void BeginGoodWakeupAlarmTransition()
         {
             _goodWakeupTransitionRequested = true;
@@ -371,31 +525,9 @@ namespace Managers
             instance.start();
             instance.release();
         }
+        #endregion
 
-        public bool TryStartLampHumLoop(Transform fromTransform, bool isOn, out EventInstance instance)
-        {
-            instance = default;
-
-            if (muteSFX || lampHumLoopEvent.IsNull)
-            {
-                return false;
-            }
-
-            instance = CreateEventInstance(lampHumLoopEvent, fromTransform);
-            SetLampHumLoopEnabled(instance, isOn);
-            instance.start();
-            return true;
-        }
-
-        public void SetLampHumLoopEnabled(EventInstance instance, bool isOn)
-        {
-            if (!instance.isValid() || string.IsNullOrWhiteSpace(lampOnParameter))
-            {
-                return;
-            }
-
-            instance.setParameterByName(lampOnParameter, isOn ? 1f : 0f);
-        }
+        #region External Event Instances
 
         public void UpdateEventInstanceTransform(EventInstance instance, Transform fromTransform)
         {
@@ -404,7 +536,7 @@ namespace Managers
                 return;
             }
 
-            instance.set3DAttributes(RuntimeUtils.To3DAttributes(fromTransform.position));
+            UpdateEventInstancePosition(instance, fromTransform.position);
         }
 
         public void UpdateEventInstancePosition(EventInstance instance, Vector3 worldPosition)
@@ -448,15 +580,33 @@ namespace Managers
             instance = default;
         }
 
-        public void PlayLampBuzzOff(Transform fromTransform = null)
+        public bool TryStartLampHumLoop(Transform fromTransform, bool isOn, out EventInstance instance)
         {
-            if (muteSFX || lampBuzzOffEvent.IsNull)
+            instance = default;
+
+            if (muteSFX || lampHumLoopEvent.IsNull)
+            {
+                return false;
+            }
+
+            instance = CreateEventInstance(lampHumLoopEvent, fromTransform);
+            SetLampHumLoopEnabled(instance, isOn);
+            instance.start();
+            return true;
+        }
+
+        public void SetLampHumLoopEnabled(EventInstance instance, bool isOn)
+        {
+            if (!instance.isValid() || string.IsNullOrWhiteSpace(lampOnParameter))
             {
                 return;
             }
 
-            PlayEvent(lampBuzzOffEvent, fromTransform);
+            instance.setParameterByName(lampOnParameter, isOn ? 1f : 0f);
         }
+        #endregion
+
+        #region Runtime Mix and Snapshot
 
         public void StopFootstepsImmediate()
         {
@@ -557,6 +707,19 @@ namespace Managers
             _pauseSnapshotActive = false;
         }
 
+        public void PlayLampBuzzOff(Transform fromTransform = null)
+        {
+            if (muteSFX || lampBuzzOffEvent.IsNull)
+            {
+                return;
+            }
+
+            PlayEvent(lampBuzzOffEvent, fromTransform);
+        }
+        #endregion
+
+        #region Generic SFX Playback
+
         public void PlayParamSfx(SfxId sfxId, Transform fromTransform = null, params SfxParam[] parameters)
         {
             if (muteSFX) return;
@@ -627,84 +790,12 @@ namespace Managers
             StopFootstepsImmediate();
             PlaySfx(SfxId.Jump, fromTransform);
         }
+        #endregion
+        #endregion
 
-        private void ApplySleepTrackerAlarmState(bool isActive, bool isGoodWakeup, Transform sourceTransform)
-        {
-            if (GameStateManager.Instance == null)
-            {
-                StopAndReleaseSleepTrackerAlarm(true);
-                StopAndReleaseGoodWakeupTransition(true);
-                return;
-            }
-
-            Types.WorldLocation worldLocation = GameStateManager.Instance.GetCurrentWorldLocation();
-            bool inBedroom = worldLocation == Types.WorldLocation.Bedroom;
-            if (!inBedroom)
-            {
-                StopAndReleaseSleepTrackerAlarm(true);
-                SetGoodWakeupTransitionActiveParameter(isActive);
-                return;
-            }
-
-            if (isGoodWakeup)
-            {
-                if (goodWakeupTransitionEvent.IsNull)
-                {
-                    Debug.LogWarning("AudioManager: Missing goodWakeupTransitionEvent reference for good wakeup alarm.");
-                    return;
-                }
-
-                if (!_goodWakeupTransitionInstance.isValid())
-                {
-                    _goodWakeupTransitionInstance = CreateEventInstance(goodWakeupTransitionEvent, sourceTransform);
-                    _goodWakeupTransitionInstance.start();
-                }
-
-                if (inBedroom && sourceTransform != null)
-                {
-                    _goodWakeupHasBedroomSourceTransform = true;
-                    if (EventInstanceIs3D(_goodWakeupTransitionInstance))
-                    {
-                        _goodWakeupTransitionInstance.set3DAttributes(RuntimeUtils.To3DAttributes(sourceTransform.position));
-                    }
-                }
-
-                SetGoodWakeupTransitionActiveParameter(isActive);
-                StopAndReleaseSleepTrackerAlarm(true);
-                return;
-            }
-
-            EventReference alarmEvent = GetSfxEvent(SfxId.AlarmBad);
-            if (alarmEvent.IsNull)
-            {
-                Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{SfxId.AlarmBad}'.");
-                return;
-            }
-
-            bool variantChanged = !_hasSleepTrackerAlarmVariant || _sleepTrackerAlarmIsGoodVariant != isGoodWakeup;
-            if (variantChanged || !_sleepTrackerAlarmInstance.isValid())
-            {
-                StopAndReleaseSleepTrackerAlarm(true);
-                _sleepTrackerAlarmInstance = CreateEventInstance(alarmEvent, sourceTransform);
-                if (!string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
-                {
-                    _sleepTrackerAlarmInstance.setParameterByName(sleepTrackerActiveParameter, isActive ? 1f : 0f);
-                }
-                _sleepTrackerAlarmInstance.start();
-                _sleepTrackerAlarmIsGoodVariant = isGoodWakeup;
-                _hasSleepTrackerAlarmVariant = true;
-                LogAudioState($"Sleep tracker alarm started ({(isGoodWakeup ? "good" : "bad")} wakeup).");
-            }
-            else if (sourceTransform != null && EventInstanceIs3D(_sleepTrackerAlarmInstance))
-            {
-                _sleepTrackerAlarmInstance.set3DAttributes(RuntimeUtils.To3DAttributes(sourceTransform.position));
-            }
-
-            if (_sleepTrackerAlarmInstance.isValid() && !string.IsNullOrWhiteSpace(sleepTrackerActiveParameter))
-            {
-                _sleepTrackerAlarmInstance.setParameterByName(sleepTrackerActiveParameter, isActive ? 1f : 0f);
-            }
-        }
+    //-------------------------------//
+        #region Sleep Tracker Audio
+    //-------------------------------//
 
         private IEnumerator CrossfadeGoodWakeupTransition(Types.ScreenFadeData screenFadeData)
         {
@@ -773,8 +864,11 @@ namespace Managers
                 _goodWakeupTransitionInstance.setParameterByName(sleepTrackerActiveParameter, parameterValue);
             }
         }
+        #endregion
 
-        // Mental audio stack
+    //------------------------------//
+        #region Mental Audio Stack
+    //------------------------------//
         private void RefreshMentalAudio()
         {
             float terrorSeverityForAudio = IsNightmareWorldLocation() ? _terrorSeverity : 0f;
@@ -782,6 +876,11 @@ namespace Managers
             ApplyNightmareAmbience();
             ApplyHeartbeat();
         }
+        #endregion
+
+    //-----------------------------------------//
+        #region Persistent Music and Ambience
+    //-----------------------------------------//
 
         private void PlayMainMenuMusicIfNeeded()
         {
@@ -809,27 +908,15 @@ namespace Managers
             LogAudioState("Main menu music started.");
         }
 
-        private void ApplyBedroomAmbience()
+        private void StopMainMenuMusic(bool allowFadeout)
         {
-            if (!ShouldPlayBedroomAmbience())
-            {
-                StopAndReleaseBedroomAmbience();
-                return;
-            }
-
-            if (bedroomAmbLoopEvent.IsNull)
+            if (!_mainMenuMusicInstance.isValid())
             {
                 return;
             }
 
-            if (_bedroomAmbienceInstance.isValid())
-            {
-                return;
-            }
-
-            _bedroomAmbienceInstance = CreateEventInstance(bedroomAmbLoopEvent);
-            _bedroomAmbienceInstance.start();
-            LogAudioState("Bedroom ambience started.");
+            _mainMenuMusicInstance.stop(allowFadeout ? FMOD.Studio.STOP_MODE.ALLOWFADEOUT : FMOD.Studio.STOP_MODE.IMMEDIATE);
+            _mainMenuMusicInstance.release();
         }
 
         private void ApplyTutorialAmbience()
@@ -855,15 +942,58 @@ namespace Managers
             LogAudioState("Tutorial ambience started.");
         }
 
-        private void StopMainMenuMusic(bool allowFadeout)
+        private void ApplyBedroomAmbience()
         {
-            if (!_mainMenuMusicInstance.isValid())
+            if (!ShouldPlayBedroomAmbience())
+            {
+                StopAndReleaseBedroomAmbience();
+                return;
+            }
+
+            if (bedroomAmbLoopEvent.IsNull)
             {
                 return;
             }
 
-            _mainMenuMusicInstance.stop(allowFadeout ? FMOD.Studio.STOP_MODE.ALLOWFADEOUT : FMOD.Studio.STOP_MODE.IMMEDIATE);
-            _mainMenuMusicInstance.release();
+            if (_bedroomAmbienceInstance.isValid())
+            {
+                return;
+            }
+
+            _bedroomAmbienceInstance = CreateEventInstance(bedroomAmbLoopEvent);
+            _bedroomAmbienceInstance.start();
+            LogAudioState("Bedroom ambience started.");
+        }
+
+        private void ApplyNightmareAmbience()
+        {
+            if (!IsNightmareWorldLocation())
+            {
+                StopAndReleaseNightmareAmbience();
+                return;
+            }
+
+            if (nightmareAmbLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            if (!_nightmareAmbienceInstance.isValid())
+            {
+                _nightmareAmbienceInstance = CreateEventInstance(nightmareAmbLoopEvent);
+                _nightmareAmbienceInstance.start();
+                LogAudioState("Nightmare ambience started. Expected: continuous ambience in Nightmare.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(terrorDistortionParameter))
+            {
+                SetFmodParameter(_nightmareAmbienceInstance, terrorDistortionParameter, _terrorSeverity, terrorParameterIsGlobal);
+            }
+
+            if (!string.IsNullOrWhiteSpace(mentalHealthDistortionParameter))
+            {
+                SetFmodParameter(_nightmareAmbienceInstance, mentalHealthDistortionParameter, _mentalStateSeverity, mentalHealthParameterIsGlobal);
+            }
         }
 
         private void ApplyTerrorLoop(float terrorSeverity)
@@ -901,37 +1031,6 @@ namespace Managers
             }
         }
 
-        private void ApplyNightmareAmbience()
-        {
-            if (!IsNightmareWorldLocation())
-            {
-                StopAndReleaseNightmareAmbience();
-                return;
-            }
-
-            if (nightmareAmbLoopEvent.IsNull)
-            {
-                return;
-            }
-
-            if (!_nightmareAmbienceInstance.isValid())
-            {
-                _nightmareAmbienceInstance = CreateEventInstance(nightmareAmbLoopEvent);
-                _nightmareAmbienceInstance.start();
-                LogAudioState("Nightmare ambience started. Expected: continuous ambience in Nightmare.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(terrorDistortionParameter))
-            {
-                SetFmodParameter(_nightmareAmbienceInstance, terrorDistortionParameter, _terrorSeverity, terrorParameterIsGlobal);
-            }
-
-            if (!string.IsNullOrWhiteSpace(mentalHealthDistortionParameter))
-            {
-                SetFmodParameter(_nightmareAmbienceInstance, mentalHealthDistortionParameter, _mentalStateSeverity, mentalHealthParameterIsGlobal);
-            }
-        }
-
         private void ApplyHeartbeat()
         {
             if (!IsNightmareWorldLocation())
@@ -962,8 +1061,12 @@ namespace Managers
                 SetFmodParameter(_heartbeatInstance, heartbeatMentalHealthParameter, _mentalStateSeverity, heartbeatMentalHealthParameterIsGlobal);
             }
         }
+        #endregion
 
-        // FMOD helpers
+    //------------------------//
+        #region FMOD Helpers
+    //------------------------//
+
         private void SetFmodParameter(EventInstance instance, string parameterName, float value, bool isGlobal)
         {
             if (string.IsNullOrWhiteSpace(parameterName))
@@ -1097,8 +1200,13 @@ namespace Managers
             FMOD.RESULT is3DResult = description.is3D(out bool is3D);
             return is3DResult == FMOD.RESULT.OK && is3D;
         }
+        #endregion
 
-        // Cleanup and cache
+    //-------------------------------//
+        #region Cleanup and Caching
+    //-------------------------------//
+
+        #region Cleanup
         private void StopAndReleaseHeartbeat()
         {
             if (_heartbeatInstance.isValid())
@@ -1193,6 +1301,9 @@ namespace Managers
                 _uiHoverInstance = default;
             }
         }
+        #endregion
+
+        #region Global Utilities
 
         private void LogAudioState(string message)
         {
@@ -1265,6 +1376,10 @@ namespace Managers
                 _ambienceBus = RuntimeManager.GetBus(ambienceBusPath);
             }
         }
+
+        #endregion
+
+        #region Tutorial Utilities
 
         private void AutoAttachLampAudioEmittersInScene(Scene scene)
         {
@@ -1362,5 +1477,8 @@ namespace Managers
 
             return animator != null && animator.enabled && animator.runtimeAnimatorController != null;
         }
+
+        #endregion
+        #endregion
     }
 }
