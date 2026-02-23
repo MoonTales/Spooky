@@ -52,7 +52,12 @@ namespace Interaction.drawings
         [Header("Text Keys (CSV row pointers)")]
         [SerializeField] private TextKey promptCollectKey; 
         [SerializeField] private TextKey promptExamineKey;
-        public TextKey PromptKey => IsDrawingInInventory() ? promptExamineKey : promptCollectKey;
+        public TextKey PromptKey
+        {
+            get => IsDrawingInInventory() ? promptExamineKey : promptCollectKey;
+            // if we cant interact, then set it to be empty, so we dont show a prompt
+            set { }
+        }
 
         private void Start()
         {

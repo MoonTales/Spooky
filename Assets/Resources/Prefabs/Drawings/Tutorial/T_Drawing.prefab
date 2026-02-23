@@ -397,7 +397,6 @@ GameObject:
   - component: {fileID: 2222797948903455746}
   - component: {fileID: 3710224291041014866}
   - component: {fileID: 1274620852179507633}
-  - component: {fileID: 3799198326854168734}
   - component: {fileID: 6639126700754852395}
   - component: {fileID: 8556374417840989498}
   m_Layer: 15
@@ -739,34 +738,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!114 &3799198326854168734
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7022321512871056367}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64c29fbebc9588c499edf00092ce8d28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  location: 2
-  drawingID: 0
-  uniqueDrawingID: -1
-  pickupTransitionSpeed: 8
-  returnTransitionSpeed: 8
-  handOffset: {x: 0, y: 0, z: 0.3}
-  _isInCorrectPosition: 0
-  promptCollectKey:
-    place: prompt
-    id: drawing_collect
-  promptExamineKey:
-    place: 
-    id: 
-  sceneToLoad:
-    _sceneAsset: {fileID: 102900000, guid: 7dd9e49a7a94a6246adee9cb166f9b55, type: 3}
-    _sceneName: Bedroom
 --- !u!199 &6639126700754852395
 ParticleSystemRenderer:
   serializedVersion: 6
@@ -5543,6 +5514,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1459862227383078, guid: cc461484bcafc664fb68be84c1fc6860, type: 3}
       propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1459862227383078, guid: cc461484bcafc664fb68be84c1fc6860, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1817713915847664, guid: cc461484bcafc664fb68be84c1fc6860, type: 3}

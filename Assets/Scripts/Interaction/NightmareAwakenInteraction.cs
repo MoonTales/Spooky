@@ -145,6 +145,5 @@ namespace Interaction
             SceneSwapper.Instance.SwapScene(sceneName);
             GameStateManager.Instance.SetCurrentZoneId(-1);
         }
-    
     }
 }
