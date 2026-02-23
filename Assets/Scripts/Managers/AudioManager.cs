@@ -86,6 +86,9 @@ namespace Managers
         [Header("Player Audio")]
         [SerializeField] private EventReference footstepPlayer;     // Parameterized footstep event with Surface label parameter.
         [SerializeField] private string playerMovementBusPath = "bus:/SFX/Player/Movement"; // Bus containing player movement events for quick stops.
+        [SerializeField] private string landingIntensityParameter = "LandingIntensity";
+        [SerializeField] private float landingFallSpeedMax = 20f;
+        [SerializeField] private float landingAirTimeMax = 1.5f;
         #endregion
 
         #region Environment Audio
@@ -97,6 +100,14 @@ namespace Managers
         [SerializeField] private EventReference lampHumLoopEvent;
         [SerializeField] private string lampOnParameter = "LampOn";
         [SerializeField] private EventReference lampBuzzOffEvent;
+
+        [Space(10)]
+        [Header("Environment Audio (Tutorial Orbs)")]
+        [SerializeField] private bool autoAttachTutorialOrbAudioOnSceneLoad = true;
+        [SerializeField] private string tutorialOrbAudioSceneName = "Tutorial";
+        [SerializeField] private string tutorialOrbRootName = "TheBuilding";
+        [SerializeField] private string tutorialOrbNamePrefix = "Orb";
+        [SerializeField] private EventReference[] tutorialOrbEvents;
         #endregion
 
         #region Mental Audio
@@ -144,6 +155,7 @@ namespace Managers
         [Space(10)]
         [Header("Menu and Snapshot Audio")]
         [SerializeField] private EventReference mainMenuMusicEvent;
+        [SerializeField] private string mainMenuTransitionParameter = "MainMenuTransition";
         [SerializeField] private EventReference pauseSnapshotEvent;
 
         [Space(10)]
@@ -205,6 +217,12 @@ namespace Managers
         private bool _pauseSnapshotActive;
         #endregion
 
+        #region Objects w/ Audio Scripts
+        // Bedroom --> THHEDOORRR: DoorPassbyEmitter
+        // Tutorial --> TheBuilding/Orb*: TutorialOrbAudioEmitter
+        #endregion
+
+
     //---------------------------------------//
         #region Lifecycle and Subscriptions
     //---------------------------------------//
@@ -252,6 +270,7 @@ namespace Managers
             CachePlayerMovementBus();
             CacheSettingsBuses();
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
+            AutoAttachTutorialOrbAudioEmittersInScene(SceneManager.GetActiveScene());
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
         }
@@ -321,6 +340,7 @@ namespace Managers
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             AutoAttachLampAudioEmittersInScene(scene);
+            AutoAttachTutorialOrbAudioEmittersInScene(scene);
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
         }
@@ -707,6 +727,11 @@ namespace Managers
             _pauseSnapshotActive = false;
         }
 
+        public void TriggerMainMenuMusicTransition()
+        {
+            SetMainMenuMusicTransitionParameter(1f);
+        }
+
         public void PlayLampBuzzOff(Transform fromTransform = null)
         {
             if (muteSFX || lampBuzzOffEvent.IsNull)
@@ -783,6 +808,42 @@ namespace Managers
             }
 
             _uiHoverInstance.start();
+        }
+
+        public void PlayPlayerLanding(float downwardSpeed, float airborneTime, Transform fromTransform = null)
+        {
+            if (muteSFX) return;
+
+            EventReference eventReference = GetSfxEvent(SfxId.Landing);
+            if (eventReference.IsNull)
+            {
+                Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{SfxId.Landing}'.");
+                return;
+            }
+
+            float clampedDownwardSpeed = Mathf.Max(0f, downwardSpeed);
+            float clampedAirborneTime = Mathf.Max(0f, airborneTime);
+            float normalizedSpeed = landingFallSpeedMax > 0f
+                ? Mathf.Clamp01(clampedDownwardSpeed / landingFallSpeedMax)
+                : 0f;
+            float normalizedAirTime = landingAirTimeMax > 0f
+                ? Mathf.Clamp01(clampedAirborneTime / landingAirTimeMax)
+                : 0f;
+            float landingIntensity = Mathf.Clamp01(Mathf.Max(normalizedSpeed, normalizedAirTime));
+
+            if (debugAudioLogs)
+            {
+                Debug.Log($"AudioManager: LandingIntensity={landingIntensity:0.000}");
+            }
+
+            EventInstance instance = CreateEventInstance(eventReference, fromTransform);
+            if (!string.IsNullOrWhiteSpace(landingIntensityParameter))
+            {
+                instance.setParameterByName(landingIntensityParameter, landingIntensity);
+            }
+
+            instance.start();
+            instance.release();
         }
         
         public void PlayPlayerJumping(float volume = 1, float deviation = 0.2f, Transform fromTransform = null)
@@ -896,6 +957,7 @@ namespace Managers
                 if (stateResult == FMOD.RESULT.OK
                     && (playbackState == PLAYBACK_STATE.PLAYING || playbackState == PLAYBACK_STATE.STARTING))
                 {
+                    SetMainMenuMusicTransitionParameter(0f);
                     LogAudioState("Main menu music already playing.");
                     return;
                 }
@@ -904,6 +966,7 @@ namespace Managers
             }
 
             _mainMenuMusicInstance = CreateEventInstance(mainMenuMusicEvent);
+            SetMainMenuMusicTransitionParameter(0f);
             _mainMenuMusicInstance.start();
             LogAudioState("Main menu music started.");
         }
@@ -917,6 +980,14 @@ namespace Managers
 
             _mainMenuMusicInstance.stop(allowFadeout ? FMOD.Studio.STOP_MODE.ALLOWFADEOUT : FMOD.Studio.STOP_MODE.IMMEDIATE);
             _mainMenuMusicInstance.release();
+        }
+
+        private void SetMainMenuMusicTransitionParameter(float value)
+        {
+            if (_mainMenuMusicInstance.isValid() && !string.IsNullOrWhiteSpace(mainMenuTransitionParameter))
+            {
+                _mainMenuMusicInstance.setParameterByName(mainMenuTransitionParameter, value);
+            }
         }
 
         private void ApplyTutorialAmbience()
@@ -1429,6 +1500,178 @@ namespace Managers
             }
 
             LogAudioState($"Lamp audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
+        }
+
+        private void AutoAttachTutorialOrbAudioEmittersInScene(Scene scene)
+        {
+            if (!autoAttachTutorialOrbAudioOnSceneLoad || !scene.IsValid() || !scene.isLoaded)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(tutorialOrbAudioSceneName)
+                && !string.Equals(scene.name, tutorialOrbAudioSceneName, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            List<Transform> orbTargets = new List<Transform>();
+            GameObject[] roots = scene.GetRootGameObjects();
+            HashSet<Transform> uniqueOrbTargets = new HashSet<Transform>();
+            bool hasRootFilter = !string.IsNullOrWhiteSpace(tutorialOrbRootName);
+
+            if (hasRootFilter)
+            {
+                for (int i = 0; i < roots.Length; i++)
+                {
+                    Transform[] transforms = roots[i].GetComponentsInChildren<Transform>(true);
+                    for (int j = 0; j < transforms.Length; j++)
+                    {
+                        Transform candidateRoot = transforms[j];
+                        if (!string.Equals(candidateRoot.name, tutorialOrbRootName, StringComparison.Ordinal))
+                        {
+                            continue;
+                        }
+
+                        CollectTutorialOrbCandidatesInHierarchy(candidateRoot, uniqueOrbTargets, orbTargets);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < roots.Length; i++)
+                {
+                    CollectTutorialOrbCandidatesInHierarchy(roots[i].transform, uniqueOrbTargets, orbTargets);
+                }
+            }
+
+            // Fallback: if the configured root name was not found, scan the whole scene for Orb* objects.
+            if (orbTargets.Count == 0 && hasRootFilter)
+            {
+                for (int i = 0; i < roots.Length; i++)
+                {
+                    CollectTutorialOrbCandidatesInHierarchy(roots[i].transform, uniqueOrbTargets, orbTargets);
+                }
+            }
+
+            List<EventReference> assignments = BuildTutorialOrbEventAssignments(orbTargets.Count);
+            if (orbTargets.Count == 0 || assignments.Count == 0)
+            {
+                if (orbTargets.Count > 0)
+                {
+                    LogAudioState("Tutorial orb audio auto-attach skipped: no valid tutorialOrbEvents configured.");
+                }
+                return;
+            }
+
+            int attachedCount = 0;
+            int configuredCount = 0;
+            for (int i = 0; i < orbTargets.Count; i++)
+            {
+                Transform orbTransform = orbTargets[i];
+                TutorialOrbAudioEmitter emitter = orbTransform.GetComponent<TutorialOrbAudioEmitter>();
+                if (emitter == null)
+                {
+                    emitter = orbTransform.gameObject.AddComponent<TutorialOrbAudioEmitter>();
+                    attachedCount++;
+                }
+
+                emitter.Configure(assignments[i]);
+                configuredCount++;
+            }
+
+            LogAudioState($"Tutorial orb audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}, events={assignments.Count}.");
+        }
+
+        private void CollectTutorialOrbCandidatesInHierarchy(
+            Transform searchRoot,
+            HashSet<Transform> uniqueOrbTargets,
+            List<Transform> orbTargets)
+        {
+            if (searchRoot == null)
+            {
+                return;
+            }
+
+            Transform[] transforms = searchRoot.GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                Transform candidate = transforms[i];
+                if (!IsTutorialOrbCandidate(candidate) || !uniqueOrbTargets.Add(candidate))
+                {
+                    continue;
+                }
+
+                orbTargets.Add(candidate);
+            }
+        }
+
+        private bool IsTutorialOrbCandidate(Transform candidate)
+        {
+            if (candidate == null || string.IsNullOrWhiteSpace(tutorialOrbNamePrefix))
+            {
+                return false;
+            }
+
+            return candidate.name.StartsWith(tutorialOrbNamePrefix, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private List<EventReference> BuildTutorialOrbEventAssignments(int targetCount)
+        {
+            List<EventReference> assignments = new List<EventReference>(Mathf.Max(0, targetCount));
+            if (targetCount <= 0)
+            {
+                return assignments;
+            }
+
+            List<EventReference> validEvents = GetValidTutorialOrbEvents();
+            if (validEvents.Count == 0)
+            {
+                return assignments;
+            }
+
+            while (assignments.Count < targetCount)
+            {
+                ShuffleEventReferences(validEvents);
+                int remaining = targetCount - assignments.Count;
+                int takeCount = Mathf.Min(remaining, validEvents.Count);
+                for (int i = 0; i < takeCount; i++)
+                {
+                    assignments.Add(validEvents[i]);
+                }
+            }
+
+            return assignments;
+        }
+
+        private List<EventReference> GetValidTutorialOrbEvents()
+        {
+            List<EventReference> validEvents = new List<EventReference>();
+            if (tutorialOrbEvents == null)
+            {
+                return validEvents;
+            }
+
+            for (int i = 0; i < tutorialOrbEvents.Length; i++)
+            {
+                if (!tutorialOrbEvents[i].IsNull)
+                {
+                    validEvents.Add(tutorialOrbEvents[i]);
+                }
+            }
+
+            return validEvents;
+        }
+
+        private static void ShuffleEventReferences(List<EventReference> events)
+        {
+            for (int i = events.Count - 1; i > 0; i--)
+            {
+                int swapIndex = UnityEngine.Random.Range(0, i + 1);
+                EventReference temp = events[i];
+                events[i] = events[swapIndex];
+                events[swapIndex] = temp;
+            }
         }
 
         private static bool IsLampCandidate(Light light)

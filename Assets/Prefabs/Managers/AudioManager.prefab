@@ -110,6 +110,9 @@ MonoBehaviour:
       Data4: 369320740
     Path: event:/sfx/player/movement/footstep
   playerMovementBusPath: bus:/SFX/StopOnPause/Player/Movement
+  landingIntensityParameter: LandingIntensity
+  landingFallSpeedMax: 20
+  landingAirTimeMax: 1.5
   autoAttachLampAudioOnSceneLoad: 1
   lampAudioAutoAttachSceneName: Tutorial
   lampHumLoopEvent:
@@ -118,7 +121,7 @@ MonoBehaviour:
       Data2: 1098275312
       Data3: 469348779
       Data4: 700184121
-    Path: event:/amb/environment/tutorial/lights/lights-flourescent
+    Path: event:/amb/env/tutorial/lights/lights-flourescent
   lampOnParameter: LampOn
   lampBuzzOffEvent:
     Guid:
@@ -126,7 +129,60 @@ MonoBehaviour:
       Data2: 1129197044
       Data3: 1126607750
       Data4: 752480140
-    Path: event:/amb/environment/tutorial/lights/lights-flourescent-buzz-off
+    Path: event:/amb/env/tutorial/lights/lights-flourescent-buzz-off
+  autoAttachTutorialOrbAudioOnSceneLoad: 1
+  tutorialOrbAudioSceneName: Tutorial
+  tutorialOrbRootName: TheBuilding
+  tutorialOrbNamePrefix: Orb
+  tutorialOrbEvents:
+  - Guid:
+      Data1: 879235584
+      Data2: 1145066423
+      Data3: -1839081051
+      Data4: 1070661361
+    Path: event:/amb/env/tutorial/ORB/orb-anger
+  - Guid:
+      Data1: -1338490465
+      Data2: 1081053581
+      Data3: -917097855
+      Data4: 182638579
+    Path: event:/amb/env/tutorial/ORB/orb-crazed
+  - Guid:
+      Data1: 1715033810
+      Data2: 1308946698
+      Data3: 1271221175
+      Data4: -435165108
+    Path: event:/amb/env/tutorial/ORB/orb-dying
+  - Guid:
+      Data1: -917307707
+      Data2: 1178093716
+      Data3: -20936550
+      Data4: -105748757
+    Path: event:/amb/env/tutorial/ORB/orb-happiness
+  - Guid:
+      Data1: -1255891454
+      Data2: 1291388525
+      Data3: 1685537206
+      Data4: -1668986247
+    Path: event:/amb/env/tutorial/ORB/orb-paranoia
+  - Guid:
+      Data1: 1000347313
+      Data2: 1147355416
+      Data3: -864280385
+      Data4: -1311312873
+    Path: event:/amb/env/tutorial/ORB/orb-peace
+  - Guid:
+      Data1: -428040326
+      Data2: 1185893364
+      Data3: 1976008833
+      Data4: 1043633036
+    Path: event:/amb/env/tutorial/ORB/orb-praise
+  - Guid:
+      Data1: 573289971
+      Data2: 1290545386
+      Data3: -1418913891
+      Data4: 1908068273
+    Path: event:/amb/env/tutorial/ORB/orb-sadness
   terrorDistortionParameter: Terror
   mentalHealthDistortionParameter: MentalHealth
   terrorParameterIsGlobal: 1
@@ -192,10 +248,7 @@ MonoBehaviour:
       Data3: 134868098
       Data4: 563664113
     Path: event:/music/main-menu
-  masterBusPath: bus:/
-  sfxBusPath: bus:/SFX
-  musicBusPath: bus:/Music
-  ambienceBusPath: bus:/Ambience
+  mainMenuTransitionParameter: MainMenuTransition
   pauseSnapshotEvent:
     Guid:
       Data1: 465369116
@@ -203,5 +256,9 @@ MonoBehaviour:
       Data3: -944230996
       Data4: 1475689940
     Path: snapshot:/snap_pause
+  masterBusPath: bus:/
+  sfxBusPath: bus:/SFX
+  musicBusPath: bus:/Music
+  ambienceBusPath: bus:/Ambience
   muteSFX: 0
   muteMusic: 0
