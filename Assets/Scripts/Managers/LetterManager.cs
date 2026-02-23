@@ -166,7 +166,7 @@ namespace Managers
         private IEnumerator SlideNote(GameObject note)
         {
             if (note == null){ yield break;}
-            AudioManager.Instance?.PlaySfx(AudioManager.SfxId.LetterSlide, note.transform);
+            EventBroadcaster.Broadcast_OnLetterSlide(note.transform);
             
             // Start at the spawn location (center of door)
             Vector3 startPosition = note.transform.position;
@@ -199,16 +199,13 @@ namespace Managers
                 
                 yield return null;
             }
-            
-            // Ensure we end at exactly the target position and rotation
-            note.transform.position = endPosition;
-            note.transform.rotation = targetRotation;
         }
 
         public IEnumerator ReverseSlideNote(GameObject note)
         {
             // this will work identically to the slide note, but it will just reverse the start and end positions and rotations, so it will slide back to the center and unrotate itself
                 if (note == null){ yield break;}
+                EventBroadcaster.Broadcast_OnLetterSlide(note.transform);
                 Vector3 startPosition = note.transform.position;
                 GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
                 // spawn the note prefab at the location of the "NoteSpawnLocation" object
