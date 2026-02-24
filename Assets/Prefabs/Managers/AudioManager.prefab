@@ -101,6 +101,22 @@ MonoBehaviour:
         Data3: 511347899
         Data4: 2074030138
       Path: event:/sfx/UI/button-on-hover
+  - id: 9
+    eventRef:
+      Guid:
+        Data1: -1018198644
+        Data2: 1316893993
+        Data3: 189787555
+        Data4: 612001018
+      Path: event:/sfx/interactable/tutorial/door-button
+  - id: 10
+    eventRef:
+      Guid:
+        Data1: -1193933622
+        Data2: 1323197806
+        Data3: 662171791
+        Data4: -1114051719
+      Path: event:/sfx/interactable/tutorial/door-slide
   debugAudioLogs: 0
   footstepPlayer:
     Guid:
@@ -134,6 +150,8 @@ MonoBehaviour:
   tutorialOrbAudioSceneName: Tutorial
   tutorialOrbRootName: TheBuilding
   tutorialOrbNamePrefix: Orb
+  tutorialOrbPinnedName: 
+  tutorialOrbPinnedEventPathToken: orb-peace
   tutorialOrbEvents:
   - Guid:
       Data1: 879235584
@@ -183,6 +201,28 @@ MonoBehaviour:
       Data3: -1418913891
       Data4: 1908068273
     Path: event:/amb/env/tutorial/ORB/orb-sadness
+  tutorialHallwayStretchEvent:
+    Guid:
+      Data1: 351463793
+      Data2: 1250743252
+      Data3: 1475581866
+      Data4: 373874254
+    Path: event:/amb/env/tutorial/hallway-stretch
+  tutorialHallwayStretchStateParameter: StretchState
+  tutorialHallwayStretchProgressParameter: StretchProgress
+  tutorialHallwayRunPressureParameter: RunPressure
+  tutorialHallwaySweepDurationSeconds: 12
+  debugTutorialHallwayParameters: 1
+  tutorialHallwayStateStretchingLabel: Stretching
+  tutorialHallwayStateContractedLabel: Contracted
+  tutorialDrawingAudioSceneName: Tutorial
+  tutorialDrawingStaticLoopEvent:
+    Guid:
+      Data1: -1869865739
+      Data2: 1223687623
+      Data3: 1456920727
+      Data4: 2144522301
+    Path: event:/amb/env/tutorial/general/drawing-end
   terrorDistortionParameter: Terror
   mentalHealthDistortionParameter: MentalHealth
   terrorParameterIsGlobal: 1
@@ -231,7 +271,7 @@ MonoBehaviour:
       Data2: 1147047463
       Data3: 1465847740
       Data4: 1382995033
-    Path: event:/amb/environment/bedroom/bed-bg
+    Path: event:/amb/env/bedroom/bed-bg
   bedroomAmbienceRequiresGameplay: 1
   tutorialAmbLoopEvent:
     Guid:

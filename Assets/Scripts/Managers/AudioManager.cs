@@ -26,6 +26,9 @@ namespace Managers
             DoorLocked,
             // UI
             UIHover,
+            // Tutorial Interactions
+            TutorialButtonClick,
+            TutorialDoorSlide,
         }
 
         // Inspector entry mapping SfxId -> FMOD event.
@@ -107,7 +110,22 @@ namespace Managers
         [SerializeField] private string tutorialOrbAudioSceneName = "Tutorial";
         [SerializeField] private string tutorialOrbRootName = "TheBuilding";
         [SerializeField] private string tutorialOrbNamePrefix = "Orb";
+        [SerializeField] private string tutorialOrbPinnedName = "Orb5 (2)";
+        [SerializeField] private string tutorialOrbPinnedEventPathToken = "orb-peace";
         [SerializeField] private EventReference[] tutorialOrbEvents;
+
+        [Space(10)]
+        [Header("Environment Audio (Tutorial Hallway Stretch)")]
+        [SerializeField] private EventReference tutorialHallwayStretchEvent;
+        [SerializeField] private string tutorialHallwayStretchStateParameter = "StretchState";
+        [SerializeField] private string tutorialHallwayStretchProgressParameter = "StretchProgress";
+        [SerializeField] private string tutorialHallwayRunPressureParameter = "RunPressure";
+        [SerializeField] private float tutorialHallwaySweepDurationSeconds = 8f;
+        [SerializeField] private bool debugTutorialHallwayParameters = false;
+        [SerializeField] private string tutorialHallwayStateStretchingLabel = "Stretching";
+        [SerializeField] private string tutorialHallwayStateContractedLabel = "Contracted";
+        [SerializeField] private string tutorialDrawingAudioSceneName = "Tutorial";
+        [SerializeField] private EventReference tutorialDrawingStaticLoopEvent;
         #endregion
 
         #region Mental Audio
@@ -192,6 +210,7 @@ namespace Managers
         // Persistent FMOD instances - world ambience and mental stack.
         private EventInstance _bedroomAmbienceInstance;
         private EventInstance _tutorialAmbienceInstance;
+        private EventInstance _tutorialHallwayStretchInstance;
         private EventInstance _nightmareAmbienceInstance;
         private EventInstance _terrorLoopInstance;
         private EventInstance _heartbeatInstance;
@@ -212,6 +231,8 @@ namespace Managers
         private bool _hasSleepTrackerAlarmVariant;
         private bool _goodWakeupTransitionRequested;
         private bool _goodWakeupHasBedroomSourceTransform;
+        private Coroutine _tutorialHallwaySweepCoroutine;
+        private Transform _tutorialHallwaySweepSourceTransform;
 
         // Runtime audio state - snapshot control.
         private bool _pauseSnapshotActive;
@@ -252,6 +273,12 @@ namespace Managers
             TrackSubscription(
                 () => EventBroadcaster.OnRequestScreenFade += OnRequestScreenFade,
                 () => EventBroadcaster.OnRequestScreenFade -= OnRequestScreenFade);
+            TrackSubscription(
+                () => EventBroadcaster.OnTutorialHallwayStretchStart += OnTutorialHallwayStretchStart,
+                () => EventBroadcaster.OnTutorialHallwayStretchStart -= OnTutorialHallwayStretchStart);
+            TrackSubscription(
+                () => EventBroadcaster.OnTutorialHallwayStretchContracted += OnTutorialHallwayStretchContracted,
+                () => EventBroadcaster.OnTutorialHallwayStretchContracted -= OnTutorialHallwayStretchContracted);
 
             // Scene/world transitions that affect persistent loops.
             TrackSubscription(
@@ -285,6 +312,7 @@ namespace Managers
             StopAndReleaseGoodWakeupTransition(true);
             StopAndReleaseBedroomAmbience();
             StopAndReleaseTutorialAmbience();
+            StopAndReleaseTutorialHallwayStretch(true);
             StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
@@ -332,6 +360,10 @@ namespace Managers
                 StopAndReleaseSleepTrackerAlarm(true);
                 StopAndReleaseGoodWakeupTransition(true);
             }
+            if (newLocation != Types.WorldLocation.Tutorial)
+            {
+                StopAndReleaseTutorialHallwayStretch(true);
+            }
             RefreshMentalAudio();
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
@@ -361,6 +393,7 @@ namespace Managers
                 PlayMainMenuMusicIfNeeded();
                 StopAndReleaseSleepTrackerAlarm(true);
                 StopAndReleaseGoodWakeupTransition(true);
+                StopAndReleaseTutorialHallwayStretch(true);
             }
             else
             {
@@ -369,6 +402,19 @@ namespace Managers
 
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+        }
+
+          //---------------//
+         //    Tutorial   //
+        //---------------//
+        private void OnTutorialHallwayStretchStart(Transform sourceTransform)
+        {
+            StartTutorialHallwayStretch(sourceTransform);
+        }
+
+        private void OnTutorialHallwayStretchContracted(Transform sourceTransform)
+        {
+            SetTutorialHallwayStretchContracted(sourceTransform);
         }
 
           //---------------//
@@ -545,6 +591,56 @@ namespace Managers
             instance.start();
             instance.release();
         }
+
+        public void StartTutorialHallwayStretch(Transform fromTransform = null)
+        {
+            if (muteSFX || tutorialHallwayStretchEvent.IsNull || !IsTutorialWorldLocation())
+            {
+                return;
+            }
+
+            if (!_tutorialHallwayStretchInstance.isValid())
+            {
+                _tutorialHallwayStretchInstance = CreateEventInstance(tutorialHallwayStretchEvent, fromTransform);
+                _tutorialHallwayStretchInstance.start();
+            }
+            else if (fromTransform != null)
+            {
+                UpdateEventInstanceTransform(_tutorialHallwayStretchInstance, fromTransform);
+            }
+
+            _tutorialHallwaySweepSourceTransform = fromTransform;
+            SetTutorialHallwayStretchStateLabel(tutorialHallwayStateStretchingLabel);
+            SetTutorialHallwayRunPressure(0f);
+            SetTutorialHallwayStretchProgress(0f, fromTransform);
+            RestartTutorialHallwaySweep();
+        }
+
+        public void SetTutorialHallwayStretchContracted(Transform fromTransform = null)
+        {
+            if (!_tutorialHallwayStretchInstance.isValid())
+            {
+                return;
+            }
+
+            if (fromTransform != null)
+            {
+                _tutorialHallwaySweepSourceTransform = fromTransform;
+            }
+
+            if (fromTransform != null)
+            {
+                UpdateEventInstanceTransform(_tutorialHallwayStretchInstance, fromTransform);
+            }
+
+            SetTutorialHallwayStretchStateLabel(tutorialHallwayStateContractedLabel);
+            SetTutorialHallwayRunPressure(1f);
+        }
+
+        public void StopTutorialHallwayStretch(bool immediate = false)
+        {
+            StopAndReleaseTutorialHallwayStretch(immediate);
+        }
         #endregion
 
         #region External Event Instances
@@ -623,6 +719,52 @@ namespace Managers
             }
 
             instance.setParameterByName(lampOnParameter, isOn ? 1f : 0f);
+        }
+
+        public bool TryStartTutorialDrawingStaticLoop(Transform fromTransform, out EventInstance instance)
+        {
+            instance = default;
+
+            if (muteSFX || tutorialDrawingStaticLoopEvent.IsNull)
+            {
+                return false;
+            }
+
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (!string.IsNullOrWhiteSpace(tutorialDrawingAudioSceneName)
+                && (!activeScene.IsValid() || !string.Equals(activeScene.name, tutorialDrawingAudioSceneName, StringComparison.Ordinal)))
+            {
+                return false;
+            }
+
+            instance = CreateEventInstance(tutorialDrawingStaticLoopEvent, fromTransform);
+            instance.start();
+            return true;
+        }
+
+        public void StopTutorialDrawingStaticLoopsImmediate()
+        {
+            if (tutorialDrawingStaticLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            EventDescription description = RuntimeManager.GetEventDescription(tutorialDrawingStaticLoopEvent);
+            if (!description.isValid() || description.getInstanceList(out EventInstance[] instances) != FMOD.RESULT.OK)
+            {
+                return;
+            }
+
+            for (int i = 0; i < instances.Length; i++)
+            {
+                if (!instances[i].isValid())
+                {
+                    continue;
+                }
+
+                instances[i].stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                instances[i].release();
+            }
         }
         #endregion
 
@@ -1187,6 +1329,12 @@ namespace Managers
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare;
         }
 
+        private static bool IsTutorialWorldLocation()
+        {
+            return GameStateManager.Instance != null
+                && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial;
+        }
+
         private bool ShouldPlayBedroomAmbience()
         {
             if (GameStateManager.Instance == null)
@@ -1225,6 +1373,112 @@ namespace Managers
             }
 
             return GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
+        }
+
+        private void SetTutorialHallwayStretchStateLabel(string stateLabel)
+        {
+            if (!_tutorialHallwayStretchInstance.isValid()
+                || string.IsNullOrWhiteSpace(tutorialHallwayStretchStateParameter)
+                || string.IsNullOrWhiteSpace(stateLabel))
+            {
+                return;
+            }
+
+            _tutorialHallwayStretchInstance.setParameterByNameWithLabel(tutorialHallwayStretchStateParameter, stateLabel);
+        }
+
+        private void RestartTutorialHallwaySweep()
+        {
+            StopTutorialHallwaySweep();
+            if (!_tutorialHallwayStretchInstance.isValid())
+            {
+                return;
+            }
+
+            _tutorialHallwaySweepCoroutine = StartCoroutine(RunTutorialHallwaySweep());
+        }
+
+        private void StopTutorialHallwaySweep()
+        {
+            if (_tutorialHallwaySweepCoroutine == null)
+            {
+                return;
+            }
+
+            StopCoroutine(_tutorialHallwaySweepCoroutine);
+            _tutorialHallwaySweepCoroutine = null;
+        }
+
+        private IEnumerator RunTutorialHallwaySweep()
+        {
+            float duration = Mathf.Max(0.01f, tutorialHallwaySweepDurationSeconds);
+            float elapsed = 0f;
+            SetTutorialHallwayStretchProgress(0f, _tutorialHallwaySweepSourceTransform);
+
+            while (_tutorialHallwayStretchInstance.isValid() && elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float stretchProgress01 = Mathf.Clamp01(elapsed / duration);
+                SetTutorialHallwayStretchProgress(stretchProgress01, _tutorialHallwaySweepSourceTransform);
+                yield return null;
+            }
+
+            if (_tutorialHallwayStretchInstance.isValid())
+            {
+                _tutorialHallwayStretchInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _tutorialHallwayStretchInstance.release();
+                _tutorialHallwayStretchInstance = default;
+                _tutorialHallwaySweepSourceTransform = null;
+                LogAudioState("Tutorial hallway stretch stopped (sweep duration complete).");
+            }
+
+            _tutorialHallwaySweepCoroutine = null;
+        }
+
+        private void SetTutorialHallwayStretchProgress(float stretchProgress01, Transform fromTransform = null)
+        {
+            if (!_tutorialHallwayStretchInstance.isValid())
+            {
+                return;
+            }
+
+            if (fromTransform != null)
+            {
+                _tutorialHallwaySweepSourceTransform = fromTransform;
+                UpdateEventInstanceTransform(_tutorialHallwayStretchInstance, fromTransform);
+            }
+
+            if (string.IsNullOrWhiteSpace(tutorialHallwayStretchProgressParameter))
+            {
+                return;
+            }
+
+            _tutorialHallwayStretchInstance.setParameterByName(
+                tutorialHallwayStretchProgressParameter,
+                Mathf.Clamp01(stretchProgress01));
+
+            if (debugTutorialHallwayParameters)
+            {
+                Debug.Log($"AudioManager[Hallway]: {tutorialHallwayStretchProgressParameter}={Mathf.Clamp01(stretchProgress01):0.000}");
+            }
+        }
+
+        private void SetTutorialHallwayRunPressure(float runPressure01)
+        {
+            if (!_tutorialHallwayStretchInstance.isValid()
+                || string.IsNullOrWhiteSpace(tutorialHallwayRunPressureParameter))
+            {
+                return;
+            }
+
+            _tutorialHallwayStretchInstance.setParameterByName(
+                tutorialHallwayRunPressureParameter,
+                Mathf.Clamp01(runPressure01));
+
+            if (debugTutorialHallwayParameters)
+            {
+                Debug.Log($"AudioManager[Hallway]: {tutorialHallwayRunPressureParameter}={Mathf.Clamp01(runPressure01):0.000}");
+            }
         }
 
         private void PlayEvent(EventReference eventReference, Transform fromTransform)
@@ -1360,6 +1614,20 @@ namespace Managers
                 _tutorialAmbienceInstance.release();
                 _tutorialAmbienceInstance = default;
                 LogAudioState("Tutorial ambience stopped.");
+            }
+        }
+
+        private void StopAndReleaseTutorialHallwayStretch(bool immediate)
+        {
+            StopTutorialHallwaySweep();
+            _tutorialHallwaySweepSourceTransform = null;
+
+            if (_tutorialHallwayStretchInstance.isValid())
+            {
+                _tutorialHallwayStretchInstance.stop(immediate ? FMOD.Studio.STOP_MODE.IMMEDIATE : FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _tutorialHallwayStretchInstance.release();
+                _tutorialHallwayStretchInstance = default;
+                LogAudioState("Tutorial hallway stretch stopped.");
             }
         }
 
@@ -1554,7 +1822,7 @@ namespace Managers
                 }
             }
 
-            List<EventReference> assignments = BuildTutorialOrbEventAssignments(orbTargets.Count);
+            List<EventReference> assignments = BuildTutorialOrbEventAssignments(orbTargets);
             if (orbTargets.Count == 0 || assignments.Count == 0)
             {
                 if (orbTargets.Count > 0)
@@ -1616,8 +1884,9 @@ namespace Managers
             return candidate.name.StartsWith(tutorialOrbNamePrefix, StringComparison.OrdinalIgnoreCase);
         }
 
-        private List<EventReference> BuildTutorialOrbEventAssignments(int targetCount)
+        private List<EventReference> BuildTutorialOrbEventAssignments(List<Transform> orbTargets)
         {
+            int targetCount = orbTargets != null ? orbTargets.Count : 0;
             List<EventReference> assignments = new List<EventReference>(Mathf.Max(0, targetCount));
             if (targetCount <= 0)
             {
@@ -1641,7 +1910,92 @@ namespace Managers
                 }
             }
 
+            ApplyPinnedTutorialOrbAssignment(orbTargets, assignments, validEvents);
             return assignments;
+        }
+
+        private void ApplyPinnedTutorialOrbAssignment(
+            List<Transform> orbTargets,
+            List<EventReference> assignments,
+            List<EventReference> validEvents)
+        {
+            if (orbTargets == null
+                || assignments == null
+                || validEvents == null
+                || orbTargets.Count == 0
+                || assignments.Count != orbTargets.Count
+                || string.IsNullOrWhiteSpace(tutorialOrbPinnedName)
+                || string.IsNullOrWhiteSpace(tutorialOrbPinnedEventPathToken))
+            {
+                return;
+            }
+
+            int pinnedOrbIndex = -1;
+            for (int i = 0; i < orbTargets.Count; i++)
+            {
+                Transform orb = orbTargets[i];
+                if (orb == null)
+                {
+                    continue;
+                }
+
+                if (string.Equals(orb.name, tutorialOrbPinnedName, StringComparison.OrdinalIgnoreCase))
+                {
+                    pinnedOrbIndex = i;
+                    break;
+                }
+            }
+
+            if (pinnedOrbIndex < 0)
+            {
+                return;
+            }
+
+            EventReference pinnedEvent = default;
+            bool foundPinnedEvent = false;
+            for (int i = 0; i < validEvents.Count; i++)
+            {
+                EventReference candidate = validEvents[i];
+                if (string.IsNullOrWhiteSpace(candidate.Path))
+                {
+                    continue;
+                }
+
+                if (candidate.Path.IndexOf(tutorialOrbPinnedEventPathToken, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    pinnedEvent = candidate;
+                    foundPinnedEvent = true;
+                    break;
+                }
+            }
+
+            if (!foundPinnedEvent)
+            {
+                LogAudioState(
+                    $"Tutorial orb pin skipped: no event path containing '{tutorialOrbPinnedEventPathToken}' found for '{tutorialOrbPinnedName}'.");
+                return;
+            }
+
+            int existingPinnedEventIndex = -1;
+            for (int i = 0; i < assignments.Count; i++)
+            {
+                if (AreSameEventReference(assignments[i], pinnedEvent))
+                {
+                    existingPinnedEventIndex = i;
+                    break;
+                }
+            }
+
+            if (existingPinnedEventIndex >= 0 && existingPinnedEventIndex != pinnedOrbIndex)
+            {
+                EventReference displacedEvent = assignments[pinnedOrbIndex];
+                assignments[pinnedOrbIndex] = pinnedEvent;
+                assignments[existingPinnedEventIndex] = displacedEvent;
+            }
+            else
+            {
+                assignments[pinnedOrbIndex] = pinnedEvent;
+            }
         }
 
         private List<EventReference> GetValidTutorialOrbEvents()
@@ -1672,6 +2026,21 @@ namespace Managers
                 events[i] = events[swapIndex];
                 events[swapIndex] = temp;
             }
+        }
+
+        private static bool AreSameEventReference(EventReference a, EventReference b)
+        {
+            if (!a.Guid.IsNull && !b.Guid.IsNull)
+            {
+                return a.Guid == b.Guid;
+            }
+
+            if (!string.IsNullOrWhiteSpace(a.Path) && !string.IsNullOrWhiteSpace(b.Path))
+            {
+                return string.Equals(a.Path, b.Path, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
         }
 
         private static bool IsLampCandidate(Light light)
