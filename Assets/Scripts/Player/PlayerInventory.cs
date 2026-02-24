@@ -16,7 +16,7 @@ namespace Player
         
         
         // Store only the IDs of collected drawings
-        private readonly HashSet<int> _collectedDrawingIDs = new HashSet<int>(); public HashSet<int> GetCollectedDrawingIDs() { return new HashSet<int>(_collectedDrawingIDs); } // return a copy to prevent external modification
+        private readonly HashSet<int> _collectedDrawingIDs = new HashSet<int>(); public HashSet<int> GetCollectedDrawingIDs() { return new HashSet<int>(_collectedDrawingIDs); } public List<int> GetAllCollectDrawingIds() { return new List<int>(_collectedDrawingIDs); } // Return a copy to prevent external modification
         // we will also need to store "dropped" drawings
         private readonly HashSet<int> _droppedDrawingIDs = new HashSet<int>();  public HashSet<int> GetDroppedDrawingIDs() { return new HashSet<int>(_droppedDrawingIDs); } // return a copy to prevent external modification
     
