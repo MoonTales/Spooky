@@ -28,7 +28,6 @@ namespace UI
         private TMP_Text _hudItemDescriptionText;
 
         // notificationText is handled via the NotificationController
-        private TMP_Text _hudNotificationText; public TMP_Text GetNotificationText() { return _hudNotificationText; }
 
         private IInteractable _hoveredInteractable;
         private bool _isInspecting;
@@ -58,9 +57,7 @@ namespace UI
             _hudItemDescriptionScrollRect = itemDescRoot.GetComponent<ScrollRect>();
             // TMP text lives under Content basically
              _hudItemDescriptionText = itemDescRoot.Find("Viewport/Content/ItemDescription").GetComponent<TMP_Text>();
-
-            _hudNotificationText = transform.Find("NotificationText").GetComponent<TMP_Text>();
-            _hudNotificationText.gameObject.SetActive(false);
+             
             SetPrompt("");
             SetInspectionText("", "");
             SetInspectionTextVisible(false);

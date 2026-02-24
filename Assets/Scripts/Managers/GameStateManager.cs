@@ -81,28 +81,49 @@ namespace Managers
                 Types.PlayerMentalCoreState coreState = PlayerStats.Instance.GetPlayerStats().GetPlayerMentalCoreState();
                 if (coreState == Types.PlayerMentalCoreState.Anxious)
                 {
-                    // this means the player was anxious death (they were in the nightmare, and need to reset to bedroom)
-
-                    SleepTrackerManager.Instance.SetIsGoodWakeup(false);
-                    SceneSwapper.Instance.SwapScene("Bedroom");
-                    // swap the core state to sleep deprived
-                    PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
-                    EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+                    HandleBadWakeup();
                 }
                 else if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
                 {
-                    // this means the player fell asleep while in the bedroom, and should be sent to the nightmare
 
-                    SceneSwapper.Instance.SwapScene("Nightmare1");
-                    // swap the core state to anxious
-                    PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
-                    EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
-
+                    HandleBadSleep();
                 }
-                
-                
             }
+        }
+
+        private void HandleBadSleep()
+        {
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1f, 1f, fadeOutDuration:0.25f, null, HandleBadSleepPostFadeOut);
+            fadeData.Send();
+        }
+
+        private void HandleBadSleepPostFadeOut()
+        {
+            // this means the player fell asleep while in the bedroom, and should be sent to the nightmare
+
+            SceneSwapper.Instance.SwapScene("Nightmare1");
+            // swap the core state to anxious
+            PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+            EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+
+        }
+
+        private void HandleBadWakeup()
+        {
+            // this means the player was anxious death (they were in the nightmare, and need to reset to bedroom)
             
+            // we are gonna wanna play a character forced cutscene here, but for now we will just do a VERY fast fade out.
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1.5f, 1f, fadeOutDuration:0.25f, null, HandleBadWakeupPostFadeOut);
+            fadeData.Send();
+        }
+
+        private void HandleBadWakeupPostFadeOut()
+        {
+            SleepTrackerManager.Instance.SetIsGoodWakeup(false);
+            SceneSwapper.Instance.SwapScene("Bedroom");
+            // swap the core state to sleep deprived
+            PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+            EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
         }
 
         protected override void OnGameRestarted()

@@ -30,12 +30,13 @@ namespace System
         public void SwapScene(SceneField newScene, string InSpawnAnchorID = "")
         {
             _spawnAnchorID = InSpawnAnchorID;
-            SceneManager.LoadScene(newScene.SceneName, LoadSceneMode.Single);
+            StartCoroutine(LoadSceneAsync(newScene.SceneName));
         }
+
         public void SwapScene(string sceneName, string InSpawnAnchorID = "")
         {
             _spawnAnchorID = InSpawnAnchorID;
-            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+            StartCoroutine(LoadSceneAsync(sceneName));
         }
         
 
@@ -64,6 +65,27 @@ namespace System
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
             }
+        }
+        
+        // Async for a smoother scene transition
+        private IEnumerator LoadSceneAsync(string sceneName)
+        {
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+
+            // Prevent the scene from activating the moment it finishes loading
+            asyncLoad.allowSceneActivation = false;
+
+            // Wait until the scene is fully loaded (progress reaches 0.9 — Unity's threshold before activation)
+            while (asyncLoad.progress < 0.9f)
+            {
+                yield return null;
+            }
+
+            // Scene is ready — activate it now for a clean, snap-free transition
+            asyncLoad.allowSceneActivation = true;
+
+            // Wait one frame for OnSceneLoaded to fire before continuing
+            yield return null;
         }
     }
 }
