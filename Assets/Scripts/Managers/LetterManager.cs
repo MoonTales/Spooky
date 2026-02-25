@@ -144,14 +144,14 @@ namespace Managers
         private void SpawnFriendLetter(GameObject spawnLocation)
         {
             // now we will also send a friend letter, but we will delay it by a few seconds and have it slide in after the researcher letter
-            _currentNoteFriend = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
+            _currentNoteFriend = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.Euler(-90f, 0f, -90f));
             _currentNoteFriend.GetComponent<Letter>().SetLetterType(Types.LetterType.Friend);
             StartCoroutine(DelayedSlideNote(_currentNoteFriend, 2f)); // Delay of 2 second before sliding in the friend note
         }
 
         private void SpawnResearcherLetter(GameObject spawnLocation)
         {
-            _currentNoteResearcher = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.identity);
+            _currentNoteResearcher = Instantiate(_notePrefab, spawnLocation.transform.position, Quaternion.Euler(-90f, 0f, -90f));
             // cast to a Letter and set the letter type to researcher
             _currentNoteResearcher.GetComponent<Letter>().SetLetterType(Types.LetterType.Researcher);
             // Start the sliding coroutine
@@ -177,11 +177,11 @@ namespace Managers
             Vector3 endPosition = startPosition + new Vector3(randomXOffset, 0, randomDistance);
             
             // Start with no rotation
-            Quaternion startRotation = Quaternion.identity;
+            Quaternion startRotation = Quaternion.Euler(-90f, 0f, -90f);
             
             // Random target rotation angle (left or right) - rotates around Y-axis
             float randomYRotation = UnityEngine.Random.Range(-maxRotationAngle, maxRotationAngle);
-            Quaternion targetRotation = Quaternion.Euler(0, randomYRotation, 0);
+            Quaternion targetRotation = Quaternion.Euler(-90f, randomYRotation, -90f);
             
             float elapsedTime = 0f;
             
@@ -212,7 +212,7 @@ namespace Managers
                 if (!spawnLocation) { yield break;}
                 Vector3 endPosition = spawnLocation.transform.position;
                 Quaternion startRotation = note.transform.rotation;
-                Quaternion targetRotation = Quaternion.identity;
+                Quaternion targetRotation = Quaternion.Euler(-90f, 0f, -90f);
                 float elapsedTime = 0f;
                 while (elapsedTime < slideDuration)
                 {

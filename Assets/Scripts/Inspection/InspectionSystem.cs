@@ -20,6 +20,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
     [Header("References")]
     [SerializeField] private Transform cameraTransform; // Main camera transform
+    [SerializeField] private Texture2D letterWritingTexture;
     
     private GameObject _currentInspectedObject;
     private Vector3 _originalPosition;
@@ -282,7 +283,8 @@ public class InspectionSystem : Singleton<InspectionSystem>
         Renderer[] renderers = _currentInspectedObject.GetComponentsInChildren<Renderer>();
         foreach (Renderer thisRenderer in renderers)
         {
-            thisRenderer.material.color = Color.green;
+            thisRenderer.material.EnableKeyword("_DETAIL_MULX2"); // Essential for URP for some reason omg
+            thisRenderer.material.SetTexture("_DetailAlbedoMap", letterWritingTexture);
         }
     }
 
