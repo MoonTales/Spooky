@@ -190,7 +190,7 @@ public class Flashlight : Singleton<Flashlight>
                     EventBroadcaster.Broadcast_OnFlashlightHitEnemy(_currentFlickerTarget, true);
                 
                     _cachedFlickerTarget = hitEnemy;
-                    StartCoroutine(FlashlightFlicker());
+                    StartCoroutine(FlashlightFlicker(3f, 0.05f));
                 }
                 return;
             }
@@ -385,7 +385,7 @@ public class Flashlight : Singleton<Flashlight>
         _isFlickering = true;
         float elapsed = 0f;
         
-        while (elapsed < flickerDuration)
+        while (elapsed < flickerDuration && _isOn)
         {
             // Randomly flicker each light component
             foreach (var light in _lightComponents)
@@ -404,6 +404,8 @@ public class Flashlight : Singleton<Flashlight>
         // if the flashlight is still on, return them to enabled state
         SetAllLights(_isOn);
 
+        // the flashlight would stop flickering on enemy after set time; this should fix that
+        _currentFlickerTarget = null;
 
         _isFlickering = false;
     }
