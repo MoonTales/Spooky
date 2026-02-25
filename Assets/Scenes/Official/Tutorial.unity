@@ -26016,6 +26016,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 901407856}
+    - target: {fileID: 5270023083463229961, guid: 2183149ef69d85a49addf626c29b7063, type: 3}
+      propertyPath: m_Name
+      value: Location1
+      objectReference: {fileID: 0}
     - target: {fileID: 5493499083333516086, guid: 2183149ef69d85a49addf626c29b7063, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -26027,6 +26031,18 @@ PrefabInstance:
     - target: {fileID: 5632837278507104263, guid: 2183149ef69d85a49addf626c29b7063, type: 3}
       propertyPath: m_LocalPosition.z
       value: -0.486
+      objectReference: {fileID: 0}
+    - target: {fileID: 6091115164991047000, guid: 2183149ef69d85a49addf626c29b7063, type: 3}
+      propertyPath: drawingSpawnLocationOne
+      value: 
+      objectReference: {fileID: 703183317}
+    - target: {fileID: 6091115164991047000, guid: 2183149ef69d85a49addf626c29b7063, type: 3}
+      propertyPath: drawingSpawnLocationTwo
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6091115164991047000, guid: 2183149ef69d85a49addf626c29b7063, type: 3}
+      propertyPath: drawingSpawnLocationThree
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6159738884254614521, guid: 2183149ef69d85a49addf626c29b7063, type: 3}
       propertyPath: m_Mesh
@@ -27293,6 +27309,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &703183317 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5270023083463229961, guid: 2183149ef69d85a49addf626c29b7063, type: 3}
+  m_PrefabInstance: {fileID: 674655628}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &704585162
 GameObject:
   m_ObjectHideFlags: 0
