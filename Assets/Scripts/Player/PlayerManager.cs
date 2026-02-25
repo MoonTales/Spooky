@@ -50,6 +50,7 @@ namespace Player
         
         public void SearchForSpawnAnchor(string spawnPointID = "")
         {
+            Flashlight.Instance.GetComponent<Animator>().SetBool("Increase", false);
             // logic to search for a spawn anchor in the scene
             PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsByType<PlayerSpawnAnchor>(FindObjectsSortMode.None);
             
