@@ -96,7 +96,7 @@ public class AttractorAI : MonoBehaviour
 		public float maxIntensityLowerBoundDangerRange = 100;
 		public float maxIntensityUpperBoundDangerRange = 100;
 
-		public ReactConditions[] possibleReactionConditionsChanges;
+		public CheckConditions[] possibleReactionConditionsChanges;
 		public float reactionConditionsLowerBoundDangerRange = 100;
 		public float reactionConditionsUpperBoundDangerRange = 100;
 
@@ -208,6 +208,15 @@ public class AttractorAI : MonoBehaviour
 		Vector3 location = new Vector3(x, y, z);
 
 		transform.position = location;
+	}
+	private int nextTeleportIndex = 0;
+	public void TeleportCycle()
+	{
+		transform.position = teleportLocations[nextTeleportIndex];
+
+		nextTeleportIndex++;
+		if (nextTeleportIndex >= teleportLocations.Count())
+			nextTeleportIndex = 0;
 	}
 
 	public enum Stats
@@ -409,6 +418,15 @@ public class AttractorAI : MonoBehaviour
 		}
 	}
 
+	public enum Comparison
+	{
+		equals,
+		greaterThan,
+		lesserThan,
+		greaterOrEqualTo,
+		lesserOrEqualTo
+	}
+
 	[System.Serializable]
 	public class BoolCondition
 	{
@@ -434,6 +452,15 @@ public class AttractorAI : MonoBehaviour
 		public List<FloatCondition> floatConditions = new List<FloatCondition>();
 		public List<IntCondition> intConditions = new List<IntCondition>();
 	}
+	[System.Serializable]
+	public class CheckConditions
+	{
+		public List<BoolCondition> boolConditions = new List<BoolCondition>();
+		public List<FloatCondition> floatConditions = new List<FloatCondition>();
+		public Comparison floatCompare;
+		public List<IntCondition> intConditions = new List<IntCondition>();
+		public Comparison intCompare;
+	}
 
 	public ReactConditions currentConditions;
 
@@ -445,7 +472,7 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
-		public ReactConditions reactionConditions;
+		public CheckConditions reactionConditions;
 		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
@@ -1076,15 +1103,29 @@ public class AttractorAI : MonoBehaviour
 						{
 							conditionsMet = false;
 						}
-						else if (reaction.reactionConditions.floatConditions.Count > 0 &&
+						else if ((reaction.reactionConditions.floatCompare == Comparison.equals || reaction.reactionConditions.floatCompare ==
+							Comparison.greaterOrEqualTo || reaction.reactionConditions.floatCompare == Comparison.lesserOrEqualTo) &&
+							(reaction.reactionConditions.floatConditions.Count > 0 &&
 							!(currentConditions.floatConditions.Intersect(reaction.reactionConditions.floatConditions).Count() ==
-							currentConditions.floatConditions.Count()))
+							currentConditions.floatConditions.Count())))
 						{
 							conditionsMet = false;
 						}
-						else if (reaction.reactionConditions.intConditions.Count > 0 &&
+						else if (reaction.reactionConditions.floatCompare == Comparison.greaterThan)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (reaction.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if ((reaction.reactionConditions.intCompare == Comparison.equals || reaction.reactionConditions.intCompare ==
+							Comparison.greaterOrEqualTo || reaction.reactionConditions.intCompare == Comparison.lesserOrEqualTo) &&
+							(reaction.reactionConditions.intConditions.Count > 0 &&
 							!(currentConditions.intConditions.Intersect(reaction.reactionConditions.intConditions).Count() ==
-							currentConditions.intConditions.Count()))
+							currentConditions.intConditions.Count())))
 						{
 							conditionsMet = false;
 						}
