@@ -71,6 +71,8 @@ namespace Interaction.drawings
             wallSlide.SlideWall();
             // since this is a special case, we will just pass it a custom ID of 0
             PlayerInventory.Instance.AddDrawing(0);
+            gameObject.SetActive(false);
+            Destroy(gameObject);
             return;
 
             const int timeToFadeOut = 5;
