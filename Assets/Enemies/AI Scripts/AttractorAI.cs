@@ -58,7 +58,8 @@ public class AttractorAI : MonoBehaviour
 		EnemyVisible_boolVisible,
 		ChangeStats_STATS,
 		AddStatuses_LISTstringStatuses_boolRemove,
-		Teleport_floatX_floatY_floatZ
+		Teleport_floatX_floatY_floatZ,
+		TeleportCycle
 	}
 
 	[System.Serializable]
@@ -510,7 +511,7 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
-		public ReactConditions thoughtConditions;
+		public CheckConditions thoughtConditions;
 		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
@@ -917,6 +918,9 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.Teleport_floatX_floatY_floatZ:
 				Teleport(function.arguments);
 				break;
+			case FunctionType.TeleportCycle:
+				TeleportCycle();
+				break;
 		}
 	}
 
@@ -992,25 +996,67 @@ public class AttractorAI : MonoBehaviour
 					if (thought.allConditionsRequired)
 					{
 
-						//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-						//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
 						if (thought.thoughtConditions.boolConditions.Count > 0 &&
 							!(currentConditions.boolConditions.Intersect(thought.thoughtConditions.boolConditions).Count() ==
 							currentConditions.boolConditions.Count()))
 						{
 							conditionsMet = false;
 						}
-						else if (thought.thoughtConditions.floatConditions.Count > 0 &&
+						else if ((thought.thoughtConditions.floatCompare == Comparison.equals || thought.thoughtConditions.floatCompare ==
+							Comparison.greaterOrEqualTo || thought.thoughtConditions.floatCompare == Comparison.lesserOrEqualTo) &&
+							(thought.thoughtConditions.floatConditions.Count > 0 &&
 							!(currentConditions.floatConditions.Intersect(thought.thoughtConditions.floatConditions).Count() ==
-							currentConditions.floatConditions.Count()))
+							currentConditions.floatConditions.Count())))
 						{
 							conditionsMet = false;
 						}
-						else if (thought.thoughtConditions.intConditions.Count > 0 &&
+						else if (thought.thoughtConditions.floatCompare == Comparison.greaterThan)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (thought.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.floatCompare == Comparison.lesserThan)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (thought.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if ((thought.thoughtConditions.intCompare == Comparison.equals || thought.thoughtConditions.intCompare ==
+							Comparison.greaterOrEqualTo || thought.thoughtConditions.intCompare == Comparison.lesserOrEqualTo) &&
+							(thought.thoughtConditions.intConditions.Count > 0 &&
 							!(currentConditions.intConditions.Intersect(thought.thoughtConditions.intConditions).Count() ==
-							currentConditions.intConditions.Count()))
+							currentConditions.intConditions.Count())))
 						{
 							conditionsMet = false;
+						}
+						else if (thought.thoughtConditions.intCompare == Comparison.greaterThan)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (thought.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.intCompare == Comparison.lesserThan)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (thought.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
 						}
 					}
 
@@ -1034,6 +1080,9 @@ public class AttractorAI : MonoBehaviour
 				}
 				else if (!thought.allConditionsRequired)
 				{
+
+					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
 					if ((thought.thoughtConditions.boolConditions.Count > 0 &&
 						thought.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
 						(thought.thoughtConditions.floatConditions.Count > 0 &&
@@ -1095,8 +1144,6 @@ public class AttractorAI : MonoBehaviour
 					if (reaction.allConditionsRequired)
 					{
 
-						//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-						//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
 						if (reaction.reactionConditions.boolConditions.Count > 0 &&
 							!(currentConditions.boolConditions.Intersect(reaction.reactionConditions.boolConditions).Count() ==
 							currentConditions.boolConditions.Count()))
@@ -1121,6 +1168,16 @@ public class AttractorAI : MonoBehaviour
 								conditionsMet = false;
 							}
 						}
+						else if (reaction.reactionConditions.floatCompare == Comparison.lesserThan)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (reaction.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
 						else if ((reaction.reactionConditions.intCompare == Comparison.equals || reaction.reactionConditions.intCompare ==
 							Comparison.greaterOrEqualTo || reaction.reactionConditions.intCompare == Comparison.lesserOrEqualTo) &&
 							(reaction.reactionConditions.intConditions.Count > 0 &&
@@ -1128,6 +1185,26 @@ public class AttractorAI : MonoBehaviour
 							currentConditions.intConditions.Count())))
 						{
 							conditionsMet = false;
+						}
+						else if (reaction.reactionConditions.intCompare == Comparison.greaterThan)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (reaction.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (reaction.reactionConditions.intCompare == Comparison.lesserThan)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (reaction.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
 						}
 					}
 
@@ -1165,6 +1242,9 @@ public class AttractorAI : MonoBehaviour
 				}
 				else if (!reaction.allConditionsRequired)
 				{
+					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+
 					if ((reaction.reactionConditions.boolConditions.Count > 0 &&
 						reaction.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
 						(reaction.reactionConditions.floatConditions.Count > 0 &&
