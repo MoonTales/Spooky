@@ -1,5 +1,6 @@
 using System;
 using Managers;
+using Player;
 using UnityEngine;
 using Types = System.Types;
 
@@ -12,6 +13,15 @@ namespace Interaction.drawings
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         public override void Interact(Interactor interactor)
         {
+            
+            
+            // we are gonna adjust how this works, we will first look for the only Tutorial_WallSlide object in the scene
+            Tutorial_WallSlide wallSlide = FindObjectOfType<Tutorial_WallSlide>();
+            
+            // since this is a special case, we will just pass it a custom ID of 0
+            PlayerInventory.Instance.AddDrawing(0);
+
+            return;
             // we are gonna treat this the EXACT same as a good wakeup, from the nightmare
             // Disable the collider so that we cant interact with this again while the fadeout is happening
             GetComponent<Collider>().enabled = false;

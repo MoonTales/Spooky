@@ -34,9 +34,9 @@ namespace Interaction
             var obj = Instantiate(placeholderPrefab, drawingSpawnLocationOne.transform);
             // we should zero our the local position of these drawings, since the prefab might have some weird offset, and we want them to be centered on the location game objects
             obj.transform.localPosition = Vector3.zero;
-            obj =Instantiate(placeholderPrefab, drawingSpawnLocationTwo.transform);
+            if (drawingSpawnLocationTwo){obj = Instantiate(placeholderPrefab, drawingSpawnLocationTwo.transform);}
             obj.transform.localPosition = Vector3.zero;
-            obj = Instantiate(placeholderPrefab, drawingSpawnLocationThree.transform);
+            if(drawingSpawnLocationThree){obj = Instantiate(placeholderPrefab, drawingSpawnLocationThree.transform);}
             obj.transform.localPosition = Vector3.zero;
         }
         
