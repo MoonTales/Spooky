@@ -12,6 +12,7 @@ namespace Player
     public class PlayerManager : Singleton<PlayerManager>
     {
         private GameObject _player;
+        private UnityEngine.Camera _playerCamera;
         [SerializeField] private string defaultSpawnPointID = "DEFAULT_SPAWN_POINT";
         
         
@@ -26,6 +27,9 @@ namespace Player
             base.Awake();
             // Get reference to the player
             _player = GameObject.FindWithTag("Player");
+
+            // Get reference to the camera
+            _playerCamera = UnityEngine.Camera.main;
         }
         
         public CinemachineCamera GetCinemachineCamera()
@@ -111,6 +115,10 @@ namespace Player
         {
             return _player;
         }
+        public UnityEngine.Camera GetCamera()
+        {
+            return _playerCamera;
+        }
 
         /// <summary>
         /// Teleports player immediately
@@ -140,6 +148,57 @@ namespace Player
 
             if (controller != null) {controller.enabled = true;}
 
+        }
+
+        public bool CanPlayerSeeThis(Transform thingToSee, float screenPercentage = 1f)
+		{
+            if (_playerCamera == null)
+            {
+                Debug.LogWarning("No player camera found!");
+                return false;
+            }
+
+            // convert the object's world position to viewport space
+            Vector3 viewportPoint = _playerCamera.WorldToViewportPoint(thingToSee.position);
+
+            // check if the object is in front of the camera (z > 0) and within the defined central viewport area
+            float min = 0.5f - screenPercentage / 2.0f;
+            float max = 0.5f + screenPercentage / 2.0f;
+
+            bool inViewportCenter = viewportPoint.z > 0 &&
+                                    viewportPoint.x >= min &&
+                                    viewportPoint.x <= max &&
+                                    viewportPoint.y >= min &&
+                                    viewportPoint.y <= max;
+
+            // if the object's center is not even in the viewport then there is no need to proceed
+            if (!inViewportCenter)
+            {
+                return false;
+            }
+
+            // perform a raycast from the camera to the object to check for occlusion
+            RaycastHit hit;
+            Vector3 direction = thingToSee.position - _playerCamera.transform.position;
+
+            if (Physics.Raycast(_playerCamera.transform.position, direction, out hit, direction.magnitude))
+            {
+                // the ray hit something so check if it is the target object
+                if (hit.transform == thingToSee)
+                {
+                    // the object is visible and in the center! Hooway!!!
+                    return true;
+                }
+                else
+                {
+                    // something else is in the way.... the object could be anywhere.... oh god
+                    return false;
+                }
+            }
+
+            // the ray did not hit anything, which means the object was not hit
+            // this could happen if the object has no collider, or the ray misses. Make sure the object has a collider!!
+            return false;
         }
         
         public Transform GetPlayerHandTransform()
