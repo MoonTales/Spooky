@@ -79,7 +79,8 @@ namespace Player
             Types.NotificationData data = new(
                 duration: 1.0f, 
                 messageKey: new TextKey { place = "Notifications", id = "CollectedDrawingSuccess"},
-                messageOverride: $"Collected a Drawing"
+                messageOverride: "Collected drawing!",
+                shouldOnlyShowOnce: false
             );
             data.Send();
             if (_collectedDrawingIDs.Add(drawingID))
@@ -87,8 +88,6 @@ namespace Player
                 _currentDrawingsThisNight ++;
                 _collectedDrawingsThisNight.Add(drawingID);
             }
-
-            
         }
 
         public bool CanAddDrawing()

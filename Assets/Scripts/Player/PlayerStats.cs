@@ -25,15 +25,15 @@ namespace Player
         [Space(10)]
         [Header("Cutoffs for each Mental Health State")]
         // Anxious Mental Health Cutoffs
-        [SerializeField] private float MildlyAnxiousMentalHealthCutoff = 0.8f;
-        [SerializeField] private float ModeratlyAnxiousMentalHealthCutoff = 0.6f;
-        [SerializeField] private float SeverlyAnxiousMentalHealthCutoff = 0.25f;
-        [SerializeField] private float PanicMentalHealthCutoff = 0.1f;
+        private float MildlyAnxiousMentalHealthCutoff = 0.75f;
+        private float ModeratlyAnxiousMentalHealthCutoff = 0.4f;
+        private float SeverlyAnxiousMentalHealthCutoff = 0.20f;
+        private float PanicMentalHealthCutoff = 0.1f;
         // Sleep Deprived Mental Health Cutoffs
-        [SerializeField] private float MildlySleepDeprivedMentalHealthCutoff = 0.8f;
-        [SerializeField] private float ModeratlySleepDeprivedMentalHealthCutoff = 0.6f;
-        [SerializeField] private float SeverlySleepDeprivedMentalHealthCutoff = 0.25f;
-        [SerializeField] private float ExhaustedMentalHealthCutoff = 0.1f;
+        private float MildlySleepDeprivedMentalHealthCutoff = 0.5f;
+        private float ModeratlySleepDeprivedMentalHealthCutoff = 0.35f;
+        private float SeverlySleepDeprivedMentalHealthCutoff = 0.20f;
+        private float ExhaustedMentalHealthCutoff = 0.1f;
         
         
         // Internal field used for the Sanity draining

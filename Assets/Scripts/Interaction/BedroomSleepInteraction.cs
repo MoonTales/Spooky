@@ -54,12 +54,13 @@ namespace Interaction
             );
             data.Send();
             GameStateManager.Instance.SetCurrentZoneId(-1);
+            // lock all movement untill we finish the fade in
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
 
         private void FadeInCompleted()
         {
-            // lock all movement untill we finish the fade in
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+
         }
     }
 }

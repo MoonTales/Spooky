@@ -64,6 +64,8 @@ namespace Interaction.Letters
         private void HandleFinishedResearcherLetter()
         {
             // this will actually be the opposite effect, where it will slide back to the original position it slid in from, and then destroy itself
+            // disable the collider so we cant interact again
+            GetComponent<Collider>().enabled = false;
             StartCoroutine(LetterManager.Instance.ReverseSlideNote(gameObject));
         }
 
@@ -72,10 +74,8 @@ namespace Interaction.Letters
         private void HandleFinishedFriendLetter()
         {
             // due to this being a "fake" letter, we want to have it "vanish"
-
+            GetComponent<Collider>().enabled = false;
             StartCoroutine(FadeOut());
-
-
         }
 
 
@@ -101,7 +101,7 @@ namespace Interaction.Letters
 
         // Prepare fade variables
         Color color = fadeMats[0].GetColor("_Base_Color");
-        float duration = 10f;
+        float duration = 2f;
         float elapsedTime = 0f;
         float startAlpha = color.a;
         float targetAlpha = 0f;

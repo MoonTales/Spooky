@@ -38,6 +38,8 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
     private LayerMask _cachedLayerMask;
     
+    private bool _isFirstInspection = true; // Flag to track if it's the first inspection
+    
     void Start()
     {
         // Get the pan/tilt component from the Cinemachine camera (which is on the player)
@@ -119,6 +121,18 @@ public class InspectionSystem : Singleton<InspectionSystem>
         // we need to do this to all child layers as well
         _cachedLayerMask = _currentInspectedObject.layer;
         SetLayerRecursively(_currentInspectedObject, LayerMask.NameToLayer("Inspection"));
+        
+        if (_isFirstInspection)
+        {
+            Types.NotificationData data = new(
+                duration: 3, 
+                messageKey: new TextKey { place = "tutorial", id = "inspect" },
+                messageOverride: "Click and drag mouse to view object. F or RMB to exit.",
+                shouldOnlyShowOnce: true
+            );
+            data.Send();
+            _isFirstInspection = false;
+        }
     }
     
     

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
 using UnityEngine.Rendering;
@@ -25,9 +26,9 @@ namespace Player.Camera
         }
         private CinemachineCamera _cinemachineCamera;
         private CinemachinePanTilt _panTilt;
-        private Volume _postProcessVolume;
-        private DepthOfField _depthOfField;
-        private ChromaticAberration _chromaticAberration;
+        private List<Volume> _postProcessVolumes = new List<Volume>();
+        private List<DepthOfField> _depthOfFields = new List<DepthOfField>();
+        private List<ChromaticAberration> _chromaticAberrations = new List<ChromaticAberration>();
 
         // Track current mental state and active coroutine
         private Types.PlayerMentalState _currentMentalState;
@@ -108,6 +109,10 @@ namespace Player.Camera
             base.RegisterSubscriptions();
             TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerMentalStateChanged,
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerMentalStateChanged);
+            TrackSubscription(() => EventBroadcaster.OnGameRestarted += HandleNormalStateEffects,
+                () => EventBroadcaster.OnGameRestarted -= HandleNormalStateEffects);
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
         }
 
         private void Start()
@@ -119,6 +124,14 @@ namespace Player.Camera
             InitializePostProcessing();
         }
 
+        private void OnWorldLocationChanged(Types.WorldLocation newLocation)
+        {
+            // re-get the post processing volume, in case we have different ones in different scenes (like the bedroom)
+            InitializePostProcessing();
+        }
+        
+        
+
         private void Update()
         {
             // Smoothly lerp blur and chromatic aberration values
@@ -126,24 +139,30 @@ namespace Player.Camera
             _currentFocusDistance = Mathf.Lerp(_currentFocusDistance, _targetFocusDistance, Time.deltaTime * transitionSpeed);
             _currentChromaticAberration = Mathf.Lerp(_currentChromaticAberration, _targetChromaticAberration, Time.deltaTime * transitionSpeed);
 
-            // Apply the current values
+            // Apply blur or disable depth of field
             if (_currentBlurIntensity > 0.01f)
             {
                 ApplyBlurEffect(_currentBlurIntensity, _currentFocusDistance);
             }
-            else if (_depthOfField != null && _depthOfField.active)
+            else
             {
-                _depthOfField.active = false;
+                foreach (DepthOfField dof in _depthOfFields)
+                {
+                    if (dof != null && dof.active) {dof.active = false;}
+                }
             }
 
-            // Apply chromatic aberration
+            // Apply chromatic aberration or reset it
             if (_currentChromaticAberration > 0.01f)
             {
                 SetChromaticAberrationIntensity(_currentChromaticAberration);
             }
-            else if (_chromaticAberration != null)
+            else
             {
-                _chromaticAberration.intensity.Override(0f);
+                foreach (ChromaticAberration ca in _chromaticAberrations)
+                {
+                    if (ca != null){ ca.intensity.Override(0f);}
+                }
             }
         }
 
@@ -199,65 +218,44 @@ namespace Player.Camera
         {
             // Immediately reset all values (no lerping)
             SetCustomVisualEffects(blurIntensity:0f, focusDistance:10f, chromaticAberration:0f, newTransitionSpeed:5f);
-    
+
             // Immediately disable effects
-            if (_depthOfField != null)
+            foreach (DepthOfField dof in _depthOfFields)
             {
-                _depthOfField.active = false;
+                if (dof != null){ dof.active = false;}
             }
-    
-            if (_chromaticAberration != null)
+
+            foreach (ChromaticAberration ca in _chromaticAberrations)
             {
-                _chromaticAberration.intensity.Override(0f);
+                if (ca != null){ ca.intensity.Override(0f);}
             }
-    
+
             transitionSpeed = 2f;
         }
 
         private void HandleMildlyAnxiousEffects()
         {
             // unique effects
-            _targetBlurIntensity = 0f;
-            _targetFocusDistance = 10f;
-            _targetChromaticAberration = 0f;
-            _currentBlurIntensity = 0f;
-            _currentFocusDistance = 10f;
-            _currentChromaticAberration = 0f;
-
+            SetCustomVisualEffects(blurIntensity:0f, focusDistance:10f, chromaticAberration:1f, newTransitionSpeed:5f);
             
         }
 
         private void HandleModeratelyAnxiousEffects()
         {
             // unique effects
-            _targetBlurIntensity = 0f;
-            _targetFocusDistance = 10f;
-            _targetChromaticAberration = 0f;
-            _currentBlurIntensity = 0f;
-            _currentFocusDistance = 10f;
-            _currentChromaticAberration = 0f;
+            SetCustomVisualEffects(blurIntensity:0f, focusDistance:10f, chromaticAberration:2f, newTransitionSpeed:5f);
         }
 
         private void HandleSeverelyAnxiousEffects()
         {
             // unique effects
-            _targetBlurIntensity = 0f;
-            _targetFocusDistance = 10f;
-            _targetChromaticAberration = 0f;
-            _currentBlurIntensity = 0f;
-            _currentFocusDistance = 10f;
-            _currentChromaticAberration = 0f;
+            SetCustomVisualEffects(blurIntensity:0f, focusDistance:10f, chromaticAberration:3f, newTransitionSpeed:5f);
         }
 
         private void HandlePanicEffects()
         {
             // unique effects
-            _targetBlurIntensity = 0f;
-            _targetFocusDistance = 10f;
-            _targetChromaticAberration = 0f;
-            _currentBlurIntensity = 0f;
-            _currentFocusDistance = 10f;
-            _currentChromaticAberration = 0f;
+            SetCustomVisualEffects(blurIntensity:0f, focusDistance:10f, chromaticAberration:5f, newTransitionSpeed:5f);
         }
 
         private void HandleMildlySleepDeprivedEffects()
@@ -335,61 +333,94 @@ namespace Player.Camera
 
         private void ApplyBlurEffect(float blurIntensity, float focusDistance)
         {
-            if(!_postProcessVolume || !_depthOfField) { return; }
-            
-            
-            // Configure blur settings
-            _depthOfField.mode.value = DepthOfFieldMode.Bokeh; // Might try gaussian soon
-            _depthOfField.focusDistance.value = focusDistance; // things close to this distance are in focus, anything else is blurred
-            _depthOfField.aperture.value = Mathf.Lerp(32f, 0.1f, blurIntensity); // Higher aperture = more blur (I think 32 is the max value)
-            _depthOfField.focalLength.value = 50f;
-            _depthOfField.active = true;
+            if (_postProcessVolumes.Count == 0 || _depthOfFields.Count == 0) { return; }
 
+            foreach (DepthOfField dof in _depthOfFields)
+            {
+                if (dof == null) continue;
+
+                dof.mode.value = DepthOfFieldMode.Bokeh;
+                dof.focusDistance.value = focusDistance;
+                dof.aperture.value = Mathf.Lerp(32f, 0.1f, blurIntensity);
+                dof.focalLength.value = 50f;
+                dof.active = true;
+            }
         }
 
         private void SetChromaticAberrationIntensity(float amount)
         {
-            if (!_postProcessVolume || !_chromaticAberration) { return; }
-            _chromaticAberration.intensity.Override(amount);
+            if (_postProcessVolumes.Count == 0 || _chromaticAberrations.Count == 0)
+            {
+                Debug.LogWarning("Cannot set chromatic aberration intensity: PostProcessVolumes or ChromaticAberration effects are missing.");
+                return;
+            }
+
+            Debug.Log($"Setting chromatic aberration intensity to {amount} on {_chromaticAberrations.Count} volume(s)");
+
+            foreach (ChromaticAberration ca in _chromaticAberrations)
+            {
+                if (ca == null) continue;
+                ca.intensity.Override(amount);
+            }
         }
         
         #region Utility Functions
 
         private void TrySetPostProcessing()
         {
-            // Searches for a post process volume on this object, and creates one if none exists
-            if (_postProcessVolume == null)
-            {
-                _postProcessVolume = GetComponent<Volume>();
+            _postProcessVolumes.Clear();
 
-                if (_postProcessVolume == null)
-                {
-                    _postProcessVolume = gameObject.AddComponent<Volume>();
-                    _postProcessVolume.isGlobal = true;
-                    _postProcessVolume.priority = 1;
-                    _postProcessVolume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
-                }
+            Volume[] foundVolumes = FindObjectsOfType<Volume>();
+
+            if (foundVolumes.Length > 0)
+            {
+                _postProcessVolumes.AddRange(foundVolumes);
+            }
+
+            if (_postProcessVolumes.Count == 0)
+            {
+                Volume newVolume = gameObject.AddComponent<Volume>();
+                newVolume.isGlobal = true;
+                newVolume.priority = 1;
+                newVolume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                _postProcessVolumes.Add(newVolume);
+            }
+
+            foreach (Volume volume in _postProcessVolumes)
+            {
+                Debug.Log($"PostProcessVolume found: {volume.name}");
             }
         }
-        
+
         private void TrySetChromaticAberration()
         {
-            // tries to get the chromatic aberration effect from the post processing volume
-            if (_postProcessVolume != null)
+            _chromaticAberrations.Clear();
+
+            foreach (Volume volume in _postProcessVolumes)
             {
-                if (!_postProcessVolume.profile.TryGet(out _chromaticAberration))
+                if (volume?.profile == null) continue;
+
+                if (!volume.profile.TryGet(out ChromaticAberration ca))
                 {
-                    _chromaticAberration = _postProcessVolume.profile.Add<ChromaticAberration>(true);
+                    ca = volume.profile.Add<ChromaticAberration>(true);
                 }
+                _chromaticAberrations.Add(ca);
             }
         }
 
         private void TrySetFieldOfDepth()
         {
-            // Tries to get the depth of field effect from the post processing volume
-            if (!_postProcessVolume.profile.TryGet(out _depthOfField))
+            _depthOfFields.Clear();
+
+            foreach (Volume volume in _postProcessVolumes)
             {
-                _depthOfField = _postProcessVolume.profile.Add<DepthOfField>(true);
+                if (volume?.profile == null) continue;
+
+                if (!volume.profile.TryGet(out DepthOfField dof))
+                {
+                    dof = volume.profile.Add<DepthOfField>(true);
+                }
+                _depthOfFields.Add(dof);
             }
         }
 
