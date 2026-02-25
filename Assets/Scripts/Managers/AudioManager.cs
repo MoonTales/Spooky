@@ -120,8 +120,10 @@ namespace Managers
         [SerializeField] private string tutorialHallwayStretchStateParameter = "StretchState";
         [SerializeField] private string tutorialHallwayStretchProgressParameter = "StretchProgress";
         [SerializeField] private string tutorialHallwayRunPressureParameter = "RunPressure";
+        [SerializeField] private string tutorialHallwayPlayerSpeedParameter = "PlayerSpeed";
+        [SerializeField] private float tutorialHallwayPlayerSpeedMax = 8f;
+        [SerializeField, Range(0f, 1f)] private float tutorialHallwayPlayerSpeedFloor = 0.2f;
         [SerializeField] private float tutorialHallwaySweepDurationSeconds = 8f;
-        [SerializeField] private bool debugTutorialHallwayParameters = false;
         [SerializeField] private string tutorialHallwayStateStretchingLabel = "Stretching";
         [SerializeField] private string tutorialHallwayStateContractedLabel = "Contracted";
         [SerializeField] private string tutorialDrawingAudioSceneName = "Tutorial";
@@ -233,6 +235,11 @@ namespace Managers
         private bool _goodWakeupHasBedroomSourceTransform;
         private Coroutine _tutorialHallwaySweepCoroutine;
         private Transform _tutorialHallwaySweepSourceTransform;
+        private CharacterController _tutorialHallwayPlayerController;
+        private Transform _tutorialHallwayPlayerTransform;
+        private Vector3 _tutorialHallwayLastPlayerPosition;
+        private bool _tutorialHallwayHasLastPlayerPosition;
+        private bool _tutorialHallwayPlayerSpeedFloorActive;
 
         // Runtime audio state - snapshot control.
         private bool _pauseSnapshotActive;
@@ -610,8 +617,11 @@ namespace Managers
             }
 
             _tutorialHallwaySweepSourceTransform = fromTransform;
+            CacheTutorialHallwayPlayerMotionSource();
+            _tutorialHallwayPlayerSpeedFloorActive = false;
             SetTutorialHallwayStretchStateLabel(tutorialHallwayStateStretchingLabel);
             SetTutorialHallwayRunPressure(0f);
+            SetTutorialHallwayPlayerSpeed(0f);
             SetTutorialHallwayStretchProgress(0f, fromTransform);
             RestartTutorialHallwaySweep();
         }
@@ -1414,10 +1424,13 @@ namespace Managers
             float duration = Mathf.Max(0.01f, tutorialHallwaySweepDurationSeconds);
             float elapsed = 0f;
             SetTutorialHallwayStretchProgress(0f, _tutorialHallwaySweepSourceTransform);
+            SetTutorialHallwayPlayerSpeed(0f);
 
             while (_tutorialHallwayStretchInstance.isValid() && elapsed < duration)
             {
-                elapsed += Time.deltaTime;
+                // Player speed (normalized 0..1) scales sweep time: 1 = realtime, 0.5 = half speed, 0 = paused.
+                float speedCoefficient = UpdateTutorialHallwayPlayerSpeedFromMotionSource();
+                elapsed += Time.deltaTime * speedCoefficient;
                 float stretchProgress01 = Mathf.Clamp01(elapsed / duration);
                 SetTutorialHallwayStretchProgress(stretchProgress01, _tutorialHallwaySweepSourceTransform);
                 yield return null;
@@ -1429,6 +1442,10 @@ namespace Managers
                 _tutorialHallwayStretchInstance.release();
                 _tutorialHallwayStretchInstance = default;
                 _tutorialHallwaySweepSourceTransform = null;
+                _tutorialHallwayPlayerController = null;
+                _tutorialHallwayPlayerTransform = null;
+                _tutorialHallwayHasLastPlayerPosition = false;
+                _tutorialHallwayPlayerSpeedFloorActive = false;
                 LogAudioState("Tutorial hallway stretch stopped (sweep duration complete).");
             }
 
@@ -1456,11 +1473,6 @@ namespace Managers
             _tutorialHallwayStretchInstance.setParameterByName(
                 tutorialHallwayStretchProgressParameter,
                 Mathf.Clamp01(stretchProgress01));
-
-            if (debugTutorialHallwayParameters)
-            {
-                Debug.Log($"AudioManager[Hallway]: {tutorialHallwayStretchProgressParameter}={Mathf.Clamp01(stretchProgress01):0.000}");
-            }
         }
 
         private void SetTutorialHallwayRunPressure(float runPressure01)
@@ -1474,11 +1486,85 @@ namespace Managers
             _tutorialHallwayStretchInstance.setParameterByName(
                 tutorialHallwayRunPressureParameter,
                 Mathf.Clamp01(runPressure01));
+        }
 
-            if (debugTutorialHallwayParameters)
+        private float UpdateTutorialHallwayPlayerSpeedFromMotionSource()
+        {
+            float speed = 0f;
+
+            if (_tutorialHallwayPlayerController != null)
             {
-                Debug.Log($"AudioManager[Hallway]: {tutorialHallwayRunPressureParameter}={Mathf.Clamp01(runPressure01):0.000}");
+                Vector3 velocity = _tutorialHallwayPlayerController.velocity;
+                velocity.y = 0f;
+                speed = velocity.magnitude;
             }
+            else if (_tutorialHallwayPlayerTransform != null)
+            {
+                Vector3 currentPosition = _tutorialHallwayPlayerTransform.position;
+                if (_tutorialHallwayHasLastPlayerPosition)
+                {
+                    float deltaTime = Mathf.Max(0.0001f, Time.deltaTime);
+                    speed = Vector3.Distance(currentPosition, _tutorialHallwayLastPlayerPosition) / deltaTime;
+                }
+
+                _tutorialHallwayLastPlayerPosition = currentPosition;
+                _tutorialHallwayHasLastPlayerPosition = true;
+            }
+
+            return SetTutorialHallwayPlayerSpeed(speed);
+        }
+
+        private float SetTutorialHallwayPlayerSpeed(float speedUnitsPerSecond)
+        {
+            if (!_tutorialHallwayStretchInstance.isValid())
+            {
+                return 0f;
+            }
+
+            float maxSpeed = Mathf.Max(0.01f, tutorialHallwayPlayerSpeedMax);
+            float normalizedSpeed = Mathf.Clamp01(speedUnitsPerSecond / maxSpeed);
+            float floorThreshold = Mathf.Clamp01(tutorialHallwayPlayerSpeedFloor);
+
+            if (!_tutorialHallwayPlayerSpeedFloorActive && normalizedSpeed > floorThreshold)
+            {
+                _tutorialHallwayPlayerSpeedFloorActive = true;
+            }
+
+            float speedForFmod = normalizedSpeed;
+            if (_tutorialHallwayPlayerSpeedFloorActive && normalizedSpeed < floorThreshold)
+            {
+                speedForFmod = floorThreshold;
+            }
+
+            if (!string.IsNullOrWhiteSpace(tutorialHallwayPlayerSpeedParameter))
+            {
+                _tutorialHallwayStretchInstance.setParameterByName(tutorialHallwayPlayerSpeedParameter, speedForFmod);
+            }
+
+            return normalizedSpeed;
+        }
+
+        private void CacheTutorialHallwayPlayerMotionSource()
+        {
+            _tutorialHallwayPlayerController = null;
+            _tutorialHallwayPlayerTransform = null;
+            _tutorialHallwayHasLastPlayerPosition = false;
+
+            GameObject playerObject = GameObject.FindWithTag("Player");
+            if (playerObject == null)
+            {
+                return;
+            }
+
+            _tutorialHallwayPlayerTransform = playerObject.transform;
+            _tutorialHallwayPlayerController = playerObject.GetComponent<CharacterController>();
+            if (_tutorialHallwayPlayerController == null)
+            {
+                _tutorialHallwayPlayerController = playerObject.GetComponentInParent<CharacterController>();
+            }
+
+            _tutorialHallwayLastPlayerPosition = _tutorialHallwayPlayerTransform.position;
+            _tutorialHallwayHasLastPlayerPosition = true;
         }
 
         private void PlayEvent(EventReference eventReference, Transform fromTransform)
@@ -1621,6 +1707,10 @@ namespace Managers
         {
             StopTutorialHallwaySweep();
             _tutorialHallwaySweepSourceTransform = null;
+            _tutorialHallwayPlayerController = null;
+            _tutorialHallwayPlayerTransform = null;
+            _tutorialHallwayHasLastPlayerPosition = false;
+            _tutorialHallwayPlayerSpeedFloorActive = false;
 
             if (_tutorialHallwayStretchInstance.isValid())
             {

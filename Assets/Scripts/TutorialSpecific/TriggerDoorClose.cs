@@ -5,13 +5,42 @@ public class TriggerDoorClose : MonoBehaviour
 {
 	[SerializeField] private bool playDoorCloseSfx = false;
 	[SerializeField] private AudioManager.SfxId doorCloseSfxId = AudioManager.SfxId.TutorialDoorSlide;
+	[SerializeField] private bool triggerOnce = true;
+
+	private bool _hasTriggered;
+	private Animator _animator;
+
+	private void Awake()
+	{
+		_animator = GetComponent<Animator>();
+	}
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.tag == "Player")
+		if (!other.CompareTag("Player"))
 		{
-			gameObject.GetComponent<Animator>().SetTrigger("Close");
-			PlayDoorCloseSfx();
+			return;
+		}
+
+		if (triggerOnce && _hasTriggered)
+		{
+			return;
+		}
+
+		_hasTriggered = true;
+		if (_animator != null)
+		{
+			_animator.SetTrigger("Close");
+		}
+		PlayDoorCloseSfx();
+
+		if (triggerOnce)
+		{
+			Collider triggerCollider = GetComponent<Collider>();
+			if (triggerCollider != null)
+			{
+				triggerCollider.enabled = false;
+			}
 		}
 	}
 
