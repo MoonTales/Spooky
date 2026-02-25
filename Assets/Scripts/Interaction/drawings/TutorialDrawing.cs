@@ -1,7 +1,7 @@
 using FMOD.Studio;
 using Managers;
-using System;
 using UnityEngine;
+using Types = System.Types;
 
 namespace Interaction.drawings
 {
@@ -56,7 +56,33 @@ namespace Interaction.drawings
             {
                 audioManager.StopTutorialDrawingStaticLoopsImmediate();
             }
+
+            // Match good-wakeup flow so alarm transition and fade timing stay in sync with other wakeup paths.
+            Collider collider = GetComponent<Collider>();
+            if (collider != null)
+            {
+                collider.enabled = false;
+            }
+
+            const int timeToFadeOut = 5;
+            SleepTrackerManager.Instance.SetIsGoodWakeup(true);
+            AudioManager.Instance.BeginGoodWakeupAlarmTransition();
+            SleepTrackerManager.Instance.TurnSleepTrackerOn();
+
+            Types.ScreenFadeData data = new Types.ScreenFadeData(
+                fadeInDuration: 1,
+                2,
+                fadeOutDuration: timeToFadeOut,
+                null,
+                FadeOutCompleted);
+            data.Send();
+        }
+
+        private void FadeOutCompleted()
+        {
+            SleepTrackerManager.Instance.SetIsGoodWakeup(true);
             SceneSwapper.Instance.SwapScene(sceneToLoad);
+            GameStateManager.Instance.SetCurrentZoneId(-1);
         }
 
         private void StartDrawingStaticLoop()
