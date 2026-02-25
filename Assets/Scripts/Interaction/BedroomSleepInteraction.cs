@@ -38,12 +38,13 @@ namespace Interaction
             GetComponent<Collider>().enabled = false;
 
             const int timeToFadeOut = 3; 
-            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:2, 1.5f, fadeOutDuration:timeToFadeOut, FadeInCompleted, FadeOutCompleted);
+            const int fadeInDuration = 2;
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:fadeInDuration, 1.5f, fadeOutDuration:timeToFadeOut, FadeInCompleted, FadeOutCompleted);
 
             fadeData.Send();
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
         }
-
+        
         private void FadeOutCompleted()
         {
             SceneSwapper.Instance.SwapScene(sceneName);
@@ -54,13 +55,12 @@ namespace Interaction
             );
             data.Send();
             GameStateManager.Instance.SetCurrentZoneId(-1);
-            // lock all movement untill we finish the fade in
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
 
         private void FadeInCompleted()
         {
-
+            
         }
     }
 }
