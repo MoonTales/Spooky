@@ -36243,6 +36243,10 @@ MonoBehaviour:
   targetAudio: {fileID: 0}
   targetObject: {fileID: 0}
   targetAnimator: {fileID: 1341225079}
+  playToggleSfx: 1
+  toggleSfxId: 9
+  playSecondaryToggleSfx: 1
+  secondaryToggleSfxId: 10
 --- !u!65 &925475108
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -51509,6 +51513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7674aacf5a289e43a0c2feb137cc7b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triggerOnce: 1
 --- !u!54 &1341225077
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -83409,6 +83414,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7674aacf5a289e43a0c2feb137cc7b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triggerOnce: 1
 --- !u!54 &108490534879005321
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -91824,6 +91830,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7674aacf5a289e43a0c2feb137cc7b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triggerOnce: 1
+  playDoorCloseSfx: 1
+  doorCloseSfxId: 10
 --- !u!64 &8870409973661344266
 MeshCollider:
   m_ObjectHideFlags: 0
