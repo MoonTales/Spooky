@@ -50,7 +50,9 @@ namespace Player
         
         public void SearchForSpawnAnchor(string spawnPointID = "")
         {
+            // reset flashlight to default intensity upon respawn
             Flashlight.Instance.GetComponent<Animator>().SetBool("Increase", false);
+
             // logic to search for a spawn anchor in the scene
             PlayerSpawnAnchor[] spawnAnchors = GameObject.FindObjectsByType<PlayerSpawnAnchor>(FindObjectsSortMode.None);
             
