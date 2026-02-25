@@ -2,14 +2,14 @@ name: Deploy to Itch.io
 
 on:
   push:
-    branches: [ Development ]
+    branches: [ Development, main ]
 
 permissions:
   actions: read
   contents: read
 
 jobs:
-  deploy:
+  deploy-windows:
     name: Deploy to Itch.io
     runs-on: ubuntu-latest
 
@@ -32,7 +32,7 @@ jobs:
       - name: Zip Build
         run: |
           cd build/StandaloneWindows64
-          zip -r ../../Game.zip .
+          zip -r ../../Game-Windows.zip .
           cd ../..
 
       # THIS POINT AND AFTER DOES NOT WORK
@@ -44,6 +44,37 @@ jobs:
       # Deploy to Itch.io
       - name: Deploy to itch.io
         run: butler push Game.zip moontalesstudio/spooky-game:windows
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+  deploy-mac:
+    name: Deploy Mac to Itch.io
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Mac Build Artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: Build.yml
+          workflow_search: true
+          name: Build-StandaloneOSX
+          path: build/StandaloneOSX
+          workflow_conclusion: success
+          allow_forks: true
+
+      - name: Zip Build
+        run: |
+          cd build/StandaloneOSX
+          zip -r ../../Game-Mac.zip .
+          cd ../..
+
+      - name: Setup butler
+        uses: remarkablegames/setup-butler@v2
+
+      - name: Deploy to itch.io
+        run: butler push Game-Mac.zip moontalesstudio/spooky-game:mac
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
           
