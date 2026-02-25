@@ -77,7 +77,7 @@ namespace Player
                 }
                 else if (coreState == Types.PlayerMentalCoreState.Anxious)
                 {
-                    drainAmount = 2f; // Drain 2 mental health per interval
+                    drainAmount = 1.5f; // Drain 2 mental health per interval
                 }
 
                 bool isInTutorialOrMainMenu = GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial || GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu;
