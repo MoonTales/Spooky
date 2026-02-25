@@ -36,10 +36,6 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
       
-      # Referenced the following links; added second upload attempt on error
-      # https://github.com/actions/upload-artifact
-      # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax
-      # https://github.com/actions/upload-pages-artifact/issues/97
       - name: Upload build artifact (attempt 1)
         id: upload_artifact_attempt_1
         continue-on-error: true
@@ -56,5 +52,44 @@ jobs:
         with:
           name: Build-${{ matrix.targetPlatform }}
           path: build/${{ matrix.targetPlatform }}
+          overwrite: true
+          compression-level: 0
+  ## The dreaded mac build...
+  buildForMac:
+    name: Build for StandaloneOSX
+    if: github.base_ref == 'main'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+      - uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-StandaloneOSX
+          restore-keys: Library-
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneOSX
+      - name: Upload build artifact (attempt 1)
+        id: upload_artifact_attempt_1
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-StandaloneOSX
+          path: build/StandaloneOSX
+          overwrite: true
+          compression-level: 0
+      - name: Upload build artifact (retry)
+        if: steps.upload_artifact_attempt_1.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-StandaloneOSX
+          path: build/StandaloneOSX
           overwrite: true
           compression-level: 0
