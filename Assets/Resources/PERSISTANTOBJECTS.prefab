@@ -129,16 +129,6 @@ MonoBehaviour:
   defaultMaxStamina: 100
   defaultMovementSpeed: 5
   defaultPlayerMentalState: 0
-  defaultPlayerMentalCoreState: 0
-  NormalMentalHealthCutoff: 1
-  MildlyAnxiousMentalHealthCutoff: 0.8
-  ModeratlyAnxiousMentalHealthCutoff: 0.6
-  SeverlyAnxiousMentalHealthCutoff: 0.25
-  PanicMentalHealthCutoff: 0.1
-  MildlySleepDeprivedMentalHealthCutoff: 0.8
-  ModeratlySleepDeprivedMentalHealthCutoff: 0.6
-  SeverlySleepDeprivedMentalHealthCutoff: 0.25
-  ExhaustedMentalHealthCutoff: 0.1
 --- !u!1 &3530379015126378944
 GameObject:
   m_ObjectHideFlags: 0
@@ -469,6 +459,34 @@ PrefabInstance:
       propertyPath: inspectionDistance
       value: 1.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1930321923446903325, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930321923446903325, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2226057379654702618, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2226057379654702618, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2226057379654702618, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3630649624445775831, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3630649624445775831, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4476944612804632008, guid: 06e316b8387beff40b678233ca86eed1, type: 3}
       propertyPath: m_VersionIndex
       value: 2289
@@ -755,7 +773,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5537662271551408140, guid: e62c50f5d0d217547814ea56e2a24ec2, type: 3}
       propertyPath: far clip plane
-      value: 50
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 5537662271551408140, guid: e62c50f5d0d217547814ea56e2a24ec2, type: 3}
       propertyPath: near clip plane
@@ -775,19 +793,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8248288443172694000, guid: e62c50f5d0d217547814ea56e2a24ec2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.16070308
+      value: 0.0452444
       objectReference: {fileID: 0}
     - target: {fileID: 8248288443172694000, guid: e62c50f5d0d217547814ea56e2a24ec2, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.0046414225
+      value: -0.013742396
       objectReference: {fileID: 0}
     - target: {fileID: 8248288443172694000, guid: e62c50f5d0d217547814ea56e2a24ec2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.9865805
+      value: 0.95576626
       objectReference: {fileID: 0}
     - target: {fileID: 8248288443172694000, guid: e62c50f5d0d217547814ea56e2a24ec2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.028494395
+      value: 0.29030156
       objectReference: {fileID: 0}
     - target: {fileID: 8248288443172694000, guid: e62c50f5d0d217547814ea56e2a24ec2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
