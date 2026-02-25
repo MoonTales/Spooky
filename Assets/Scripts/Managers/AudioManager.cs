@@ -110,8 +110,6 @@ namespace Managers
         [SerializeField] private string tutorialOrbAudioSceneName = "Tutorial";
         [SerializeField] private string tutorialOrbRootName = "TheBuilding";
         [SerializeField] private string tutorialOrbNamePrefix = "Orb";
-        [SerializeField] private string tutorialOrbPinnedName = "Orb5 (2)";
-        [SerializeField] private string tutorialOrbPinnedEventPathToken = "orb-peace";
         [SerializeField] private EventReference[] tutorialOrbEvents;
 
         [Space(10)]
@@ -1912,7 +1910,7 @@ namespace Managers
                 }
             }
 
-            List<EventReference> assignments = BuildTutorialOrbEventAssignments(orbTargets);
+            List<EventReference> assignments = BuildTutorialOrbEventAssignments(orbTargets.Count);
             if (orbTargets.Count == 0 || assignments.Count == 0)
             {
                 if (orbTargets.Count > 0)
@@ -1974,9 +1972,8 @@ namespace Managers
             return candidate.name.StartsWith(tutorialOrbNamePrefix, StringComparison.OrdinalIgnoreCase);
         }
 
-        private List<EventReference> BuildTutorialOrbEventAssignments(List<Transform> orbTargets)
+        private List<EventReference> BuildTutorialOrbEventAssignments(int targetCount)
         {
-            int targetCount = orbTargets != null ? orbTargets.Count : 0;
             List<EventReference> assignments = new List<EventReference>(Mathf.Max(0, targetCount));
             if (targetCount <= 0)
             {
@@ -1999,93 +1996,7 @@ namespace Managers
                     assignments.Add(validEvents[i]);
                 }
             }
-
-            ApplyPinnedTutorialOrbAssignment(orbTargets, assignments, validEvents);
             return assignments;
-        }
-
-        private void ApplyPinnedTutorialOrbAssignment(
-            List<Transform> orbTargets,
-            List<EventReference> assignments,
-            List<EventReference> validEvents)
-        {
-            if (orbTargets == null
-                || assignments == null
-                || validEvents == null
-                || orbTargets.Count == 0
-                || assignments.Count != orbTargets.Count
-                || string.IsNullOrWhiteSpace(tutorialOrbPinnedName)
-                || string.IsNullOrWhiteSpace(tutorialOrbPinnedEventPathToken))
-            {
-                return;
-            }
-
-            int pinnedOrbIndex = -1;
-            for (int i = 0; i < orbTargets.Count; i++)
-            {
-                Transform orb = orbTargets[i];
-                if (orb == null)
-                {
-                    continue;
-                }
-
-                if (string.Equals(orb.name, tutorialOrbPinnedName, StringComparison.OrdinalIgnoreCase))
-                {
-                    pinnedOrbIndex = i;
-                    break;
-                }
-            }
-
-            if (pinnedOrbIndex < 0)
-            {
-                return;
-            }
-
-            EventReference pinnedEvent = default;
-            bool foundPinnedEvent = false;
-            for (int i = 0; i < validEvents.Count; i++)
-            {
-                EventReference candidate = validEvents[i];
-                if (string.IsNullOrWhiteSpace(candidate.Path))
-                {
-                    continue;
-                }
-
-                if (candidate.Path.IndexOf(tutorialOrbPinnedEventPathToken, StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    pinnedEvent = candidate;
-                    foundPinnedEvent = true;
-                    break;
-                }
-            }
-
-            if (!foundPinnedEvent)
-            {
-                LogAudioState(
-                    $"Tutorial orb pin skipped: no event path containing '{tutorialOrbPinnedEventPathToken}' found for '{tutorialOrbPinnedName}'.");
-                return;
-            }
-
-            int existingPinnedEventIndex = -1;
-            for (int i = 0; i < assignments.Count; i++)
-            {
-                if (AreSameEventReference(assignments[i], pinnedEvent))
-                {
-                    existingPinnedEventIndex = i;
-                    break;
-                }
-            }
-
-            if (existingPinnedEventIndex >= 0 && existingPinnedEventIndex != pinnedOrbIndex)
-            {
-                EventReference displacedEvent = assignments[pinnedOrbIndex];
-                assignments[pinnedOrbIndex] = pinnedEvent;
-                assignments[existingPinnedEventIndex] = displacedEvent;
-            }
-            else
-            {
-                assignments[pinnedOrbIndex] = pinnedEvent;
-            }
         }
 
         private List<EventReference> GetValidTutorialOrbEvents()
@@ -2116,21 +2027,6 @@ namespace Managers
                 events[i] = events[swapIndex];
                 events[swapIndex] = temp;
             }
-        }
-
-        private static bool AreSameEventReference(EventReference a, EventReference b)
-        {
-            if (!a.Guid.IsNull && !b.Guid.IsNull)
-            {
-                return a.Guid == b.Guid;
-            }
-
-            if (!string.IsNullOrWhiteSpace(a.Path) && !string.IsNullOrWhiteSpace(b.Path))
-            {
-                return string.Equals(a.Path, b.Path, StringComparison.OrdinalIgnoreCase);
-            }
-
-            return false;
         }
 
         private static bool IsLampCandidate(Light light)
