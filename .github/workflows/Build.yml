@@ -54,7 +54,7 @@ jobs:
           path: build/${{ matrix.targetPlatform }}
           overwrite: true
           compression-level: 0
-  ## The dreaded mac build...
+  ## The dreaded mac build....
   buildForMac:
     name: Build for StandaloneOSX
     if: github.base_ref == 'main'
