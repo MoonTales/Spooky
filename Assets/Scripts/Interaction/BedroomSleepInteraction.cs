@@ -39,7 +39,7 @@ namespace Interaction
 
             const int timeToFadeOut = 3; 
             const int fadeInDuration = 2;
-            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:fadeInDuration, 1.5f, fadeOutDuration:timeToFadeOut, FadeInCompleted, FadeOutCompleted);
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:fadeInDuration, 1.5f, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted, FadeDurationCompleted);
 
             fadeData.Send();
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
@@ -55,12 +55,12 @@ namespace Interaction
             );
             data.Send();
             GameStateManager.Instance.SetCurrentZoneId(-1);
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            
         }
 
-        private void FadeInCompleted()
+        private void FadeDurationCompleted()
         {
-            
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
     }
 }
