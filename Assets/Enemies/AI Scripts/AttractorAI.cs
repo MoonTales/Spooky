@@ -208,12 +208,12 @@ public class AttractorAI : MonoBehaviour
 		float z = float.Parse(arguments[2]);
 		Vector3 location = new Vector3(x, y, z);
 
-		transform.position = location;
+		agent.Warp(location);
 	}
 	private int nextTeleportIndex = 0;
 	public void TeleportCycle()
 	{
-		transform.position = teleportLocations[nextTeleportIndex];
+		agent.Warp(teleportLocations[nextTeleportIndex]);
 
 		nextTeleportIndex++;
 		if (nextTeleportIndex >= teleportLocations.Count())
