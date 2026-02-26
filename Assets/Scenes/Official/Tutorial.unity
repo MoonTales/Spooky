@@ -17994,6 +17994,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxRunTime: 5
+  runPressureThreshold: 6
+  debugHallwayState: 0
 --- !u!54 &463715133
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -29674,7 +29676,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6217011444701178445, guid: 728c46287123e8b46b29bc4e7c37181d, type: 3}
       propertyPath: notificationTextOverride
-      value: Use WASD to move and mouse to look around.
+      value: Use WASD to move and your mouse to look around.
       objectReference: {fileID: 0}
     - target: {fileID: 6843150883900394806, guid: 728c46287123e8b46b29bc4e7c37181d, type: 3}
       propertyPath: m_Name
@@ -50527,6 +50529,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7674aacf5a289e43a0c2feb137cc7b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playDoorCloseSfx: 0
+  doorCloseSfxId: 10
   triggerOnce: 1
 --- !u!54 &1341225077
 Rigidbody:
@@ -67998,7 +68002,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6217011444701178445, guid: 728c46287123e8b46b29bc4e7c37181d, type: 3}
       propertyPath: notificationTextOverride
-      value: Press C to Uncrouch
+      value: Press C to uncrouch.
       objectReference: {fileID: 0}
     - target: {fileID: 6217011444701178445, guid: 728c46287123e8b46b29bc4e7c37181d, type: 3}
       propertyPath: notificationDisplayDuration
@@ -82098,6 +82102,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7674aacf5a289e43a0c2feb137cc7b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playDoorCloseSfx: 0
+  doorCloseSfxId: 10
   triggerOnce: 1
 --- !u!54 &108490534879005321
 Rigidbody:
@@ -90514,9 +90520,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7674aacf5a289e43a0c2feb137cc7b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerOnce: 1
   playDoorCloseSfx: 1
   doorCloseSfxId: 10
+  triggerOnce: 1
 --- !u!64 &8870409973661344266
 MeshCollider:
   m_ObjectHideFlags: 0
