@@ -1,3 +1,4 @@
+using Managers;
 using UnityEngine;
 
 public class ToggleInteractable : MonoBehaviour, IInteractable
@@ -28,6 +29,12 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
     [SerializeField] private Animator targetAnimator;
     // add more as we need
 
+    [Header("FMOD SFX")]
+    [SerializeField] private bool playToggleSfx = false;
+    [SerializeField] private AudioManager.SfxId toggleSfxId = AudioManager.SfxId.TutorialButtonClick;
+    [SerializeField] private bool playSecondaryToggleSfx = false;
+    [SerializeField] private AudioManager.SfxId secondaryToggleSfxId = AudioManager.SfxId.TutorialDoorSlide;
+
 
     // From the IInteractable interface - set these as appropriate
     public AudioClip HoverSfx => null;
@@ -56,6 +63,8 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
 
         bool newState = !IsOn();
         SetOn(newState);
+        PlayToggleSfx();
+        PlaySecondaryToggleSfx();
     }
 
 
@@ -134,6 +143,34 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
 
                 // add more as we need
 
+        }
+    }
+
+    private void PlayToggleSfx()
+    {
+        if (!playToggleSfx)
+        {
+            return;
+        }
+
+        AudioManager audioManager = Object.FindAnyObjectByType<AudioManager>();
+        if (audioManager != null)
+        {
+            audioManager.PlaySfx(toggleSfxId, transform);
+        }
+    }
+
+    private void PlaySecondaryToggleSfx()
+    {
+        if (!playSecondaryToggleSfx)
+        {
+            return;
+        }
+
+        AudioManager audioManager = Object.FindAnyObjectByType<AudioManager>();
+        if (audioManager != null)
+        {
+            audioManager.PlaySfx(secondaryToggleSfxId, transform);
         }
     }
 }

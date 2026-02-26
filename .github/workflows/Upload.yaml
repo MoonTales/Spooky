@@ -2,7 +2,7 @@ name: Deploy to Itch.io
 
 on:
   push:
-    branches: [ Development ]
+    branches: [ Development, main ]
 
 permissions:
   actions: read
@@ -35,7 +35,6 @@ jobs:
           zip -r ../../Game.zip .
           cd ../..
 
-      # THIS POINT AND AFTER DOES NOT WORK
       # Install Butler
       - name: Setup butler
         uses: remarkablegames/setup-butler@v2
@@ -46,4 +45,3 @@ jobs:
         run: butler push Game.zip moontalesstudio/spooky-game:windows
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-          

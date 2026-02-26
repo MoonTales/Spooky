@@ -34,9 +34,9 @@ namespace Interaction
             var obj = Instantiate(placeholderPrefab, drawingSpawnLocationOne.transform);
             // we should zero our the local position of these drawings, since the prefab might have some weird offset, and we want them to be centered on the location game objects
             obj.transform.localPosition = Vector3.zero;
-            obj =Instantiate(placeholderPrefab, drawingSpawnLocationTwo.transform);
+            if (drawingSpawnLocationTwo){obj = Instantiate(placeholderPrefab, drawingSpawnLocationTwo.transform);}
             obj.transform.localPosition = Vector3.zero;
-            obj = Instantiate(placeholderPrefab, drawingSpawnLocationThree.transform);
+            if(drawingSpawnLocationThree){obj = Instantiate(placeholderPrefab, drawingSpawnLocationThree.transform);}
             obj.transform.localPosition = Vector3.zero;
         }
         
@@ -58,8 +58,7 @@ namespace Interaction
             // otherwise, we cant return yet
             Types.NotificationData data = new(
                 duration: 1, 
-                messageKey: new TextKey(),
-                messageOverride: "You feel like you haven't done enough tonight. Maybe you should explore a bit more?",
+                messageKey: new TextKey { place="prompt", id="no_drawings"},
                 shouldOnlyShowOnce:false
             );
             data.Send();
