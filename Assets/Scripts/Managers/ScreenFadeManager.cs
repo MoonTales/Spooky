@@ -64,6 +64,7 @@ namespace Managers
 
             // Pause for a set time
             yield return new WaitForSeconds(fadeData.GetFadeDuration());
+            OnScreenFadeDurationComplete(fadeData.GetOnFadeDurationComplete());
             
             // Fade to clear (Fade Out)
             yield return StartCoroutine(FadeToClear(fadeData.GetFadeInDuration()));
@@ -119,6 +120,11 @@ namespace Managers
         }
 
         private void OnScreenFadeOutComplete(Action onComplete)
+        {
+            onComplete?.Invoke();
+        }
+
+        private void OnScreenFadeDurationComplete(Action onComplete)
         {
             onComplete?.Invoke();
         }

@@ -156,5 +156,15 @@ namespace UI
             textColor.a = 0f;
             _notificationText.color = textColor;
         }
+
+        public void HideNotificationText()
+        {
+            _notificationText.gameObject.SetActive(false);
+        }
+
+        public void ShowNotificationText()
+        {
+            _notificationText.gameObject.SetActive(true);
+        }
     }
 }

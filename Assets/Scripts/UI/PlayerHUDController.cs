@@ -121,6 +121,7 @@ namespace UI
                 case Types.GameState.Gameplay:
                     SetInspectionText("", "");
                     SetInspectionTextVisible(false);
+                    SetInspectionBGVisible(false);
                     if (_hudCrosshair != null) { _hudCrosshair.enabled = true; }
                     ShowHUD(true);
                     break;
@@ -142,6 +143,7 @@ namespace UI
         private void HandleInspection()
         {
             ShowHUD(true);
+            SetInspectionBGVisible(true);
             InspectableObject obj = InspectionSystem.Instance.GetCurrentInspectedObject();
             if (obj == null)
             {
@@ -195,6 +197,9 @@ namespace UI
         {
             if (_hudItemNameText != null) _hudItemNameText.gameObject.SetActive(visible);
             if (_hudItemDescriptionScrollRect != null) _hudItemDescriptionScrollRect.gameObject.SetActive(visible);
+        }
+        private void SetInspectionBGVisible(bool visible)
+        {
             if (_hudOverlay != null) _hudOverlay.enabled = visible;
         }
         private void SetInspectionText(string name, string desc)
