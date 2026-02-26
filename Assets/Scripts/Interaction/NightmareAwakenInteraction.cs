@@ -58,8 +58,7 @@ namespace Interaction
             // otherwise, we cant return yet
             Types.NotificationData data = new(
                 duration: 1, 
-                messageKey: new TextKey(),
-                messageOverride: "You feel like you haven't done enough tonight. Maybe you should explore a bit more?",
+                messageKey: new TextKey { place="prompt", id="no_drawings"},
                 shouldOnlyShowOnce:false
             );
             data.Send();
