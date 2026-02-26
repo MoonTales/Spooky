@@ -1305,7 +1305,7 @@ public class AttractorAI : MonoBehaviour
 					if (conditionsMet)
 					{
 						nextStatePriority = tempPriority;
-						nextFunctions = reaction.functionExecutions;
+						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
 						if (nextStatePriority < currentStatePriority)
 						{
 							foreach (FunctionPicker function in nextFunctions)
@@ -1348,7 +1348,7 @@ public class AttractorAI : MonoBehaviour
 						reaction.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any()))
 					{
 						nextStatePriority = tempPriority;
-						nextFunctions = reaction.functionExecutions;
+						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
 						if (nextStatePriority < currentStatePriority)
 						{
 							foreach (FunctionPicker function in nextFunctions)
@@ -1561,7 +1561,7 @@ public class AttractorAI : MonoBehaviour
 					nextFocus = attackRevertFocus == null ? defaultFocus : attackRevertFocus;
 					nextState = attackRevertState;
 					nextStatePriority = attackRevertPriority;
-					nextFunctions = behaviourHierarchy[nextStatePriority].functionExecutions;
+					nextFunctions = new List<FunctionPicker>(behaviourHierarchy[nextStatePriority].functionExecutions);
 				}
 				currentFocus = nextFocus;
 				currentState = nextState;
