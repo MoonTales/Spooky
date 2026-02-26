@@ -247,14 +247,16 @@ namespace System
             private float _fadeOutDuration; public float GetFadeOutDuration() { return _fadeOutDuration; }
             private Action _onFadeInComplete; public Action GetOnFadeInComplete() { return _onFadeInComplete; }
             private Action _onFadeOutComplete; public Action GetOnFadeOutComplete() { return _onFadeOutComplete; }
+            private Action _OnFadeDurationComplete; public Action GetOnFadeDurationComplete() { return _OnFadeDurationComplete; }
 
-            public ScreenFadeData(float fadeInDuration, float fadeDuration, float fadeOutDuration, Action onFadeInComplete = null, Action onFadeOutComplete = null)
+            public ScreenFadeData(float fadeInDuration, float fadeDuration, float fadeOutDuration, Action onFadeInComplete = null, Action onFadeOutComplete = null, Action onFadeDurationComplete = null)
             {
                 _fadeInDuration = fadeInDuration;
                 _fadeDuration = fadeDuration;
                 _fadeOutDuration = fadeOutDuration;
                 _onFadeInComplete = onFadeInComplete;
                 _onFadeOutComplete = onFadeOutComplete;
+                _OnFadeDurationComplete = onFadeDurationComplete;
             }
 
             public void Send()

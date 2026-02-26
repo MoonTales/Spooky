@@ -131,8 +131,21 @@ namespace System
             OnLetterScribble.Invoke(sourceTransform);
             return true;
         }
-        
-        
+
+        public delegate void OnTutorialHallwayStretchStartHandler(Transform sourceTransform);
+        public static event OnTutorialHallwayStretchStartHandler OnTutorialHallwayStretchStart;
+        public static void Broadcast_OnTutorialHallwayStretchStart(Transform sourceTransform)
+        {
+            OnTutorialHallwayStretchStart?.Invoke(sourceTransform);
+        }
+
+        public delegate void OnTutorialHallwayStretchContractedHandler(Transform sourceTransform);
+        public static event OnTutorialHallwayStretchContractedHandler OnTutorialHallwayStretchContracted;
+        public static void Broadcast_OnTutorialHallwayStretchContracted(Transform sourceTransform)
+        {
+            OnTutorialHallwayStretchContracted?.Invoke(sourceTransform);
+        }
+
         public delegate void OnFlashlightToggledHandler(bool isOn);
         public static event OnFlashlightToggledHandler OnFlashlightToggled;
         public static void Broadcast_OnFlashlightToggled(bool isOn) { OnFlashlightToggled?.Invoke(isOn); }

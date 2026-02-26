@@ -59,7 +59,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
         }
     }
     
-    void Update()
+    void FixedUpdate()
     {
         // check if we are currently inspecting an object
         if (_isInspecting)
@@ -128,7 +128,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
             Types.NotificationData data = new(
                 duration: 3, 
                 messageKey: new TextKey { place = "tutorial", id = "inspect" },
-                messageOverride: "Click and drag mouse to view object. F or RMB to exit.",
+                messageOverride: "Click and drag to view object. F or right click to exit.",
                 shouldOnlyShowOnce: true
             );
             data.Send();
@@ -217,7 +217,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
         if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
         {
             // only allow exit once the object is close enough to the inspection point (so we dont have weird snapping)
-            if (Vector3.Distance(_currentInspectedObject.transform.localPosition, targetZoomPosition) < 0.1f)
+            if (Vector3.Distance(_currentInspectedObject.transform.localPosition, targetZoomPosition) < 0.05f)
             {
                 // determine if the object we are currently inspecting is:
                 // a) a research letter AND has not been written on yet

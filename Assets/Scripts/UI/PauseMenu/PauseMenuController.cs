@@ -106,6 +106,10 @@ namespace UI.PauseMenu
             paused = true;
             PauseMenuCanvas.SetActive(true);
         
+            
+            // we have an edge case if we pause while a notification is on screen (so we will wanna hide it)
+            NotificationController.Instance.HideNotificationText();
+
         }
 
         public void Play()
@@ -119,6 +123,7 @@ namespace UI.PauseMenu
             paused = false;
             ShowMenu(false);
             SettingsController.Instance.CloseSettings();
+            NotificationController.Instance.ShowNotificationText();
         }
 
         public void ShowMenu(bool show)
