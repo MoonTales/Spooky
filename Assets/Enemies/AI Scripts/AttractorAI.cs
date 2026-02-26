@@ -38,6 +38,7 @@ public class AttractorAI : MonoBehaviour
 	public EnemyState defaultState = EnemyState.Stand;
 	private EnemyState currentState = EnemyState.Stand;
 	private EnemyState nextState = EnemyState.Stand;
+	private List<FunctionPicker> nextFunctions = new List<FunctionPicker>();
 	[Tooltip("Leave blank to default focus on player")]
 	public Transform defaultFocus;
 
@@ -817,6 +818,7 @@ public class AttractorAI : MonoBehaviour
 		currentFocus = defaultFocus;
 		currentState = defaultState;
 		nextState = defaultState;
+		nextFunctions.Clear();
 		lowestPriority = behaviourHierarchy.Count;
 		currentStatePriority = lowestPriority;
 		agent = GetComponent<NavMeshAgent>();
@@ -1164,7 +1166,6 @@ public class AttractorAI : MonoBehaviour
 					}
 				}
 			}
-			tempPriority++;
 		}
 
 		foreach (EnemyReactions reaction in behaviourHierarchy)
@@ -1304,9 +1305,10 @@ public class AttractorAI : MonoBehaviour
 					if (conditionsMet)
 					{
 						nextStatePriority = tempPriority;
+						nextFunctions = reaction.functionExecutions;
 						if (nextStatePriority < currentStatePriority)
 						{
-							foreach (FunctionPicker function in reaction.functionExecutions)
+							foreach (FunctionPicker function in nextFunctions)
 							{
 								HandleFunctionCalling(function);
 							}
@@ -1346,9 +1348,10 @@ public class AttractorAI : MonoBehaviour
 						reaction.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any()))
 					{
 						nextStatePriority = tempPriority;
+						nextFunctions = reaction.functionExecutions;
 						if (nextStatePriority < currentStatePriority)
 						{
-							foreach (FunctionPicker function in reaction.functionExecutions)
+							foreach (FunctionPicker function in nextFunctions)
 							{
 								HandleFunctionCalling(function);
 							}
@@ -1377,6 +1380,7 @@ public class AttractorAI : MonoBehaviour
 			nextFocus = defaultFocus;
 			nextStatePriority = lowestPriority;
 			nextState = defaultState;
+			nextFunctions.Clear();
 		}
 
 		// Check if the agent has reached its destination and is not calculating a new path
@@ -1384,6 +1388,13 @@ public class AttractorAI : MonoBehaviour
 		{
 			currentFocus = nextFocus;
 			currentState = nextState;
+			if (nextStatePriority != currentStatePriority)
+			{
+				foreach (FunctionPicker function in nextFunctions)
+				{
+					HandleFunctionCalling(function);
+				}
+			}
 			currentStatePriority = nextStatePriority;
 			agent.speed = wanderSpeed;
 			patrolTimer -= Time.deltaTime;
@@ -1399,6 +1410,13 @@ public class AttractorAI : MonoBehaviour
 		{
 			currentFocus = nextFocus;
 			currentState = nextState;
+			if (nextStatePriority != currentStatePriority)
+			{
+				foreach (FunctionPicker function in nextFunctions)
+				{
+					HandleFunctionCalling(function);
+				}
+			}
 			currentStatePriority = nextStatePriority;
 			agent.speed = 0;
 		}
@@ -1417,6 +1435,13 @@ public class AttractorAI : MonoBehaviour
 			{
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 
@@ -1452,6 +1477,13 @@ public class AttractorAI : MonoBehaviour
 			{
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 
@@ -1489,6 +1521,13 @@ public class AttractorAI : MonoBehaviour
 			{
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 
@@ -1522,9 +1561,17 @@ public class AttractorAI : MonoBehaviour
 					nextFocus = attackRevertFocus == null ? defaultFocus : attackRevertFocus;
 					nextState = attackRevertState;
 					nextStatePriority = attackRevertPriority;
+					nextFunctions = behaviourHierarchy[nextStatePriority].functionExecutions;
 				}
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 		}
@@ -1539,6 +1586,13 @@ public class AttractorAI : MonoBehaviour
 				animator.SetBool("Inspecting", false);
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 		}
@@ -1601,6 +1655,13 @@ public class AttractorAI : MonoBehaviour
 						hiding = false;
 						currentFocus = nextFocus;
 						currentState = nextState;
+						if (nextStatePriority != currentStatePriority)
+						{
+							foreach (FunctionPicker function in nextFunctions)
+							{
+								HandleFunctionCalling(function);
+							}
+						}
 						currentStatePriority = nextStatePriority;
 					}
 				}
@@ -1644,6 +1705,13 @@ public class AttractorAI : MonoBehaviour
 						currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
+					if (nextStatePriority != currentStatePriority)
+					{
+						foreach (FunctionPicker function in nextFunctions)
+						{
+							HandleFunctionCalling(function);
+						}
+					}
 					currentStatePriority = nextStatePriority;
 				}
 			}
@@ -1686,6 +1754,13 @@ public class AttractorAI : MonoBehaviour
 						currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
+					if (nextStatePriority != currentStatePriority)
+					{
+						foreach (FunctionPicker function in nextFunctions)
+						{
+							HandleFunctionCalling(function);
+						}
+					}
 					currentStatePriority = nextStatePriority;
 				}
 			}
