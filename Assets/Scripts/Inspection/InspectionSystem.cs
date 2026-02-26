@@ -128,7 +128,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
             Types.NotificationData data = new(
                 duration: 3, 
                 messageKey: new TextKey { place = "tutorial", id = "inspect" },
-                messageOverride: "Click and drag mouse to view object. F or RMB to exit.",
+                messageOverride: "Click and drag to view object. F or right click to exit.",
                 shouldOnlyShowOnce: true
             );
             data.Send();
