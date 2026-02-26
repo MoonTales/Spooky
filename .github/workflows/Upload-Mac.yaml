@@ -31,10 +31,9 @@ jobs:
       # Zip the .app bundle
       - name: Zip Mac Build
         run: |
-          cd build/StandaloneOSX
-          APP_NAME=$(ls *.app)
-          zip -r ../../Game-Mac.zip "$APP_NAME"
-          cd ../..
+          APP_PATH=$(find build -name "*.app" -type d | head -n 1)
+          echo "Found app at: $APP_PATH"
+          zip -r Game-Mac.zip "$APP_PATH"
 
       # Install Butler
       - name: Setup butler
