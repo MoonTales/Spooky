@@ -85,6 +85,10 @@ namespace System
             asyncLoad.allowSceneActivation = true;
 
             // Wait one frame for OnSceneLoaded to fire before continuing
+            
+            //SAVE UPDATE
+            // we want to save the game whenever we successfully scene swap
+            SaveSystem.Instance.SaveGame();
             yield return null;
         }
     }

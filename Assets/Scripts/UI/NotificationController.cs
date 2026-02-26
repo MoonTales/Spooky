@@ -159,12 +159,12 @@ namespace UI
 
         public void HideNotificationText()
         {
-            _notificationText.gameObject.SetActive(false);
+            if(_notificationText){_notificationText.gameObject.SetActive(false);}
         }
 
         public void ShowNotificationText()
         {
-            _notificationText.gameObject.SetActive(true);
+            if(_notificationText){_notificationText.gameObject.SetActive(true);}
         }
     }
 }

@@ -71,9 +71,22 @@ namespace UI.Main_Menu
         {
             // close the main menu canvas
             mainMenuCanvas.SetActive(false);
-            // Yes it snaps away, but this will be changed once the game has a fade away or anything to transition us into gameplay!
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            SceneSwapper.Instance.SwapScene("Tutorial");
+            
+            /// TEMP SAVE HANDLING ///
+            // if the player has save data, we will want to load their data, and send them to the bedroom
+            // if the player has no save data, we will send them to the tutorial like normal
+            if (SaveSystem.Instance.DoesSaveGameExist())
+            {
+                //TODO: LOAD
+            }
+            else
+            {
+                //No save data, start like normal!
+                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+                SceneSwapper.Instance.SwapScene("Tutorial");
+            }
+            
+
         }
 
         private void OnSettingsButtonClicked()
