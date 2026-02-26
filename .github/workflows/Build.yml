@@ -57,7 +57,7 @@ jobs:
   ## The dreaded mac build....
   buildForMac:
     name: Build for StandaloneOSX
-    if: github.base_ref == 'main'
+    ## if: github.base_ref == 'main' 
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
