@@ -1,0 +1,47 @@
+name: Deploy Mac to Itch.io
+
+on:
+  push:
+    branches: [ Development, main ]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Mac to Itch.io
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Download the Unity Mac build artifact
+      - name: Download Build Artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: Build.yml
+          workflow_search: true
+          name: Build-StandaloneOSX
+          path: build/StandaloneOSX
+          workflow_conclusion: success
+          allow_forks: true
+
+      # Zip the .app bundle
+      - name: Zip Mac Build
+        run: |
+          cd build/StandaloneOSX
+          APP_NAME=$(ls *.app)
+          zip -r ../../Game-Mac.zip "$APP_NAME"
+          cd ../..
+
+      # Install Butler
+      - name: Setup butler
+        uses: remarkablegames/setup-butler@v2
+
+      # Deploy to itch.io (Mac channel)
+      - name: Deploy to itch.io
+        run: butler push Game-Mac.zip moontalesstudio/spooky-game:mac
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
