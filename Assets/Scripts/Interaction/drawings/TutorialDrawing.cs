@@ -1,6 +1,7 @@
 using FMOD.Studio;
 using Managers;
 using System;
+using Player;
 using UnityEngine;
 using Types = System.Types;
 
@@ -64,6 +65,15 @@ namespace Interaction.drawings
             {
                 collider.enabled = false;
             }
+            
+            // we are gonna adjust how this works, we will first look for the only Tutorial_WallSlide object in the scene
+            Tutorial_WallSlide wallSlide = FindObjectOfType<Tutorial_WallSlide>();
+            wallSlide.SlideWall();
+            // since this is a special case, we will just pass it a custom ID of 0
+            PlayerInventory.Instance.AddDrawing(0);
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+            return;
 
             const int timeToFadeOut = 5;
             SleepTrackerManager.Instance.SetIsGoodWakeup(true);
@@ -189,3 +199,4 @@ namespace Interaction.drawings
         }
     }
 }
+
