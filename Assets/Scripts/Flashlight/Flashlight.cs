@@ -17,7 +17,7 @@ public class FlickerSettings
     public float flickerSpeed = 0.1f;
 }
 
-public class Flashlight : Singleton<Flashlight>
+public class Flashlight : Singleton<Flashlight>, ISaveSystemInterface<Flashlight.FlashlightSaveData>
 {
     // Tag used for what should cause the flashlight to Flicker
     [SerializeField] private string flickerTag = "Enemy";
@@ -103,6 +103,11 @@ public class Flashlight : Singleton<Flashlight>
     private GameObject _cachedFlickerTarget;
     private GameObject _currentFlickerTarget = null;
 
+
+    public struct FlashlightSaveData
+    {
+        public bool doWePossessTheFlashlight;
+    }
     
     private void Start()
     {
@@ -417,5 +422,26 @@ public class Flashlight : Singleton<Flashlight>
             light.enabled = state;
         }
     }
-    
+
+    protected override void OnGameRestarted()
+    {
+        _doWePossessTheFlashlight = false;
+    }
+
+    // ------------------------------------
+    // Save System Interface Implementation
+    // ------------------------------------
+    public string SaveId => "Flashlight";
+    public FlashlightSaveData OnSave()
+    {
+        return new FlashlightSaveData
+        {
+            doWePossessTheFlashlight = _doWePossessTheFlashlight
+        };
+    }
+
+    public void OnLoad(FlashlightSaveData data)
+    {
+        _doWePossessTheFlashlight = data.doWePossessTheFlashlight;
+    }
 }

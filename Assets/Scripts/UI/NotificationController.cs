@@ -172,6 +172,13 @@ namespace UI
             if(_notificationText){_notificationText.gameObject.SetActive(true);}
         }
 
+        protected override void OnGameRestarted()
+        {
+            base.OnGameRestarted();
+            // when the game restarts, we want to clear our hashtable of active notifications
+            _activeNotifications.Clear();
+        }
+
         // ------------------------
         // Save System Interface
         // -------------------------

@@ -239,6 +239,18 @@ namespace Managers
                 note.transform.rotation = targetRotation;
                 Destroy(note);
         }
+        
+
+        protected override void OnGameRestarted()
+        {
+            base.OnGameRestarted();
+            _hasReadAct1ResearcherLetter = false;
+            _hasReadAct1FriendLetter = false;
+            _hasReadAct2ResearcherLetter = false;
+            _hasReadAct2FriendLetter = false;
+            _hasReadAct3ResearcherLetter = false;
+            _hasReadAct3FriendLetter = false;
+        }
 
         public string SaveId => "LetterManager";
         public LetterSaveData OnSave()

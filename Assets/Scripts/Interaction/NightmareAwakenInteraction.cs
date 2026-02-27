@@ -96,6 +96,8 @@ namespace Interaction
             HashSet<int> collectedDrawingIds = PlayerInventory.Instance.GetCollectedDrawingIDs();
             foreach (int drawingID in collectedDrawingIds)
             {
+                // tutorial drawing, skip it
+                if (drawingID == 0) { continue; }
                 string prefabName = $"Prefabs/Drawings/Nightmare/N_Drawing_{drawingID}";
                 GameObject prefabToSpawn = Resources.Load<GameObject>(prefabName);
                 if (prefabToSpawn == null) { Debug.LogError($"Unable to find prefab for drawing ID {drawingID} at path {prefabName}"); continue; }

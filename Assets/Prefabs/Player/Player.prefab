@@ -5050,6 +5050,9 @@ MonoBehaviour:
   jumpForce: 4
   gravity: -12
   initialFallVelocity: -2
+  airStrafeMultiplier: 0.5
+  airBackwardMultiplier: 0.5
+  airAcceleration: 3
   standHeight: 2
   crouchHeight: 1
   crouchTransitionSpeed: 10
@@ -5087,7 +5090,7 @@ CharacterController:
   serializedVersion: 3
   m_Height: 2
   m_Radius: 0.4
-  m_SlopeLimit: 90
+  m_SlopeLimit: 62.5
   m_StepOffset: 0.4
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
@@ -7059,7 +7062,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9144412685554819017, guid: 7c7086b625cee654ebb4cb3aa45f8e37, type: 3}
       propertyPath: m_Value
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
