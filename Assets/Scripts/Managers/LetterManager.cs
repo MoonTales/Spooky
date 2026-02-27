@@ -10,8 +10,18 @@ namespace Managers
     /// <summary>
     /// The goal of this class, will handle the notes that spawn into the game at the start of each "Act"
     /// </summary>
-    public class LetterManager : Singleton<LetterManager>
+    public class LetterManager : Singleton<LetterManager>, ISaveSystemInterface<LetterManager.LetterSaveData>
     {
+
+        public struct LetterSaveData
+        {
+            public bool HasReadAct1ResearcherLetter;
+            public bool HasReadAct1FriendLetter;
+            public bool HasReadAct2ResearcherLetter;
+            public bool HasReadAct2FriendLetter;
+            public bool HasReadAct3ResearcherLetter;
+            public bool HasReadAct3FriendLetter;
+        }
         
         // Internal variables
         private GameObject _notePrefab;
@@ -227,6 +237,28 @@ namespace Managers
                 note.transform.rotation = targetRotation;
                 Destroy(note);
         }
-        
+
+        public string SaveId => "LetterManager";
+        public LetterSaveData OnSave()
+        {
+            return new LetterSaveData
+            {
+                HasReadAct1ResearcherLetter = _hasReadAct1ResearcherLetter,
+                HasReadAct1FriendLetter = _hasReadAct1FriendLetter,
+                HasReadAct2ResearcherLetter = _hasReadAct2ResearcherLetter,
+                HasReadAct2FriendLetter = _hasReadAct2FriendLetter,
+                HasReadAct3ResearcherLetter = _hasReadAct3ResearcherLetter,
+                HasReadAct3FriendLetter = _hasReadAct3FriendLetter
+            };
+        }
+        public void OnLoad(LetterSaveData data)
+        {
+            _hasReadAct1ResearcherLetter = data.HasReadAct1ResearcherLetter;
+            _hasReadAct1FriendLetter = data.HasReadAct1FriendLetter;
+            _hasReadAct2ResearcherLetter = data.HasReadAct2ResearcherLetter;
+            _hasReadAct2FriendLetter = data.HasReadAct2FriendLetter;
+            _hasReadAct3ResearcherLetter = data.HasReadAct3ResearcherLetter;
+            _hasReadAct3FriendLetter = data.HasReadAct3FriendLetter;
+        }
     }
 }
