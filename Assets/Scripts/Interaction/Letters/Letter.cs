@@ -83,8 +83,6 @@ namespace Interaction.Letters
     {
         // Get ALL mesh renderers (this object + all children)
         MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
-        Debug.Log(renderers.Length);
-        Debug.Log(materialArray.Length);
 
         // Replace material element 0 on all renderers with its transparent material counterpart
         Material[] fadeMats = new Material[renderers.Length];

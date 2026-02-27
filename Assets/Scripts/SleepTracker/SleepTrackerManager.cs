@@ -84,7 +84,6 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
     /// </summary>
     public void TurnSleepTrackerOff()
     {
-        DebugUtils.Log("Turning Sleep Tracker Off");
         _isSleepTrackerActive = false;
         BroadcastSleepTrackerAudioState();
     }
@@ -94,7 +93,6 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
     /// </summary>
     public void TurnSleepTrackerOn()
     {
-        DebugUtils.Log("Turning Sleep Tracker On");
         _isSleepTrackerActive = true;
         BroadcastSleepTrackerAudioState();
     }
