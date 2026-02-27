@@ -41,6 +41,13 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
     private bool _isFirstInspection = true; // Flag to track if it's the first inspection
     
+    // fix:
+    // you need to be inspecting an object for atleast 0.5 seconds before you can exit
+    // this is to stop the low fsp issue of it returning to the og position
+    float inspectionStartTime = 0f;
+    bool canExitInspection => inspectionStartTime >= 0.5f;
+    
+    
     void Start()
     {
         // Get the pan/tilt component from the Cinemachine camera (which is on the player)
@@ -59,7 +66,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
         }
     }
     
-    void FixedUpdate()
+    void Update()
     {
         // check if we are currently inspecting an object
         if (_isInspecting)
@@ -73,7 +80,15 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 HandleInspection();
             }
         }
+        
+        // update the time
+        if (_isInspecting && !canExitInspection)
+        {
+            inspectionStartTime += Time.deltaTime;
+        }
     }
+    
+    
     
     // Public function which can be called from any other script to start inspecting an object (itself or another)
     public void StartInspection(GameObject objectToInspect)
@@ -158,6 +173,9 @@ public class InspectionSystem : Singleton<InspectionSystem>
         {
             inspectable.OnInspectionFinished();
         }
+        
+        // reset the inspection start time for the next inspection
+        inspectionStartTime = 0f; 
     }
     
     private void HandleInspection()
@@ -216,6 +234,10 @@ public class InspectionSystem : Singleton<InspectionSystem>
         //TODO: fix this so that we can use F
         if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
         {
+            
+            // ensure enough time has pass
+            if (!canExitInspection) { return; }
+            
             // only allow exit once the object is close enough to the inspection point (so we dont have weird snapping)
             if (Vector3.Distance(_currentInspectedObject.transform.localPosition, targetZoomPosition) < 0.05f)
             {
