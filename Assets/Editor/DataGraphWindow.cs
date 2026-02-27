@@ -75,47 +75,96 @@ public class DataGraphWindow : EditorWindow
         var node = new Node { title = prop.displayName };
         node.SetPosition(new Rect(pos, new Vector2(_defaultWidth, 200)));
 
-        // Set styling to allow infinite vertical growth
-        node.style.width = _defaultWidth;
+        // Base Node Styling
+        node.style.width = StyleKeyword.Auto;
+        node.style.minWidth = _defaultWidth;
         node.style.height = StyleKeyword.Auto;
-        node.mainContainer.style.height = StyleKeyword.Auto;
-        node.extensionContainer.style.height = StyleKeyword.Auto;
-        node.extensionContainer.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.8f);
 
-        // --- RECURSIVE DATA BUILDING ---
-        // This function manually builds the fields so they never use a ScrollView
-        void BuildDataUI(SerializedProperty p, VisualElement container)
+        // --- FIXED PADDING FOR THE EXTENSION CONTAINER ---
+        node.extensionContainer.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.9f);
+        node.extensionContainer.style.paddingTop = 5;
+        node.extensionContainer.style.paddingBottom = 5;
+        node.extensionContainer.style.paddingLeft = 5;
+        node.extensionContainer.style.paddingRight = 5;
+
+        // --- RECURSIVE ALTERNATING BUILDER ---
+        // isVertical: true = Top-to-Bottom, false = Left-to-Right
+        void BuildDataUI(SerializedProperty p, VisualElement container, bool isVertical)
         {
+            // CASE 1: It's a LIST (Array)
             if (p.isArray && p.propertyType == SerializedPropertyType.Generic)
             {
-                // Manual List Header
-                var foldout = new Foldout { text = $"{p.displayName} (List: {p.arraySize})", value = true };
-                container.Add(foldout);
+                // 1. Create a Header that includes the "+" and "-" functionality
+                // We use a PropertyField for JUST the array header to keep built-in Unity buttons
+                var listHeader = new PropertyField(p.Copy(), "");
+                listHeader.Bind(p.serializedObject);
+                container.Add(listHeader);
 
-                // Create a field for every element in the list manually
+                var listContent = new VisualElement();
+                listContent.style.flexDirection = isVertical ? FlexDirection.Column : FlexDirection.Row;
+                listContent.style.flexWrap = Wrap.NoWrap;
+
                 for (int i = 0; i < p.arraySize; i++)
                 {
                     var element = p.GetArrayElementAtIndex(i);
-                    var elementContainer = new VisualElement { style = { paddingLeft = 15, paddingBottom = 2 } };
-                    BuildDataUI(element, elementContainer); // Recursive call for nested data
-                    foldout.Add(elementContainer);
+                    var elementWrapper = new VisualElement();
+
+                    // Styling the "Cell"
+                    elementWrapper.style.paddingTop = 5; elementWrapper.style.paddingBottom = 5;
+                    elementWrapper.style.paddingLeft = 5; elementWrapper.style.paddingRight = 5;
+                    elementWrapper.style.borderTopWidth = 1; elementWrapper.style.borderBottomWidth = 1;
+                    elementWrapper.style.borderLeftWidth = 1; elementWrapper.style.borderRightWidth = 1;
+                    elementWrapper.style.borderTopColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+                    elementWrapper.style.borderBottomColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+                    elementWrapper.style.borderLeftColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+                    elementWrapper.style.borderRightColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+                    elementWrapper.style.backgroundColor = new Color(1, 1, 1, 0.03f);
+
+                    // FLIP the orientation for children of this list
+                    BuildDataUI(element, elementWrapper, !isVertical);
+                    listContent.Add(elementWrapper);
                 }
+                container.Add(listContent);
             }
+            // CASE 2: It's a CLASS/STRUCT (with children)
+            else if (p.hasVisibleChildren)
+            {
+                // Create a Foldout so classes can be collapsed
+                var classFoldout = new Foldout { text = p.displayName, value = true };
+                classFoldout.style.flexDirection = FlexDirection.Column;
+
+                var it = p.Copy();
+                var end = it.GetEndProperty();
+                it.NextVisible(true); // Enter the class
+
+                while (it != null && !SerializedProperty.EqualContents(it, end))
+                {
+                    // Note: We don't flip isVertical here because it's a class
+                    BuildDataUI(it.Copy(), classFoldout, isVertical);
+                    if (!it.NextVisible(false)) break;
+                }
+                container.Add(classFoldout);
+            }
+            // CASE 3: It's a simple variable
             else
             {
-                // For standard variables, just use a basic PropertyField
                 var field = new PropertyField(p.Copy());
                 field.Bind(p.serializedObject);
+                field.style.minWidth = 150;
                 container.Add(field);
             }
         }
 
-        BuildDataUI(prop.Copy(), node.extensionContainer);
+
+
+
+        // Start with Vertical for the main list
+        BuildDataUI(prop.Copy(), node.extensionContainer, true);
 
         node.RefreshExpandedState();
         _graphView.AddElement(node);
 
-        // Save Position callback
+        // Save Position
         node.RegisterCallback<GeometryChangedEvent>(evt => {
             var currentPos = node.GetPosition().position;
             EditorPrefs.SetFloat(saveKey + "X", currentPos.x);
