@@ -38,6 +38,7 @@ public class AttractorAI : MonoBehaviour
 	public EnemyState defaultState = EnemyState.Stand;
 	private EnemyState currentState = EnemyState.Stand;
 	private EnemyState nextState = EnemyState.Stand;
+	private List<FunctionPicker> nextFunctions = new List<FunctionPicker>();
 	[Tooltip("Leave blank to default focus on player")]
 	public Transform defaultFocus;
 
@@ -58,7 +59,8 @@ public class AttractorAI : MonoBehaviour
 		EnemyVisible_boolVisible,
 		ChangeStats_STATS,
 		AddStatuses_LISTstringStatuses_boolRemove,
-		Teleport_floatX_floatY_floatZ
+		Teleport_floatX_floatY_floatZ,
+		TeleportCycle
 	}
 
 	[System.Serializable]
@@ -96,7 +98,7 @@ public class AttractorAI : MonoBehaviour
 		public float maxIntensityLowerBoundDangerRange = 100;
 		public float maxIntensityUpperBoundDangerRange = 100;
 
-		public ReactConditions[] possibleReactionConditionsChanges;
+		public CheckConditions[] possibleReactionConditionsChanges;
 		public float reactionConditionsLowerBoundDangerRange = 100;
 		public float reactionConditionsUpperBoundDangerRange = 100;
 
@@ -207,7 +209,16 @@ public class AttractorAI : MonoBehaviour
 		float z = float.Parse(arguments[2]);
 		Vector3 location = new Vector3(x, y, z);
 
-		transform.position = location;
+		agent.Warp(location);
+	}
+	private int nextTeleportIndex = 0;
+	public void TeleportCycle()
+	{
+		agent.Warp(teleportLocations[nextTeleportIndex]);
+
+		nextTeleportIndex++;
+		if (nextTeleportIndex >= teleportLocations.Count())
+			nextTeleportIndex = 0;
 	}
 
 	public enum Stats
@@ -409,23 +420,53 @@ public class AttractorAI : MonoBehaviour
 		}
 	}
 
+	public enum Comparison
+	{
+		equals,
+		greaterThan,
+		lesserThan,
+		greaterOrEqualTo,
+		lesserOrEqualTo
+	}
+
 	[System.Serializable]
-	public class BoolCondition
+	public class BoolCondition : System.IEquatable<BoolCondition>
 	{
 		public string boolName;
 		public bool boolValue;
+
+		// define equality
+		public bool Equals(BoolCondition other)
+		{
+			if (other == null) return false;
+			return (boolName == other.boolName && boolValue == other.boolValue);
+		}
 	}
 	[System.Serializable]
-	public class FloatCondition
+	public class FloatCondition : System.IEquatable<FloatCondition>
 	{
 		public string floatName;
 		public float floatValue;
+
+		// define equality
+		public bool Equals(FloatCondition other)
+		{
+			if (other == null) return false;
+			return (floatName == other.floatName && floatValue == other.floatValue);
+		}
 	}
 	[System.Serializable]
-	public class IntCondition
+	public class IntCondition : System.IEquatable<IntCondition>
 	{
 		public string intName;
 		public int intValue;
+
+		// define equality
+		public bool Equals(IntCondition other)
+		{
+			if (other == null) return false;
+			return (intName == other.intName && intValue == other.intValue);
+		}
 	}
 	[System.Serializable]
 	public class ReactConditions
@@ -433,6 +474,15 @@ public class AttractorAI : MonoBehaviour
 		public List<BoolCondition> boolConditions = new List<BoolCondition>();
 		public List<FloatCondition> floatConditions = new List<FloatCondition>();
 		public List<IntCondition> intConditions = new List<IntCondition>();
+	}
+	[System.Serializable]
+	public class CheckConditions
+	{
+		public List<BoolCondition> boolConditions = new List<BoolCondition>();
+		public List<FloatCondition> floatConditions = new List<FloatCondition>();
+		public Comparison floatCompare;
+		public List<IntCondition> intConditions = new List<IntCondition>();
+		public Comparison intCompare;
 	}
 
 	public ReactConditions currentConditions;
@@ -445,7 +495,7 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
-		public ReactConditions reactionConditions;
+		public CheckConditions reactionConditions;
 		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
@@ -483,7 +533,7 @@ public class AttractorAI : MonoBehaviour
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
 		public float maxIntensity;
-		public ReactConditions thoughtConditions;
+		public CheckConditions thoughtConditions;
 		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
@@ -497,7 +547,7 @@ public class AttractorAI : MonoBehaviour
 
 		public float repeatBuffer = 1;
 		public bool forceBuffer = false;
-		[HideInInspector]public float timer = 0;
+		public float timer = 0;
 	}
 
 	public List<EnemyReactions> behaviourHierarchy;
@@ -768,6 +818,7 @@ public class AttractorAI : MonoBehaviour
 		currentFocus = defaultFocus;
 		currentState = defaultState;
 		nextState = defaultState;
+		nextFunctions.Clear();
 		lowestPriority = behaviourHierarchy.Count;
 		currentStatePriority = lowestPriority;
 		agent = GetComponent<NavMeshAgent>();
@@ -890,6 +941,9 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.Teleport_floatX_floatY_floatZ:
 				Teleport(function.arguments);
 				break;
+			case FunctionType.TeleportCycle:
+				TeleportCycle();
+				break;
 		}
 	}
 
@@ -944,8 +998,8 @@ public class AttractorAI : MonoBehaviour
 		foreach (ThoughtProcess thought in thoughts)
 		{
 			if ((thought.stateRestriction.Count < 1 || thought.stateRestriction.Contains(currentState)) && (thought.statusRestrictions.Count < 1 ||
-				thought.allStatusesRequired ? currentStatuses.Intersect(thought.statusRestrictions).Count() == currentStatuses.Count() :
-				thought.statusRestrictions.Intersect(currentStatuses).Any()))
+				(thought.allStatusesRequired ? currentStatuses.Intersect(thought.statusRestrictions).Count() == thought.statusRestrictions.Count() :
+				thought.statusRestrictions.Intersect(currentStatuses).Any())))
 			{
 				List<Attractor> tempAttractors = new List<Attractor>();
 				if (thought.attractorType != AttractorType.NONE && tempDetectedAttractors.ContainsKey(thought.attractorType))
@@ -965,25 +1019,103 @@ public class AttractorAI : MonoBehaviour
 					if (thought.allConditionsRequired)
 					{
 
-						//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-						//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
 						if (thought.thoughtConditions.boolConditions.Count > 0 &&
 							!(currentConditions.boolConditions.Intersect(thought.thoughtConditions.boolConditions).Count() ==
-							currentConditions.boolConditions.Count()))
+							thought.thoughtConditions.boolConditions.Count()))
 						{
 							conditionsMet = false;
 						}
-						else if (thought.thoughtConditions.floatConditions.Count > 0 &&
+						else if (thought.thoughtConditions.floatCompare == Comparison.equals && (thought.thoughtConditions.floatConditions.Count > 0 &&
 							!(currentConditions.floatConditions.Intersect(thought.thoughtConditions.floatConditions).Count() ==
-							currentConditions.floatConditions.Count()))
+							thought.thoughtConditions.floatConditions.Count())))
 						{
 							conditionsMet = false;
 						}
-						else if (thought.thoughtConditions.intConditions.Count > 0 &&
+						else if (thought.thoughtConditions.floatCompare == Comparison.greaterThan)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (thought.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (thought.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.floatCompare == Comparison.lesserThan)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (thought.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.floatCompare == Comparison.lesserOrEqualTo)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (thought.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.intCompare == Comparison.equals && (thought.thoughtConditions.intConditions.Count > 0 &&
 							!(currentConditions.intConditions.Intersect(thought.thoughtConditions.intConditions).Count() ==
-							currentConditions.intConditions.Count()))
+							thought.thoughtConditions.intConditions.Count())))
 						{
 							conditionsMet = false;
+						}
+						else if (thought.thoughtConditions.intCompare == Comparison.greaterThan)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (thought.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.intCompare == Comparison.greaterOrEqualTo)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (thought.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.intCompare == Comparison.lesserThan)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (thought.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (thought.thoughtConditions.intCompare == Comparison.lesserOrEqualTo)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (thought.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
 						}
 					}
 
@@ -1007,6 +1139,9 @@ public class AttractorAI : MonoBehaviour
 				}
 				else if (!thought.allConditionsRequired)
 				{
+
+					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
 					if ((thought.thoughtConditions.boolConditions.Count > 0 &&
 						thought.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
 						(thought.thoughtConditions.floatConditions.Count > 0 &&
@@ -1031,13 +1166,12 @@ public class AttractorAI : MonoBehaviour
 					}
 				}
 			}
-			tempPriority++;
 		}
 
 		foreach (EnemyReactions reaction in behaviourHierarchy)
 		{
 			if ((reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState)) && (reaction.statusRestrictions.Count < 1 ||
-				reaction.allStatusesRequired ? currentStatuses.Intersect(reaction.statusRestrictions).Count() == currentStatuses.Count() :
+				reaction.allStatusesRequired ? currentStatuses.Intersect(reaction.statusRestrictions).Count() == reaction.statusRestrictions.Count() :
 				reaction.statusRestrictions.Intersect(currentStatuses).Any()))
 			{
 				Transform tempFocus = defaultFocus;
@@ -1068,34 +1202,113 @@ public class AttractorAI : MonoBehaviour
 					if (reaction.allConditionsRequired)
 					{
 
-						//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-						//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
 						if (reaction.reactionConditions.boolConditions.Count > 0 &&
 							!(currentConditions.boolConditions.Intersect(reaction.reactionConditions.boolConditions).Count() ==
-							currentConditions.boolConditions.Count()))
+							reaction.reactionConditions.boolConditions.Count()))
 						{
 							conditionsMet = false;
 						}
-						else if (reaction.reactionConditions.floatConditions.Count > 0 &&
+						else if ((reaction.reactionConditions.floatCompare == Comparison.equals) && (reaction.reactionConditions.floatConditions.Count > 0 &&
 							!(currentConditions.floatConditions.Intersect(reaction.reactionConditions.floatConditions).Count() ==
-							currentConditions.floatConditions.Count()))
+							reaction.reactionConditions.floatConditions.Count())))
 						{
 							conditionsMet = false;
 						}
-						else if (reaction.reactionConditions.intConditions.Count > 0 &&
+						else if (reaction.reactionConditions.floatCompare == Comparison.greaterThan)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (reaction.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (reaction.reactionConditions.floatCompare == Comparison.greaterOrEqualTo)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (reaction.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (reaction.reactionConditions.floatCompare == Comparison.lesserThan)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (reaction.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (reaction.reactionConditions.floatCompare == Comparison.lesserOrEqualTo)
+						{
+							Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+							if (reaction.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+							tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if ((reaction.reactionConditions.intCompare == Comparison.equals) && (reaction.reactionConditions.intConditions.Count > 0 &&
 							!(currentConditions.intConditions.Intersect(reaction.reactionConditions.intConditions).Count() ==
-							currentConditions.intConditions.Count()))
+							reaction.reactionConditions.intConditions.Count())))
 						{
 							conditionsMet = false;
+						}
+						else if (reaction.reactionConditions.intCompare == Comparison.greaterThan)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (reaction.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (reaction.reactionConditions.intCompare == Comparison.greaterOrEqualTo)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (reaction.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (reaction.reactionConditions.intCompare == Comparison.lesserThan)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (reaction.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
+						}
+						else if (reaction.reactionConditions.intCompare == Comparison.lesserOrEqualTo)
+						{
+							Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+							if (reaction.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+							tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+							{
+								conditionsMet = false;
+							}
 						}
 					}
 
 					if (conditionsMet)
 					{
 						nextStatePriority = tempPriority;
+						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
 						if (nextStatePriority < currentStatePriority)
 						{
-							foreach (FunctionPicker function in reaction.functionExecutions)
+							foreach (FunctionPicker function in nextFunctions)
 							{
 								HandleFunctionCalling(function);
 							}
@@ -1124,6 +1337,9 @@ public class AttractorAI : MonoBehaviour
 				}
 				else if (!reaction.allConditionsRequired)
 				{
+					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+
 					if ((reaction.reactionConditions.boolConditions.Count > 0 &&
 						reaction.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
 						(reaction.reactionConditions.floatConditions.Count > 0 &&
@@ -1132,9 +1348,10 @@ public class AttractorAI : MonoBehaviour
 						reaction.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any()))
 					{
 						nextStatePriority = tempPriority;
+						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
 						if (nextStatePriority < currentStatePriority)
 						{
-							foreach (FunctionPicker function in reaction.functionExecutions)
+							foreach (FunctionPicker function in nextFunctions)
 							{
 								HandleFunctionCalling(function);
 							}
@@ -1163,6 +1380,7 @@ public class AttractorAI : MonoBehaviour
 			nextFocus = defaultFocus;
 			nextStatePriority = lowestPriority;
 			nextState = defaultState;
+			nextFunctions.Clear();
 		}
 
 		// Check if the agent has reached its destination and is not calculating a new path
@@ -1170,6 +1388,13 @@ public class AttractorAI : MonoBehaviour
 		{
 			currentFocus = nextFocus;
 			currentState = nextState;
+			if (nextStatePriority != currentStatePriority)
+			{
+				foreach (FunctionPicker function in nextFunctions)
+				{
+					HandleFunctionCalling(function);
+				}
+			}
 			currentStatePriority = nextStatePriority;
 			agent.speed = wanderSpeed;
 			patrolTimer -= Time.deltaTime;
@@ -1185,6 +1410,13 @@ public class AttractorAI : MonoBehaviour
 		{
 			currentFocus = nextFocus;
 			currentState = nextState;
+			if (nextStatePriority != currentStatePriority)
+			{
+				foreach (FunctionPicker function in nextFunctions)
+				{
+					HandleFunctionCalling(function);
+				}
+			}
 			currentStatePriority = nextStatePriority;
 			agent.speed = 0;
 		}
@@ -1203,6 +1435,13 @@ public class AttractorAI : MonoBehaviour
 			{
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 
@@ -1238,6 +1477,13 @@ public class AttractorAI : MonoBehaviour
 			{
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 
@@ -1275,6 +1521,13 @@ public class AttractorAI : MonoBehaviour
 			{
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 
@@ -1308,9 +1561,17 @@ public class AttractorAI : MonoBehaviour
 					nextFocus = attackRevertFocus == null ? defaultFocus : attackRevertFocus;
 					nextState = attackRevertState;
 					nextStatePriority = attackRevertPriority;
+					nextFunctions = new List<FunctionPicker>(behaviourHierarchy[nextStatePriority].functionExecutions);
 				}
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 		}
@@ -1325,6 +1586,13 @@ public class AttractorAI : MonoBehaviour
 				animator.SetBool("Inspecting", false);
 				currentFocus = nextFocus;
 				currentState = nextState;
+				if (nextStatePriority != currentStatePriority)
+				{
+					foreach (FunctionPicker function in nextFunctions)
+					{
+						HandleFunctionCalling(function);
+					}
+				}
 				currentStatePriority = nextStatePriority;
 			}
 		}
@@ -1387,6 +1655,13 @@ public class AttractorAI : MonoBehaviour
 						hiding = false;
 						currentFocus = nextFocus;
 						currentState = nextState;
+						if (nextStatePriority != currentStatePriority)
+						{
+							foreach (FunctionPicker function in nextFunctions)
+							{
+								HandleFunctionCalling(function);
+							}
+						}
 						currentStatePriority = nextStatePriority;
 					}
 				}
@@ -1430,6 +1705,13 @@ public class AttractorAI : MonoBehaviour
 						currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
+					if (nextStatePriority != currentStatePriority)
+					{
+						foreach (FunctionPicker function in nextFunctions)
+						{
+							HandleFunctionCalling(function);
+						}
+					}
 					currentStatePriority = nextStatePriority;
 				}
 			}
@@ -1472,6 +1754,13 @@ public class AttractorAI : MonoBehaviour
 						currentAvoidedTarget.enabled = false;
 					currentFocus = nextFocus;
 					currentState = nextState;
+					if (nextStatePriority != currentStatePriority)
+					{
+						foreach (FunctionPicker function in nextFunctions)
+						{
+							HandleFunctionCalling(function);
+						}
+					}
 					currentStatePriority = nextStatePriority;
 				}
 			}
