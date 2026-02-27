@@ -94,22 +94,37 @@ public class DataGraphWindow : EditorWindow
             // CASE 1: It's a LIST (Array)
             if (p.isArray && p.propertyType == SerializedPropertyType.Generic)
             {
-                // 1. Create a Header that includes the "+" and "-" functionality
-                // We use a PropertyField for JUST the array header to keep built-in Unity buttons
-                var listHeader = new PropertyField(p.Copy(), "");
-                listHeader.Bind(p.serializedObject);
-                container.Add(listHeader);
+                // 1. Create a Header PropertyField to show the size/buttons
+                var listHeaderField = new PropertyField(p.Copy());
+                listHeaderField.Bind(p.serializedObject);
 
+                // 2. THE SURGICAL FIX: Use a schedule to find and hide ONLY the scrollable list part
+                listHeaderField.schedule.Execute(() => {
+                    // Unity's PropertyField for lists creates a ListView inside it.
+                    // We want to hide the scrollable part but keep the Foldout/Buttons.
+                    var internalListView = listHeaderField.Q<ListView>();
+                    if (internalListView != null)
+                    {
+                        // Hiding the 'content-viewport' or the list itself stops the scrolling view
+                        // but keeps the header row with the + and - buttons.
+                        internalListView.style.display = DisplayStyle.None;
+                    }
+                }).ExecuteLater(50); // Small delay to let Unity build the internal list
+
+                container.Add(listHeaderField);
+
+                // 3. Create our custom non-scrolling grid view below the header
                 var listContent = new VisualElement();
                 listContent.style.flexDirection = isVertical ? FlexDirection.Column : FlexDirection.Row;
                 listContent.style.flexWrap = Wrap.NoWrap;
+                listContent.style.marginLeft = 15; // Indent slightly below the buttons
 
                 for (int i = 0; i < p.arraySize; i++)
                 {
                     var element = p.GetArrayElementAtIndex(i);
                     var elementWrapper = new VisualElement();
 
-                    // Styling the "Cell"
+                    // Cell Styling (corrected for IStyle)
                     elementWrapper.style.paddingTop = 5; elementWrapper.style.paddingBottom = 5;
                     elementWrapper.style.paddingLeft = 5; elementWrapper.style.paddingRight = 5;
                     elementWrapper.style.borderTopWidth = 1; elementWrapper.style.borderBottomWidth = 1;
@@ -120,32 +135,27 @@ public class DataGraphWindow : EditorWindow
                     elementWrapper.style.borderRightColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
                     elementWrapper.style.backgroundColor = new Color(1, 1, 1, 0.03f);
 
-                    // FLIP the orientation for children of this list
                     BuildDataUI(element, elementWrapper, !isVertical);
                     listContent.Add(elementWrapper);
                 }
                 container.Add(listContent);
             }
-            // CASE 2: It's a CLASS/STRUCT (with children)
+            // CASE 2: It's a CLASS/STRUCT
             else if (p.hasVisibleChildren)
             {
-                // Create a Foldout so classes can be collapsed
                 var classFoldout = new Foldout { text = p.displayName, value = true };
-                classFoldout.style.flexDirection = FlexDirection.Column;
-
                 var it = p.Copy();
                 var end = it.GetEndProperty();
-                it.NextVisible(true); // Enter the class
+                it.NextVisible(true);
 
                 while (it != null && !SerializedProperty.EqualContents(it, end))
                 {
-                    // Note: We don't flip isVertical here because it's a class
                     BuildDataUI(it.Copy(), classFoldout, isVertical);
                     if (!it.NextVisible(false)) break;
                 }
                 container.Add(classFoldout);
             }
-            // CASE 3: It's a simple variable
+            // CASE 3: Simple variable
             else
             {
                 var field = new PropertyField(p.Copy());
@@ -154,9 +164,6 @@ public class DataGraphWindow : EditorWindow
                 container.Add(field);
             }
         }
-
-
-
 
         // Start with Vertical for the main list
         BuildDataUI(prop.Copy(), node.extensionContainer, true);
