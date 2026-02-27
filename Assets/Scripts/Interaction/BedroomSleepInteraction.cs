@@ -54,7 +54,6 @@ namespace Interaction
                 messageKey: new TextKey { place = "cutscene", id = "act1" }
             );
             data.Send();
-            GameStateManager.Instance.SetCurrentZoneId(-1);
             
         }
 

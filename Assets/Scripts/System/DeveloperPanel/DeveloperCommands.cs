@@ -48,6 +48,7 @@ namespace System
         [SerializeField] private TMP_Text _GameStateText;
         [SerializeField] private TMP_Text _WorldLocationText;
         [SerializeField] private TMP_Text _drawingCollectionText;
+        [SerializeField] private TMP_Text _zoneIdText;
         private void Start()
         {
             //_developerCanvas = transform.Find("DevCanvas").gameObject;
@@ -118,6 +119,11 @@ namespace System
             if (_drawingCollectionText)
             {
                 _drawingCollectionText.text = "Drawings Collected: [" + PlayerInventory.Instance.GetCurrentDrawingsThisNight() + "/ " + PlayerInventory.Instance.GetMaxDrawingsPerNight() + "] - (" + PlayerInventory.Instance.GetDrawingCount() + " in Inventory)";
+            }
+
+            if (_zoneIdText)
+            {
+                _zoneIdText.text = "Current Zone ID: [" + GameStateManager.Instance.GetCurrentZoneId() + "]";
             }
 
         }

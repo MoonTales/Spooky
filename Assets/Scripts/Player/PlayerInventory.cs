@@ -106,7 +106,7 @@ namespace Player
             return true;
         }
         
-        private void RemoveDrawing(int drawingID)
+        public void RemoveDrawing(int drawingID)
         {
             _collectedDrawingIDs.Remove(drawingID);
         }

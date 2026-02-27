@@ -14,6 +14,8 @@ namespace Managers
         {
             // save the world clock hour
             public int worldClockHour;
+            public int currentZoneId;
+            
         }
         
         
@@ -170,7 +172,8 @@ namespace Managers
         {
             return new GameStateSaveData
             {
-                worldClockHour = _currentWorldClockHour
+                worldClockHour = _currentWorldClockHour,
+                currentZoneId = _currentZoneId
             };
         }
 
@@ -179,6 +182,9 @@ namespace Managers
             SetWorldClockHour(data.worldClockHour);
             // we will alwaysw start in gameplay
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            _currentZoneId = data.currentZoneId;
         }
+        
+        
     }
 }

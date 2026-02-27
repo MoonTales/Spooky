@@ -77,6 +77,12 @@ namespace Interaction
             SleepTrackerManager.Instance.TurnSleepTrackerOn();
             Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             data.Send();
+            
+            // EDGE CASE, if we are currently in the tutorial, we will want to Remove the index 0 drawing from the inventory
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial)
+            {
+                PlayerInventory.Instance.RemoveDrawing(0);
+            }
 
         }
 
