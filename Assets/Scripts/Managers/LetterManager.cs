@@ -89,6 +89,8 @@ namespace Managers
             else if(id == "res_letter_2"){ _hasReadAct2ResearcherLetter = true;}
             else if(id == "fren_letter_3"){ _hasReadAct3FriendLetter = true;}
             else if(id == "res_letter_3"){ _hasReadAct3ResearcherLetter = true;}
+            
+            SaveSystem.Instance.RequestSave(this);
         }
 
 

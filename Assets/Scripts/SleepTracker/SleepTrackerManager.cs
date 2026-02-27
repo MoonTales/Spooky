@@ -13,6 +13,13 @@ using UnityEngine;
 /// </summary>
 public class SleepTrackerManager : Singleton<SleepTrackerManager>
 {
+    
+    public struct SleepTrackerSaveData
+    {
+        public bool isGoodWakeup;
+        public bool isSleepTrackerActive;
+    }
+    
     // Internal State
     private bool _isGoodWakeup  = false;
     private bool _isSleepTrackerActive = false; public bool GetIsSleepTrackerActive() { return _isSleepTrackerActive; }

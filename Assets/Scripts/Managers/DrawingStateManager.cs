@@ -92,6 +92,9 @@ namespace Managers
 
             
             CheckForAllCorrectPlacements();
+            
+            // we also want to request a save after we update the drawing data, this will be a localized save just for the drawing data
+            SaveSystem.Instance.RequestSave(this);
         }
 
         public int CheckForAllCorrectPlacements()

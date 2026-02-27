@@ -30,7 +30,7 @@ namespace UI.Main_Menu
                 if (button.name == "Play")
                 {
                     _playButton = button;
-                    _playButton.onClick.AddListener(OnPlayerButtonClicked);
+                    _playButton.onClick.AddListener(OnPlayButtonClicked);
                     _playButton.enabled = true;
                 }
                 else if (button.name == "Settings")
@@ -48,7 +48,7 @@ namespace UI.Main_Menu
             }
         }
         // Button connections
-        private void OnPlayerButtonClicked()
+        private void OnPlayButtonClicked()
         {
             // we will just disable all of the buttons, so that nothing can be clicked while we fade in
             _playButton.enabled = false;
@@ -66,14 +66,13 @@ namespace UI.Main_Menu
             
         }
 
+        
+        
         private void SwapToGame()
         {
             // close the main menu canvas
             mainMenuCanvas.SetActive(false);
             
-            /// TEMP SAVE HANDLING ///
-            // if the player has save data, we will want to load their data, and send them to the bedroom
-            // if the player has no save data, we will send them to the tutorial like normal
             if (SaveSystem.Instance.DoesSaveGameExist())
             {
                 SaveSystem.Instance.LoadGame();
@@ -84,6 +83,14 @@ namespace UI.Main_Menu
                 EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
                 SceneSwapper.Instance.SwapScene("Tutorial");
             }
+        }
+        
+        // this will be called when the player presses the new game button
+        private void NewGameButtonPressed()
+        {
+            
+            SaveSystem.Instance.DeleteSaveData();
+            SwapToGame();
         }
 
         private void OnSettingsButtonClicked()

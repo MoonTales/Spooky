@@ -186,7 +186,7 @@ namespace UI
 
         public void OnLoad(NotificationSaveData data)
         {
-            _activeNotifications = data.activeNotifications;
+            _activeNotifications = data.activeNotifications ?? new Hashtable();
         }
     }
 }

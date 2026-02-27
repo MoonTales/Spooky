@@ -4,6 +4,15 @@ using System.Linq;
 using Managers;
 using UnityEngine;
 
+///
+/// There is currently a few set places where the game saves
+/// 1. When the game loads a new scene (the save is AFTER we have loaded the new scene, so that we can save the new scene name in our save data)
+/// 2. Whenever the player moves the drawings in the world
+/// 3. Whenever the player finishes reading a letter
+///
+/// They all use the following function: SaveSystem.Instance.RequestSave(this);
+/// 
+
 namespace System
 {
     [System.Serializable]
@@ -27,16 +36,6 @@ namespace System
         {
             base.Awake();
             _currentSaveData = new SaveData { saveData = new List<SavableObject>() };
-        }
-
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.G)){
-                SaveGame();
-            }
-            if (Input.GetKeyDown(KeyCode.H)){
-                LoadGame();
-            }
         }
 
         // ------------------------
@@ -100,6 +99,22 @@ namespace System
             }
             DebugUtils.LogSuccess("Game has been loaded!");
         }
+        
+        
+        // this function will be able to be called from a function, to request we save their current data, at a different
+        // time from the rest of the game (like a one off save). it will also take in their custom struct
+        public void RequestSave(ISaveSystemInterface saveInterface)
+        {
+            saveInterface.SaveData();
+
+            // now that each class has saved their info, write to disk
+            string json = JsonUtility.ToJson(_currentSaveData);
+            PlayerPrefs.SetString("SaveData", json);
+            PlayerPrefs.Save();
+            
+            DebugUtils.LogSuccess("Game has been saved!");
+        }
+        
 
         public void DeleteSaveData()
         {
