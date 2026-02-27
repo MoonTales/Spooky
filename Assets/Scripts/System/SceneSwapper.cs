@@ -10,8 +10,15 @@ namespace System
     
 
     
-    public class SceneSwapper : Singleton<SceneSwapper>
+    public class SceneSwapper : Singleton<SceneSwapper>, ISaveSystemInterface<SceneSwapper.SceneSwapSaveData>
     {
+        
+        public struct SceneSwapSaveData
+        {
+            // get the name of our current scene
+            public string CurrentSceneName;
+        }
+        
         // Internal variables
         private string _spawnAnchorID = "";
 
@@ -52,12 +59,13 @@ namespace System
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Bedroom);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
-
+                SaveSystem.Instance.SaveGame();
             }
             if (scene.name.ToLower() == "nightmare1")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+                SaveSystem.Instance.SaveGame();
             }
 
             if (scene.name.ToLower() == "tutorial")
@@ -65,6 +73,8 @@ namespace System
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
             }
+            
+
         }
         
         // Async for a smoother scene transition
@@ -86,10 +96,25 @@ namespace System
 
             // Wait one frame for OnSceneLoaded to fire before continuing
             
-            //SAVE UPDATE
-            // we want to save the game whenever we successfully scene swap
-            SaveSystem.Instance.SaveGame();
+
             yield return null;
+        }
+
+        public string SaveId => "SceneSwapper";
+        public SceneSwapSaveData OnSave()
+        {
+            // we want to save the name of our current scene, so that way we can return to it if we need to
+            SceneSwapSaveData saveData = new SceneSwapSaveData
+            {
+                CurrentSceneName = SceneManager.GetActiveScene().name
+            };
+            return saveData;
+        }
+
+        public void OnLoad(SceneSwapSaveData data)
+        {
+            // when we load, we want to immediately swap to the scene that we were in when we saved
+            SwapScene(data.CurrentSceneName);
         }
     }
 }

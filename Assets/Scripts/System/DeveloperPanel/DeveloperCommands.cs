@@ -185,7 +185,7 @@ namespace System
             // Set Frame Rate to 120
             RegisterCommand(KeyCode.Alpha7, ()=>SetFrameRate(120), "Set Ultra FPS", "Sets the target frame rate to 120");
             // Delete save gme
-                RegisterCommand(KeyCode.Delete, () => SaveSystem.Instance.DeleteSaveData(), "Delete Save Game", "Deletes the current save game data from the persistent data path");
+            RegisterCommand(KeyCode.Backslash, () => SaveSystem.Instance.DeleteSaveData(), "Delete Save Game", "Deletes the current save game data from the persistent data path");
         }
 
         private void ForceStartGameplay()

@@ -8,9 +8,13 @@ namespace Managers
     /// <summary>
     /// Class used to manage the overall state of the game.
     /// </summary>
-    public class GameStateManager : Singleton<GameStateManager>
+    public class GameStateManager : Singleton<GameStateManager>, ISaveSystemInterface<GameStateManager.GameStateSaveData>
     {
-
+        public struct GameStateSaveData
+        {
+            // save the world clock hour
+            public int worldClockHour;
+        }
         
         
         [SerializeField] private int _maxDrawingsPerAct = 3; public int GetMaxDrawingsPerAct() { return _maxDrawingsPerAct; }
@@ -156,6 +160,25 @@ namespace Managers
             
             _previousGameState = _currentGameState;
             _currentGameState = newState;
+        }
+
+        // ------------------------------------
+        // Save System Interface Implementation
+        // ------------------------------------
+        public string SaveId => "GameState";
+        public GameStateSaveData OnSave()
+        {
+            return new GameStateSaveData
+            {
+                worldClockHour = _currentWorldClockHour
+            };
+        }
+
+        public void OnLoad(GameStateSaveData data)
+        {
+            SetWorldClockHour(data.worldClockHour);
+            // we will alwaysw start in gameplay
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
     }
 }

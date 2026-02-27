@@ -62,7 +62,6 @@ namespace UI.Main_Menu
             {
                 AudioManager.Instance.TriggerMainMenuMusicTransition();
             }
-
             new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToGame).Send();
             
         }
@@ -77,7 +76,7 @@ namespace UI.Main_Menu
             // if the player has no save data, we will send them to the tutorial like normal
             if (SaveSystem.Instance.DoesSaveGameExist())
             {
-                //TODO: LOAD
+                SaveSystem.Instance.LoadGame();
             }
             else
             {
@@ -85,8 +84,6 @@ namespace UI.Main_Menu
                 EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
                 SceneSwapper.Instance.SwapScene("Tutorial");
             }
-            
-
         }
 
         private void OnSettingsButtonClicked()
