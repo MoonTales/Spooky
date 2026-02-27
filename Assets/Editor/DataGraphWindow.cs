@@ -16,7 +16,6 @@ public class DataGraphWindow : EditorWindow
 
     private void CreateGUI()
     {
-        // --- TOOLBAR ---
         var toolbar = new Toolbar();
 
         var picker = new ObjectField("Target") { objectType = typeof(MonoBehaviour), style = { width = 250 } };
@@ -37,7 +36,6 @@ public class DataGraphWindow : EditorWindow
         toolbar.Add(zoomSlider);
         rootVisualElement.Add(toolbar);
 
-        // --- GRAPH CANVAS ---
         _graphView = new SimpleGraphView { style = { flexGrow = 1 } };
         _graphView.AddManipulator(new ContentDragger());
         _graphView.AddManipulator(new SelectionDragger());
@@ -80,40 +78,35 @@ public class DataGraphWindow : EditorWindow
         node.style.minWidth = _defaultWidth;
         node.style.height = StyleKeyword.Auto;
 
-        // --- FIXED PADDING FOR THE EXTENSION CONTAINER ---
         node.extensionContainer.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.9f);
         node.extensionContainer.style.paddingTop = 5;
         node.extensionContainer.style.paddingBottom = 5;
         node.extensionContainer.style.paddingLeft = 5;
         node.extensionContainer.style.paddingRight = 5;
 
-        // --- RECURSIVE ALTERNATING BUILDER ---
-        // isVertical: true = Top-to-Bottom, false = Left-to-Right
+        // if isVertical is true then Top-to-Bottom, if it is false then Left-to-Right
         void BuildDataUI(SerializedProperty p, VisualElement container, bool isVertical)
         {
-            // CASE 1: It's a LIST (Array)
+            // If it is an array (or list technically)
             if (p.isArray && p.propertyType == SerializedPropertyType.Generic)
             {
-                // 1. Create a Header PropertyField to show the size/buttons
+                // Create a Header PropertyField to show the size/buttons
                 var listHeaderField = new PropertyField(p.Copy());
                 listHeaderField.Bind(p.serializedObject);
 
-                // 2. THE SURGICAL FIX: Use a schedule to find and hide ONLY the scrollable list part
+                // Use a schedule to find and hide ONLY the scrollable list part
                 listHeaderField.schedule.Execute(() => {
-                    // Unity's PropertyField for lists creates a ListView inside it.
-                    // We want to hide the scrollable part but keep the Foldout/Buttons.
+                    // This never ended up working. Oh well
                     var internalListView = listHeaderField.Q<ListView>();
                     if (internalListView != null)
                     {
-                        // Hiding the 'content-viewport' or the list itself stops the scrolling view
-                        // but keeps the header row with the + and - buttons.
                         internalListView.style.display = DisplayStyle.None;
                     }
                 }).ExecuteLater(50); // Small delay to let Unity build the internal list
 
                 container.Add(listHeaderField);
 
-                // 3. Create our custom non-scrolling grid view below the header
+                // Create the custom non-scrolling grid view below the header
                 var listContent = new VisualElement();
                 listContent.style.flexDirection = isVertical ? FlexDirection.Column : FlexDirection.Row;
                 listContent.style.flexWrap = Wrap.NoWrap;
@@ -140,7 +133,7 @@ public class DataGraphWindow : EditorWindow
                 }
                 container.Add(listContent);
             }
-            // CASE 2: It's a CLASS/STRUCT
+            // If it is a class
             else if (p.hasVisibleChildren)
             {
                 var classFoldout = new Foldout { text = p.displayName, value = true };
@@ -155,7 +148,7 @@ public class DataGraphWindow : EditorWindow
                 }
                 container.Add(classFoldout);
             }
-            // CASE 3: Simple variable
+            // for simple variables
             else
             {
                 var field = new PropertyField(p.Copy());
