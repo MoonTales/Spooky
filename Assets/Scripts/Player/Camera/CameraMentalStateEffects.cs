@@ -355,7 +355,7 @@ namespace Player.Camera
                 return;
             }
 
-            Debug.Log($"Setting chromatic aberration intensity to {amount} on {_chromaticAberrations.Count} volume(s)");
+            //Debug.Log($"Setting chromatic aberration intensity to {amount} on {_chromaticAberrations.Count} volume(s)");
 
             foreach (ChromaticAberration ca in _chromaticAberrations)
             {

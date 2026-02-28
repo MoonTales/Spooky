@@ -31,6 +31,9 @@ namespace Player
         [SerializeField] private float jumpForce = 7.0f;
         [SerializeField] private float gravity = -12.0f;
         [SerializeField] private float initialFallVelocity = -2.0f;
+        [SerializeField] private float airStrafeMultiplier = 0.5f;
+        [SerializeField] private float airBackwardMultiplier = 0.5f; 
+        [SerializeField] private float airAcceleration = 3f; // lower = driftier, higher = more responsive
         [Space(10)]
         [Header("Crouching")]
         [SerializeField] private float standHeight = 2.0f;
@@ -72,6 +75,13 @@ namespace Player
         private float _cameraBaseY;
         private float _currentSpeed;
         private bool _isInspecting = false;
+        private bool _crouchInputActive = false;
+        
+        private bool _toggleCrouchMode = false; public void SetToggleCrouchMode(bool toggle) { _toggleCrouchMode = toggle; }
+        private float _crouchHeldTime = 0f;
+        private const float MinCrouchTime = 0.10f;
+        
+        private Vector3 _airMomentumDirection; // store this when we leave the ground
 
         // Audio internals
         private string _surfaceType;
@@ -89,6 +99,13 @@ namespace Player
         private Types.PlayerMovementState _playerMovementState;
         private void FixedUpdate()
         {
+            
+            // set U to toggle between toggle crouch and hold crouch modes for testing
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                SetToggleCrouchMode(!_toggleCrouchMode);
+                Debug.Log("Toggled crouch mode. Now toggle crouch mode is: " + _toggleCrouchMode);
+            }
             
             // debug print if input is locked
             if(_lockedInput){
@@ -111,6 +128,11 @@ namespace Player
             }
             
             _isGrounded = _characterController.isGrounded;
+            if (_wasGrounded && !_isGrounded)
+            {
+                // just left the ground, lock in momentum direction
+                _airMomentumDirection = Vector3.ProjectOnPlane(_characterController.velocity, Vector3.up).normalized;
+            }
             Types.GameState currentGameState = GetCurrentGameState();
             HandleLandingSfx(currentGameState);
             SyncJumpAudioTracking(currentGameState);
@@ -130,6 +152,7 @@ namespace Player
             
             HandleGravity();
             HandleMovement();
+            HandleCrouchInput();
             HandleCrouchTransition();
             cameraEffects.UpdateEffects(_isGrounded, IsPlayerMoving(), _isSprinting, _isCrouching);
             
@@ -247,10 +270,10 @@ namespace Player
             moveAction.action.canceled += OnMovePerformed;
             jumpAction.action.performed += OnJump;
             jumpAction.action.canceled += OnJumpCanceled;
-            crouchAction.action.performed += OnCrouch;
             sprintAction.action.performed += OnSprint;
             sprintAction.action.canceled += OnSprint;
             flashlightToggleAction.action.performed += OnFlashlightToggle;
+            crouchAction.action.performed += OnCrouch;
         }
 
         protected override void RegisterSubscriptions()
@@ -298,9 +321,10 @@ namespace Player
             moveAction.action.canceled -= OnMovePerformed;
             jumpAction.action.performed -= OnJump;
             jumpAction.action.canceled -= OnJumpCanceled;
-            crouchAction.action.performed -= OnCrouch;
             sprintAction.action.performed -= OnSprint;
             sprintAction.action.canceled -= OnSprint;
+            crouchAction.action.performed -= OnCrouch;
+            flashlightToggleAction.action.performed -= OnFlashlightToggle;
         }
         #endregion
         
@@ -332,6 +356,10 @@ namespace Player
 
             _isSprinting = obj.performed;
         }
+        
+
+
+        // Toggle mode for crouch
         private void OnCrouch(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
@@ -345,6 +373,39 @@ namespace Player
                 
             }
             _isCrouching = !_isCrouching;
+        }
+        
+        private void HandleCrouchInput()
+        {
+            
+            if (_toggleCrouchMode) { return;}
+            if (_lockedInput) { return; }
+
+            bool crouchHeld = crouchAction.action.IsPressed();
+
+            if (crouchHeld)
+            {
+                _crouchHeldTime += Time.fixedDeltaTime;
+
+                if (!_isCrouching)
+                {
+                    _isCrouching = true;
+                    _targetHeight = crouchHeight;
+                }
+            }
+            else
+            {
+                if (_isCrouching)
+                {
+                    bool validHold = _crouchHeldTime >= MinCrouchTime;
+                    if (!validHold || CanStandUp())
+                    {
+                        _isCrouching = false;
+                        _targetHeight = standHeight;
+                    }
+                }
+                _crouchHeldTime = 0f;
+            }
         }
 
         public void ForceCrouch()
@@ -392,26 +453,27 @@ namespace Player
         private void HandleCrouchTransition()
         {
             float currentHeight = _characterController.height;
+
+            // If trying to stand up but blocked, keep crouching
+            if (_targetHeight == standHeight && !CanStandUp())
+            {
+                _isCrouching = true;
+                _targetHeight = crouchHeight; // snap back to crouch target
+            }
+
             if (Mathf.Approximately(currentHeight, _targetHeight))
             {
                 _characterController.height = _targetHeight;
                 return;
             }
-            // perform the transition
+
             float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.fixedDeltaTime);
             _characterController.height = newHeight;
-            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
-            
+            _characterController.center = Vector3.up * (newHeight / 2);
+
             float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
-
-            _cameraBaseY = Mathf.Lerp(
-                _cameraBaseY,
-                targetCameraBaseY,
-                crouchTransitionSpeed * Time.fixedDeltaTime
-            );
-            
+            _cameraBaseY = Mathf.Lerp(_cameraBaseY, targetCameraBaseY, crouchTransitionSpeed * Time.fixedDeltaTime);
             cameraEffects.UpdateCameraBaseY(_cameraBaseY);
-
         }
         private bool CanStandUp()
         {
@@ -454,8 +516,38 @@ namespace Player
             if (_lockedInput) { return; }
 
             Vector3 moveDirection = _cameraTransform.TransformDirection(new Vector3(_moveInput.x, 0, _moveInput.y)).normalized;
+            
+            // FIX: the move speed gets slower as we look up or down because the move direction is tied to the foreward vector
+            // so we need to project the move direction onto the horizontal plane to prevent this
+            moveDirection = Vector3.ProjectOnPlane(moveDirection, Vector3.up).normalized;
+            
+            /*
+             
+             //This is more realistic.. just dosent feel as smooth tbh
+            if (!_isGrounded && _airMomentumDirection != Vector3.zero)
+            {
+                float forwardDot = Vector3.Dot(moveDirection, _airMomentumDirection);
+                Vector3 perp = Vector3.Cross(Vector3.up, _airMomentumDirection);
+                float strafeDot = Vector3.Dot(moveDirection, perp);
 
-            float targetSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
+                Vector3 forwardComponent = _airMomentumDirection * forwardDot;
+                Vector3 strafeComponent = perp * strafeDot;
+
+                float forwardMultiplier = forwardDot >= 0 ? 1f : airBackwardMultiplier;
+                moveDirection = (forwardComponent * forwardMultiplier) + (strafeComponent * airStrafeMultiplier);
+            }
+            */
+            
+            float targetSpeed;
+            if (_isGrounded)
+            {
+                targetSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
+            }
+            else
+            {
+                // keep whatever speed we had when we left the ground (this fixes the drop in speed in the air)
+                targetSpeed = _currentSpeed;
+            }
 
             // Smoothly interpolate speed
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.fixedDeltaTime);

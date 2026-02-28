@@ -9,7 +9,7 @@ namespace Managers
 {
     
     [Serializable]
-    struct DrawingTransformData
+    public struct DrawingTransformData
     {
         public int DrawingID;
         public UnityEngine.Vector3 Position;  // Use UnityEngine.Vector3
@@ -25,8 +25,12 @@ namespace Managers
     /// <summary>
     /// Manager in charge of storing and handling the drawings positions between scenes
     /// </summary>
-    public class DrawingStateManager : Singleton<DrawingStateManager>
+    public class DrawingStateManager : Singleton<DrawingStateManager>, ISaveSystemInterface<DrawingStateManager.DrawingSaveData>
     {
+        public struct DrawingSaveData 
+        {
+            public List<DrawingTransformData> DrawingTransformDataList;
+        }
         
         // Internal list, to hold the drawings ID, and its current Transform
         private List<DrawingTransformData> _drawingTransformDataList = new List<DrawingTransformData>();
@@ -36,8 +40,9 @@ namespace Managers
         
         // Determine how many drawings are in the "correct" position
         private int totalNumberOfDrawings = 9; // hardcoded game value for now
-        
-        
+        private ISaveSystemInterface<DrawingSaveData> _saveSystemInterfaceImplementation;
+
+
         protected override void RegisterSubscriptions()
         {
             base.RegisterSubscriptions();
@@ -87,6 +92,9 @@ namespace Managers
 
             
             CheckForAllCorrectPlacements();
+            
+            // we also want to request a save after we update the drawing data, this will be a localized save just for the drawing data
+            SaveSystem.Instance.RequestSave(this);
         }
 
         public int CheckForAllCorrectPlacements()
@@ -215,6 +223,21 @@ namespace Managers
                 }
             }
             return false;
+        }
+
+        public string SaveId => "DrawingStateManager";
+
+        public DrawingSaveData OnSave()
+        {
+            return new DrawingSaveData
+            {
+                DrawingTransformDataList = _drawingTransformDataList
+            };
+        }
+
+        public void OnLoad(DrawingSaveData data)
+        {
+            _drawingTransformDataList = data.DrawingTransformDataList ?? new List<DrawingTransformData>();
         }
     }
 }

@@ -11,8 +11,13 @@ namespace UI
     /// to create "pop up notifications" on the screen for the player to see.
     /// </summary>
 
-    public class NotificationController : Singleton<NotificationController>
+    public class NotificationController : Singleton<NotificationController>, ISaveSystemInterface<NotificationController.NotificationSaveData>
     {
+
+        public struct NotificationSaveData
+        {
+           public Hashtable activeNotifications;
+        }
 
         // Internal Variables:
         // we are gonna steal this off the hud, and manually control the text
@@ -159,12 +164,36 @@ namespace UI
 
         public void HideNotificationText()
         {
-            _notificationText.gameObject.SetActive(false);
+            if(_notificationText){_notificationText.gameObject.SetActive(false);}
         }
 
         public void ShowNotificationText()
         {
-            _notificationText.gameObject.SetActive(true);
+            if(_notificationText){_notificationText.gameObject.SetActive(true);}
+        }
+
+        protected override void OnGameRestarted()
+        {
+            base.OnGameRestarted();
+            // when the game restarts, we want to clear our hashtable of active notifications
+            _activeNotifications.Clear();
+        }
+
+        // ------------------------
+        // Save System Interface
+        // -------------------------
+        public string SaveId => "NotificationController";
+        public NotificationSaveData OnSave()
+        {
+            return new NotificationSaveData
+            {
+                activeNotifications = _activeNotifications
+            };
+        }
+
+        public void OnLoad(NotificationSaveData data)
+        {
+            _activeNotifications = data.activeNotifications ?? new Hashtable();
         }
     }
 }

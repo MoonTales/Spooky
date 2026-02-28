@@ -37,10 +37,10 @@ namespace System
             gameObject.AddComponent<SpawnAnchorManager>();
             gameObject.AddComponent<ScreenFadeManager>();
             gameObject.AddComponent<SleepTrackerManager>();
+            gameObject.AddComponent<SaveSystem>();
 
-            
-            
-        
+
+
         }
     }
 }

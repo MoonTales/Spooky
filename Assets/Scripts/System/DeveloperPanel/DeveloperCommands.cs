@@ -48,6 +48,7 @@ namespace System
         [SerializeField] private TMP_Text _GameStateText;
         [SerializeField] private TMP_Text _WorldLocationText;
         [SerializeField] private TMP_Text _drawingCollectionText;
+        [SerializeField] private TMP_Text _zoneIdText;
         private void Start()
         {
             //_developerCanvas = transform.Find("DevCanvas").gameObject;
@@ -120,6 +121,11 @@ namespace System
                 _drawingCollectionText.text = "Drawings Collected: [" + PlayerInventory.Instance.GetCurrentDrawingsThisNight() + "/ " + PlayerInventory.Instance.GetMaxDrawingsPerNight() + "] - (" + PlayerInventory.Instance.GetDrawingCount() + " in Inventory)";
             }
 
+            if (_zoneIdText)
+            {
+                _zoneIdText.text = "Current Zone ID: [" + GameStateManager.Instance.GetCurrentZoneId() + "]";
+            }
+
         }
     
         void ToggleDeveloperMode()
@@ -184,6 +190,8 @@ namespace System
             RegisterCommand(KeyCode.Alpha6, ()=>SetFrameRate(60), "Set High FPS", "Sets the target frame rate to 60");
             // Set Frame Rate to 120
             RegisterCommand(KeyCode.Alpha7, ()=>SetFrameRate(120), "Set Ultra FPS", "Sets the target frame rate to 120");
+            // Delete save gme
+            RegisterCommand(KeyCode.Backslash, () => SaveSystem.Instance.DeleteSaveData(), "Delete Save Game", "Deletes the current save game data from the persistent data path");
         }
 
         private void ForceStartGameplay()

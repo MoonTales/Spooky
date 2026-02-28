@@ -5,7 +5,7 @@ using Types = System.Types;
 
 namespace Player
 {
-    public class PlayerInventory : Singleton<PlayerInventory>
+    public class PlayerInventory : Singleton<PlayerInventory>, ISaveSystemInterface<PlayerInventory.PlayerInventorySaveData>
     {
         // Customization variablews for the feel of the game
         [SerializeField] private int _maxDrawingsPerNight = 3; public int GetMaxDrawingsPerNight() { return _maxDrawingsPerNight; }
@@ -16,7 +16,7 @@ namespace Player
         
         
         // Store only the IDs of collected drawings
-        private readonly HashSet<int> _collectedDrawingIDs = new HashSet<int>(); public HashSet<int> GetCollectedDrawingIDs() { return new HashSet<int>(_collectedDrawingIDs); } // return a copy to prevent external modification
+        private readonly HashSet<int> _collectedDrawingIDs = new HashSet<int>(); public HashSet<int> GetCollectedDrawingIDs() { return new HashSet<int>(_collectedDrawingIDs); } public List<int> GetAllCollectDrawingIds() { return new List<int>(_collectedDrawingIDs); } // Return a copy to prevent external modification
         // we will also need to store "dropped" drawings
         private readonly HashSet<int> _droppedDrawingIDs = new HashSet<int>();  public HashSet<int> GetDroppedDrawingIDs() { return new HashSet<int>(_droppedDrawingIDs); } // return a copy to prevent external modification
     
@@ -106,7 +106,7 @@ namespace Player
             return true;
         }
         
-        private void RemoveDrawing(int drawingID)
+        public void RemoveDrawing(int drawingID)
         {
             _collectedDrawingIDs.Remove(drawingID);
         }
@@ -145,6 +145,46 @@ namespace Player
             _currentDrawingsThisNight = Mathf.Clamp(_currentDrawingsThisNight + delta, 0, _maxDrawingsPerNight);
             DebugUtils.Log($"Debug: Current drawings this night set to {_currentDrawingsThisNight}/{_maxDrawingsPerNight}.");
         }
-        
+
+        // ------------------------
+        // Save System Interface
+        // -------------------------
+        public struct PlayerInventorySaveData
+        {
+            public List<int> collectedDrawingIDs;
+            public int currentDrawingsThisNight;
+            public List<int> droppedDrawingIDs;
+        }
+
+        public string SaveId => "PlayerInventory";
+        public PlayerInventorySaveData OnSave()
+        {
+            DebugUtils.LogSuccess("Saving PlayerInventory... we currently have " + _collectedDrawingIDs.Count + " drawings in our inventory, and " + _currentDrawingsThisNight + " drawings collected this night.");
+            return new PlayerInventorySaveData
+            {
+                collectedDrawingIDs = new List<int>(_collectedDrawingIDs),
+                currentDrawingsThisNight = _currentDrawingsThisNight,
+                droppedDrawingIDs = new List<int>(_droppedDrawingIDs),
+                
+                
+            };
+        }
+
+        public void OnLoad(PlayerInventorySaveData data)
+        {
+            _collectedDrawingIDs.Clear();
+            foreach (int drawingID in data.collectedDrawingIDs)
+            {
+                _collectedDrawingIDs.Add(drawingID);
+            }
+            _currentDrawingsThisNight = data.currentDrawingsThisNight;
+            _droppedDrawingIDs.Clear();
+            foreach (int drawingID in data.droppedDrawingIDs)
+            {
+                _droppedDrawingIDs.Add(drawingID);
+            }
+            
+            DebugUtils.LogSuccess("Player Inventory loaded... we currently have " + _collectedDrawingIDs.Count + " drawings in our inventory, and " + _currentDrawingsThisNight + " drawings collected this night.");
+        }
     }
 }

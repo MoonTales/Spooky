@@ -77,6 +77,12 @@ namespace Interaction
             SleepTrackerManager.Instance.TurnSleepTrackerOn();
             Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
             data.Send();
+            
+            // EDGE CASE, if we are currently in the tutorial, we will want to Remove the index 0 drawing from the inventory
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial)
+            {
+                PlayerInventory.Instance.RemoveDrawing(0);
+            }
 
         }
 
@@ -90,6 +96,8 @@ namespace Interaction
             HashSet<int> collectedDrawingIds = PlayerInventory.Instance.GetCollectedDrawingIDs();
             foreach (int drawingID in collectedDrawingIds)
             {
+                // tutorial drawing, skip it
+                if (drawingID == 0) { continue; }
                 string prefabName = $"Prefabs/Drawings/Nightmare/N_Drawing_{drawingID}";
                 GameObject prefabToSpawn = Resources.Load<GameObject>(prefabName);
                 if (prefabToSpawn == null) { Debug.LogError($"Unable to find prefab for drawing ID {drawingID} at path {prefabName}"); continue; }

@@ -108,6 +108,7 @@ namespace Managers
                   The idea is that if we are currently in act 2, and we reach zone 1 and die, the drawings should try to spawn in zone 1, rather than Act 2
              */
             int lastSeenZone = GameStateManager.Instance.GetCurrentZoneId(); // as this was the last zone the player was in, before death
+            DebugUtils.Log($"Last seen zone before death: {lastSeenZone}");
             // if this is ever -1, that means we had a "good" wakeup and didnt drop anything, and we can just spawn normally based on the act
             if (lastSeenZone != -1 && lastSeenZone != 0) // as zero is the default value at startup
             {
