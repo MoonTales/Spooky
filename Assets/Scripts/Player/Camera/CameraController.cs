@@ -1,6 +1,7 @@
 using System;
 using Unity.Cinemachine;
 using UnityEngine;
+using Types = System.Types;
 
 namespace Player.Camera
 {
@@ -9,6 +10,8 @@ namespace Player.Camera
         [Header("Camera Lag")]
         [SerializeField] private float panLag = 6f;
         [SerializeField] private float tiltLag = 6f;
+        [SerializeField] private float snapLag = 25f; // fast "snap" when flashlight is off
+
         
         [SerializeField] private float tiltMin = -80f;
         [SerializeField] private float tiltMax = 80f;
@@ -25,6 +28,8 @@ namespace Player.Camera
 
         private float _currentPan;
         private float _currentTilt;
+        
+        private bool _shouldUpdate = true;
 
         private void Start()
         {
@@ -39,23 +44,43 @@ namespace Player.Camera
 
         private void Update()
         {
-            // Read raw input yourself
+            if (!_shouldUpdate) return;
+
             float mouseX = Input.GetAxis("Mouse X");
             float mouseY = Input.GetAxis("Mouse Y");
 
             TargetPan += mouseX * sensitivity;
-            TargetTilt -= mouseY * sensitivity; // minus because mouse up = tilt down
+            TargetTilt -= mouseY * sensitivity;
             TargetTilt = Mathf.Clamp(TargetTilt, tiltMin, tiltMax);
         }
 
+        private bool _isCaughtUp = true;
+
         private void LateUpdate()
         {
-            // Lerp the camera's actual pan/tilt to lag behind the target
-            _currentPan = Mathf.LerpAngle(_currentPan, TargetPan, Time.deltaTime * panLag);
-            _currentTilt = Mathf.LerpAngle(_currentTilt, TargetTilt, Time.deltaTime * tiltLag);
+            if (!_shouldUpdate) return;
+
+            float lag = Flashlight.Instance.IsFlashlightOn() ? panLag : snapLag;
+
+            _currentPan = Mathf.LerpAngle(_currentPan, TargetPan, Time.deltaTime * lag);
+            _currentTilt = Mathf.LerpAngle(_currentTilt, TargetTilt, Time.deltaTime * lag);
 
             _panTilt.PanAxis.Value = _currentPan;
             _panTilt.TiltAxis.Value = _currentTilt;
+        }
+        
+        
+        protected override void OnGameStateChanged(Types.GameState newState)
+        {
+            if (newState == Types.GameState.Gameplay)
+            {
+                // we only want to update during gameplay sections of the game
+                _shouldUpdate = true;
+            }
+            else
+            {
+                _shouldUpdate = false;
+            }
         }
     }
 }
