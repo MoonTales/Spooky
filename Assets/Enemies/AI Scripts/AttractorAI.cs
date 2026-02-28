@@ -62,7 +62,11 @@ public class AttractorAI : MonoBehaviour
 		Teleport_floatX_floatY_floatZ,
 		TeleportCycle,
 		ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount,
-		ReprogramThoughts_THOUGHTREPROGRAM
+		ReprogramThoughts_THOUGHTREPROGRAM,
+		RemoveReaction_LISTintPossiblePriorities,
+		RemoveThought_LISTintPossiblePriorities,
+		AddReaction_LISTintPossiblePriorities_ADDREACTIONS,
+		AddThought_LISTintPossiblePriorities_ADDTHOUGHTS
 	}
 
 	[System.Serializable]
@@ -228,6 +232,14 @@ public class AttractorAI : MonoBehaviour
 		public Stats[] statsToChange;
 		public Alteration changeStatsBy;
 		public float statsChangeAmount;
+		[Header("AddReactionsAndThoughts")]
+		[Tooltip("One of these will be chosen randomly within the danger range")]
+		[SerializeField] public List<EnemyReactions> addReactions;
+		public float addReactionLowerBoundDangerRange = 100;
+		public float addReactionUpperBoundDangerRange = 100;
+		[SerializeField] public List<ThoughtProcess> addThoughts;
+		public float addThoughtsLowerBoundDangerRange = 100;
+		public float addThoughtsUpperBoundDangerRange = 100;
 	}
 
 	public void TestFunction(List<string> arguments)
@@ -298,6 +310,96 @@ public class AttractorAI : MonoBehaviour
 		{
 			IEnumerable<string> itemsToAdd = Statuses.Except(currentStatuses);
 			currentStatuses.AddRange(itemsToAdd);
+		}
+	}
+	public void RemoveReaction(List<string> arguments)
+	{
+		List<int> PossiblePriorities = arguments[0].Split(' ', System.StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+
+		if (PossiblePriorities.Count <= 0)
+		{
+			return;
+		}
+
+		int chosenPriority = PossiblePriorities[Random.Range(0, PossiblePriorities.Count)];
+
+		//Debug.Log("Priority length is " + priority.Length + " and behavior hierarchy count is " + behaviourHierarchy.Count);
+
+		if (chosenPriority < behaviourHierarchy.Count)
+		{
+			behaviourHierarchy.RemoveAt(chosenPriority);
+		}
+	}
+	public void RemoveThought(List<string> arguments)
+	{
+		List<int> PossiblePriorities = arguments[0].Split(' ', System.StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+
+		if (PossiblePriorities.Count <= 0)
+		{
+			return;
+		}
+
+		int chosenPriority = PossiblePriorities[Random.Range(0, PossiblePriorities.Count)];
+
+		//Debug.Log("Priority length is " + priority.Length + " and behavior hierarchy count is " + behaviourHierarchy.Count);
+
+		if (chosenPriority < thoughts.Count)
+		{
+			thoughts.RemoveAt(chosenPriority);
+		}
+	}
+	public void AddReaction(List<string> arguments, List<EnemyReactions> addReactions, float addReactionsLowerBoundDangerRange, float
+		addReactionsUpperBoundDangerRange)
+	{
+		List<int> PossiblePriorities = arguments[0].Split(' ', System.StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+
+		if (PossiblePriorities.Count <= 0)
+		{
+			return;
+		}
+
+		int chosenPriority = PossiblePriorities[Random.Range(0, PossiblePriorities.Count)];
+
+		//Debug.Log("Priority length is " + priority.Length + " and behavior hierarchy count is " + behaviourHierarchy.Count);
+
+		float tempLowerBound = Mathf.Clamp(currentDangerLevel - addReactionsLowerBoundDangerRange, 0, 100) / 100;
+		float tempUpperBound = Mathf.Clamp(currentDangerLevel + addReactionsUpperBoundDangerRange, 0, 100) / 100;
+
+		if (chosenPriority < behaviourHierarchy.Count)
+		{
+			behaviourHierarchy.Insert(chosenPriority, addReactions[Random.Range((int)(addReactions.Count * tempLowerBound),
+				Mathf.CeilToInt(addReactions.Count * tempUpperBound))]);
+		}
+		else
+		{
+			behaviourHierarchy.Add(addReactions[Random.Range((int)(addReactions.Count * tempLowerBound),
+				Mathf.CeilToInt(addReactions.Count * tempUpperBound))]);
+		}
+	}
+	public void AddThought(List<string> arguments, List<ThoughtProcess> addThoughts, float addThoughtsLowerBoundDangerRange, float addThoughtsUpperBoundDangerRange)
+	{
+		List<int> PossiblePriorities = arguments[0].Split(' ', System.StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+
+		if (PossiblePriorities.Count <= 0)
+		{
+			return;
+		}
+
+		int chosenPriority = PossiblePriorities[Random.Range(0, PossiblePriorities.Count)];
+
+		//Debug.Log("Priority length is " + priority.Length + " and behavior hierarchy count is " + behaviourHierarchy.Count);
+
+		float tempLowerBound = Mathf.Clamp(currentDangerLevel - addThoughtsLowerBoundDangerRange, 0, 100) / 100;
+		float tempUpperBound = Mathf.Clamp(currentDangerLevel + addThoughtsUpperBoundDangerRange, 0, 100) / 100;
+
+		if (chosenPriority < thoughts.Count)
+		{
+			thoughts.Insert(chosenPriority, addThoughts[Random.Range((int)(addThoughts.Count * tempLowerBound), Mathf.CeilToInt(addThoughts.Count *
+				tempUpperBound))]);
+		}
+		else
+		{
+			thoughts.Add(addThoughts[Random.Range((int)(addThoughts.Count * tempLowerBound), Mathf.CeilToInt(addThoughts.Count * tempUpperBound))]);
 		}
 	}
 	public void Teleport(List<string> arguments)
@@ -673,7 +775,7 @@ public class AttractorAI : MonoBehaviour
 
 			//Debug.Log("Priority length is " + priority.Length + " and behavior hierarchy count is " + behaviourHierarchy.Count);
 
-			if (priority.Length <= behaviourHierarchy.Count)
+			if (chosenPriority < behaviourHierarchy.Count)
 			{
 				EnemyReactions chosenReaction = behaviourHierarchy[chosenPriority];
 
@@ -828,7 +930,7 @@ public class AttractorAI : MonoBehaviour
 
 			//Debug.Log("Priority length is " + priority.Length + " and behavior hierarchy count is " + behaviourHierarchy.Count);
 
-			if (priority.Length <= thoughts.Count)
+			if (chosenPriority < thoughts.Count)
 			{
 				ThoughtProcess chosenThought = thoughts[chosenPriority];
 
@@ -1229,6 +1331,18 @@ public class AttractorAI : MonoBehaviour
 				break;
 			case FunctionType.ReprogramThoughts_THOUGHTREPROGRAM:
 				ReprogramThoughts(function.possiblePriorityReprograms, function.thoughtReprogramParameters);
+				break;
+			case FunctionType.RemoveReaction_LISTintPossiblePriorities:
+				RemoveReaction(function.arguments);
+				break;
+			case FunctionType.RemoveThought_LISTintPossiblePriorities:
+				RemoveThought(function.arguments);
+				break;
+			case FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS:
+				AddReaction(function.arguments, function.addReactions, function.addReactionLowerBoundDangerRange, function.addReactionUpperBoundDangerRange);
+				break;
+			case FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS:
+				AddThought(function.arguments, function.addThoughts, function.addThoughtsLowerBoundDangerRange, function.addThoughtsUpperBoundDangerRange);
 				break;
 		}
 	}
