@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using Managers;
+using MirzaBeig.VolumetricFogLite;
 using Player;
+using Player.Camera;
 using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
@@ -102,6 +104,7 @@ public class Flashlight : Singleton<Flashlight>, ISaveSystemInterface<Flashlight
     
     private GameObject _cachedFlickerTarget;
     private GameObject _currentFlickerTarget = null;
+    private CameraLagController _cameraController;
 
 
     public struct FlashlightSaveData
@@ -113,6 +116,7 @@ public class Flashlight : Singleton<Flashlight>, ISaveSystemInterface<Flashlight
     {
         // Get all Light components attached to this GameObject and its children
         _lightComponents = GetComponentsInChildren<Light>();
+        _cameraController = CameraLagController.Instance;
         
         // Get camera if not assigned
         if (_playerCamera == null) {_playerCamera = Camera.main;}
@@ -144,28 +148,15 @@ public class Flashlight : Singleton<Flashlight>, ISaveSystemInterface<Flashlight
 
     private void LateUpdate()
     {
-        if (!_doWePossessTheFlashlight){return;}
-        if (CinemaCamera == null)
-        {
-            CinemaCamera = PlayerManager.Instance.GetCinemachineCamera();
-            if (CinemaCamera == null) return;
-        }
+        if (!_doWePossessTheFlashlight) return;
+        if (_cameraController == null) return;
 
-        // Get target rotation - try WORLD rotation instead of local
-        Vector3 targetEuler = CinemaCamera.transform.eulerAngles; // Changed from localEulerAngles
-        float targetPan = targetEuler.y;
-        float targetTilt = targetEuler.x;
-
-        // Use LerpAngle to handle wrapping
-        _currentPan = Mathf.LerpAngle(_currentPan, targetPan, Time.deltaTime * panDrag);
-        _currentTilt = Mathf.LerpAngle(_currentTilt, targetTilt, Time.deltaTime * tiltDrag);
-
-        // IMPORTANT: Normalize the angles to prevent infinite growth
-        _currentPan = Mathf.Repeat(_currentPan, 360f);
-        _currentTilt = Mathf.Repeat(_currentTilt, 360f);
-
-        // Apply to flashlight - you might need WORLD rotation here too
-        transform.rotation = Quaternion.Euler(_currentTilt, _currentPan, 0f); // Changed from localRotation
+        // Flashlight snaps to the RAW input target — ahead of the camera
+        transform.rotation = Quaternion.Euler(
+            _cameraController.TargetTilt,
+            _cameraController.TargetPan,
+            0f
+        );
     }
 
 
