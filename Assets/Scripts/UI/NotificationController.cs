@@ -95,7 +95,7 @@ namespace UI
             // double check we have some text to show
             if (string.IsNullOrEmpty(_notificationText.text))
             {
-                DebugUtils.LogWarning("NotificationController received a notification with no message to display!");
+                //DebugUtils.LogWarning("NotificationController received a notification with no message to display!");
                 _notificationText.text = "";
                 return;
             }

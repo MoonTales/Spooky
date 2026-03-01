@@ -82,5 +82,19 @@ namespace Player.Camera
                 _shouldUpdate = false;
             }
         }
+
+        public void ForceSetCameraRotation(Quaternion newRotation)
+        {
+            if (_panTilt == null) {return;}
+            if (_cinemachineCamera == null){ return;}
+            // this will primarily be called when we are teleporting the player, and need to force the camera to snap to a new rotation immediately, without any lag.
+            TargetPan = newRotation.eulerAngles.y;
+            TargetTilt = newRotation.eulerAngles.x;
+            _currentPan = TargetPan;
+            _currentTilt = TargetTilt;
+            _panTilt.PanAxis.Value = _currentPan;
+            _panTilt.TiltAxis.Value = _currentTilt;
+        }
+
     }
 }
