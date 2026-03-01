@@ -90,7 +90,7 @@ namespace Managers
             else if(id == "fren_letter_3"){ _hasReadAct3FriendLetter = true;}
             else if(id == "res_letter_3"){ _hasReadAct3ResearcherLetter = true;}
             
-            SaveSystem.Instance.RequestSave(this);
+            //SaveSystem.Instance.RequestSave(this);
         }
 
 
