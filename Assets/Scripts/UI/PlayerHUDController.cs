@@ -195,12 +195,26 @@ namespace UI
 
         private void SetInspectionTextVisible(bool visible)
         {
-            if (_hudItemNameText != null) _hudItemNameText.gameObject.SetActive(visible);
-            if (_hudItemDescriptionScrollRect != null) _hudItemDescriptionScrollRect.gameObject.SetActive(visible);
+            if (_hudItemNameText != null)
+            {
+                _hudItemNameText.CrossFadeAlpha(visible ? 1f : 0f, 0.5f, true);
+               //_hudItemNameText.gameObject.SetActive(visible);
+            }
+
+            if (_hudItemDescriptionScrollRect != null)
+            {
+                _hudItemNameText.CrossFadeAlpha(visible ? 1f : 0f, 0.5f, true);
+                //_hudItemDescriptionScrollRect.gameObject.SetActive(visible);
+            }
         }
         private void SetInspectionBGVisible(bool visible)
         {
-            if (_hudOverlay != null) _hudOverlay.enabled = visible;
+            // Experimenting with making this "fade in" rather than just pop in
+            if (_hudOverlay != null)
+            {
+                //_hudOverlay.enabled = visible;
+                _hudOverlay.CrossFadeAlpha(visible ? 1f : 0f, 0.5f, true);
+            }
         }
         private void SetInspectionText(string name, string desc)
         {
