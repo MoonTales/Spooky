@@ -21,7 +21,7 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
     }
     
     // Internal State
-    private bool _isGoodWakeup  = false;
+    private bool _isGoodWakeup  = false; public bool GetIsGoodWakeup() { return _isGoodWakeup; }
     private bool _isSleepTrackerActive = false; public bool GetIsSleepTrackerActive() { return _isSleepTrackerActive; }
     private Transform _sleepTrackerSourceTransform;
     

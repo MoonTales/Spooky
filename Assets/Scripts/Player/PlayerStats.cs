@@ -64,8 +64,20 @@ namespace Player
 
         private IEnumerator StartSanityDrain()
         {
-            while (_playerStats.GetCurrentMentalHealth() > 0)
+            while (_playerStats.GetCurrentMentalHealth() > 0 )
             {
+                
+                // A few edge cases to look for:
+                // A good wake up, while in the nightmare, should pause our sanity drain
+                if(GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare && SleepTrackerManager.Instance.GetIsGoodWakeup())
+                {
+                    yield return null; // skip this frame and check again on the next frame
+                    continue;
+                }
+                // a good sleep, while in the bedroom (
+                
+                
+                
                 // Drain sanity over time based on core state
                 Types.PlayerMentalCoreState coreState = _playerStats.GetPlayerMentalCoreState();
                 float drainAmount = 0f;
