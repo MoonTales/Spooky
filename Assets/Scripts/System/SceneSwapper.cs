@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Managers;
+using Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,9 +10,15 @@ namespace System
     
 
     
-    public class SceneSwapper : Singleton<SceneSwapper>
+    public class SceneSwapper : Singleton<SceneSwapper>, ISaveSystemInterface<SceneSwapper.SceneSwapSaveData>
     {
-        private float _fadeInTime = 1f;
+        
+        public struct SceneSwapSaveData
+        {
+            // get the name of our current scene
+            public string CurrentSceneName;
+        }
+        
         // Internal variables
         private string _spawnAnchorID = "";
 
@@ -29,25 +36,85 @@ namespace System
 
         public void SwapScene(SceneField newScene, string InSpawnAnchorID = "")
         {
-            DebugUtils.Log($"[SceneSwapper] Swapping to scene: {newScene.SceneName}");
             _spawnAnchorID = InSpawnAnchorID;
-            SceneManager.LoadScene(newScene.SceneName, LoadSceneMode.Single);
+            StartCoroutine(LoadSceneAsync(newScene.SceneName));
         }
+
         public void SwapScene(string sceneName, string InSpawnAnchorID = "")
         {
-            DebugUtils.Log($"[SceneSwapper] Swapping to scene: {sceneName}");
             _spawnAnchorID = InSpawnAnchorID;
-            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+            StartCoroutine(LoadSceneAsync(sceneName));
         }
         
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            DebugUtils.LogSuccess($"[SceneSwapper] Scene loaded: {scene.name}");
             // after the scene has been loaded, we need to ensure the player is teleported to the correct location
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
             // This is when we want to broadcast the world clock
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(GameStateManager.Instance.GetCurrentWorldClockHour());
+            
+            // for now we will hardcode this
+            if (scene.name.ToLower() == "bedroom")
+            {
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Bedroom);
+                EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+                SaveSystem.Instance.SaveGame();
+            }
+            if (scene.name.ToLower() == "nightmare1")
+            {
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
+                EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+                SaveSystem.Instance.SaveGame();
+            }
+
+            if (scene.name.ToLower() == "tutorial")
+            {
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);
+                EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+            }
+            
+
+        }
+        
+        // Async for a smoother scene transition
+        private IEnumerator LoadSceneAsync(string sceneName)
+        {
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+
+            // Prevent the scene from activating the moment it finishes loading
+            asyncLoad.allowSceneActivation = false;
+
+            // Wait until the scene is fully loaded (progress reaches 0.9 — Unity's threshold before activation)
+            while (asyncLoad.progress < 0.9f)
+            {
+                yield return null;
+            }
+
+            // Scene is ready — activate it now for a clean, snap-free transition
+            asyncLoad.allowSceneActivation = true;
+
+            // Wait one frame for OnSceneLoaded to fire before continuing
+            
+
+            yield return null;
+        }
+
+        public string SaveId => "SceneSwapper";
+        public SceneSwapSaveData OnSave()
+        {
+            // we want to save the name of our current scene, so that way we can return to it if we need to
+            SceneSwapSaveData saveData = new SceneSwapSaveData
+            {
+                CurrentSceneName = SceneManager.GetActiveScene().name
+            };
+            return saveData;
+        }
+
+        public void OnLoad(SceneSwapSaveData data)
+        {
+            // when we load, we want to immediately swap to the scene that we were in when we saved
+            SwapScene(data.CurrentSceneName);
         }
     }
 }

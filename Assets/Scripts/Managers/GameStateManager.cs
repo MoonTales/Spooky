@@ -8,18 +8,33 @@ namespace Managers
     /// <summary>
     /// Class used to manage the overall state of the game.
     /// </summary>
-    public class GameStateManager : Singleton<GameStateManager>
+    public class GameStateManager : Singleton<GameStateManager>, ISaveSystemInterface<GameStateManager.GameStateSaveData>
     {
-
+        public struct GameStateSaveData
+        {
+            // save the world clock hour
+            public int worldClockHour;
+            public int currentZoneId;
+            
+        }
         
+        
+        [SerializeField] private int _maxDrawingsPerAct = 3; public int GetMaxDrawingsPerAct() { return _maxDrawingsPerAct; }
+        [SerializeField] private int _MaxDrawingsInGame = 9; public int GetMaxDrawingsInGame() { return _MaxDrawingsInGame; }
         // Game state manager can send broadcats for when the game starts, pauses, resumes, and ends.
         // private local variables to track the game state
-        private Types.GameState _currentGameState = Types.GameState.MainMenu;
+        private Types.GameState _currentGameState = Types.GameState.MainMenu; public Types.GameState GetCurrentGameState() { return _currentGameState; }
+        private Types.GameState _previousGameState = Types.GameState.MainMenu; public Types.GameState GetPreviousGameState() { return _previousGameState; }
+        private Types.WorldLocation _currentWorldLocation = new Types.WorldLocation(); public Types.WorldLocation GetCurrentWorldLocation() { return _currentWorldLocation; }
+        
+        private int _currentZoneId = 0; public int GetCurrentZoneId() { return _currentZoneId; } public void SetCurrentZoneId(int zoneId) { _currentZoneId = zoneId; }
+        
         private int _currentWorldClockHour = 1; public int GetCurrentWorldClockHour() { return _currentWorldClockHour; }
         public void Start()
         {
             // Initialize the game state
             _currentGameState = Types.GameState.MainMenu;
+            _previousGameState = _currentGameState;
             // for now, we will assume the game starts
             EventBroadcaster.Broadcast_GameStateChanged(_currentGameState);
         }
@@ -30,66 +45,101 @@ namespace Managers
             // Example subscription to player health state changes
             TrackSubscription(() => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerHealthStateChanged,
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerHealthStateChanged);
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+
+        }
+        
+        
+        public void SetWorldClockHour(int hour)
+        {
+            _currentWorldClockHour = hour;
+            TextDB.SetCurrentAct(_currentWorldClockHour);
+            EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
         }
 
-        private void OnPlayerHealthStateChanged(Types.PlayerHealthState newhealthstate)
+        public void CycleWorldLocation(int direction)
+        {
+            int count = Enum.GetValues(typeof(Types.WorldLocation)).Length;
+            int nextIndex = ((int)_currentWorldLocation + direction) % count;
+            if (nextIndex < 0)
+            {
+                nextIndex += count;
+            }
+
+            EventBroadcaster.Broadcast_OnWorldLocationChanged((Types.WorldLocation)nextIndex);
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
+        {
+            _currentWorldLocation = worldLocation;
+        }
+
+        private void OnPlayerHealthStateChanged(Types.PlayerMentalState newhealthstate)
         {
             // check for a player death
-            if (newhealthstate == Types.PlayerHealthState.Dead)
+            if (newhealthstate == Types.PlayerMentalState.Breakdown)
             {
-                // Handle what should happens when the player Dies
+                
                 PlayerStats.Instance.ResetAllStatsToDefault();
-                SceneSwapper.Instance.SwapScene("Bedroom");
+                
+                // check the core state of the player
+                Types.PlayerMentalCoreState coreState = PlayerStats.Instance.GetPlayerStats().GetPlayerMentalCoreState();
+                if (coreState == Types.PlayerMentalCoreState.Anxious)
+                {
+                    HandleBadWakeup();
+                }
+                else if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
+                {
+
+                    HandleBadSleep();
+                }
             }
         }
 
-        protected void Update()
+        private void HandleBadSleep()
         {
-            // small update to show how this would work
-            if(Input.GetKeyDown(KeyCode.X))
-            {
-                DebugUtils.Log("Player Damaged Event Broadcasted with 10.0f damage");
-                EventBroadcaster.Broadcast_OnPlayerDamaged(10.0f);
-            }
-            if(Input.GetKeyDown(KeyCode.G))
-            {
-                DebugUtils.Log("Switching to Gameplay State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            }
-            if(Input.GetKeyDown(KeyCode.K))
-            {
-                DebugUtils.Log("Switching to Cutscene State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
-            }
-            if(Input.GetKeyDown(KeyCode.M))
-            {
-                DebugUtils.Log("Switching to MainMenu State");
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
-            }
-            
-            if(Input.GetKeyDown(KeyCode.O))
-            {
-                SceneSwapper.Instance.SwapScene("Bedroom");
-            }
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1f, 1f, fadeOutDuration:0.25f, null, HandleBadSleepPostFadeOut);
+            fadeData.Send();
+        }
 
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                SceneSwapper.Instance.SwapScene("Cohen");
-            }
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                SceneSwapper.Instance.SwapScene("FirstAiTest");
-            }
+        private void HandleBadSleepPostFadeOut()
+        {
+            // this means the player fell asleep while in the bedroom, and should be sent to the nightmare
+
+            SceneSwapper.Instance.SwapScene("Nightmare1");
+            // swap the core state to anxious
+            PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
+            EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+
+        }
+
+        private void HandleBadWakeup()
+        {
+            // this means the player was anxious death (they were in the nightmare, and need to reset to bedroom)
             
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour += 1);
-            }
-            
-            
+            // we are gonna wanna play a character forced cutscene here, but for now we will just do a VERY fast fade out.
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1.5f, 1f, fadeOutDuration:0.25f, null, HandleBadWakeupPostFadeOut);
+            fadeData.Send();
+        }
+
+        private void HandleBadWakeupPostFadeOut()
+        {
+            SleepTrackerManager.Instance.SetIsGoodWakeup(false);
+            SceneSwapper.Instance.SwapScene("Bedroom");
+            // swap the core state to sleep deprived
+            PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
+            EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+        }
+
+        protected override void OnGameRestarted()
+        {
+            // when we restart, we wanna reset the world clock hour back to 1
+            SetWorldClockHour(1);
         }
 
 
+        
         protected override void OnGameStateChanged(Types.GameState newState)
         {
             
@@ -99,7 +149,6 @@ namespace Managers
             {
                 EventBroadcaster.Broadcast_GameStarted();
                 // this also means we can broadcast the first WorldClock tick
-                DebugUtils.Log("Broadcasting Initial World Clock Hour Change: " + _currentWorldClockHour);
                 EventBroadcaster.Broadcast_OnWorldClockHourChanged(_currentWorldClockHour);
                 
             }
@@ -107,11 +156,35 @@ namespace Managers
             //2. If we EVER return to the main menu, we can consider that a game restart
             if (_currentGameState != Types.GameState.MainMenu && newState == Types.GameState.MainMenu)
             {
+                
                 EventBroadcaster.Broadcast_GameRestarted();
             }
             
-            
+            _previousGameState = _currentGameState;
             _currentGameState = newState;
         }
+
+        // ------------------------------------
+        // Save System Interface Implementation
+        // ------------------------------------
+        public string SaveId => "GameState";
+        public GameStateSaveData OnSave()
+        {
+            return new GameStateSaveData
+            {
+                worldClockHour = _currentWorldClockHour,
+                currentZoneId = _currentZoneId
+            };
+        }
+
+        public void OnLoad(GameStateSaveData data)
+        {
+            SetWorldClockHour(data.worldClockHour);
+            // we will alwaysw start in gameplay
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            _currentZoneId = data.currentZoneId;
+        }
+        
+        
     }
 }

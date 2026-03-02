@@ -2,8 +2,8 @@ using UnityEngine;
 
 public interface IInteractable
 {
-    // maybe a short prompt for UI, like "pick up key", "hide", "turn off alarm"
-    string Prompt { get; }
+    // key to a short prompt
+    TextKey PromptKey { get; }
 
 
     // return false to block interaction (locked, already used, wrong state, whatever)
@@ -15,7 +15,7 @@ public interface IInteractable
 
 
     // optional common audio (can be null)
-    AudioClip HoverSfx { get; }
-    AudioClip InteractSfx { get; }
-    AudioClip DeniedSfx { get; }
+    //AudioClip HoverSfx { get; }
+    //AudioClip InteractSfx { get; }
+    //AudioClip DeniedSfx { get; }
 }

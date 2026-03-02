@@ -30,6 +30,7 @@ Material:
   - _ALPHATEST_ON
   - _BUILTIN_ALPHATEST_ON
   - _BUILTIN_AlphaClip
+  - _RECEIVE_SHADOWS_OFF
   m_InvalidKeywords:
   - _DISABLE_DECALS
   - _DISABLE_SSR
@@ -49,6 +50,7 @@ Material:
   - RayTracingPrepass
   - ForwardEmissiveForDeferred
   - MOTIONVECTORS
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -121,10 +123,10 @@ Material:
     m_Floats:
     - AO_Scale: 0.5
     - Alpha_Clip_Threshold: 0.86
-    - Animation_Cutoff: 20
+    - Animation_Cutoff: 5
     - Boolean_42a44e347a464bd59e694ae00ebc61d5: 0
-    - Distance_Fade_End: 80
-    - Distance_Fade_Start: 40
+    - Distance_Fade_End: 20
+    - Distance_Fade_Start: 10
     - Dither_Scale: 1.5
     - Enable_Blend_Terrain_Color: 0
     - Normal_Scale: 1
@@ -143,7 +145,7 @@ Material:
     - Vector1_470c7ffcdf88403a8c7144266a4f3546: 10
     - Vector1_593c5cea6c4a42e993ed03ced4685732: 0.5
     - Vector1_687109297e874d1a848c7007e0a6b58e: 180
-    - Vector1_8651797e3e304e108dbd25f9d5a426ba: 0.81
+    - Vector1_8651797e3e304e108dbd25f9d5a426ba: 0
     - Vector1_88a79d61c4924a7f8a3cd9694abcada1: 5
     - Vector1_8d0ed5c4e8184041a818498c5845e583: 0
     - Vector1_9D07BAD0: 0
@@ -159,7 +161,7 @@ Material:
     - Wind_Blast: 0.1
     - Wind_Intensity: 0.05
     - Wind_Ripples: 0.05
-    - Wind_Speed: 5
+    - Wind_Speed: 1
     - Wind_Turbulence: 0
     - Wind_Turbulence_1: 0
     - Wind_Wavelength: 10
@@ -185,7 +187,7 @@ Material:
     - _Blend: 0
     - _BlendMode: 0
     - _BlendModePreserveSpecular: 0
-    - _CastShadows: 1
+    - _CastShadows: 0
     - _ConservativeDepthOffsetEnable: 0
     - _Cull: 0
     - _CullMode: 0
@@ -205,7 +207,7 @@ Material:
     - _QueueControl: 1
     - _QueueOffset: 0
     - _RayTracing: 0
-    - _ReceiveShadows: 1
+    - _ReceiveShadows: 0
     - _ReceivesSSR: 0
     - _ReceivesSSRTransparent: 0
     - _RefractionModel: 0

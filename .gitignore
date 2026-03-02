@@ -55,6 +55,7 @@ ExportedObj/
 *.opendb
 *.VC.db
 *.idea
+*.vscode
 
 # Unity3D generated meta files
 *.pidb.meta
@@ -98,3 +99,14 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Ignore the Cache folder since it is updated locally.
+/[Aa]ssets/Plugins/FMOD/Cache/*
+
+# FMOD Studio project local cache
+/Audio/FMODProject/Spooky/.cache/
+/Audio/FMODProject/Spooky/Metadata/ProfilerSession/
+Assets/Plugins/FMOD/Resources/FMODStudioSettings.asset
+Assets/Fonts/Quando-Regular SDF.asset
+Assets/Fonts/CFCrayons-Regular SDF.asset
+Assets/Fonts/Quando-Regular SDF.asset

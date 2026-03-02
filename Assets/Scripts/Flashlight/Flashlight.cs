@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using Managers;
+using MirzaBeig.VolumetricFogLite;
 using Player;
+using Player.Camera;
 using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
@@ -17,7 +19,7 @@ public class FlickerSettings
     public float flickerSpeed = 0.1f;
 }
 
-public class Flashlight : Singleton<Flashlight>
+public class Flashlight : Singleton<Flashlight>, ISaveSystemInterface<Flashlight.FlashlightSaveData>
 {
     // Tag used for what should cause the flashlight to Flicker
     [SerializeField] private string flickerTag = "Enemy";
@@ -65,7 +67,6 @@ public class Flashlight : Singleton<Flashlight>
     [Space(10)]
     [Header("battery Settings")]
     [SerializeField] private float maxBatteryLife = 100f; // Assume this is in seconds for now
-    [SerializeField] private float minBatterylife = 20f; // The lowest battery life we will drop to
     [SerializeField] private float batteryDrainRate = 10f; // percentage per minute
     [SerializeField] private float batteryRechargeRate = 0.5f; // percentage per minute
     // threshold values
@@ -77,6 +78,7 @@ public class Flashlight : Singleton<Flashlight>
     private float _batteryLife = 100f; // percentage
     private Coroutine _batteryDrainCoroutine;
     private Coroutine _batteryRechargeCoroutine;
+    private bool _doWePossessTheFlashlight = false; public bool DoWePossessTheFlashlight() { return _doWePossessTheFlashlight; } public void SetDoWePossessTheFlashlight(bool value) { _doWePossessTheFlashlight = value; }
     
     
     // Internal Variables
@@ -102,18 +104,25 @@ public class Flashlight : Singleton<Flashlight>
     
     private GameObject _cachedFlickerTarget;
     private GameObject _currentFlickerTarget = null;
+    private CameraLagController _cameraController;
 
+
+    public struct FlashlightSaveData
+    {
+        public bool doWePossessTheFlashlight;
+    }
     
     private void Start()
     {
         // Get all Light components attached to this GameObject and its children
         _lightComponents = GetComponentsInChildren<Light>();
+        _cameraController = CameraLagController.Instance;
         
         // Get camera if not assigned
         if (_playerCamera == null) {_playerCamera = Camera.main;}
         
-        // Initialize flashlight state
-        OnFlashlightToggled(_isOn);
+        // Initialize flashlight state without triggering toggle SFX on startup.
+        OnFlashlightToggled(_isOn, false);
         
         CinemaCamera = PlayerManager.Instance.GetCinemachineCamera();
         panTilt = CinemaCamera.GetComponent<CinemachinePanTilt>();
@@ -123,10 +132,14 @@ public class Flashlight : Singleton<Flashlight>
             _currentPan = panTilt.PanAxis.Value;
             _currentTilt = panTilt.TiltAxis.Value;
         }
+        
+        HandleFlashlightOff(playSfx: false);
+        _isOn = false; // Ensure flashlight starts off
     }
     
     private void Update()
     {
+        if (!_doWePossessTheFlashlight){return;}
         if (_isOn && !_isFlickering)
         {
             CheckForEnemy();
@@ -135,27 +148,15 @@ public class Flashlight : Singleton<Flashlight>
 
     private void LateUpdate()
     {
-        if (CinemaCamera == null)
-        {
-            CinemaCamera = PlayerManager.Instance.GetCinemachineCamera();
-            if (CinemaCamera == null) return;
-        }
+        if (!_doWePossessTheFlashlight) return;
+        if (_cameraController == null) return;
 
-        // Get target rotation - try WORLD rotation instead of local
-        Vector3 targetEuler = CinemaCamera.transform.eulerAngles; // Changed from localEulerAngles
-        float targetPan = targetEuler.y;
-        float targetTilt = targetEuler.x;
-
-        // Use LerpAngle to handle wrapping
-        _currentPan = Mathf.LerpAngle(_currentPan, targetPan, Time.deltaTime * panDrag);
-        _currentTilt = Mathf.LerpAngle(_currentTilt, targetTilt, Time.deltaTime * tiltDrag);
-
-        // IMPORTANT: Normalize the angles to prevent infinite growth
-        _currentPan = Mathf.Repeat(_currentPan, 360f);
-        _currentTilt = Mathf.Repeat(_currentTilt, 360f);
-
-        // Apply to flashlight - you might need WORLD rotation here too
-        transform.rotation = Quaternion.Euler(_currentTilt, _currentPan, 0f); // Changed from localRotation
+        // Flashlight snaps to the RAW input target — ahead of the camera
+        transform.rotation = Quaternion.Euler(
+            _cameraController.TargetTilt,
+            _cameraController.TargetPan,
+            0f
+        );
     }
 
 
@@ -185,7 +186,7 @@ public class Flashlight : Singleton<Flashlight>
                     EventBroadcaster.Broadcast_OnFlashlightHitEnemy(_currentFlickerTarget, true);
                 
                     _cachedFlickerTarget = hitEnemy;
-                    StartCoroutine(FlashlightFlicker());
+                    StartCoroutine(FlashlightFlicker(3f, 0.05f));
                 }
                 return;
             }
@@ -199,27 +200,30 @@ public class Flashlight : Singleton<Flashlight>
         }
     
         // draw a debug ray
-        Debug.DrawRay(ray.origin, ray.direction * maxFlickerDistance, Color.yellow);
     }
     
-    private void OnFlashlightToggled(bool isOn)
+    private void OnFlashlightToggled(bool isOn, bool playSfx = true)
     {
+        if (!_doWePossessTheFlashlight){return;}
+        
         // Handle flashlight toggle event
         if (isOn)
         {
-            HandleFlashlightOn();
+            HandleFlashlightOn(playSfx);
         }
         else
         {
-            HandleFlashlightOff();
+            HandleFlashlightOff(playSfx);
         }
     }
 
-    private void HandleFlashlightOn()
+    private void HandleFlashlightOn(bool playSfx)
     {
         EventBroadcaster.Broadcast_OnFlashlightToggled(true);
-        // play SFX
-        AudioManager.Instance.PlayFlashlightOn();
+        if (playSfx)
+        {
+            AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
+        }
         // turn on all light components
         SetAllLights(true);
         // Start special flicker timer
@@ -241,11 +245,13 @@ public class Flashlight : Singleton<Flashlight>
         }
     }
     
-    private void HandleFlashlightOff()
+    private void HandleFlashlightOff(bool playSfx)
     {
         EventBroadcaster.Broadcast_OnFlashlightToggled(false);
-        // play SFX
-        AudioManager.Instance.PlayFlashlightOff();
+        if (playSfx)
+        {
+            AudioManager.Instance.PlaySfx(AudioManager.SfxId.Flashlight, transform);
+        }
         // turn off all light components
         SetAllLights(false);
         // Stop special flicker timer
@@ -318,7 +324,6 @@ public class Flashlight : Singleton<Flashlight>
             // Check if battery died and turn off flashlight
             if (_currentBatteryState == Types.FlashlightBatteryState.Dead)
             {
-                DebugUtils.Log("Battery died! Turning off flashlight.");
                 ToggleFlashlight();
                 yield break; // Exit coroutine immediately
             }
@@ -376,7 +381,7 @@ public class Flashlight : Singleton<Flashlight>
         _isFlickering = true;
         float elapsed = 0f;
         
-        while (elapsed < flickerDuration)
+        while (elapsed < flickerDuration && _isOn)
         {
             // Randomly flicker each light component
             foreach (var light in _lightComponents)
@@ -395,6 +400,8 @@ public class Flashlight : Singleton<Flashlight>
         // if the flashlight is still on, return them to enabled state
         SetAllLights(_isOn);
 
+        // the flashlight would stop flickering on enemy after set time; this should fix that
+        _currentFlickerTarget = null;
 
         _isFlickering = false;
     }
@@ -406,5 +413,26 @@ public class Flashlight : Singleton<Flashlight>
             light.enabled = state;
         }
     }
-    
+
+    protected override void OnGameRestarted()
+    {
+        _doWePossessTheFlashlight = false;
+    }
+
+    // ------------------------------------
+    // Save System Interface Implementation
+    // ------------------------------------
+    public string SaveId => "Flashlight";
+    public FlashlightSaveData OnSave()
+    {
+        return new FlashlightSaveData
+        {
+            doWePossessTheFlashlight = _doWePossessTheFlashlight
+        };
+    }
+
+    public void OnLoad(FlashlightSaveData data)
+    {
+        _doWePossessTheFlashlight = data.doWePossessTheFlashlight;
+    }
 }

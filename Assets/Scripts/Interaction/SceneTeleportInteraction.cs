@@ -1,13 +1,17 @@
 using System;
+using Managers;
 using UnityEngine;
 
 public class SceneTeleportInteraction : MonoBehaviour, IInteractable
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
+    [SerializeField] private bool bShouldResetZoneId = true;
     [SerializeField] private string sceneName = "";
     
-    public string Prompt { get; }
+    [Header("Text Keys (CSV row pointers)")]
+    [SerializeField] private TextKey promptTextKey;
+    public TextKey PromptKey => promptTextKey;
     public bool CanInteract(Interactor interactor)
     {
         return true;
@@ -16,6 +20,7 @@ public class SceneTeleportInteraction : MonoBehaviour, IInteractable
     public void Interact(Interactor interactor)
     {
         SceneSwapper.Instance.SwapScene(sceneName);
+        if(bShouldResetZoneId){GameStateManager.Instance.SetCurrentZoneId(-1);}
     }
 
     public AudioClip HoverSfx { get; }

@@ -3,6 +3,10 @@ using Player;
 using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
+using Inspection;
+using Interaction.Letters;
+using Managers;
+using UI;
 
 public class InspectionSystem : Singleton<InspectionSystem>
 {
@@ -16,6 +20,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
     [Header("References")]
     [SerializeField] private Transform cameraTransform; // Main camera transform
+    [SerializeField] private Texture2D letterWritingTexture;
     
     private GameObject _currentInspectedObject;
     private Vector3 _originalPosition;
@@ -33,6 +38,15 @@ public class InspectionSystem : Singleton<InspectionSystem>
     private Vector3 targetZoomPosition = Vector3.zero;
     
     private LayerMask _cachedLayerMask;
+    
+    private bool _isFirstInspection = true; // Flag to track if it's the first inspection
+    
+    // fix:
+    // you need to be inspecting an object for atleast 0.5 seconds before you can exit
+    // this is to stop the low fsp issue of it returning to the og position
+    float inspectionStartTime = 0f;
+    bool canExitInspection => inspectionStartTime >= 0.5f;
+    
     
     void Start()
     {
@@ -66,7 +80,15 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 HandleInspection();
             }
         }
+        
+        // update the time
+        if (_isInspecting && !canExitInspection)
+        {
+            inspectionStartTime += Time.deltaTime;
+        }
     }
+    
+    
     
     // Public function which can be called from any other script to start inspecting an object (itself or another)
     public void StartInspection(GameObject objectToInspect)
@@ -115,6 +137,18 @@ public class InspectionSystem : Singleton<InspectionSystem>
         // we need to do this to all child layers as well
         _cachedLayerMask = _currentInspectedObject.layer;
         SetLayerRecursively(_currentInspectedObject, LayerMask.NameToLayer("Inspection"));
+        
+        if (_isFirstInspection)
+        {
+            Types.NotificationData data = new(
+                duration: 3, 
+                messageKey: new TextKey { place = "tutorial", id = "inspect" },
+                messageOverride: "Click and drag to view object. F or right click to exit.",
+                shouldOnlyShowOnce: true
+            );
+            data.Send();
+            _isFirstInspection = false;
+        }
     }
     
     
@@ -131,66 +165,156 @@ public class InspectionSystem : Singleton<InspectionSystem>
         
         // reset the target zoom position
         targetZoomPosition = _currentInspectedObject.transform.localPosition;
+        
+        // Call any inspection finished logic on the inspected object
+        // I should change this to just be the default
+        InspectableObject inspectable = _currentInspectedObject.GetComponent<InspectableObject>();
+        if (inspectable != null)
+        {
+            inspectable.OnInspectionFinished();
+        }
+        
+        // reset the inspection start time for the next inspection
+        inspectionStartTime = 0f; 
     }
     
     private void HandleInspection()
-{
-    // Smooth move to inspection point
-    // we need to ensure we are not actively zooming though
-    if (!isZooming)
-    {
-        _currentInspectedObject.transform.localPosition = Vector3.Lerp(_currentInspectedObject.transform.localPosition, targetZoomPosition, Time.deltaTime * transitionSpeed);
-    }
-    
-    // MOUSE DRAG
-    if (Input.GetMouseButtonDown(0))
-    {
-        _prevMousePosition = Input.mousePosition;
-    }
-    else if (Input.GetMouseButton(0))
-    {
-        Vector3 delta = Input.mousePosition - _prevMousePosition;
-    
+    {   
+        // Smooth move to inspection point
+        // we need to ensure we are not actively zooming though
+        if (!isZooming)
+        {
+            _currentInspectedObject.transform.localPosition = Vector3.Lerp(_currentInspectedObject.transform.localPosition, targetZoomPosition, Time.deltaTime * transitionSpeed);
+        }
         
-        // you may notice that the stuff is inverted... yeah I dont even know, this is what managed to make it work LOL
-        // Horizontal drag = left/right rotation
-        float horizontalRotation = -delta.x * rotationStrength;
-        _currentInspectedObject.transform.Rotate(cameraTransform.up, horizontalRotation, Space.World);
-    
-        // Vertical drag = up/down rotation
-        float verticalRotation = delta.y * rotationStrength;
-        _currentInspectedObject.transform.Rotate(cameraTransform.right, verticalRotation, Space.World);
-    
-        _prevMousePosition = Input.mousePosition;
-    }
-    
-    
-    // ZOOM IN - OUT
-    // get the value of the scroll wheel (which is between -1 and 1 ish)
-    float scroll = Input.GetAxis("Mouse ScrollWheel");
-    if (scroll != 0f)
-    {
-        isZooming = true;
+        // MOUSE DRAG
+        if (Input.GetMouseButtonDown(0))
+        {
+            _prevMousePosition = Input.mousePosition;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            Vector3 delta = Input.mousePosition - _prevMousePosition;
         
-        // Adjust the local Z position (distance from camera in local space)
-        Vector3 newPos = targetZoomPosition;
-        newPos.z -= scroll * 2f; // Zoom speed factor
-        newPos.z = Mathf.Clamp(newPos.z, minZoomDistance, maxZoomDistance);
+            
+            // you may notice that the stuff is inverted... yeah I dont even know, this is what managed to make it work LOL
+            // Horizontal drag = left/right rotation
+            float horizontalRotation = -delta.x * rotationStrength;
+            _currentInspectedObject.transform.Rotate(cameraTransform.up, horizontalRotation, Space.World);
         
-        targetZoomPosition = newPos;
-    }
-    else
-    {
-        isZooming = false;
-    }
-    
+            // Vertical drag = up/down rotation
+            float verticalRotation = delta.y * rotationStrength;
+            _currentInspectedObject.transform.Rotate(cameraTransform.right, verticalRotation, Space.World);
+        
+            _prevMousePosition = Input.mousePosition;
+        }
+        
+        
+        // ZOOM IN - OUT
+        // get the value of the scroll wheel (which is between -1 and 1 ish)
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0f)
+        {
+            isZooming = true;
+            
+            // Adjust the local Z position (distance from camera in local space)
+            Vector3 newPos = targetZoomPosition;
+            newPos.z -= scroll * 2f; // Zoom speed factor
+            newPos.z = Mathf.Clamp(newPos.z, minZoomDistance, maxZoomDistance);
+            
+            targetZoomPosition = newPos;
+        }
+        else
+        {
+            isZooming = false;
+        }
+        
 
-    // Exit inspection with right click or ESC
-    if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
-    {
-        EndInspection();
+        // Exit inspection with right click or ESC
+        //TODO: fix this so that we can use F
+        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
+        {
+            
+            // ensure enough time has pass
+            if (!canExitInspection) { return; }
+            
+            // only allow exit once the object is close enough to the inspection point (so we dont have weird snapping)
+            if (Vector3.Distance(_currentInspectedObject.transform.localPosition, targetZoomPosition) < 0.05f)
+            {
+                // determine if the object we are currently inspecting is:
+                // a) a research letter AND has not been written on yet
+                if (_currentInspectedObject.GetComponent<Letter>() != null && !_currentInspectedObject.GetComponent<Letter>().GetHasBeenWrittenOn())
+                {
+                    // if its a friend letter
+                    if (_currentInspectedObject.GetComponent<Letter>().GetLetterType() == Types.LetterType.Friend)
+                    {
+                        // if so, we want to do some unique logic for that (like showing the writing UI)
+                        EndInspection();
+                        return;
+                    }
+                    // if so, we want to do some unique logic for that (like showing the writing UI)
+                    HandleUniqueInspectionLogic();
+                    return;
+                }
+                else
+                {
+                    EndInspection();
+                }
+                
+                // handles anything other than a letter
+                if (!_currentInspectedObject.GetComponent<Letter>())
+                {
+                    // if not, just end the inspection normally
+                    EndInspection();
+                }
+                
+            }
+        }
     }
-}
+
+    private void HandleUniqueInspectionLogic()
+    {
+        // step 2) fade to black
+        new Types.ScreenFadeData(3f, 3f, 3f,
+            HandleFadeFinished,
+            HandleScribbleNote
+        ).Send();
+
+    }
+
+    private void HandleScribbleNote()
+    {
+        // at this point, we should play the scribble sounds and swap the letter model to the one with the writing on it, then fade back in
+        if (GameStateManager.Instance != null
+            && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom)
+        {
+            Transform sourceTransform = _currentInspectedObject != null ? _currentInspectedObject.transform : transform;
+            if (!EventBroadcaster.Broadcast_OnLetterScribble(sourceTransform))
+            {
+                // Fallback for startup-order edge cases where AudioManager has not subscribed yet.
+                AudioManager.Instance?.PlaySfx(AudioManager.SfxId.LetterScribble, sourceTransform);
+            }
+        }
+
+        Letter letter = _currentInspectedObject.GetComponent<Letter>();
+        letter.SetResponseTextKey();
+        PlayerHUDController.Instance.RefreshInspectionText();
+        
+        //TODO: CHANGE THE VISUALS TOO
+        // for now we will just like.. idk change the color?
+        Renderer[] renderers = _currentInspectedObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer thisRenderer in renderers)
+        {
+            thisRenderer.material.EnableKeyword("_DETAIL_MULX2"); // Essential for URP for some reason omg
+            thisRenderer.material.SetTexture("_DetailAlbedoMap", letterWritingTexture);
+        }
+    }
+
+    private void HandleFadeFinished()
+    {
+        Letter letter = _currentInspectedObject.GetComponent<Letter>();
+        letter.SetHasBeenWrittenOn(true);
+    }
     
     private void HandleExitTransition()
     {
@@ -233,10 +357,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 col.enabled = true;
             }
         
-            // Clear inspecting flags and current object
-            _isInspecting = false;
-            _isExitingInspection = false;
-            _currentInspectedObject = null;
+
         
             // Restore and re-enable pan/tilt
             if (panTilt != null)
@@ -245,7 +366,23 @@ public class InspectionSystem : Singleton<InspectionSystem>
                 panTilt.TiltAxis.Value = savedPanTilt.y;
                 panTilt.enabled = true;
             }
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            
+            InspectableObject inspectable = _currentInspectedObject.GetComponent<InspectableObject>();
+            if (inspectable != null)
+            {
+                inspectable.OnReturnedToOriginalPosition();
+            }
+            
+            // Clear inspecting flags and current object
+            _isInspecting = false;
+            _isExitingInspection = false;
+            _currentInspectedObject = null;
+            
+            // only set this, if we are not currently in the main menu (an edge case)
+            if (GameStateManager.Instance.GetCurrentGameState() != Types.GameState.MainMenu)
+            {
+                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            }
         }
     }
     
@@ -257,6 +394,27 @@ public class InspectionSystem : Singleton<InspectionSystem>
         foreach (Transform child in obj.transform)
         {
             SetLayerRecursively(child.gameObject, layer);
+        }
+    }
+
+    // Get inspected object thank u Cohen :D
+    public InspectableObject GetCurrentInspectedObject()
+    {
+        if (_currentInspectedObject != null)
+        {
+            return _currentInspectedObject.GetComponent<InspectableObject>();
+        }
+        return null;
+    }
+    
+    protected override void OnGameStateChanged(Types.GameState newstate)
+    {
+        // If we are inspecting and the game state changes away from inspecting, end inspection
+        // UNLESS we are pausing the game while inspecting, we will allow that
+        if (_isInspecting && newstate != Types.GameState.Inspecting)
+        {
+            if (newstate == Types.GameState.Paused) { return; }
+            EndInspection();
         }
     }
 }

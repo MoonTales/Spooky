@@ -44,46 +44,264 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c2785e918517f24d8e3a453702a4176, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _poolSize: 10
-  soundGrass:
-  - {fileID: 8300000, guid: 23f537bc838b6224a8b22680c3ec0477, type: 3}
-  - {fileID: 8300000, guid: 77313b3ac9c75f545a7cce94bdc8c1a3, type: 3}
-  - {fileID: 8300000, guid: fe99b708869596346a35738043ba969f, type: 3}
-  - {fileID: 8300000, guid: 1642d501db459a2408f8b9b45ea7e09f, type: 3}
-  soundWater:
-  - {fileID: 8300000, guid: e0fe87410d2160d46906e152b4bd6f21, type: 3}
-  - {fileID: 8300000, guid: b87dc1a8465327349b2bd94b58666b60, type: 3}
-  - {fileID: 8300000, guid: ce73e51f44d67f3448b78085d8e3a22e, type: 3}
-  soundConcrete:
-  - {fileID: 8300000, guid: 229c64ed39310624c9aada3d771c7b06, type: 3}
-  - {fileID: 8300000, guid: 1f866668884214b4db7140d25b0def17, type: 3}
-  - {fileID: 8300000, guid: e5ae416f49602c1409e7c0d85ae0215c, type: 3}
-  - {fileID: 8300000, guid: 169f75c2c9f5fae4c9147639256eb0c8, type: 3}
-  - {fileID: 8300000, guid: 375af61fe5c06774084832c408e31683, type: 3}
-  soundGravel:
-  - {fileID: 8300000, guid: 5cbf4dba6e3b40040938560663d850cc, type: 3}
-  - {fileID: 8300000, guid: 36b2a5a7f988c3a49a8dcb97c82f3055, type: 3}
-  - {fileID: 8300000, guid: 061f92917f3344e46a181210cd2be5f8, type: 3}
-  - {fileID: 8300000, guid: e6b69fa3aa7d71543b631e73a8d4edaa, type: 3}
-  - {fileID: 8300000, guid: 325a507d48fda384fa119f766f5c51a7, type: 3}
-  - {fileID: 8300000, guid: 763ef6481f64ff044b076930e3e76ba2, type: 3}
-  soundWood:
-  - {fileID: 8300000, guid: 7cfe8fa2d154f5b48b968c6c2873f0c5, type: 3}
-  - {fileID: 8300000, guid: ae55f2c92e3202b4aaef430dfe971fce, type: 3}
-  - {fileID: 8300000, guid: 04999e5a75ae5eb4d86f476107b81a6d, type: 3}
-  - {fileID: 8300000, guid: a0f7c9da8c6a58649a40f6fb7b4a56df, type: 3}
-  - {fileID: 8300000, guid: 2d064d60ac258d848b3e2dee1a223058, type: 3}
-  soundMetal:
-  - {fileID: 8300000, guid: b39d500728efec2468983e463e16d719, type: 3}
-  - {fileID: 8300000, guid: 819a181928a16d64993eeba8d3b8c651, type: 3}
-  - {fileID: 8300000, guid: b0b8cdcf5e784624990a0d61b230fd3e, type: 3}
-  - {fileID: 8300000, guid: aa4a5fc2bf0743348943776816aa5a68, type: 3}
+  sfxEvents:
+  - id: 0
+    eventRef:
+      Guid:
+        Data1: 400017232
+        Data2: 1086536650
+        Data3: 357605298
+        Data4: -920795188
+      Path: event:/sfx/player/movement/jump
+  - id: 1
+    eventRef:
+      Guid:
+        Data1: 435730620
+        Data2: 1276468479
+        Data3: 858536617
+        Data4: 2120149737
+      Path: event:/sfx/player/movement/land
+  - id: 2
+    eventRef:
+      Guid:
+        Data1: 739701894
+        Data2: 1274669532
+        Data3: 316999592
+        Data4: 2026019272
+      Path: event:/sfx/switches/flashlight
+  - id: 3
+    eventRef:
+      Guid:
+        Data1: 851541296
+        Data2: 1207363628
+        Data3: 2054426510
+        Data4: 988299289
+      Path: event:/sfx/interactable/bedroom/letter-slide
+  - id: 4
+    eventRef:
+      Guid:
+        Data1: 308712568
+        Data2: 1257233277
+        Data3: -1279461214
+        Data4: -1045431688
+      Path: event:/sfx/interactable/bedroom/scribble
+  - id: 6
+    eventRef:
+      Guid:
+        Data1: -1719849088
+        Data2: 1114230528
+        Data3: 1032617629
+        Data4: 147325942
+      Path: event:/sfx/interactable/bedroom/alarm-bad
+  - id: 8
+    eventRef:
+      Guid:
+        Data1: -589383920
+        Data2: 1194023304
+        Data3: 511347899
+        Data4: 2074030138
+      Path: event:/sfx/UI/button-on-hover
+  - id: 9
+    eventRef:
+      Guid:
+        Data1: -1018198644
+        Data2: 1316893993
+        Data3: 189787555
+        Data4: 612001018
+      Path: event:/sfx/interactable/tutorial/door-button
+  - id: 10
+    eventRef:
+      Guid:
+        Data1: -1193933622
+        Data2: 1323197806
+        Data3: 662171791
+        Data4: -1114051719
+      Path: event:/sfx/interactable/tutorial/door-slide
+  debugAudioLogs: 0
+  footstepPlayer:
+    Guid:
+      Data1: 1793541463
+      Data2: 1172772533
+      Data3: -958284151
+      Data4: 369320740
+    Path: event:/sfx/player/movement/footstep
+  playerMovementBusPath: bus:/SFX/StopOnPause/Player/Movement
+  landingIntensityParameter: LandingIntensity
+  landingFallSpeedMax: 20
+  landingAirTimeMax: 1.5
+  autoAttachLampAudioOnSceneLoad: 1
+  lampAudioAutoAttachSceneName: Tutorial
+  lampHumLoopEvent:
+    Guid:
+      Data1: -904938069
+      Data2: 1098275312
+      Data3: 469348779
+      Data4: 700184121
+    Path: event:/amb/env/tutorial/lights/lights-flourescent
+  lampOnParameter: LampOn
+  lampBuzzOffEvent:
+    Guid:
+      Data1: 1492966471
+      Data2: 1129197044
+      Data3: 1126607750
+      Data4: 752480140
+    Path: event:/amb/env/tutorial/lights/lights-flourescent-buzz-off
+  autoAttachTutorialOrbAudioOnSceneLoad: 1
+  tutorialOrbAudioSceneName: Tutorial
+  tutorialOrbRootName: TheBuilding
+  tutorialOrbNamePrefix: Orb
+  tutorialOrbPinnedName: 
+  tutorialOrbPinnedEventPathToken: orb-peace
+  tutorialOrbEvents:
+  - Guid:
+      Data1: 879235584
+      Data2: 1145066423
+      Data3: -1839081051
+      Data4: 1070661361
+    Path: event:/amb/env/tutorial/ORB/orb-anger
+  - Guid:
+      Data1: -1338490465
+      Data2: 1081053581
+      Data3: -917097855
+      Data4: 182638579
+    Path: event:/amb/env/tutorial/ORB/orb-crazed
+  - Guid:
+      Data1: 1715033810
+      Data2: 1308946698
+      Data3: 1271221175
+      Data4: -435165108
+    Path: event:/amb/env/tutorial/ORB/orb-dying
+  - Guid:
+      Data1: -917307707
+      Data2: 1178093716
+      Data3: -20936550
+      Data4: -105748757
+    Path: event:/amb/env/tutorial/ORB/orb-happiness
+  - Guid:
+      Data1: -1255891454
+      Data2: 1291388525
+      Data3: 1685537206
+      Data4: -1668986247
+    Path: event:/amb/env/tutorial/ORB/orb-paranoia
+  - Guid:
+      Data1: 1000347313
+      Data2: 1147355416
+      Data3: -864280385
+      Data4: -1311312873
+    Path: event:/amb/env/tutorial/ORB/orb-peace
+  - Guid:
+      Data1: -428040326
+      Data2: 1185893364
+      Data3: 1976008833
+      Data4: 1043633036
+    Path: event:/amb/env/tutorial/ORB/orb-praise
+  - Guid:
+      Data1: 573289971
+      Data2: 1290545386
+      Data3: -1418913891
+      Data4: 1908068273
+    Path: event:/amb/env/tutorial/ORB/orb-sadness
+  tutorialHallwayStretchEvent:
+    Guid:
+      Data1: 351463793
+      Data2: 1250743252
+      Data3: 1475581866
+      Data4: 373874254
+    Path: event:/amb/env/tutorial/hallway-stretch
+  tutorialHallwayStretchStateParameter: StretchState
+  tutorialHallwayStretchProgressParameter: StretchProgress
+  tutorialHallwayRunPressureParameter: RunPressure
+  tutorialHallwayPlayerSpeedParameter: PlayerSpeed
+  tutorialHallwayPlayerSpeedMax: 8
+  tutorialHallwaySweepDurationSeconds: 12
+  debugTutorialHallwayParameters: 0
+  debugTutorialHallwayPlayerSpeed: 1
+  tutorialHallwayStateStretchingLabel: Stretching
+  tutorialHallwayStateContractedLabel: Contracted
+  tutorialDrawingAudioSceneName: Tutorial
+  tutorialDrawingStaticLoopEvent:
+    Guid:
+      Data1: -1869865739
+      Data2: 1223687623
+      Data3: 1456920727
+      Data4: 2144522301
+    Path: event:/amb/env/tutorial/general/drawing-end
+  terrorDistortionParameter: Terror
+  mentalHealthDistortionParameter: MentalHealth
+  terrorParameterIsGlobal: 1
+  mentalHealthParameterIsGlobal: 1
+  terrorLoopEvent:
+    Guid:
+      Data1: 2097291503
+      Data2: 1085846812
+      Data3: 555803024
+      Data4: 1634982556
+    Path: event:/amb/nightmare/mental-terror-loop
+  nightmareAmbLoopEvent:
+    Guid:
+      Data1: -198520460
+      Data2: 1165664335
+      Data3: 580708496
+      Data4: -533915791
+    Path: event:/amb/nightmare/mental-amb-loop
+  heartbeatLoopEvent:
+    Guid:
+      Data1: 1493692059
+      Data2: 1300314028
+      Data3: -807272307
+      Data4: 673174759
+    Path: event:/sfx/player/hearbeat/heartbeat
+  heartbeatTerrorParameter: Terror
+  heartbeatMentalHealthParameter: MentalHealth
+  heartbeatTerrorParameterIsGlobal: 1
+  heartbeatMentalHealthParameterIsGlobal: 1
+  logTerrorParameterValue: 0
+  sleepTrackerActiveParameter: SleepTracker
+  goodWakeupTransitionEvent:
+    Guid:
+      Data1: -487564662
+      Data2: 1167357698
+      Data3: -195426905
+      Data4: -284838725
+    Path: event:/sfx/interactable/bedroom/alarm-good
+  goodWakeupTransitionParameter: TransitionBlend
+  goodWakeupCrossfadeFractionOfFadeOut: 0.4
+  goodWakeupCrossfadeMinSeconds: 0.4
+  goodWakeupCrossfadeMaxSeconds: 1.5
+  bedroomAmbLoopEvent:
+    Guid:
+      Data1: -2122210753
+      Data2: 1147047463
+      Data3: 1465847740
+      Data4: 1382995033
+    Path: event:/amb/env/bedroom/bed-bg
+  bedroomAmbienceRequiresGameplay: 1
+  tutorialAmbLoopEvent:
+    Guid:
+      Data1: -2097326929
+      Data2: 1132397191
+      Data3: -306931572
+      Data4: 1881523798
+    Path: event:/amb/bg/indoors-nm
+  tutorialAmbienceRequiresGameplay: 1
+  mainMenuMusicEvent:
+    Guid:
+      Data1: -578515550
+      Data2: 1080999304
+      Data3: 134868098
+      Data4: 563664113
+    Path: event:/music/main-menu
+  mainMenuTransitionParameter: MainMenuTransition
+  pauseSnapshotEvent:
+    Guid:
+      Data1: 465369116
+      Data2: 1139649020
+      Data3: -944230996
+      Data4: 1475689940
+    Path: snapshot:/snap_pause
+  masterBusPath: bus:/
+  sfxBusPath: bus:/SFX
+  musicBusPath: bus:/Music
+  ambienceBusPath: bus:/Ambience
   muteSFX: 0
   muteMusic: 0
-  landingAudioClip: {fileID: 0}
-  jumpingAudioClip: {fileID: 8300000, guid: 56d2ae87641afd04ab7327adc39cb823, type: 3}
-  inCrouchAudioClip: {fileID: 0}
-  outCrouchAudioClip: {fileID: 0}
-  Musicsource: {fileID: 0}
-  sfxValue: 1
-  musicValue: 1

@@ -1,5 +1,6 @@
 using Managers;
 using Player;
+using UI;
 using UnityEngine;
 
 namespace System
@@ -28,8 +29,18 @@ namespace System
             gameObject.AddComponent<PlayerManager>();
             gameObject.AddComponent<GameStateManager>();
             gameObject.AddComponent<SceneSwapper>();
-            
-        
+            gameObject.AddComponent<PlayerInventory>();
+            gameObject.AddComponent<DrawingStateManager>();
+            gameObject.AddComponent<NotificationController>();
+            gameObject.AddComponent<CutsceneManager>();
+            gameObject.AddComponent<LetterManager>();
+            gameObject.AddComponent<SpawnAnchorManager>();
+            gameObject.AddComponent<ScreenFadeManager>();
+            gameObject.AddComponent<SleepTrackerManager>();
+            gameObject.AddComponent<SaveSystem>();
+
+
+
         }
     }
 }

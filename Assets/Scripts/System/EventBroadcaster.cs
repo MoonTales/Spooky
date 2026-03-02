@@ -1,3 +1,4 @@
+using Cutscenes;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -83,8 +84,8 @@ namespace System
         public static event GameStateChangedHandler OnGameStateChanged;
         public static void Broadcast_GameStateChanged(Types.GameState newState) { OnGameStateChanged?.Invoke(newState); }
         //---------------------------------------------------------------------------------//
-
-    
+        
+        
         /// <summary>
         /// Player specific broadcasts.
         ///
@@ -99,11 +100,52 @@ namespace System
         public static void Broadcast_OnPlayerDamaged(float damageAmount) { OnPlayerDamaged?.Invoke(damageAmount); }
         
         
-        public delegate void OnPlayerHealthStateChangedHandler(Types.PlayerHealthState newHealthState);
+        public delegate void OnPlayerHealthStateChangedHandler(Types.PlayerMentalState newMentalState);
         public static event OnPlayerHealthStateChangedHandler OnPlayerHealthStateChanged;
-        public static void Broadcast_OnPlayerHealthStateChanged(Types.PlayerHealthState newHealthState) { OnPlayerHealthStateChanged?.Invoke(newHealthState); }
-        
-        
+        public static void Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState newMentalState) { OnPlayerHealthStateChanged?.Invoke(newMentalState); }
+
+        public delegate void OnTerrorIntensityChangedHandler(float normalizedIntensity, Transform terrorSourceTransform);
+        public static event OnTerrorIntensityChangedHandler OnTerrorIntensityChanged;
+        public static void Broadcast_OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform) { OnTerrorIntensityChanged?.Invoke(normalizedIntensity, terrorSourceTransform); }
+
+        public delegate void OnSleepTrackerAudioStateChangedHandler(bool isActive, bool isGoodWakeup, Transform sourceTransform);
+        public static event OnSleepTrackerAudioStateChangedHandler OnSleepTrackerAudioStateChanged;
+        public static void Broadcast_OnSleepTrackerAudioStateChanged(bool isActive, bool isGoodWakeup, Transform sourceTransform)
+        {
+            OnSleepTrackerAudioStateChanged?.Invoke(isActive, isGoodWakeup, sourceTransform);
+        }
+
+        public delegate void OnLetterSlideHandler(Transform sourceTransform);
+        public static event OnLetterSlideHandler OnLetterSlide;
+        public static void Broadcast_OnLetterSlide(Transform sourceTransform) { OnLetterSlide?.Invoke(sourceTransform); }
+
+        public delegate void OnLetterScribbleHandler(Transform sourceTransform);
+        public static event OnLetterScribbleHandler OnLetterScribble;
+        public static bool Broadcast_OnLetterScribble(Transform sourceTransform)
+        {
+            if (OnLetterScribble == null)
+            {
+                return false;
+            }
+
+            OnLetterScribble.Invoke(sourceTransform);
+            return true;
+        }
+
+        public delegate void OnTutorialHallwayStretchStartHandler(Transform sourceTransform);
+        public static event OnTutorialHallwayStretchStartHandler OnTutorialHallwayStretchStart;
+        public static void Broadcast_OnTutorialHallwayStretchStart(Transform sourceTransform)
+        {
+            OnTutorialHallwayStretchStart?.Invoke(sourceTransform);
+        }
+
+        public delegate void OnTutorialHallwayStretchContractedHandler(Transform sourceTransform);
+        public static event OnTutorialHallwayStretchContractedHandler OnTutorialHallwayStretchContracted;
+        public static void Broadcast_OnTutorialHallwayStretchContracted(Transform sourceTransform)
+        {
+            OnTutorialHallwayStretchContracted?.Invoke(sourceTransform);
+        }
+
         public delegate void OnFlashlightToggledHandler(bool isOn);
         public static event OnFlashlightToggledHandler OnFlashlightToggled;
         public static void Broadcast_OnFlashlightToggled(bool isOn) { OnFlashlightToggled?.Invoke(isOn); }
@@ -114,6 +156,15 @@ namespace System
         //-------------------------------- End Activity Events --------------------------------//
         
         
+        // broadcast to show when we started hovering our cursor ro interact with an interactable object
+        public delegate void OnBeganHoverInteractableHandler(IInteractable interactable);
+        public static event OnBeganHoverInteractableHandler OnBeganHoverInteractable;
+        public static void Broadcast_OnBeganHoverInteractable(IInteractable interactable) { OnBeganHoverInteractable?.Invoke(interactable); }
+        // broadcast to show when we stopped hovering our cursor ro interact with an interactable object
+        // we dont need any references here
+        public delegate void OnEndedHoverInteractableHandler();
+        public static event OnEndedHoverInteractableHandler OnEndedHoverInteractable;
+        public static void Broadcast_OnEndedHoverInteractable() { OnEndedHoverInteractable?.Invoke(); }
         
         ///<summary>
         /// World Clock Events
@@ -121,5 +172,20 @@ namespace System
         public delegate void OnWorldClockHandler(int clockHour);
         public static event OnWorldClockHandler OnWorldClockHourChanged;
         public static void Broadcast_OnWorldClockHourChanged(int clockHour) { OnWorldClockHourChanged?.Invoke(clockHour);}
+        
+        public delegate void OnWorldLocationChanged(Types.WorldLocation newLocation);
+
+        public static event OnWorldLocationChanged OnWorldLocationChangedEvent;
+        public static void Broadcast_OnWorldLocationChanged(Types.WorldLocation newLocation) { OnWorldLocationChangedEvent?.Invoke(newLocation); }
+        
+        
+        public static event OnNotificationSentHandler OnNotificationSent;
+        public delegate void OnNotificationSentHandler(Types.NotificationData notificationData);
+        public static void Broadcast_OnNotificationSent(Types.NotificationData notificationData) { OnNotificationSent?.Invoke(notificationData); }
+        
+        public static event OnRequestScreenFadeHandler OnRequestScreenFade;
+        public delegate void OnRequestScreenFadeHandler(Types.ScreenFadeData screenFadeData);
+        public static void Broadcast_OnRequestScreenFade(Types.ScreenFadeData screenFadeData) { OnRequestScreenFade?.Invoke(screenFadeData); }
+        
     }
 }

@@ -1,0 +1,47 @@
+name: Deploy to Itch.io
+
+on:
+  push:
+    branches: [ Development, main ]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Itch.io
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Download the Unity build from the Build workflow
+      - name: Download Build Artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: Build.yml
+          workflow_search: true
+          name: Build-StandaloneWindows64
+          path: build/StandaloneWindows64
+          workflow_conclusion: success
+          allow_forks: true
+
+      # Zip the Unity build
+      - name: Zip Build
+        run: |
+          cd build/StandaloneWindows64
+          zip -r ../../Game.zip .
+          cd ../..
+
+      # Install Butler
+      - name: Setup butler
+        uses: remarkablegames/setup-butler@v2
+
+
+      # Deploy to Itch.io
+      - name: Deploy to itch.io
+        run: butler push Game.zip moontalesstudio/spooky-game:windows
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}

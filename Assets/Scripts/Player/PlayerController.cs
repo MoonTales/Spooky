@@ -5,7 +5,7 @@ using Managers;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using XtremeFPS.FPSController;
+using UnityEngine.SceneManagement;
 using Random = Unity.Mathematics.Random;
 using Types = System.Types;
 
@@ -15,7 +15,7 @@ namespace Player
     /// Class used to handle player input and control the player character
     /// Also will listen to player state changes and adjust controls accordingly
     /// </summary>
-    public class PlayerController : EventSubscriberBase
+    public class PlayerController : Singleton<PlayerController>
     {
 
         // I'm so sorry that the changes I'm about to make are so sloppy :(
@@ -31,6 +31,9 @@ namespace Player
         [SerializeField] private float jumpForce = 7.0f;
         [SerializeField] private float gravity = -12.0f;
         [SerializeField] private float initialFallVelocity = -2.0f;
+        [SerializeField] private float airStrafeMultiplier = 0.5f;
+        [SerializeField] private float airBackwardMultiplier = 0.5f; 
+        [SerializeField] private float airAcceleration = 3f; // lower = driftier, higher = more responsive
         [Space(10)]
         [Header("Crouching")]
         [SerializeField] private float standHeight = 2.0f;
@@ -47,6 +50,12 @@ namespace Player
         [SerializeField] private InputActionReference flashlightToggleAction;
         [SerializeField] private GameObject[] ObjectsToDisableOnCutscene;
         
+        [Space(10)]
+        [Header("Audio Guards")]
+        [SerializeField] private float landingMinAirborneTimeForSfx = 0.5f; // Minimum airborne time before a grounded edge is treated as a real landing.
+        [SerializeField] private float landingMinDropDistanceForSfx = 0.5f; // Minimum vertical drop to suppress rapid stair-step landing retriggers.
+
+        [Space(10)]
         [SerializeField] private Transform _cameraTransform;
         [SerializeField] private Transform head;
         [Header("Camera Effects")]
@@ -55,23 +64,48 @@ namespace Player
         /* Internal variables */
         private CharacterController _characterController;
         private Vector2 _moveInput;
-        private bool _isGrounded;
+        private bool _isGrounded; public bool IsGrounded() { return _isGrounded; }
+        private bool _wasGrounded;
         private bool _isCrouching;
         private bool _isSprinting;
         private bool _cachedSprintState;
         private float _verticalVelocity;
         private float _targetHeight;
         private bool _lockedInput = false;
-        private float time;
         private float _cameraBaseY;
         private float _currentSpeed;
-
+        private bool _isInspecting = false;
+        private bool _crouchInputActive = false;
         
+        private bool _toggleCrouchMode = false; public void SetToggleCrouchMode(bool toggle) { _toggleCrouchMode = toggle; }
+        private float _crouchHeldTime = 0f;
+        private const float MinCrouchTime = 0.10f;
+        
+        private Vector3 _airMomentumDirection; // store this when we leave the ground
+
+        // Audio internals
+        private string _surfaceType;
+        private float _audioEffectSpeed = 0.5f; // time between footstep sounds
+        private bool _jumpSfxArmed;
+        private bool _jumpRequested;
+        private bool _landingAudioArmed;
+        private bool _hasGameplayAirborneToken;
+        private float _gameplayAirborneTime;
+        private float _gameplayAirbornePeakY;
+        private bool _suppressNextLandingAfterPause;
+
         // Local reference that the controller cares about
-        private Types.PlayerHealthState currentPlayerHealthState;
+        private Types.PlayerMentalState _currentPlayerMentalState;
         private Types.PlayerMovementState _playerMovementState;
-        private void Update()
+        private void FixedUpdate()
         {
+            
+            // set U to toggle between toggle crouch and hold crouch modes for testing
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                SetToggleCrouchMode(!_toggleCrouchMode);
+                Debug.Log("Toggled crouch mode. Now toggle crouch mode is: " + _toggleCrouchMode);
+            }
             
             // debug print if input is locked
             if(_lockedInput){
@@ -94,6 +128,15 @@ namespace Player
             }
             
             _isGrounded = _characterController.isGrounded;
+            if (_wasGrounded && !_isGrounded)
+            {
+                // just left the ground, lock in momentum direction
+                _airMomentumDirection = Vector3.ProjectOnPlane(_characterController.velocity, Vector3.up).normalized;
+            }
+            Types.GameState currentGameState = GetCurrentGameState();
+            HandleLandingSfx(currentGameState);
+            SyncJumpAudioTracking(currentGameState);
+            HandleJumpRequest(currentGameState);
             // check the cached sprint state when we land, incase it changed mid-air
             if (_isGrounded && !_isSprinting)
             {
@@ -109,18 +152,14 @@ namespace Player
             
             HandleGravity();
             HandleMovement();
+            HandleCrouchInput();
             HandleCrouchTransition();
             cameraEffects.UpdateEffects(_isGrounded, IsPlayerMoving(), _isSprinting, _isCrouching);
             
-
+            _wasGrounded = _isGrounded;
             
         }
         
-        // TESTING
-        protected override void OnGameStarted()
-        {
-            DebugUtils.LogSuccess("The game started!!");
-        }
 
         private void HandleStateDetection()
         {
@@ -170,29 +209,24 @@ namespace Player
             {
                 case Types.PlayerMovementState.Idle:
                     // logic for entering idle state
-                    DebugUtils.Log("PlayerController: Entered Idle State");
                     stepSoundsAI.intensity = 0;
                     break;
                 case Types.PlayerMovementState.Walking:
                     // logic for entering walking state
-                    DebugUtils.Log("PlayerController: Entered Walking State");
                     stepSoundsAI.intensity = 5;
                     _audioEffectSpeed = 0.5f;
                     break;
                 case Types.PlayerMovementState.Sprinting:
                     // logic for entering sprinting state
-                    DebugUtils.Log("PlayerController: Entered Sprinting State");
                     stepSoundsAI.intensity = 7;
                     _audioEffectSpeed = 0.3f;
                     break;
                 case Types.PlayerMovementState.CrouchIdle:
                     // logic for entering crouch idle state
-                    DebugUtils.Log("PlayerController: Entered Crouch Idle State");
                     stepSoundsAI.intensity = 0;
                     break;
                 case Types.PlayerMovementState.CrouchWalking:
                     // logic for entering crouch walking state
-                    DebugUtils.Log("PlayerController: Entered Crouch Walking State");
                     stepSoundsAI.intensity = 3;
                     _audioEffectSpeed = 0.7f;
                     break;
@@ -203,8 +237,10 @@ namespace Player
         }
 
         #region Initialization
-        private void Awake()
+
+        protected override void Awake()
         {
+            base.Awake();
             // set up initial character variables
             _characterController = GetComponent<CharacterController>();
             _targetHeight = standHeight;
@@ -216,6 +252,14 @@ namespace Player
         {
             StartCoroutine(PlayFootstepSounds());
             _currentSpeed = walkSpeed;
+            _isGrounded = _characterController.isGrounded;
+            _wasGrounded = _isGrounded;
+            _landingAudioArmed = GetCurrentGameState() == Types.GameState.Gameplay && _isGrounded;
+            _hasGameplayAirborneToken = false;
+            _gameplayAirborneTime = 0f;
+            _suppressNextLandingAfterPause = false;
+            _jumpSfxArmed = GetCurrentGameState() == Types.GameState.Gameplay && !IsJumpActionPressed();
+            _jumpRequested = false;
 
         }
         protected override void OnEnable()
@@ -225,18 +269,47 @@ namespace Player
             moveAction.action.performed += OnMovePerformed;
             moveAction.action.canceled += OnMovePerformed;
             jumpAction.action.performed += OnJump;
-            crouchAction.action.performed += OnCrouch;
+            jumpAction.action.canceled += OnJumpCanceled;
             sprintAction.action.performed += OnSprint;
             sprintAction.action.canceled += OnSprint;
             flashlightToggleAction.action.performed += OnFlashlightToggle;
-            
-            
+            crouchAction.action.performed += OnCrouch;
         }
+
+        protected override void RegisterSubscriptions()
+        {
+            base.RegisterSubscriptions();
+            TrackSubscription(() => EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+            TrackSubscription(() => SceneManager.sceneLoaded += OnSceneLoaded,
+                () => SceneManager.sceneLoaded -= OnSceneLoaded);
+        }
+
+        private void OnWorldLocationChanged(Types.WorldLocation worldLocation)
+        {
+            if (_isCrouching)
+            {
+                ForceCrouch();
+            }
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            ResetLandingAudioTracking(disarmUntilGrounded: true);
+            _suppressNextLandingAfterPause = false;
+            ResetJumpAudioTracking(disarmUntilRelease: true);
+        }
+        
 
         private void OnFlashlightToggle(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
+
+            if (GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Nightmare && GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Tutorial) { return;}
             // Logic to toggle flashlight
+            // we can just do a check here, to make sure we are not in the pause meny gamestate
+            // there is other places this can go, but this works and its easy
+            if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Paused) { return; }
             Flashlight.Instance.ToggleFlashlight();
         }
 
@@ -247,9 +320,11 @@ namespace Player
             moveAction.action.performed -= OnMovePerformed;
             moveAction.action.canceled -= OnMovePerformed;
             jumpAction.action.performed -= OnJump;
-            crouchAction.action.performed -= OnCrouch;
+            jumpAction.action.canceled -= OnJumpCanceled;
             sprintAction.action.performed -= OnSprint;
             sprintAction.action.canceled -= OnSprint;
+            crouchAction.action.performed -= OnCrouch;
+            flashlightToggleAction.action.performed -= OnFlashlightToggle;
         }
         #endregion
         
@@ -281,6 +356,10 @@ namespace Player
 
             _isSprinting = obj.performed;
         }
+        
+
+
+        // Toggle mode for crouch
         private void OnCrouch(InputAction.CallbackContext obj)
         {
             if(_lockedInput){ return; }
@@ -294,23 +373,77 @@ namespace Player
                 
             }
             _isCrouching = !_isCrouching;
-            time = 0f;
+        }
+        
+        private void HandleCrouchInput()
+        {
             
+            if (_toggleCrouchMode) { return;}
+            if (_lockedInput) { return; }
 
+            bool crouchHeld = crouchAction.action.IsPressed();
+
+            if (crouchHeld)
+            {
+                _crouchHeldTime += Time.fixedDeltaTime;
+
+                if (!_isCrouching)
+                {
+                    _isCrouching = true;
+                    _targetHeight = crouchHeight;
+                }
+            }
+            else
+            {
+                if (_isCrouching)
+                {
+                    bool validHold = _crouchHeldTime >= MinCrouchTime;
+                    if (!validHold || CanStandUp())
+                    {
+                        _isCrouching = false;
+                        _targetHeight = standHeight;
+                    }
+                }
+                _crouchHeldTime = 0f;
+            }
+        }
+
+        public void ForceCrouch()
+        {
+            if(_lockedInput){ return; }
+            if (_isCrouching)
+            {
+                if (!CanStandUp()) { return;}
+                _targetHeight = standHeight;
+            } else
+            {
+                _targetHeight = crouchHeight;
+                
+            }
+            _isCrouching = !_isCrouching;
         }
         private void OnJump(InputAction.CallbackContext obj)
         {
-            
             if(_lockedInput){ return; }
-            if (_isCrouching) { return;}
-            if(_isGrounded)
-            {
-                // Apply jump force
-                _verticalVelocity = jumpForce;
-            }
+            _jumpRequested = true;
+        }
+
+        private void OnJumpCanceled(InputAction.CallbackContext obj)
+        {
+            _jumpSfxArmed = GetCurrentGameState() == Types.GameState.Gameplay;
         }
         private void HandleGravity()
         {
+            // Freeze vertical integration outside gameplay so pause/cutscene transitions do not accumulate fake fall velocity.
+            if (GetCurrentGameState() != Types.GameState.Gameplay)
+            {
+                if (_isGrounded && _verticalVelocity < 0f)
+                {
+                    _verticalVelocity = initialFallVelocity;
+                }
+                return;
+            }
+
             if (_isGrounded && _verticalVelocity < 0)
             {
                 _verticalVelocity = initialFallVelocity;
@@ -320,26 +453,27 @@ namespace Player
         private void HandleCrouchTransition()
         {
             float currentHeight = _characterController.height;
+
+            // If trying to stand up but blocked, keep crouching
+            if (_targetHeight == standHeight && !CanStandUp())
+            {
+                _isCrouching = true;
+                _targetHeight = crouchHeight; // snap back to crouch target
+            }
+
             if (Mathf.Approximately(currentHeight, _targetHeight))
             {
                 _characterController.height = _targetHeight;
                 return;
             }
-            // perform the transition
-            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.deltaTime);
+
+            float newHeight = Mathf.Lerp(currentHeight, _targetHeight, crouchTransitionSpeed * Time.fixedDeltaTime);
             _characterController.height = newHeight;
-            _characterController.center = Vector3.up * (newHeight / 2); // we crouch to half the height
-            
+            _characterController.center = Vector3.up * (newHeight / 2);
+
             float targetCameraBaseY = _targetHeight - cameraCrouchOffset;
-
-            _cameraBaseY = Mathf.Lerp(
-                _cameraBaseY,
-                targetCameraBaseY,
-                crouchTransitionSpeed * Time.deltaTime
-            );
-            
+            _cameraBaseY = Mathf.Lerp(_cameraBaseY, targetCameraBaseY, crouchTransitionSpeed * Time.fixedDeltaTime);
             cameraEffects.UpdateCameraBaseY(_cameraBaseY);
-
         }
         private bool CanStandUp()
         {
@@ -382,27 +516,55 @@ namespace Player
             if (_lockedInput) { return; }
 
             Vector3 moveDirection = _cameraTransform.TransformDirection(new Vector3(_moveInput.x, 0, _moveInput.y)).normalized;
+            
+            // FIX: the move speed gets slower as we look up or down because the move direction is tied to the foreward vector
+            // so we need to project the move direction onto the horizontal plane to prevent this
+            moveDirection = Vector3.ProjectOnPlane(moveDirection, Vector3.up).normalized;
+            
+            /*
+             
+             //This is more realistic.. just dosent feel as smooth tbh
+            if (!_isGrounded && _airMomentumDirection != Vector3.zero)
+            {
+                float forwardDot = Vector3.Dot(moveDirection, _airMomentumDirection);
+                Vector3 perp = Vector3.Cross(Vector3.up, _airMomentumDirection);
+                float strafeDot = Vector3.Dot(moveDirection, perp);
 
-            float targetSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
+                Vector3 forwardComponent = _airMomentumDirection * forwardDot;
+                Vector3 strafeComponent = perp * strafeDot;
+
+                float forwardMultiplier = forwardDot >= 0 ? 1f : airBackwardMultiplier;
+                moveDirection = (forwardComponent * forwardMultiplier) + (strafeComponent * airStrafeMultiplier);
+            }
+            */
+            
+            float targetSpeed;
+            if (_isGrounded)
+            {
+                targetSpeed = _isCrouching ? crouchSpeed : (_isSprinting ? sprintSpeed : walkSpeed);
+            }
+            else
+            {
+                // keep whatever speed we had when we left the ground (this fixes the drop in speed in the air)
+                targetSpeed = _currentSpeed;
+            }
 
             // Smoothly interpolate speed
-            _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.deltaTime);
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.fixedDeltaTime);
 
             Vector3 velocity = moveDirection * _currentSpeed; velocity.y = _verticalVelocity;
 
-            CollisionFlags collisions = _characterController.Move(velocity * Time.deltaTime);
+            CollisionFlags collisions = _characterController.Move(velocity * Time.fixedDeltaTime);
 
-            if ((collisions & CollisionFlags.Above) != 0)
+            if ((collisions & CollisionFlags.Above) != 0 && _verticalVelocity > 0)
             {
-                _verticalVelocity = initialFallVelocity;
+                _verticalVelocity = 0;
             }
         }
 
         #endregion
         
         #region Sound Management
-        private string _surfaceType;
-        private float _audioEffectSpeed = 0.5f; // time between footstep sounds
         /// <summary>
         /// Function used to detect the surface type the player is currently on
         ///
@@ -426,6 +588,14 @@ namespace Player
         {
             while (true)
             {
+                bool isGameplayState = GameStateManager.Instance != null
+                                       && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
+                if (!isGameplayState)
+                {
+                    yield return null;
+                    continue;
+                }
+
                 if (!_isGrounded )
                 {
                     yield return null;
@@ -439,47 +609,211 @@ namespace Player
                     continue;
                 }
 
-                switch (_surfaceType)
+                if (_surfaceType == "Unknown")
                 {
-                    case "grass":
-                        Debug.Log("Playing grass sound");
-                        AudioManager.Instance.PlayPlayerWalkingGrass();
-                        break;
-                    case "gravel":
-                        Debug.Log("Playing gravel sound");
-                        AudioManager.Instance.PlayPlayerWalkingGravel();
-                        break;
-                    case "water":
-                        Debug.Log("Playing water sound");
-                        AudioManager.Instance.PlayPlayerWalkingWater();
-                        break;
-                    case "metal":
-                        Debug.Log("Playing metal sound");
-                        AudioManager.Instance.PlayPlayerWalkingMetal();
-                        break;
-                    case "concrete":
-                        Debug.Log("Playing concrete sound");
-                        AudioManager.Instance.PlayPlayerWalkingConcrete();
-                        break;
-                    case "wood":
-                        Debug.Log("Playing wood sound");
-                        AudioManager.Instance.PlayPlayerWalkingWood();
-                        break;
-                    default:
-                        yield return null;
-                        break;
+                    yield return null;
+                    continue;
                 }
+
+                AudioManager.Instance.PlayFootstep(_surfaceType, transform);
                 
                 yield return new WaitForSeconds(_audioEffectSpeed);
 
             }
         }
-        
+
+        private bool CanPlayPlayerMovementSfx(Types.GameState currentGameState)
+        {
+            return currentGameState == Types.GameState.Gameplay;
+        }
+
+        private void HandleLandingSfx(Types.GameState currentGameState)
+        {
+            // Landing SFX is gameplay-only; menu/cutscene/pause state updates should never emit landings.
+            if (currentGameState != Types.GameState.Gameplay)
+            {
+                return;
+            }
+
+            // After transitions we disarm landing until we are safely grounded again.
+            if (!_landingAudioArmed)
+            {
+                if (_isGrounded)
+                {
+                    _landingAudioArmed = true;
+                }
+                return;
+            }
+
+            if (!_isGrounded)
+            {
+                // If the player intentionally moved off-ground after unpausing, clear one-shot pause suppression.
+                if (_suppressNextLandingAfterPause && IsPlayerMoving())
+                {
+                    _suppressNextLandingAfterPause = false;
+                }
+
+                // Cache airborne state to validate real landings.
+                if (!_hasGameplayAirborneToken)
+                {
+                    _gameplayAirbornePeakY = transform.position.y;
+                }
+                _hasGameplayAirborneToken = true;
+                _gameplayAirborneTime += Time.deltaTime;
+                _gameplayAirbornePeakY = Mathf.Max(_gameplayAirbornePeakY, transform.position.y);
+                return;
+            }
+
+            if (_isGrounded && !_wasGrounded)
+            {
+                // Hard gate: skip the first landing edge after unpausing to avoid pause/resume false positives.
+                if (_suppressNextLandingAfterPause)
+                {
+                    _suppressNextLandingAfterPause = false;
+                    _hasGameplayAirborneToken = false;
+                    _gameplayAirborneTime = 0f;
+                    return;
+                }
+
+                bool hadMeaningfulAirborneTime = _gameplayAirborneTime >= Mathf.Max(0f, landingMinAirborneTimeForSfx);
+                float dropDistance = _gameplayAirbornePeakY - transform.position.y;
+                bool hadMeaningfulDropDistance = dropDistance >= Mathf.Max(0f, landingMinDropDistanceForSfx);
+                
+                if (_hasGameplayAirborneToken && hadMeaningfulAirborneTime && hadMeaningfulDropDistance)
+                {
+                    float impactDownwardSpeed = Mathf.Max(0f, -_verticalVelocity);
+                    AudioManager.Instance.PlayPlayerLanding(impactDownwardSpeed, _gameplayAirborneTime, transform);
+                }
+
+                // Landing edge consumed; reset airborne tracking for the next jump/fall cycle.
+                _hasGameplayAirborneToken = false;
+                _gameplayAirborneTime = 0f;
+                _gameplayAirbornePeakY = transform.position.y;
+            }
+        }
+
+        private void BeginGameplayAirborneToken()
+        {
+            // A new real jump should not inherit pause-resume landing suppression.
+            _suppressNextLandingAfterPause = false;
+            _landingAudioArmed = true;
+            _hasGameplayAirborneToken = true;
+            _gameplayAirborneTime = 0f;
+            _gameplayAirbornePeakY = transform.position.y;
+        }
+
+        private void SyncJumpAudioTracking(Types.GameState currentGameState)
+        {
+            if (currentGameState != Types.GameState.Gameplay)
+            {
+                _jumpRequested = false;
+                return;
+            }
+
+            // Require a clean release before jump SFX can fire again after transitions.
+            if (!_jumpSfxArmed && !IsJumpActionPressed())
+            {
+                _jumpSfxArmed = true;
+            }
+        }
+
+        private void HandleJumpRequest(Types.GameState currentGameState)
+        {
+            // Consume one queued jump input request per frame.
+            if (!_jumpRequested)
+            {
+                return;
+            }
+
+            _jumpRequested = false;
+
+            // Ignore jump requests outside gameplay.
+            if (!CanPlayPlayerMovementSfx(currentGameState))
+            {
+                return;
+            }
+
+            // Only allow a real jump when input is armed, player is grounded, and not crouching.
+            if (!_jumpSfxArmed || _isCrouching || !_isGrounded)
+            {
+                return;
+            }
+
+            // Valid gameplay jump: apply velocity, mark airborne token for landing validation, and emit jump SFX once.
+            BeginGameplayAirborneToken();
+            _verticalVelocity = jumpForce;
+            Debug.Log("PlayerAudio: Jump SFX");
+            AudioManager.Instance.PlayPlayerJumping(fromTransform: transform);
+            _jumpSfxArmed = false;
+        }
+
+        private void HandleGameplayJumpStateEntry(Types.GameState previousGameState)
+        {
+            bool enteredGameplayFromOtherState = previousGameState != Types.GameState.Gameplay;
+            if (enteredGameplayFromOtherState)
+            {
+                ResetJumpAudioTracking(disarmUntilRelease: true);
+                return;
+            }
+
+            _jumpRequested = false;
+            _jumpSfxArmed = !IsJumpActionPressed();
+        }
+
+        private void ResetJumpAudioTracking(bool disarmUntilRelease)
+        {
+            _jumpRequested = false;
+            _jumpSfxArmed = !disarmUntilRelease && !IsJumpActionPressed();
+        }
+
+        private void ResetLandingAudioTracking(bool disarmUntilGrounded)
+        {
+            _landingAudioArmed = !disarmUntilGrounded && _isGrounded;
+            _hasGameplayAirborneToken = false;
+            _gameplayAirborneTime = 0f;
+            _gameplayAirbornePeakY = transform.position.y;
+            _wasGrounded = _characterController != null && _characterController.isGrounded;
+        }
+
+        private void HandleGameplayAudioStateEntry(Types.GameState previousGameState)
+        {
+            // Pause resume should preserve true airborne jumps/falls so they can still produce a landing.
+            if (previousGameState == Types.GameState.Paused)
+            {
+                bool groundedNow = _characterController != null && _characterController.isGrounded;
+
+                _landingAudioArmed = true;
+                _wasGrounded = groundedNow;
+                // When resuming grounded, suppress the next grounded edge once to block pause/unpause false landings.
+                _suppressNextLandingAfterPause = groundedNow;
+
+                if (groundedNow)
+                {
+                    _hasGameplayAirborneToken = false;
+                    _gameplayAirborneTime = 0f;
+                    _gameplayAirbornePeakY = transform.position.y;
+                }
+                else if (!_hasGameplayAirborneToken)
+                {
+                    // Resume while airborne still needs a token so the eventual grounded edge can be treated as a real landing.
+                    _hasGameplayAirborneToken = true;
+                    _gameplayAirbornePeakY = transform.position.y;
+                }
+
+                return;
+            }
+
+            // Non-pause transitions should require a fresh grounded gameplay frame before landing can trigger.
+            ResetLandingAudioTracking(disarmUntilGrounded: true);
+            _suppressNextLandingAfterPause = false;
+        }
+
         #endregion
         
         
         protected override void OnGameStateChanged(Types.GameState newState)
         {
+            Types.GameState previousGameState = ResolvePreviousGameStateForTransition(newState);
             switch (newState)
             {
                 case Types.GameState.Gameplay:
@@ -494,7 +828,27 @@ namespace Player
                 case Types.GameState.Inspecting:
                     HandleInspectionState();
                     break;
+                case Types.GameState.Paused:
+                    HandlePausedState();
+                    break;
                 // handle other game states as needed
+            }
+
+            if (newState == Types.GameState.Gameplay)
+            {
+                HandleGameplayAudioStateEntry(previousGameState);
+                HandleGameplayJumpStateEntry(previousGameState);
+            }
+            else if (newState == Types.GameState.MainMenu)
+            {
+                ResetLandingAudioTracking(disarmUntilGrounded: true);
+                _suppressNextLandingAfterPause = false;
+                ResetJumpAudioTracking(disarmUntilRelease: true);
+            }
+            else
+            {
+                _suppressNextLandingAfterPause = false;
+                ResetJumpAudioTracking(disarmUntilRelease: true);
             }
         }
 
@@ -514,6 +868,7 @@ namespace Player
         }
         private void HandleGameplayState()
         {
+            _isInspecting = false;
             // Return to basic player controls
             _lockedInput = false;
             for (int i = 0; i < ObjectsToDisableOnCutscene.Length; i++)
@@ -537,10 +892,12 @@ namespace Player
                 Flashlight.Instance.ToggleFlashlight();
             }
             StopAllPlayerMovement();
+            SyncLandingTrackingForStateTransition();
         }
 
         private void HandleInspectionState()
         {
+            _isInspecting = true;
             // Disable player controls for cutscene
             _lockedInput = true;
             // disable the head so its hidden
@@ -548,8 +905,19 @@ namespace Player
             {
                 ObjectsToDisableOnCutscene[i].SetActive(false);
             }
+            // if the player is currently moving (or has any input at all, we want to disable it)
+            StopAllPlayerMovement();
+            SyncLandingTrackingForStateTransition();
         }
 
+        private void HandlePausedState()
+        {
+            _lockedInput = true;
+            StopAllPlayerMovement();
+            SyncLandingTrackingForStateTransition();
+        }
+
+        
         #region Helper Function
         /// <summary>
         /// A series of various helpers to determine possible things about the player, mostly generic movement
@@ -574,17 +942,64 @@ namespace Player
         {
             return Vector3.Distance(position, transform.position);
         }
+        public bool IsPlayerInspecting()
+        {
+            return _isInspecting;
+        }
 
         private void StopAllPlayerMovement()
         {
-            _isCrouching = false;
             _cachedSprintState = false;
             _isSprinting = false;
             _moveInput = Vector2.zero;
         }
-        
+
+        private void SyncLandingTrackingForStateTransition()
+        {
+            bool groundedNow = _characterController != null && _characterController.isGrounded;
+            _wasGrounded = groundedNow;
+            if (groundedNow)
+            {
+                _hasGameplayAirborneToken = false;
+                _gameplayAirborneTime = 0f;
+            }
+        }
+
+        private Types.GameState GetCurrentGameState()
+        {
+            return GameStateManager.Instance != null
+                ? GameStateManager.Instance.GetCurrentGameState()
+                : Types.GameState.MainMenu;
+        }
+
+        private Types.GameState GetPreviousGameState()
+        {
+            return GameStateManager.Instance != null
+                ? GameStateManager.Instance.GetPreviousGameState()
+                : Types.GameState.MainMenu;
+        }
+
+        private Types.GameState ResolvePreviousGameStateForTransition(Types.GameState newState)
+        {
+            Types.GameState currentGameState = GetCurrentGameState();
+            if (currentGameState == newState)
+            {
+                return GetPreviousGameState();
+            }
+
+            return currentGameState;
+        }
+
+        private bool IsJumpActionPressed()
+        {
+            return jumpAction != null
+                && jumpAction.action != null
+                && jumpAction.action.IsPressed();
+        }
+
         
         #endregion
         
     }
 }
+

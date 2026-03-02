@@ -1,3 +1,4 @@
+using Managers;
 using UnityEngine;
 
 public class ToggleInteractable : MonoBehaviour, IInteractable
@@ -7,24 +8,32 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
         Light,
         AudioSource,
         GameObjectActive,
+        Animator
         // add more as needed that fit the 'toggle' structure
     }
 
     [Header("Mode")]
     [SerializeField] private ToggleMode mode = ToggleMode.Light;
 
-    [Header("Prompt")]
-    [SerializeField] private string promptWhenOff = "Turn on";
-    [SerializeField] private string promptWhenOn = "Turn off";
+    [Header("Prompt Keys (CSV rows)")]
+    [SerializeField] private TextKey promptWhenOffKey; 
+    [SerializeField] private TextKey promptWhenOnKey;  
+
+    public TextKey PromptKey => IsOn() ? promptWhenOnKey : promptWhenOffKey;
 
     // Targets (use whichever matches your mode)
     [Header("Targets")]
     [SerializeField] private Light targetLight;
     [SerializeField] private AudioSource targetAudio;
     [SerializeField] private GameObject targetObject;
+    [SerializeField] private Animator targetAnimator;
     // add more as we need
 
-    public string Prompt => IsOn() ? promptWhenOn : promptWhenOff;
+    [Header("FMOD SFX")]
+    [SerializeField] private bool playToggleSfx = false;
+    [SerializeField] private AudioManager.SfxId toggleSfxId = AudioManager.SfxId.TutorialButtonClick;
+    [SerializeField] private bool playSecondaryToggleSfx = false;
+    [SerializeField] private AudioManager.SfxId secondaryToggleSfxId = AudioManager.SfxId.TutorialDoorSlide;
 
 
     // From the IInteractable interface - set these as appropriate
@@ -41,6 +50,7 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
             ToggleMode.Light => targetLight != null,
             ToggleMode.AudioSource => targetAudio != null,
             ToggleMode.GameObjectActive => targetObject != null,
+            ToggleMode.Animator => targetAnimator != null,
             // add more as we need
             _ => false
         };
@@ -53,6 +63,8 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
 
         bool newState = !IsOn();
         SetOn(newState);
+        PlayToggleSfx();
+        PlaySecondaryToggleSfx();
     }
 
 
@@ -74,6 +86,11 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
             targetObject = gameObject;
         }
 
+        if (targetAnimator == null)
+        {
+            targetAnimator = GetComponentInChildren<Animator>();
+        }
+
         // add more as we need
     }
 
@@ -84,6 +101,7 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
             ToggleMode.Light => targetLight != null && targetLight.enabled,
             ToggleMode.AudioSource => targetAudio != null && targetAudio.enabled && targetAudio.isPlaying,
             ToggleMode.GameObjectActive => targetObject != null && targetObject.activeSelf,
+            ToggleMode.Animator => targetAnimator != null && targetAnimator.enabled,
             // add more as we need
             _ => false
         };
@@ -117,9 +135,42 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
                 targetObject.SetActive(on);
                 break;
 
+            // for animators
+            case ToggleMode.Animator:
+                targetAnimator.enabled = on;
+                break;
 
-            // add more as we need
 
+                // add more as we need
+
+        }
+    }
+
+    private void PlayToggleSfx()
+    {
+        if (!playToggleSfx)
+        {
+            return;
+        }
+
+        AudioManager audioManager = Object.FindAnyObjectByType<AudioManager>();
+        if (audioManager != null)
+        {
+            audioManager.PlaySfx(toggleSfxId, transform);
+        }
+    }
+
+    private void PlaySecondaryToggleSfx()
+    {
+        if (!playSecondaryToggleSfx)
+        {
+            return;
+        }
+
+        AudioManager audioManager = Object.FindAnyObjectByType<AudioManager>();
+        if (audioManager != null)
+        {
+            audioManager.PlaySfx(secondaryToggleSfxId, transform);
         }
     }
 }
