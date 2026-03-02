@@ -1,4 +1,5 @@
 using System;
+using Player.Camera;
 using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
@@ -147,7 +148,13 @@ namespace Player
             }
 
             if (controller != null) {controller.enabled = true;}
-
+            
+            // we need to also force update the CameraController (CameraLagController)
+            if (CameraLagController.Instance)
+            {
+                CameraLagController.Instance.ForceSetCameraRotation(rotation ?? Quaternion.identity);
+            }
+            
         }
 
         public bool CanPlayerSeeThis(Transform thingToSee, float screenPercentage = 1f)

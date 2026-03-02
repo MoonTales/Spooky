@@ -159,7 +159,6 @@ namespace Player
         public string SaveId => "PlayerInventory";
         public PlayerInventorySaveData OnSave()
         {
-            DebugUtils.LogSuccess("Saving PlayerInventory... we currently have " + _collectedDrawingIDs.Count + " drawings in our inventory, and " + _currentDrawingsThisNight + " drawings collected this night.");
             return new PlayerInventorySaveData
             {
                 collectedDrawingIDs = new List<int>(_collectedDrawingIDs),

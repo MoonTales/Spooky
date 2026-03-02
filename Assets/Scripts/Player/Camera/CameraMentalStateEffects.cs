@@ -385,11 +385,6 @@ namespace Player.Camera
                 newVolume.profile = ScriptableObject.CreateInstance<VolumeProfile>();
                 _postProcessVolumes.Add(newVolume);
             }
-
-            foreach (Volume volume in _postProcessVolumes)
-            {
-                Debug.Log($"PostProcessVolume found: {volume.name}");
-            }
         }
 
         private void TrySetChromaticAberration()

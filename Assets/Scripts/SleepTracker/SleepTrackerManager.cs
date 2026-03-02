@@ -21,7 +21,7 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
     }
     
     // Internal State
-    private bool _isGoodWakeup  = false;
+    private bool _isGoodWakeup  = false; public bool GetIsGoodWakeup() { return _isGoodWakeup; }
     private bool _isSleepTrackerActive = false; public bool GetIsSleepTrackerActive() { return _isSleepTrackerActive; }
     private Transform _sleepTrackerSourceTransform;
     
@@ -43,7 +43,7 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
 
         // this will be called whenever the world location changed, and we will pull if it was a good or bad wakeup
         // ensure we are in the bedroom, as thats the only location of the sleeptracker is present
-        DebugUtils.Log(_isGoodWakeup ? "Good Wakeup!" : "Bad Wakeup!");
+        //DebugUtils.Log(_isGoodWakeup ? "Good Wakeup!" : "Bad Wakeup!");
         TurnSleepTrackerOn();
     }
 
@@ -52,7 +52,6 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
     {
         TurnSleepTrackerOff();
     }
-
     // -------------------------------------------------------------------------
     // IInteractable
     // -------------------------------------------------------------------------
