@@ -100,7 +100,7 @@ public class DataGraphWindow : EditorWindow
                     var internalListView = listHeaderField.Q<ListView>();
                     if (internalListView != null)
                     {
-                        internalListView.style.display = DisplayStyle.None;
+                        //internalListView.style.display = DisplayStyle.None;
                     }
                 }).ExecuteLater(50); // Small delay to let Unity build the internal list
 
