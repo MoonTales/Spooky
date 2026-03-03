@@ -101,12 +101,17 @@ namespace UI.Main_Menu
 
         private void OnQuitButtonClicked()
         {
-            Application.Quit();
+            UiPopupConfirmation.Instance.RequestPopupConfirmation("Are you sure you want to quit?", CloseGame);
         }
     
         public void MainMenuVisible()
         {
             mainMenuCanvas.SetActive(true);
+        }
+
+        private void CloseGame()
+        {
+            Application.Quit();
         }
 
     }
