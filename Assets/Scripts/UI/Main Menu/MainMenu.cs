@@ -63,14 +63,14 @@ namespace UI.Main_Menu
         private void OnContinueButtonClicked()
         {
             DisableButtons();
-            new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToExistGame).Send();
+            new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToExistGame).Send();
         }
 
         private void OnNewGameButtonClicked()
         {
              if (SaveSystem.Instance.DoesSaveGameExist())
             {
-                UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("popup", "newgame"), CloseGame);
+                UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("popup", "newgame"), DeleteSave);
             }
             else
             {
@@ -116,7 +116,7 @@ namespace UI.Main_Menu
         {
             SaveSystem.Instance.DeleteSaveData();
             DisableButtons();
-            new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToNewGame).Send();
+            new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToNewGame).Send();
         }
 
         private void OnSettingsButtonClicked()

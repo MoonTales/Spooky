@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -57,7 +58,7 @@ public class GameWarningScreen : MonoBehaviour
 
             // fade to black, then load main menu when black is reached
             new Types.ScreenFadeData(
-                fadeInDuration: 0f,
+                fadeInDuration: 1f,
                 fadeDuration: 0.1f,
                 fadeOutDuration: exitToBlackDuration,
                 onFadeOutComplete: LoadMainMenu
@@ -67,6 +68,8 @@ public class GameWarningScreen : MonoBehaviour
 
     private void LoadMainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
+        //SceneManager.LoadScene("MainMenu");
+        // we need to use our custom scene swapper, to ensure stuff handles itself correctly
+        SceneSwapper.Instance.SwapScene("MainMenu");
     }
 }

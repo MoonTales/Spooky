@@ -130,6 +130,7 @@ namespace UI
                     break;
                 case Types.GameState.MainMenu:
                     ShowHUD(false);
+                    SetInspectionBGVisible(false);
                     break;
                 case Types.GameState.Inspecting:
                     HandleInspection();
@@ -201,9 +202,9 @@ namespace UI
                //_hudItemNameText.gameObject.SetActive(visible);
             }
 
-            if (_hudItemDescriptionScrollRect != null)
+            if (_hudItemDescriptionText != null)
             {
-                _hudItemNameText.CrossFadeAlpha(visible ? 1f : 0f, 0.5f, true);
+                _hudItemDescriptionText.CrossFadeAlpha(visible ? 1f : 0f, 0.5f, true);
                 //_hudItemDescriptionScrollRect.gameObject.SetActive(visible);
             }
         }
