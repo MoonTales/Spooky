@@ -38,7 +38,7 @@ namespace System
             gameObject.AddComponent<ScreenFadeManager>();
             gameObject.AddComponent<SleepTrackerManager>();
             gameObject.AddComponent<SaveSystem>();
-
+            gameObject.AddComponent<UiPopupConfirmation>();
 
 
         }
