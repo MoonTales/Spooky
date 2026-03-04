@@ -56,7 +56,7 @@ namespace UI
             Transform itemDescRoot = transform.Find("ItemDescription");
             _hudItemDescriptionScrollRect = itemDescRoot.GetComponent<ScrollRect>();
             // TMP text lives under Content basically
-             _hudItemDescriptionText = itemDescRoot.Find("Viewport/Content/ItemDescription").GetComponent<TMP_Text>();
+             _hudItemDescriptionText = itemDescRoot.Find("Viewport/Content").GetComponent<TMP_Text>();
              
             SetPrompt("");
             SetInspectionText("", "");
