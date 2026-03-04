@@ -337,6 +337,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrollViewRect: {fileID: 488115526608022094}
   parentCanvas: {fileID: 5504734747962761063}
+  vertScrollbar: {fileID: 2029168075670595162}
+  minAlpha: 0.25
+  maxAlpha: 0.9
+  pulseSpeed: 2
 --- !u!1 &4161153672289241319
 GameObject:
   m_ObjectHideFlags: 0
@@ -1075,7 +1079,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2061435906104558943}
   m_HandleRect: {fileID: 3837187079557218083}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
