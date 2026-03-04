@@ -1240,15 +1240,18 @@ public class AttractorAI : MonoBehaviour
 	{
 		List<Attractor> tempAttractorList = new List<Attractor>();
 		// For efficiency, check for all targets in range before fireing any raycasts
-		hitColliders = Physics.OverlapSphere(transform.position, currentSense.detectionRadius, currentSense.targetLayer);
-
-		foreach (var hitCollider in hitColliders)
+		foreach (Transform senseOrgan in currentSense.senseOrgans)
 		{
-			Transform target = hitCollider.transform;
+			hitColliders = Physics.OverlapSphere(senseOrgan.position, currentSense.detectionRadius, currentSense.targetLayer);
 
-			if (CheckConeVisibility(target.position, currentSense))
+			foreach (var hitCollider in hitColliders)
 			{
-				tempAttractorList.Add(target.GetComponent<Attractor>());
+				Transform target = hitCollider.transform;
+
+				if (CheckConeVisibility(target.position, currentSense))
+				{
+					tempAttractorList.Add(target.GetComponent<Attractor>());
+				}
 			}
 		}
 		return tempAttractorList;
@@ -1268,6 +1271,7 @@ public class AttractorAI : MonoBehaviour
 				if (Physics.Raycast(organ.position, directionToTarget, out hit, distanceToTarget, currentSense.obstacleLayer | currentSense.targetLayer))
 				{
 					// Check if the hit object is the target itself (ignoring obstacles)
+
 					if (((1 << hit.collider.gameObject.layer) & currentSense.targetLayer) != 0)
 					{
 						return true;
