@@ -61,6 +61,11 @@ public class InspectionSystem : Singleton<InspectionSystem>
             GameObject inspectionObj = new GameObject("InspectionPoint");
             inspectionPoint = inspectionObj.transform;
             inspectionPoint.SetParent(cameraTransform);
+
+            // TODO: [POLISH] think of a way to have this object sit at a position that doesn't clip into the inspection text
+            // -- IF HAS TEXT, potentially designate an area for the item, have it be at the center of that
+            // ----- [if HAS TEXT is basically that you'd need to check if a valid TextKey exists, because the component exists on it anyway]
+            // -- ELSE, just do 0, 0 (this would be for drawings)
             inspectionPoint.localPosition = new Vector3(-0.1f, 0, inspectionDistance);
             inspectionPoint.localRotation = Quaternion.identity;
         }
