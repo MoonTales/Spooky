@@ -10,7 +10,7 @@ namespace UI
 {
     public class PlayerHUDController : Singleton<PlayerHUDController>
     {
-
+        public CursorInScrollView scrollViewChecker;
         // Internal References to the HUD
         private Canvas _hudCanvas;
         // Crosshair
