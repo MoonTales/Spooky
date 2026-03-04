@@ -70,7 +70,7 @@ namespace UI.Main_Menu
         {
              if (SaveSystem.Instance.DoesSaveGameExist())
             {
-                UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("mainmenu", "newgame"), CloseGame);
+                UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("popup", "newgame"), CloseGame);
             }
             else
             {
@@ -127,7 +127,7 @@ namespace UI.Main_Menu
 
         private void OnQuitButtonClicked()
         {
-            UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("mainmenu", "quit"), CloseGame);
+            UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("popup", "quit"), CloseGame);
         }
     
         public void MainMenuVisible()
