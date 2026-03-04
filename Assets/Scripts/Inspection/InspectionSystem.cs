@@ -61,7 +61,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
             GameObject inspectionObj = new GameObject("InspectionPoint");
             inspectionPoint = inspectionObj.transform;
             inspectionPoint.SetParent(cameraTransform);
-            inspectionPoint.localPosition = new Vector3(0, 0, inspectionDistance);
+            inspectionPoint.localPosition = new Vector3(-0.1f, 0, inspectionDistance);
             inspectionPoint.localRotation = Quaternion.identity;
         }
     }
