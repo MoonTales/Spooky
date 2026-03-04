@@ -70,7 +70,7 @@ namespace UI.Main_Menu
         {
              if (SaveSystem.Instance.DoesSaveGameExist())
             {
-                UiPopupConfirmation.Instance.RequestPopupConfirmation("Are you sure you want to overwrite your save?", DeleteSave);
+                UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("mainmenu", "newgame"), CloseGame);
             }
             else
             {
@@ -127,7 +127,7 @@ namespace UI.Main_Menu
 
         private void OnQuitButtonClicked()
         {
-            UiPopupConfirmation.Instance.RequestPopupConfirmation("Are you sure you want to quit?", CloseGame);
+            UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("mainmenu", "quit"), CloseGame);
         }
     
         public void MainMenuVisible()
