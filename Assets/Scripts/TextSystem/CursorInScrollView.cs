@@ -10,19 +10,11 @@ public class CursorInScrollView : MonoBehaviour
 
     public bool IsCursorInScrollView()
     {
-        if (scrollViewRect == null) return false;
-
-        Camera eventCamera = null;
-
-        if (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-        {
-            eventCamera = parentCanvas.worldCamera;
-        }
-
+        // HUD canvas render mode = screen space overlay
+        // so screen coords are reliable
         return RectTransformUtility.RectangleContainsScreenPoint(
             scrollViewRect,
-            Input.mousePosition,
-            eventCamera
+            Input.mousePosition
         );
     }
 }
