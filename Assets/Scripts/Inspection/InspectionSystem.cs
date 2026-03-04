@@ -300,7 +300,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
     private void HandleUniqueInspectionLogic()
     {
         // step 2) fade to black
-        new Types.ScreenFadeData(3f, 3f, 3f,
+        new Types.ScreenFadeData(2f, 2f, 2f,
             HandleFadeFinished,
             HandleScribbleNote
         ).Send();
