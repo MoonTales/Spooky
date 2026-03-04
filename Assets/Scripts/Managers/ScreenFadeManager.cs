@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Types = System.Types;
@@ -21,6 +22,10 @@ namespace Managers
         private GameObject _screenFadeCanvas;
         private Image _fadeImage;
         private bool _isFading = false;
+        
+        // FIX: this is a queue to avoid the case of multiple screenfades called at the same time
+        private readonly Queue<Types.ScreenFadeData> _fadeQueue = new Queue<Types.ScreenFadeData>();
+
 
         
         private void Start()
@@ -47,7 +52,14 @@ namespace Managers
 
         private void OnRequestScreenFade(Types.ScreenFadeData screenFadeData)
         {
-            if (!_isFading && _fadeImage != null)
+
+            if (_fadeImage == null) { return;}
+            
+            if (_isFading)
+            {
+                _fadeQueue.Enqueue(screenFadeData);
+            }
+            else
             {
                 StartCoroutine(FadeSequence(screenFadeData));
             }
@@ -72,11 +84,17 @@ namespace Managers
 
             _isFading = false;
             IsFadeInProgress = false;
+            // Check the queue
+            if (_fadeQueue.Count > 0)
+            {
+                StartCoroutine(FadeSequence(_fadeQueue.Dequeue()));
+            }
         }
 
         protected override void OnDestroy()
         {
             IsFadeInProgress = false;
+            _fadeQueue.Clear();
             base.OnDestroy();
         }
 
@@ -114,20 +132,9 @@ namespace Managers
             _fadeImage.color = new Color(color.r, color.g, color.b, 0f);
         }
 
-        private void OnScreenFadeInComplete(Action onComplete)
-        {
-            onComplete?.Invoke();
-        }
-
-        private void OnScreenFadeOutComplete(Action onComplete)
-        {
-            onComplete?.Invoke();
-        }
-
-        private void OnScreenFadeDurationComplete(Action onComplete)
-        {
-            onComplete?.Invoke();
-        }
+        private void OnScreenFadeInComplete(Action onComplete) { onComplete?.Invoke(); }
+        private void OnScreenFadeOutComplete(Action onComplete) { onComplete?.Invoke(); }
+        private void OnScreenFadeDurationComplete(Action onComplete) { onComplete?.Invoke(); }
 
     }
 }
