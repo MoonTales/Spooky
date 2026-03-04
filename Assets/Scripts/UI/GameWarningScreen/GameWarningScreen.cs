@@ -58,7 +58,7 @@ public class GameWarningScreen : MonoBehaviour
 
             // fade to black, then load main menu when black is reached
             new Types.ScreenFadeData(
-                fadeInDuration: 1f,
+                fadeInDuration: 0.5f,
                 fadeDuration: 0.1f,
                 fadeOutDuration: exitToBlackDuration,
                 onFadeOutComplete: LoadMainMenu
