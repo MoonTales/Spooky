@@ -240,6 +240,11 @@ public class AttractorAI : MonoBehaviour
 		[SerializeField] public List<ThoughtProcess> addThoughts;
 		public float addThoughtsLowerBoundDangerRange = 100;
 		public float addThoughtsUpperBoundDangerRange = 100;
+
+		[Header("Other Stuff")]
+		public bool changeDefaultState = false;
+		public EnemyState newDefaultState;
+		public Transform alsoChangeDefaultFocus;
 	}
 
 	public void TestFunction(List<string> arguments)
@@ -1348,6 +1353,13 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS:
 				AddThought(function.arguments, function.addThoughts, function.addThoughtsLowerBoundDangerRange, function.addThoughtsUpperBoundDangerRange);
 				break;
+		}
+
+		if (function.changeDefaultState)
+			defaultState = function.newDefaultState;
+		if (function.alsoChangeDefaultFocus != null)
+		{
+			defaultFocus = function.alsoChangeDefaultFocus;
 		}
 	}
 
