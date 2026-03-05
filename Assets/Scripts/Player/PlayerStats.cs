@@ -85,7 +85,7 @@ namespace Player
                 
                 if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
                 {
-                    drainAmount = 1f; // Drain 1 mental health per interval
+                    drainAmount = 0f; // Drain 1 mental health per interval
                 }
                 else if (coreState == Types.PlayerMentalCoreState.Anxious)
                 {
