@@ -57,7 +57,7 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
     }
 
 
-    public void Interact(Interactor interactor)
+    public virtual void Interact(Interactor interactor)
     {
         if (!CanInteract(interactor)) return;
 
