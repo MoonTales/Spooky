@@ -17,7 +17,6 @@ public class GameWarningScreen : MonoBehaviour
 
     private bool _canContinue;
     private bool _leaving;
-    float alpha = 1;
 
     private Color _pressKeyBaseColor;
 
@@ -68,8 +67,8 @@ public class GameWarningScreen : MonoBehaviour
 
     private void LoadMainMenu()
     {
-        //SceneManager.LoadScene("MainMenu");
         // we need to use our custom scene swapper, to ensure stuff handles itself correctly
+        // i am so sorry Cohen, was this what caused the bug T~T
         SceneSwapper.Instance.SwapScene("MainMenu");
     }
 }

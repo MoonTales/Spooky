@@ -16,9 +16,9 @@ public class Headphones : MonoBehaviour
 
     private bool _canContinue;
     private bool _leaving;
-    float alpha = 1;
 
-    private Color _pressKeyBaseColor;
+    // this is for transparency for the fade
+    float alpha = 1;
 
     private void Start()
     {
@@ -32,6 +32,7 @@ public class Headphones : MonoBehaviour
         ).Send();
     }
 
+    // ill set this up later
     private IEnumerator ShowHeadphonesAfterDelay()
     {
         yield return new WaitForSeconds(headphonesAnim);
@@ -45,7 +46,7 @@ public class Headphones : MonoBehaviour
          _leaving = true;
          _canContinue = false;
 
-         // fade to black, then load main menu when black is reached
+         // fade to black, then load game warnings when black is reached
          new Types.ScreenFadeData(
              fadeInDuration: 0.5f,
              fadeDuration: 0.1f,
