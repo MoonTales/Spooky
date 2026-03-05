@@ -36,16 +36,10 @@ public class Headphones : MonoBehaviour
     private IEnumerator ShowHeadphonesAfterDelay()
     {
         yield return new WaitForSeconds(headphonesAnim);
-        _canContinue = true;
     }
 
     private void Update()
     {
-        if (!_canContinue || _leaving) return;
-
-         _leaving = true;
-         _canContinue = false;
-
          // fade to black, then load game warnings when black is reached
          new Types.ScreenFadeData(
              fadeInDuration: 0.5f,
@@ -53,7 +47,6 @@ public class Headphones : MonoBehaviour
              fadeOutDuration: exitToBlackDuration,
              onFadeOutComplete: LoadGameWarnings
           ).Send();
-        
     }
 
     private void LoadGameWarnings()
