@@ -14,7 +14,8 @@ namespace UI.Main_Menu
         [SerializeField] private GameObject mainMenuCanvas;
     
         // Internal variables to link to all of the buttons on the main menu
-        private Button _playButton;
+        private Button _newgameButton;
+        private Button _continueButton;
         private Button _settingsButton;
         private Button _quitButton;
         private void Start()
@@ -27,11 +28,22 @@ namespace UI.Main_Menu
             { 
                 UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
 
-                if (button.name == "Play")
+                if (button.name == "NewGame")
                 {
-                    _playButton = button;
-                    _playButton.onClick.AddListener(OnPlayButtonClicked);
-                    _playButton.enabled = true;
+                    _newgameButton = button;
+                    _newgameButton.onClick.AddListener(OnNewGameButtonClicked);
+                    _newgameButton.enabled = true;
+                } 
+                else if (button.name == "Continue")
+                {
+                    _continueButton = button;
+                    _continueButton.enabled = true;
+                    if (SaveSystem.Instance.DoesSaveGameExist()){
+                        _continueButton.interactable = true; 
+                        _continueButton.onClick.AddListener(OnContinueButtonClicked);
+                    } else {
+                        _continueButton.interactable = false;  
+                    }
                 }
                 else if (button.name == "Settings")
                 {
@@ -48,11 +60,32 @@ namespace UI.Main_Menu
             }
         }
         // Button connections
-        private void OnPlayButtonClicked()
+        private void OnContinueButtonClicked()
+        {
+            DisableButtons();
+            new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToExistGame).Send();
+        }
+
+        private void OnNewGameButtonClicked()
+        {
+             if (SaveSystem.Instance.DoesSaveGameExist())
+            {
+                UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("popup", "newgame"), DeleteSave);
+            }
+            else
+            {
+                DisableButtons();
+                new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToNewGame).Send();
+            }
+        }
+
+        private void DisableButtons()
         {
             // we will just disable all of the buttons, so that nothing can be clicked while we fade in
-            _playButton.enabled = false;
-            _playButton.interactable = false;
+            _newgameButton.enabled = false;
+            _newgameButton.interactable = false;
+            _continueButton.enabled = false;
+            _continueButton.interactable = false;
             _settingsButton.enabled = false;
             _settingsButton.interactable = false;
             _quitButton.enabled = false;
@@ -62,35 +95,28 @@ namespace UI.Main_Menu
             {
                 AudioManager.Instance.TriggerMainMenuMusicTransition();
             }
-            new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToGame).Send();
-            
         }
 
         
         
-        private void SwapToGame()
+        private void SwapToNewGame()
         {
-            // close the main menu canvas
             mainMenuCanvas.SetActive(false);
-            
-            if (SaveSystem.Instance.DoesSaveGameExist())
-            {
-                SaveSystem.Instance.LoadGame();
-            }
-            else
-            {
-                //No save data, start like normal!
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-                SceneSwapper.Instance.SwapScene("Tutorial");
-            }
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            SceneSwapper.Instance.SwapScene("Tutorial"); 
         }
-        
-        // this will be called when the player presses the new game button
-        private void NewGameButtonPressed()
+
+        private void SwapToExistGame()
         {
-            
+            mainMenuCanvas.SetActive(false);
+            SaveSystem.Instance.LoadGame();
+        }
+
+        private void DeleteSave()
+        {
             SaveSystem.Instance.DeleteSaveData();
-            SwapToGame();
+            DisableButtons();
+            new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToNewGame).Send();
         }
 
         private void OnSettingsButtonClicked()
@@ -101,12 +127,17 @@ namespace UI.Main_Menu
 
         private void OnQuitButtonClicked()
         {
-            Application.Quit();
+            UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("popup", "quit"), CloseGame);
         }
     
         public void MainMenuVisible()
         {
             mainMenuCanvas.SetActive(true);
+        }
+
+        private void CloseGame()
+        {
+            Application.Quit();
         }
 
     }

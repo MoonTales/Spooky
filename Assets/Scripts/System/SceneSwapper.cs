@@ -12,6 +12,7 @@ namespace System
     
     public class SceneSwapper : Singleton<SceneSwapper>, ISaveSystemInterface<SceneSwapper.SceneSwapSaveData>
     {
+        private string _oldSceneName = "";
         
         public struct SceneSwapSaveData
         {
@@ -36,6 +37,7 @@ namespace System
 
         public void SwapScene(SceneField newScene, string InSpawnAnchorID = "")
         {
+            _oldSceneName = SceneManager.GetActiveScene().name;
             _spawnAnchorID = InSpawnAnchorID;
             StartCoroutine(LoadSceneAsync(newScene.SceneName));
         }
@@ -59,13 +61,15 @@ namespace System
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Bedroom);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
-                SaveSystem.Instance.SaveGame();
+                // only save if we did not come from the mainmenu
+                if (_oldSceneName.ToLower() != "mainmenu"){SaveSystem.Instance.SaveGame();}
+                
             }
             if (scene.name.ToLower() == "nightmare1")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
-                SaveSystem.Instance.SaveGame();
+                if (_oldSceneName.ToLower() != "mainmenu"){SaveSystem.Instance.SaveGame();}
             }
 
             if (scene.name.ToLower() == "tutorial")

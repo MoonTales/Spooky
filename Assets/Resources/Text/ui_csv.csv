@@ -1,8 +1,11 @@
 ﻿place,id,text,prompt,name,desc,notes
-mainmenu,title,<style=title>Broken Crayons</style>,,,,Game title
-mainmenu,play,<style=menuButton>Play</style>,,,,Main menu button
+mainmenu,title,<style=title>Ephialtine</style>,,,,Game title
+mainmenu,ng,<style=menuButton>New Game</style>,,,,Main menu button
+mainmenu,continue,<style=menuButton>Continue</style>,,,,Main menu button
 mainmenu,settings,<style=menuButton>Settings</style>,,,,
 mainmenu,quit,<style=menuButton>Quit</style>,,,,
+,,,,,,
+mainmenu,version,<style=menuButton><size=50>2.0.1.0</size></style>,,,,Main menu button
 ,,,,,,
 settings,title,<style=title>Settings</style>,,,,
 settings,master,<style=menuButton>Master Volume</style>,,,,
@@ -14,3 +17,10 @@ pause,title,<style=title>Pause</style>,,,,
 pause,continue,<style=menuButton>Continue</style>,,,,
 pause,settings,<style=menuButton>Settings</style>,,,,
 pause,mainmenu,<style=menuButton>Main Menu</style>,,,,
+,,,,,,
+popup,quit,<style=prompt><size=50>Are you sure you want to quit?</size></style>,,,,
+popup,newgame,<style=prompt><size=50>Are you sure you want to overwrite your save?</size></style>,,,,
+,,,,,,
+warnings,text,"<style=prompt><size=20>This game contains flashing lights, loud noises, spiders, and imagery that may be disturbing.
+
+<color=red>Player discretion is advised.</color></size></style>",,,,

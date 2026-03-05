@@ -37,8 +37,8 @@ namespace Interaction
             // we are good to sleep!
             GetComponent<Collider>().enabled = false;
 
-            const int timeToFadeOut = 3; 
-            const int fadeInDuration = 3;
+            const int timeToFadeOut = 2; 
+            const int fadeInDuration = 2;
             Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:fadeInDuration, 1.5f, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted, FadeDurationCompleted);
 
             fadeData.Send();

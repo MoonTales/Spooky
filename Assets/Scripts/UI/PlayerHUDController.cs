@@ -10,7 +10,7 @@ namespace UI
 {
     public class PlayerHUDController : Singleton<PlayerHUDController>
     {
-
+        public CursorInScrollView scrollViewChecker;
         // Internal References to the HUD
         private Canvas _hudCanvas;
         // Crosshair
@@ -56,7 +56,7 @@ namespace UI
             Transform itemDescRoot = transform.Find("ItemDescription");
             _hudItemDescriptionScrollRect = itemDescRoot.GetComponent<ScrollRect>();
             // TMP text lives under Content basically
-             _hudItemDescriptionText = itemDescRoot.Find("Viewport/Content/ItemDescription").GetComponent<TMP_Text>();
+             _hudItemDescriptionText = itemDescRoot.Find("Viewport/Content").GetComponent<TMP_Text>();
              
             SetPrompt("");
             SetInspectionText("", "");
@@ -130,6 +130,7 @@ namespace UI
                     break;
                 case Types.GameState.MainMenu:
                     ShowHUD(false);
+                    SetInspectionBGVisible(false);
                     break;
                 case Types.GameState.Inspecting:
                     HandleInspection();
@@ -201,9 +202,9 @@ namespace UI
                //_hudItemNameText.gameObject.SetActive(visible);
             }
 
-            if (_hudItemDescriptionScrollRect != null)
+            if (_hudItemDescriptionText != null)
             {
-                _hudItemNameText.CrossFadeAlpha(visible ? 1f : 0f, 0.5f, true);
+                _hudItemDescriptionText.CrossFadeAlpha(visible ? 1f : 0f, 0.5f, true);
                 //_hudItemDescriptionScrollRect.gameObject.SetActive(visible);
             }
         }

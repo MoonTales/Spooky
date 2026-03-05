@@ -60,7 +60,7 @@ namespace Player.Camera
         {
             if (!_shouldUpdate) return;
 
-            float lag = Flashlight.Instance.IsFlashlightOn() ? panLag : snapLag;
+            float lag = Flashlight.Instance.IsFlashlightOn() && Flashlight.Instance.DoWePossessTheFlashlight() ? panLag : snapLag;
 
             _currentPan = Mathf.LerpAngle(_currentPan, TargetPan, Time.deltaTime * lag);
             _currentTilt = Mathf.LerpAngle(_currentTilt, TargetTilt, Time.deltaTime * lag);
