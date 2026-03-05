@@ -14,9 +14,6 @@ public class Headphones : MonoBehaviour
     [SerializeField] private float exitToBlackDuration = 1f;
     [SerializeField] private float headphonesAnim = 2f;
 
-    private bool _canContinue;
-    private bool _leaving;
-
     // this is for transparency for the fade
     float alpha = 1;
 
