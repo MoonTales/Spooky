@@ -61,15 +61,14 @@ namespace Managers
             }
             else
             {
+                _isFading = true;
+                IsFadeInProgress = true;
                 StartCoroutine(FadeSequence(screenFadeData));
             }
         }
 
         private IEnumerator FadeSequence(Types.ScreenFadeData fadeData)
         {
-            _isFading = true;
-            IsFadeInProgress = true;
-
             // Fade to black (Fade Out)
             yield return StartCoroutine(FadeToBlack(fadeData.GetFadeOutDuration()));
             OnScreenFadeOutComplete(fadeData.GetOnFadeOutComplete());

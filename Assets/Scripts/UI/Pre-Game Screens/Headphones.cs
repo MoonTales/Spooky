@@ -24,10 +24,11 @@ public class Headphones : MonoBehaviour
         // reveal scene from black
         new Types.ScreenFadeData(
             fadeInDuration: revealDuration,
-            fadeDuration: 0f,
-            fadeOutDuration: 0f
+            fadeDuration: 0.1f,
+            fadeOutDuration: 0.2f,
+            SendToNextScene
         ).Send();
-        SendToNextScene();
+        
     }
 
     // ill set this up later
@@ -38,6 +39,7 @@ public class Headphones : MonoBehaviour
 
     private void SendToNextScene()
     {
+        Debug.Log("Headphones fade out complete, loading game warnings");
         // fade to black, then load game warnings when black is reached
         new Types.ScreenFadeData(
             fadeInDuration: 0.5f,
