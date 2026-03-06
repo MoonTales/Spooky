@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Managers;
+using Player;
 using UI.PauseMenu;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +20,13 @@ namespace UI.Main_Menu
         private Button _continueButton;
         private Button _settingsButton;
         private Button _quitButton;
+        
+        // Internal Variables for polish
+        private int savedAct;
+        private List<int> savedDrawingIDs;
+        private string savedSceneName;
+        
+        
         private void Start()
         {
             mainMenuCanvas.SetActive(true);
@@ -58,6 +67,31 @@ namespace UI.Main_Menu
                     _quitButton.enabled = true;
                 }
             }
+            
+            // CHANGES ALLOW TO LOAD SAVE DATA
+            if (SaveSystem.Instance.DoesSaveGameExist())
+            {
+                SaveSystem.Instance.ReadSaveFromDisk();
+
+                var sceneData = SaveSystem.Instance.GetData("SceneSwapper");
+                var gameStateData = SaveSystem.Instance.GetData("GameState");
+                var inventoryData = SaveSystem.Instance.GetData("PlayerInventory");
+
+                if (sceneData.HasValue)
+                    savedSceneName = JsonUtility.FromJson<SceneSwapper.SceneSwapSaveData>(sceneData.Value.Data).CurrentSceneName;
+
+                if (gameStateData.HasValue)
+                    savedAct = JsonUtility.FromJson<GameStateManager.GameStateSaveData>(gameStateData.Value.Data).worldClockHour;
+
+                if (inventoryData.HasValue)
+                    savedDrawingIDs = JsonUtility.FromJson<PlayerInventory.PlayerInventorySaveData>(inventoryData.Value.Data).collectedDrawingIDs;
+            }
+            
+            if(savedSceneName != ""){ Debug.Log("Saved scene name: " + savedSceneName);} else {Debug.Log("No saved scene name found.");}
+            if(savedAct != 0){ Debug.Log("Saved act: " + savedAct);} else {Debug.Log("No saved act found.");}
+            if(savedDrawingIDs != null){ Debug.Log("Saved drawing IDs: " + string.Join(", ", savedDrawingIDs));} else {Debug.Log("No saved drawing IDs found.");}
+   
+            
         }
         // Button connections
         private void OnContinueButtonClicked()
