@@ -15,7 +15,7 @@ namespace Interaction
     /// </summary>
     public class NightmareAwakenInteraction : MonoBehaviour, IInteractable
     {
-        [SerializeField] private SceneField sceneName;
+        [SerializeField] private string sceneName = "Bedroom";
     
         [Header("Text Keys (CSV row pointers)")]
         [SerializeField] private TextKey promptTextKey;
@@ -38,6 +38,11 @@ namespace Interaction
             obj.transform.localPosition = Vector3.zero;
             if(drawingSpawnLocationThree){obj = Instantiate(placeholderPrefab, drawingSpawnLocationThree.transform);}
             obj.transform.localPosition = Vector3.zero;
+            if (sceneName == "")
+            {
+                sceneName = "Bedroom";
+            }
+            
         }
         
         public bool CanInteract(Interactor interactor)
