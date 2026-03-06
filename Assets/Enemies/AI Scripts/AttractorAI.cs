@@ -784,8 +784,8 @@ public class AttractorAI : MonoBehaviour
 			{
 				EnemyReactions chosenReaction = behaviourHierarchy[chosenPriority];
 
-				float tempLowerBound = 100;
-				float tempUpperBound = 100;
+				float tempLowerBound = 0;
+				float tempUpperBound = 1;
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
