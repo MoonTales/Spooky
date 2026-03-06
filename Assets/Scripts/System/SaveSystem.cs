@@ -137,6 +137,14 @@ namespace System
         {
             return _currentSaveData;
         }
+        public void ReadSaveFromDisk()
+        {
+            if (PlayerPrefs.HasKey("SaveData"))
+            {
+                string json = PlayerPrefs.GetString("SaveData");
+                _currentSaveData = JsonUtility.FromJson<SaveData>(json);
+            }
+        }
     }
 
     // Non-generic base interface — allows SaveSystem to find and call all saveable objects

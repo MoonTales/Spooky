@@ -71,34 +71,25 @@ namespace UI.Main_Menu
             // CHANGES ALLOW TO LOAD SAVE DATA
             if (SaveSystem.Instance.DoesSaveGameExist())
             {
-                // this is saved within: SaveData -> GameState -> public struct GameStateSaveData
-                // and within: SaveData -> PlayerInventory -> public struct PlayerInventorySaveData
-                SaveData saveData = SaveSystem.Instance.GetCurrentSaveData();
-                foreach (SavableObject savableObject in saveData.saveData)
-                {
-                    if (savableObject.Id == "GameState")
-                    {
-                        GameStateManager.GameStateSaveData gameStateSaveData = JsonUtility.FromJson<GameStateManager.GameStateSaveData>(savableObject.Data);
-                        savedAct = gameStateSaveData.currentZoneId;
-                    }
-                    else if (savableObject.Id == "PlayerInventory")
-                    {
-                        PlayerInventory.PlayerInventorySaveData playerInventorySaveData = JsonUtility.FromJson<PlayerInventory.PlayerInventorySaveData>(savableObject.Data);
-                        savedDrawingIDs = playerInventorySaveData.collectedDrawingIDs;
-                    }
-                    else if (savableObject.Id == "SceneSwapper")
-                    {
-                        SceneSwapper.SceneSwapSaveData sceneSwapSaveData = JsonUtility.FromJson<SceneSwapper.SceneSwapSaveData>(savableObject.Data);
-                        savedSceneName = sceneSwapSaveData.CurrentSceneName;
-                        
-                    }
-                }
-                // AFTER THIS POINT, you have access to either the act "savedAct" and the list of saved drawing ids
-                Debug.Log("Saved Act: " + savedAct);
-                if (savedDrawingIDs != null && savedDrawingIDs.Count > 0){Debug.Log("Saved Drawings: " + string.Join(", ", savedDrawingIDs));} else {Debug.Log("No Saved Drawings (yet)");}
-                
-                Debug.Log("Saved Scene: " + savedSceneName);
+                SaveSystem.Instance.ReadSaveFromDisk();
+
+                var sceneData = SaveSystem.Instance.GetData("SceneSwapper");
+                var gameStateData = SaveSystem.Instance.GetData("GameState");
+                var inventoryData = SaveSystem.Instance.GetData("PlayerInventory");
+
+                if (sceneData.HasValue)
+                    savedSceneName = JsonUtility.FromJson<SceneSwapper.SceneSwapSaveData>(sceneData.Value.Data).CurrentSceneName;
+
+                if (gameStateData.HasValue)
+                    savedAct = JsonUtility.FromJson<GameStateManager.GameStateSaveData>(gameStateData.Value.Data).worldClockHour;
+
+                if (inventoryData.HasValue)
+                    savedDrawingIDs = JsonUtility.FromJson<PlayerInventory.PlayerInventorySaveData>(inventoryData.Value.Data).collectedDrawingIDs;
             }
+            
+            if(savedSceneName != ""){ Debug.Log("Saved scene name: " + savedSceneName);} else {Debug.Log("No saved scene name found.");}
+            if(savedAct != 0){ Debug.Log("Saved act: " + savedAct);} else {Debug.Log("No saved act found.");}
+            if(savedDrawingIDs != null){ Debug.Log("Saved drawing IDs: " + string.Join(", ", savedDrawingIDs));} else {Debug.Log("No saved drawing IDs found.");}
    
             
         }

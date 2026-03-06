@@ -25,7 +25,8 @@ public class Headphones : MonoBehaviour
         new Types.ScreenFadeData(
             fadeInDuration: revealDuration,
             fadeDuration: 0.1f,
-            fadeOutDuration: 0.2f,
+            fadeOutDuration: 0f,
+            null,
             SendToNextScene
         ).Send();
         
