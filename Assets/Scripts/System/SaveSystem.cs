@@ -132,6 +132,11 @@ namespace System
         {
             return PlayerPrefs.HasKey("SaveData");
         }
+        
+        public SaveData GetCurrentSaveData()
+        {
+            return _currentSaveData;
+        }
     }
 
     // Non-generic base interface — allows SaveSystem to find and call all saveable objects

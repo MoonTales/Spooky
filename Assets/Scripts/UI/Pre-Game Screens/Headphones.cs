@@ -27,6 +27,7 @@ public class Headphones : MonoBehaviour
             fadeDuration: 0f,
             fadeOutDuration: 0f
         ).Send();
+        SendToNextScene();
     }
 
     // ill set this up later
@@ -35,16 +36,17 @@ public class Headphones : MonoBehaviour
         yield return new WaitForSeconds(headphonesAnim);
     }
 
-    private void Update()
+    private void SendToNextScene()
     {
-         // fade to black, then load game warnings when black is reached
-         new Types.ScreenFadeData(
-             fadeInDuration: 0.5f,
-             fadeDuration: 0.1f,
-             fadeOutDuration: exitToBlackDuration,
-             onFadeOutComplete: LoadGameWarnings
-          ).Send();
+        // fade to black, then load game warnings when black is reached
+        new Types.ScreenFadeData(
+            fadeInDuration: 0.5f,
+            fadeDuration: 0.1f,
+            fadeOutDuration: exitToBlackDuration,
+            onFadeOutComplete: LoadGameWarnings
+        ).Send();
     }
+    
 
     private void LoadGameWarnings()
     {

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Managers;
+using Player;
 using UI.PauseMenu;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +20,13 @@ namespace UI.Main_Menu
         private Button _continueButton;
         private Button _settingsButton;
         private Button _quitButton;
+        
+        // Internal Variables for polish
+        private int savedAct;
+        private List<int> savedDrawingIDs;
+        private string savedSceneName;
+        
+        
         private void Start()
         {
             mainMenuCanvas.SetActive(true);
@@ -58,6 +67,40 @@ namespace UI.Main_Menu
                     _quitButton.enabled = true;
                 }
             }
+            
+            // CHANGES ALLOW TO LOAD SAVE DATA
+            if (SaveSystem.Instance.DoesSaveGameExist())
+            {
+                // this is saved within: SaveData -> GameState -> public struct GameStateSaveData
+                // and within: SaveData -> PlayerInventory -> public struct PlayerInventorySaveData
+                SaveData saveData = SaveSystem.Instance.GetCurrentSaveData();
+                foreach (SavableObject savableObject in saveData.saveData)
+                {
+                    if (savableObject.Id == "GameState")
+                    {
+                        GameStateManager.GameStateSaveData gameStateSaveData = JsonUtility.FromJson<GameStateManager.GameStateSaveData>(savableObject.Data);
+                        savedAct = gameStateSaveData.currentZoneId;
+                    }
+                    else if (savableObject.Id == "PlayerInventory")
+                    {
+                        PlayerInventory.PlayerInventorySaveData playerInventorySaveData = JsonUtility.FromJson<PlayerInventory.PlayerInventorySaveData>(savableObject.Data);
+                        savedDrawingIDs = playerInventorySaveData.collectedDrawingIDs;
+                    }
+                    else if (savableObject.Id == "SceneSwapper")
+                    {
+                        SceneSwapper.SceneSwapSaveData sceneSwapSaveData = JsonUtility.FromJson<SceneSwapper.SceneSwapSaveData>(savableObject.Data);
+                        savedSceneName = sceneSwapSaveData.CurrentSceneName;
+                        
+                    }
+                }
+                // AFTER THIS POINT, you have access to either the act "savedAct" and the list of saved drawing ids
+                Debug.Log("Saved Act: " + savedAct);
+                if (savedDrawingIDs != null && savedDrawingIDs.Count > 0){Debug.Log("Saved Drawings: " + string.Join(", ", savedDrawingIDs));} else {Debug.Log("No Saved Drawings (yet)");}
+                
+                Debug.Log("Saved Scene: " + savedSceneName);
+            }
+   
+            
         }
         // Button connections
         private void OnContinueButtonClicked()
