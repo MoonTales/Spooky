@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using System.Reflection;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
@@ -39,6 +40,7 @@ public class AttractorAI : MonoBehaviour
 	private EnemyState currentState = EnemyState.Stand;
 	private EnemyState nextState = EnemyState.Stand;
 	private List<FunctionPicker> nextFunctions = new List<FunctionPicker>();
+	private List<UnityEvent> nextEvents = new List<UnityEvent>();
 	[Tooltip("Leave blank to default focus on player")]
 	public Transform defaultFocus;
 
@@ -88,6 +90,12 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	[System.Serializable]
+	public class UnityEventListWrapper
+	{
+		public List<UnityEvent> eventExecutions;
+	}
+
+	[System.Serializable]
 	public class EnemyReactionReprogram
 	{
 		[Tooltip("If set to true, each change's randomness will only include elements determined by the enemy's danger level and the respective change's danger" +
@@ -131,6 +139,10 @@ public class AttractorAI : MonoBehaviour
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
 		public float functionExecutionsLowerBoundDangerRange = 100;
 		public float functionExecutionsUpperBoundDangerRange = 100;
+
+		[SerializeField] public UnityEventListWrapper[] possibleEventExecutionsChanges;
+		public float eventExecutionsLowerBoundDangerRange = 100;
+		public float eventExecutionsUpperBoundDangerRange = 100;
 
 		public EnemyState[] possibleStateChangeChanges;
 		public float stateChangeLowerBoundDangerRange = 100;
@@ -199,6 +211,10 @@ public class AttractorAI : MonoBehaviour
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
 		public float functionExecutionsLowerBoundDangerRange = 100;
 		public float functionExecutionsUpperBoundDangerRange = 100;
+
+		[SerializeField] public UnityEventListWrapper[] possibleEventExecutionsChanges;
+		public float eventExecutionsLowerBoundDangerRange = 100;
+		public float eventExecutionsUpperBoundDangerRange = 100;
 
 		public float[] possibleRepeatBufferChanges;
 		public float repeatBufferLowerBoundDangerRange = 100;
@@ -711,6 +727,7 @@ public class AttractorAI : MonoBehaviour
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
 		public EnemyState stateChange;
 		//[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
 			//"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
@@ -749,6 +766,7 @@ public class AttractorAI : MonoBehaviour
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
 
 		public float repeatBuffer = 1;
 		public bool forceBuffer = false;
@@ -869,6 +887,18 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.functionExecutions = reactionEdit.possibleFunctionExecutionsChanges[Random.Range((int)(
 						reactionEdit.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
+				}
+				if (reactionEdit.possibleEventExecutionsChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.eventExecutionsLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.eventExecutionsUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.eventExecutions = reactionEdit.possibleEventExecutionsChanges[Random.Range((int)(
+						reactionEdit.possibleEventExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
+							reactionEdit.possibleEventExecutionsChanges.Length * tempUpperBound))].eventExecutions;
 				}
 				if (reactionEdit.possibleStateChangeChanges.Length > 0)
 				{
@@ -1024,6 +1054,18 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.functionExecutions = reactionEdit.possibleFunctionExecutionsChanges[Random.Range((int)(
 						reactionEdit.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
+				}
+				if (reactionEdit.possibleEventExecutionsChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.eventExecutionsLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.eventExecutionsUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.eventExecutions = reactionEdit.possibleEventExecutionsChanges[Random.Range((int)(
+						reactionEdit.possibleEventExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
+							reactionEdit.possibleEventExecutionsChanges.Length * tempUpperBound))].eventExecutions;
 				}
 				if (reactionEdit.possibleRepeatBufferChanges.Length > 0)
 				{
@@ -1206,6 +1248,7 @@ public class AttractorAI : MonoBehaviour
 		currentState = defaultState;
 		nextState = defaultState;
 		nextFunctions.Clear();
+		nextEvents.Clear();
 		lowestPriority = behaviourHierarchy.Count;
 		currentStatePriority = lowestPriority;
 		agent = GetComponent<NavMeshAgent>();
@@ -1290,9 +1333,12 @@ public class AttractorAI : MonoBehaviour
 	void OnDrawGizmosSelected()
 	{
 		Gizmos.color = Color.red;
-		foreach (EnemySense sense in senses)
-			foreach (Transform senseOrgan in sense.senseOrgans)
-				DrawCone(senseOrgan, sense);
+		if (senses.Length > 0)
+		{
+			foreach (EnemySense sense in senses)
+				foreach (Transform senseOrgan in sense.senseOrgans)
+					DrawCone(senseOrgan, sense);
+		}
 	}
 
 	void DrawCone(Transform organ, EnemySense sense) // Just for viewing in the inspector
@@ -1546,6 +1592,10 @@ public class AttractorAI : MonoBehaviour
 							{
 								HandleFunctionCalling(function);
 							}
+							foreach (UnityEvent unityEvent in thought.eventExecutions)
+							{
+								unityEvent.Invoke();
+							}
 						}
 					}
 					else if (!thought.forceBuffer)
@@ -1582,6 +1632,10 @@ public class AttractorAI : MonoBehaviour
 							foreach (FunctionPicker function in thought.functionExecutions)
 							{
 								HandleFunctionCalling(function);
+							}
+							foreach (UnityEvent unityEvent in thought.eventExecutions)
+							{
+								unityEvent.Invoke();
 							}
 						}
 					}
@@ -1731,11 +1785,16 @@ public class AttractorAI : MonoBehaviour
 					{
 						nextStatePriority = tempPriority;
 						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
+						nextEvents = new List<UnityEvent>(reaction.eventExecutions);
 						if (nextStatePriority < currentStatePriority)
 						{
 							foreach (FunctionPicker function in nextFunctions)
 							{
 								HandleFunctionCalling(function);
+							}
+							foreach (UnityEvent unityEvent in nextEvents)
+							{
+								unityEvent.Invoke();
 							}
 						}
 
@@ -1783,11 +1842,16 @@ public class AttractorAI : MonoBehaviour
 					{
 						nextStatePriority = tempPriority;
 						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
+						nextEvents = new List<UnityEvent>(reaction.eventExecutions);
 						if (nextStatePriority < currentStatePriority)
 						{
 							foreach (FunctionPicker function in nextFunctions)
 							{
 								HandleFunctionCalling(function);
+							}
+							foreach (UnityEvent unityEvent in nextEvents)
+							{
+								unityEvent.Invoke();
 							}
 						}
 
@@ -1815,6 +1879,7 @@ public class AttractorAI : MonoBehaviour
 			nextStatePriority = lowestPriority;
 			nextState = defaultState;
 			nextFunctions.Clear();
+			nextEvents.Clear();
 		}
 
 		// Check if the agent has reached its destination and is not calculating a new path
@@ -1827,6 +1892,10 @@ public class AttractorAI : MonoBehaviour
 				foreach (FunctionPicker function in nextFunctions)
 				{
 					HandleFunctionCalling(function);
+				}
+				foreach (UnityEvent unityEvent in nextEvents)
+				{
+					unityEvent.Invoke();
 				}
 			}
 			currentStatePriority = nextStatePriority;
@@ -1849,6 +1918,10 @@ public class AttractorAI : MonoBehaviour
 				foreach (FunctionPicker function in nextFunctions)
 				{
 					HandleFunctionCalling(function);
+				}
+				foreach (UnityEvent unityEvent in nextEvents)
+				{
+					unityEvent.Invoke();
 				}
 			}
 			currentStatePriority = nextStatePriority;
@@ -1874,6 +1947,10 @@ public class AttractorAI : MonoBehaviour
 					foreach (FunctionPicker function in nextFunctions)
 					{
 						HandleFunctionCalling(function);
+					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
 					}
 				}
 				currentStatePriority = nextStatePriority;
@@ -1916,6 +1993,10 @@ public class AttractorAI : MonoBehaviour
 					foreach (FunctionPicker function in nextFunctions)
 					{
 						HandleFunctionCalling(function);
+					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
 					}
 				}
 				currentStatePriority = nextStatePriority;
@@ -1961,6 +2042,10 @@ public class AttractorAI : MonoBehaviour
 					{
 						HandleFunctionCalling(function);
 					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
+					}
 				}
 				currentStatePriority = nextStatePriority;
 			}
@@ -1996,6 +2081,7 @@ public class AttractorAI : MonoBehaviour
 					nextState = attackRevertState;
 					nextStatePriority = attackRevertPriority;
 					nextFunctions = new List<FunctionPicker>(behaviourHierarchy[nextStatePriority].functionExecutions);
+					nextEvents = new List<UnityEvent>(behaviourHierarchy[nextStatePriority].eventExecutions);
 				}
 				currentFocus = nextFocus;
 				currentState = nextState;
@@ -2004,6 +2090,10 @@ public class AttractorAI : MonoBehaviour
 					foreach (FunctionPicker function in nextFunctions)
 					{
 						HandleFunctionCalling(function);
+					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
 					}
 				}
 				currentStatePriority = nextStatePriority;
@@ -2025,6 +2115,10 @@ public class AttractorAI : MonoBehaviour
 					foreach (FunctionPicker function in nextFunctions)
 					{
 						HandleFunctionCalling(function);
+					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
 					}
 				}
 				currentStatePriority = nextStatePriority;
@@ -2095,6 +2189,10 @@ public class AttractorAI : MonoBehaviour
 							{
 								HandleFunctionCalling(function);
 							}
+							foreach (UnityEvent unityEvent in nextEvents)
+							{
+								unityEvent.Invoke();
+							}
 						}
 						currentStatePriority = nextStatePriority;
 					}
@@ -2145,6 +2243,10 @@ public class AttractorAI : MonoBehaviour
 						{
 							HandleFunctionCalling(function);
 						}
+						foreach (UnityEvent unityEvent in nextEvents)
+						{
+							unityEvent.Invoke();
+						}
 					}
 					currentStatePriority = nextStatePriority;
 				}
@@ -2193,6 +2295,10 @@ public class AttractorAI : MonoBehaviour
 						foreach (FunctionPicker function in nextFunctions)
 						{
 							HandleFunctionCalling(function);
+						}
+						foreach (UnityEvent unityEvent in nextEvents)
+						{
+							unityEvent.Invoke();
 						}
 					}
 					currentStatePriority = nextStatePriority;
