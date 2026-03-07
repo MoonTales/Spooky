@@ -1141,8 +1141,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 99.99996, z: 99.999954}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7413038294053854235}
+  m_Children: []
   m_Father: {fileID: 7255999071917568931}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!137 &3814712088769485990
@@ -2082,11 +2081,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4597851291755882717}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.61739135, y: 0.16529119, z: -0.3337256, w: -0.69291705}
+  m_LocalRotation: {x: -0.6173925, y: 0.165288, z: -0.33372214, w: -0.6929185}
   m_LocalPosition: {x: 23.832, y: -5.569, z: 26.195}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 7413038294053854235}
   - {fileID: 7255999071917568931}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -255, y: -135, z: -93.30301}
@@ -2136,9 +2136,92 @@ MonoBehaviour:
     floatConditions: []
     intConditions: []
   behaviourHierarchy:
+  - attractorType: 2
+    minIntensity: 1
+    maxIntensity: 4
+    reactionConditions:
+      boolConditions: []
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 0
+    statusRestrictions:
+    - Homophobic
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 3
+      arguments:
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 2
+      arguments: []
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 3739229688241821059}
+    eventExecutions:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+          m_MethodName: set_enabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4597851291755882717}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    stateChange: 0
+    targetDetectedObject: 0
+    prioritizeDistanceInsteadOfIntensity: 0
+    invertPriority: 0
   - attractorType: 3
-    minIntensity: 4
-    maxIntensity: 7
+    minIntensity: 7
+    maxIntensity: 10
     reactionConditions:
       boolConditions: []
       floatConditions: []
@@ -2151,14 +2234,15 @@ MonoBehaviour:
     allStatusesRequired: 1
     stateRestriction: 
     functionExecutions: []
+    eventExecutions: []
     stateChange: 3
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
   thoughts: []
   senses:
-  - detectionRadius: 5
-    detectionAngle: 30
+  - detectionRadius: 0.1
+    detectionAngle: 180
     targetLayer:
       serializedVersion: 2
       m_Bits: 8192
@@ -2194,7 +2278,7 @@ MonoBehaviour:
   investigateSpeed: 0
   permanenceTime: 0
   giveUpTime: 0
-  rushOverSpeed: 15
+  rushOverSpeed: 5
   rushPermanenceTime: 20
   rushGiveUpTime: 20
   screamBeforeRushOver: 0
@@ -2453,7 +2537,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7413038294053854235}
   - component: {fileID: 1450579434313142142}
-  - component: {fileID: 4108712138345595540}
+  - component: {fileID: 7262032908901906525}
   m_Layer: 13
   m_Name: SelfAttractor
   m_TagString: Untagged
@@ -2469,13 +2553,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5104742207399905863}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0139, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.4895197, y: 0.5102652, z: 0.51026523, w: 0.48951954}
+  m_LocalPosition: {x: 1.082013, y: -1.7149997, z: 1.8048756}
+  m_LocalScale: {x: 32.078, y: 20, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3013639106418598217}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Father: {fileID: 3739229688241821059}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 37.65}
 --- !u!114 &1450579434313142142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2489,9 +2573,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attractorType: 3
-  intensity: 5
---- !u!135 &4108712138345595540
-SphereCollider:
+  intensity: 8
+--- !u!65 &7262032908901906525
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2509,7 +2593,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.01
+  m_Size: {x: 0.1, y: 0.1, z: 0.1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5167671466647632498
 GameObject:
