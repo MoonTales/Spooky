@@ -1139,6 +1139,7 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float minPatrolTimer;
 	[Tooltip("The longest amount of time before the enemy decides to move to a new location")]
 	[SerializeField] private float maxPatrolTimer;
+	[SerializeField] private Transform optionalPatrolPoint;
 
 	private float patrolTimer;
 
@@ -2332,7 +2333,7 @@ public class AttractorAI : MonoBehaviour
 
 	private void SetNewRandomDestination()
 	{
-		Vector3 randomPoint = FindFirstObjectByType<NavMeshSurface>().transform.position + Random.insideUnitSphere * patrolRadius;
+		Vector3 randomPoint = (optionalPatrolPoint != null ? optionalPatrolPoint.position : transform.position) + Random.insideUnitSphere * patrolRadius;
 		NavMeshHit hit;
 
 		// Sample the NavMesh to find the closest valid point within the specified range
