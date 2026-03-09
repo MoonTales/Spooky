@@ -17,6 +17,12 @@ public class AttractorAI : MonoBehaviour
 	[Tooltip("Between 0-100")]
 	public float currentDangerLevel = 0;
 	[SerializeField] private List<string> currentStatuses = new List<string>();
+
+	private bool hasAgent = false;
+	private float nonAgentSpeed = 0;
+	private Vector3 nonAgentDestination;
+	private bool hasNonAgentDestination = false;
+	private bool hasAnimator = false;
 	#endregion
 
 	#region States
@@ -48,7 +54,7 @@ public class AttractorAI : MonoBehaviour
 	{
 		visual,
 		audio,
-		attackRange,
+		custom,
 		self,
 		NONE
 	}
@@ -105,6 +111,10 @@ public class AttractorAI : MonoBehaviour
 		public AttractorType[] possibleAttractorTypeChanges;
 		public float attractorTypeLowerBoundDangerRange = 100;
 		public float attractorTypeUpperBoundDangerRange = 100;
+
+		public string[] possibleCustomAttractorIDChanges;
+		public float customAttractorIDLowerBoundDangerRange = 100;
+		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
@@ -177,6 +187,10 @@ public class AttractorAI : MonoBehaviour
 		public AttractorType[] possibleAttractorTypeChanges;
 		public float attractorTypeLowerBoundDangerRange = 100;
 		public float attractorTypeUpperBoundDangerRange = 100;
+
+		public string[] possibleCustomAttractorIDChanges;
+		public float customAttractorIDLowerBoundDangerRange = 100;
+		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
@@ -284,7 +298,10 @@ public class AttractorAI : MonoBehaviour
 	{
 		bool visible = bool.Parse(arguments[0]);
 
-		animator.gameObject.SetActive(visible);
+		if (hasAnimator)
+			animator.gameObject.SetActive(visible);
+		else if (transform.childCount > 0)
+			transform.GetChild(0).gameObject.SetActive(visible);
 	}
 	public void ChangeConditions(List<string> arguments, Alteration changeBy, float changeAmount)
 	{
@@ -430,12 +447,18 @@ public class AttractorAI : MonoBehaviour
 		float z = float.Parse(arguments[2]);
 		Vector3 location = new Vector3(x, y, z);
 
-		agent.Warp(location);
+		if (hasAgent)
+			agent.Warp(location);
+		else
+			transform.position = location;
 	}
 	private int nextTeleportIndex = 0;
 	public void TeleportCycle()
 	{
-		agent.Warp(teleportLocations[nextTeleportIndex]);
+		if (hasAgent)
+			agent.Warp(teleportLocations[nextTeleportIndex]);
+		else
+			transform.position = teleportLocations[nextTeleportIndex];
 
 		nextTeleportIndex++;
 		if (nextTeleportIndex >= teleportLocations.Count())
@@ -712,6 +735,8 @@ public class AttractorAI : MonoBehaviour
 	public class EnemyReactions
 	{
 		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		public string customAttractorID;
 		[Tooltip("Inclusve")]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
@@ -751,6 +776,8 @@ public class AttractorAI : MonoBehaviour
 	public class ThoughtProcess
 	{
 		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		public string customAttractorID;
 		[Tooltip("Inclusve")]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
@@ -817,6 +844,18 @@ public class AttractorAI : MonoBehaviour
 
 					chosenReaction.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.customAttractorIDLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.customAttractorIDUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.customAttractorID =
+						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
+						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
 				}
 				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
@@ -969,8 +1008,8 @@ public class AttractorAI : MonoBehaviour
 			{
 				ThoughtProcess chosenThought = thoughts[chosenPriority];
 
-				float tempLowerBound = 100;
-				float tempUpperBound = 100;
+				float tempLowerBound = 0;
+				float tempUpperBound = 1;
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
@@ -984,6 +1023,18 @@ public class AttractorAI : MonoBehaviour
 
 					chosenThought.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.customAttractorIDLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.customAttractorIDUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.customAttractorID =
+						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
+						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
 				}
 				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
@@ -1110,9 +1161,11 @@ public class AttractorAI : MonoBehaviour
 		public float detectionRadius = 10f;
 		public float detectionAngle = 360f;
 		public LayerMask targetLayer;
+		[Tooltip("If the Target Layer includes CustomAttractor, you must specify which Custom Attractor IDs you wish to target")]
+		public string[] customAttractorIDs;
 		public LayerMask obstacleLayer;
 		public Transform[] senseOrgans;
-		public bool addPlayerCameraAsSenseOrgan = false;
+		//public bool addPlayerCameraAsSenseOrgan = false;
 		[Tooltip("Attractors detected by this sense will instead be clasified as not detected, " +
 			"while every Attractor in the targetLayer NOT detected by this sense is considered detected (as of right now, this does nothing)")]
 		public bool invertDetection = false;  // finish this later
@@ -1230,21 +1283,12 @@ public class AttractorAI : MonoBehaviour
 
 	#endregion
 
-	public void AddCameraSenses()
-	{
-		foreach (EnemySense sense in senses)
-		{
-			if (sense.addPlayerCameraAsSenseOrgan)
-			{
-				sense.senseOrgans.Append(Flashlight.Instance.GetComponentInParent<Transform>());
-			}
-		}
-	}
-
 	void Start()
 	{
 		if (defaultFocus == null)
 			defaultFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+		if (animator != null)
+			hasAnimator = true;
 		currentFocus = defaultFocus;
 		currentState = defaultState;
 		nextState = defaultState;
@@ -1252,10 +1296,9 @@ public class AttractorAI : MonoBehaviour
 		nextEvents.Clear();
 		lowestPriority = behaviourHierarchy.Count;
 		currentStatePriority = lowestPriority;
-		agent = GetComponent<NavMeshAgent>();
+		if (gameObject.TryGetComponent(out agent))
+			hasAgent = true;
 		patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
-
-		AddCameraSenses();
 	}
 
 	Dictionary<AttractorType, List<Attractor>> DetectedAttractors()
@@ -1296,10 +1339,15 @@ public class AttractorAI : MonoBehaviour
 			foreach (var hitCollider in hitColliders)
 			{
 				Transform target = hitCollider.transform;
+				Attractor targetAttractor = target.GetComponent<Attractor>();
 
-				if (CheckConeVisibility(target.position, currentSense))
+				if ((targetAttractor.attractorType != AttractorType.self || target.IsChildOf(transform)) && (targetAttractor.attractorType != AttractorType.custom
+					|| currentSense.customAttractorIDs.Contains(targetAttractor.customAttractorID)))
 				{
-					tempAttractorList.Add(target.GetComponent<Attractor>());
+					if (CheckConeVisibility(target.position, currentSense))
+					{
+						tempAttractorList.Add(target.GetComponent<Attractor>());
+					}
 				}
 			}
 		}
@@ -1338,7 +1386,8 @@ public class AttractorAI : MonoBehaviour
 		{
 			foreach (EnemySense sense in senses)
 				foreach (Transform senseOrgan in sense.senseOrgans)
-					DrawCone(senseOrgan, sense);
+					if (senseOrgan != null)
+						DrawCone(senseOrgan, sense);
 		}
 	}
 
@@ -1417,7 +1466,9 @@ public class AttractorAI : MonoBehaviour
 			currentConditions.intConditions[0].intValue = Player.PlayerInventory.Instance.GetDrawingCount();
 		}
 
-		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);  // this keeps the animation in sync with the enemy speed
+		if (hasAnimator)
+			animator.SetFloat("Speed", (hasAgent ? agent.velocity.magnitude : hasNonAgentDestination ? nonAgentSpeed : 0) / walkSpdAnimMult); 
+			// this keeps the animation in sync with the enemy speed
 
 		if (!(currentState == EnemyState.RushOver))
 		{
@@ -1429,12 +1480,14 @@ public class AttractorAI : MonoBehaviour
 		}
 		if (!(currentState == EnemyState.Inspect))
 		{
-			animator.SetBool("Inspecting", false);
+			if (hasAnimator)
+				animator.SetBool("Inspecting", false);
 			currentInspect = 0;
 		}
 		if (!(currentState == EnemyState.Search))
 		{
-			animator.SetBool("LookingAround", false);
+			if (hasAnimator)
+				animator.SetBool("LookingAround", false);
 			searchTimer = 0;
 			if (searchLocations.Count > 1)
 				searchLocations.Clear();
@@ -1469,7 +1522,8 @@ public class AttractorAI : MonoBehaviour
 				{
 					foreach (Attractor attractor in tempDetectedAttractors[thought.attractorType])
 					{
-						if (thought.minIntensity <= attractor.intensity && attractor.intensity < thought.maxIntensity)
+						if (thought.minIntensity <= attractor.intensity && attractor.intensity < thought.maxIntensity && (thought.attractorType !=
+							AttractorType.custom || thought.customAttractorID == attractor.customAttractorID))
 						{
 							tempAttractors.Add(attractor);
 						}
@@ -1661,12 +1715,14 @@ public class AttractorAI : MonoBehaviour
 				{
 					foreach (Attractor attractor in tempDetectedAttractors[reaction.attractorType])
 					{
-						if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity)
+						if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity && (reaction.attractorType !=
+							AttractorType.custom || reaction.customAttractorID == attractor.customAttractorID))
 						{
 							if (reaction.targetDetectedObject && (tempValue < 0 || (reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority &&
 								Vector3.Distance(transform.position, attractor.transform.position) > tempValue) || (!reaction.invertPriority &&
-								Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) || (!reaction.prioritizeDistanceInsteadOfIntensity
-								&& ((reaction.invertPriority && attractor.intensity < tempValue) || (!reaction.invertPriority && attractor.intensity > tempValue)))))
+								Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) ||
+								(!reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority && attractor.intensity < tempValue) ||
+								(!reaction.invertPriority && attractor.intensity > tempValue)))))
 							{
 								tempFocus = attractor.transform;
 							}
@@ -1900,9 +1956,12 @@ public class AttractorAI : MonoBehaviour
 				}
 			}
 			currentStatePriority = nextStatePriority;
-			agent.speed = wanderSpeed;
+			if (hasAgent)
+				agent.speed = wanderSpeed;
+			else
+				nonAgentSpeed = wanderSpeed;
 			patrolTimer -= Time.deltaTime;
-			if (!agent.pathPending && agent.remainingDistance < 0.5f)
+			if (hasAgent ? !agent.pathPending && agent.remainingDistance < 0.5f : Vector3.Distance(transform.position, nonAgentDestination) < 0.5f)
 				patrolTimer -= Time.deltaTime;
 			if (patrolTimer <= 0)
 			{
@@ -1926,7 +1985,10 @@ public class AttractorAI : MonoBehaviour
 				}
 			}
 			currentStatePriority = nextStatePriority;
-			agent.speed = 0;
+			if (hasAgent)
+				agent.speed = 0;
+			else
+				nonAgentSpeed = 0;
 		}
 		else if (currentState == EnemyState.Investigate)
 		{
@@ -1962,10 +2024,21 @@ public class AttractorAI : MonoBehaviour
 				ghostPosition = currentFocus.position;
 			}
 
-			
-			agent.speed = investigateSpeed;
+
+			if (hasAgent)
+				agent.speed = investigateSpeed;
+			else
+				nonAgentSpeed = investigateSpeed;
 			if (Vector3.Distance(transform.position, ghostPosition) > 1)
-				agent.SetDestination(ghostPosition);
+			{
+				if (hasAgent)
+					agent.SetDestination(ghostPosition);
+				else
+				{
+					nonAgentDestination = ghostPosition;
+					hasNonAgentDestination = true;
+				}
+			}
 		}
 		else if (currentState == EnemyState.RushOver)
 		{
@@ -2010,9 +2083,20 @@ public class AttractorAI : MonoBehaviour
 
 			if (finishedScream)
 			{
-				agent.speed = rushOverSpeed;
+				if (hasAgent)
+					agent.speed = rushOverSpeed;
+				else
+					nonAgentSpeed = rushOverSpeed;
 				if (Vector3.Distance(transform.position, ghostPosition) > 1)
-					agent.SetDestination(ghostPosition);
+				{
+					if (hasAgent)
+						agent.SetDestination(ghostPosition);
+					else
+					{
+						nonAgentDestination = ghostPosition;
+						hasNonAgentDestination = true;
+					}
+				}
 			}
 		}
 		else if (currentState == EnemyState.Chase)
@@ -2058,9 +2142,20 @@ public class AttractorAI : MonoBehaviour
 
 			if (finishedScream)
 			{
-				agent.speed = chaseSpeed;
+				if (hasAgent)
+					agent.speed = chaseSpeed;
+				else
+					nonAgentSpeed = chaseSpeed;
 				if (Vector3.Distance(transform.position, ghostPosition) > 1)
-					agent.SetDestination(ghostPosition);
+				{
+					if (hasAgent)
+						agent.SetDestination(ghostPosition);
+					else
+					{
+						nonAgentDestination = ghostPosition;
+						hasNonAgentDestination = true;
+					}
+				}
 			}
 		}
 		else if (currentState == EnemyState.Attack)
@@ -2102,13 +2197,18 @@ public class AttractorAI : MonoBehaviour
 		}
 		else if (currentState == EnemyState.Inspect)
 		{
-			agent.speed = 0;
-			animator.SetBool("Inspecting", true);
+			if (hasAgent)
+				agent.speed = 0;
+			else
+				nonAgentSpeed = 0;
+			if (hasAnimator)
+				animator.SetBool("Inspecting", true);
 			currentInspect += Time.deltaTime;
 			if (currentInspect >= inspectTime)
 			{
 				currentInspect = 0;
-				animator.SetBool("Inspecting", false);
+				if (hasAnimator)
+					animator.SetBool("Inspecting", false);
 				currentFocus = nextFocus;
 				currentState = nextState;
 				if (nextStatePriority != currentStatePriority)
@@ -2127,7 +2227,10 @@ public class AttractorAI : MonoBehaviour
 		}
 		else if (currentState == EnemyState.Search)
 		{
-			agent.speed = searchSpeed;
+			if (hasAgent)
+				agent.speed = searchSpeed;
+			else
+				nonAgentSpeed = searchSpeed;
 
 			if (!searching)
 			{
@@ -2169,13 +2272,20 @@ public class AttractorAI : MonoBehaviour
 					if (searchLocations.Count > 0)
 					{
 						int lastIndex = searchLocations.Count - 1;
-						agent.SetDestination(searchLocations[lastIndex]);
+						if (hasAgent)
+							agent.SetDestination(searchLocations[lastIndex]);
+						else
+						{
+							nonAgentDestination = searchLocations[lastIndex];
+							hasNonAgentDestination = true;
+						}
 						searchLocations.RemoveAt(lastIndex);
 						searchingSpot = true;
 					}
 					else
 					{
-						animator.SetBool("LookingAround", false);
+						if (hasAnimator)
+							animator.SetBool("LookingAround", false);
 						searchTimer = 0;
 						searching = false;
 						if (currentAvoidedTarget != null)
@@ -2198,9 +2308,13 @@ public class AttractorAI : MonoBehaviour
 						currentStatePriority = nextStatePriority;
 					}
 				}
-				else if (hiddenStationary || agent.remainingDistance < agent.stoppingDistance)
+				else if (hiddenStationary || hasAgent ? agent.remainingDistance < agent.stoppingDistance : Vector3.Distance(transform.position,
+					nonAgentDestination) < 0.5f)
 				{
-					agent.ResetPath();
+					if (hasAgent)
+						agent.ResetPath();
+					else
+						hasNonAgentDestination = false;
 					if (hide)
 					{
 						hiddenStationary = true;
@@ -2210,7 +2324,13 @@ public class AttractorAI : MonoBehaviour
 							Vector3 searchSpot = FindSearchSpot(hideRadius);
 							if (searchSpot != Vector3.zero)
 							{
-								agent.SetDestination(searchSpot);
+								if (hasAgent)
+									agent.SetDestination(searchSpot);
+								else
+								{
+									nonAgentDestination = searchSpot;
+									hasNonAgentDestination = true;
+								}
 							}
 							else
 							{
@@ -2229,7 +2349,8 @@ public class AttractorAI : MonoBehaviour
 				
 				if (searchTimer <= 0)
 				{
-					animator.SetBool("LookingAround", false);
+					if (hasAnimator)
+						animator.SetBool("LookingAround", false);
 					searchTimer = 0;
 					searching = false;
 					hiddenStationary = false;
@@ -2255,7 +2376,10 @@ public class AttractorAI : MonoBehaviour
 		}
 		else if (currentState == EnemyState.Flee)
 		{
-			agent.speed = fleeSpeed;
+			if (hasAgent)
+				agent.speed = fleeSpeed;
+			else
+				nonAgentSpeed = fleeSpeed;
 
 			if (!fleeing)
 			{
@@ -2276,14 +2400,20 @@ public class AttractorAI : MonoBehaviour
 					currentAvoidedTarget = obstacle;
 				}
 
-				agent.SetDestination(targetDestination);
+				if (hasAgent)
+					agent.SetDestination(targetDestination);
+				else
+				{
+					nonAgentDestination = targetDestination;
+					hasNonAgentDestination = true;
+				}
 				fleeing = true;
 			}
 			else
 			{
 				fleeTime -= Time.deltaTime;
 
-				if (fleeTime <= 0 || agent.remainingDistance < 0.5f)
+				if (fleeTime <= 0 || hasAgent ? agent.remainingDistance < 0.5f : Vector3.Distance(transform.position, nonAgentDestination) < 0.5f)
 				{
 					fleeTime = 0;
 					fleeing = false;
@@ -2310,36 +2440,62 @@ public class AttractorAI : MonoBehaviour
 
 	IEnumerator ScreamRoutine()
 	{
-		animator.SetBool("Screaming", true);
-		agent.speed = 0;
+		if (hasAnimator)
+			animator.SetBool("Screaming", true);
+		if (hasAgent)
+			agent.speed = 0;
+		else
+			nonAgentSpeed = 0;
 		yield return new WaitForSeconds(screamTime);
-		animator.SetBool("Screaming", false);
+		if (hasAnimator)
+			animator.SetBool("Screaming", false);
 		finishedScream = true;
 	}
 
 	IEnumerator AttackRoutine()
 	{
-		attackBox.enabled = true;
-		animator.SetBool("Attacking", true);
-		agent.speed = 0;
+		if (attackBox != null)
+			attackBox.enabled = true;
+		if (hasAnimator)
+			animator.SetBool("Attacking", true);
+		if (hasAgent)
+			agent.speed = 0;
+		else
+			nonAgentSpeed = 0;
 		yield return new WaitForSeconds(attackBufferTime);
-		agent.speed = attackSpeed;
+		if (hasAgent)
+			agent.speed = attackSpeed;
+		else
+			nonAgentSpeed = attackSpeed;
 		yield return new WaitForSeconds(attackTime);
-		agent.speed = 0;
+		if (hasAgent)
+			agent.speed = 0;
+		else
+			nonAgentSpeed = 0;
 		yield return new WaitForSeconds(attackCooldownTime);
-		animator.SetBool("Attacking", false);
+		if (hasAnimator)
+			animator.SetBool("Attacking", false);
 		finishedAttack = true;
 	}
 
 	private void SetNewRandomDestination()
 	{
 		Vector3 randomPoint = (optionalPatrolPoint != null ? optionalPatrolPoint.position : transform.position) + Random.insideUnitSphere * patrolRadius;
-		NavMeshHit hit;
 
-		// Sample the NavMesh to find the closest valid point within the specified range
-		if (NavMesh.SamplePosition(randomPoint, out hit, patrolRadius, NavMesh.AllAreas))
+		if (hasAgent)
 		{
-			agent.SetDestination(hit.position);
+			NavMeshHit hit;
+
+			// Sample the NavMesh to find the closest valid point within the specified range
+			if (NavMesh.SamplePosition(randomPoint, out hit, patrolRadius, NavMesh.AllAreas))
+			{
+				agent.SetDestination(hit.position);
+			}
+		}
+		else
+		{
+			nonAgentDestination = randomPoint;
+			hasNonAgentDestination = true;
 		}
 	}
 
