@@ -29,6 +29,8 @@ namespace Managers
             // Tutorial Interactions
             TutorialButtonClick,
             TutorialDoorSlide,
+            // Environment
+            ClockTick,
         }
 
         // Inspector entry mapping SfxId -> FMOD event.
