@@ -1161,6 +1161,8 @@ public class AttractorAI : MonoBehaviour
 		public float detectionRadius = 10f;
 		public float detectionAngle = 360f;
 		public LayerMask targetLayer;
+		[Tooltip("If the Target Layer includes CustomAttractor, you must specify which Custom Attractor IDs you wish to target")]
+		public string[] customAttractorIDs;
 		public LayerMask obstacleLayer;
 		public Transform[] senseOrgans;
 		//public bool addPlayerCameraAsSenseOrgan = false;
@@ -1339,7 +1341,8 @@ public class AttractorAI : MonoBehaviour
 				Transform target = hitCollider.transform;
 				Attractor targetAttractor = target.GetComponent<Attractor>();
 
-				if (targetAttractor.attractorType != AttractorType.self || target.IsChildOf(transform))
+				if ((targetAttractor.attractorType != AttractorType.self || target.IsChildOf(transform)) && (targetAttractor.attractorType != AttractorType.custom
+					|| currentSense.customAttractorIDs.Contains(targetAttractor.customAttractorID)))
 				{
 					if (CheckConeVisibility(target.position, currentSense))
 					{
