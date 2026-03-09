@@ -150,8 +150,6 @@ MonoBehaviour:
   tutorialOrbAudioSceneName: Tutorial
   tutorialOrbRootName: TheBuilding
   tutorialOrbNamePrefix: Orb
-  tutorialOrbPinnedName: 
-  tutorialOrbPinnedEventPathToken: orb-peace
   tutorialOrbEvents:
   - Guid:
       Data1: 879235584
@@ -203,19 +201,18 @@ MonoBehaviour:
     Path: event:/amb/env/tutorial/ORB/orb-sadness
   tutorialHallwayStretchEvent:
     Guid:
-      Data1: 351463793
-      Data2: 1250743252
-      Data3: 1475581866
-      Data4: 373874254
-    Path: event:/amb/env/tutorial/hallway-stretch
+      Data1: 1240122567
+      Data2: 1230136536
+      Data3: 1299489968
+      Data4: 267243005
+    Path: event:/amb/env/tutorial/hall/hallway-stretch-simple
   tutorialHallwayStretchStateParameter: StretchState
   tutorialHallwayStretchProgressParameter: StretchProgress
   tutorialHallwayRunPressureParameter: RunPressure
   tutorialHallwayPlayerSpeedParameter: PlayerSpeed
   tutorialHallwayPlayerSpeedMax: 8
+  tutorialHallwayPlayerSpeedFloor: 0.2
   tutorialHallwaySweepDurationSeconds: 12
-  debugTutorialHallwayParameters: 0
-  debugTutorialHallwayPlayerSpeed: 1
   tutorialHallwayStateStretchingLabel: Stretching
   tutorialHallwayStateContractedLabel: Contracted
   tutorialDrawingAudioSceneName: Tutorial
