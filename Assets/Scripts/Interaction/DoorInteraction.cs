@@ -13,6 +13,7 @@ namespace Interaction
         [SerializeField] private float shakeDurationVariance = 0.1f;
         [SerializeField] private float shakeAmount = 5f;
         [SerializeField] private float shakeAmountVariance = 2f;
+        [SerializeField] private AudioManager.SfxId doorSfxId = AudioManager.SfxId.DoorLocked;
 
         // Internal
         private bool _isShaking = false;
@@ -38,7 +39,7 @@ namespace Interaction
         public void Interact(Interactor interactor)
         {
             // <> SFX HERE <>
-            AudioManager.Instance.PlayUiHoverSfx();
+            AudioManager.Instance?.PlaySfx(doorSfxId, transform);
             // --------------
             // "shake" the door handle
             StartCoroutine(ShakeHandle());
