@@ -2454,7 +2454,8 @@ public class AttractorAI : MonoBehaviour
 
 	IEnumerator AttackRoutine()
 	{
-		attackBox.enabled = true;
+		if (attackBox != null)
+			attackBox.enabled = true;
 		if (hasAnimator)
 			animator.SetBool("Attacking", true);
 		if (hasAgent)
