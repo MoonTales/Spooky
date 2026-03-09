@@ -54,7 +54,7 @@ public class AttractorAI : MonoBehaviour
 	{
 		visual,
 		audio,
-		attackRange,
+		custom,
 		self,
 		NONE
 	}
@@ -111,6 +111,10 @@ public class AttractorAI : MonoBehaviour
 		public AttractorType[] possibleAttractorTypeChanges;
 		public float attractorTypeLowerBoundDangerRange = 100;
 		public float attractorTypeUpperBoundDangerRange = 100;
+
+		public string[] possibleCustomAttractorIDChanges;
+		public float customAttractorIDLowerBoundDangerRange = 100;
+		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
@@ -183,6 +187,10 @@ public class AttractorAI : MonoBehaviour
 		public AttractorType[] possibleAttractorTypeChanges;
 		public float attractorTypeLowerBoundDangerRange = 100;
 		public float attractorTypeUpperBoundDangerRange = 100;
+
+		public string[] possibleCustomAttractorIDChanges;
+		public float customAttractorIDLowerBoundDangerRange = 100;
+		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
@@ -727,6 +735,8 @@ public class AttractorAI : MonoBehaviour
 	public class EnemyReactions
 	{
 		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		public string customAttractorID;
 		[Tooltip("Inclusve")]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
@@ -766,6 +776,8 @@ public class AttractorAI : MonoBehaviour
 	public class ThoughtProcess
 	{
 		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		public string customAttractorID;
 		[Tooltip("Inclusve")]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
@@ -832,6 +844,18 @@ public class AttractorAI : MonoBehaviour
 
 					chosenReaction.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.customAttractorIDLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.customAttractorIDUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.customAttractorID =
+						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
+						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
 				}
 				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
@@ -999,6 +1023,18 @@ public class AttractorAI : MonoBehaviour
 
 					chosenThought.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.customAttractorIDLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.customAttractorIDUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.customAttractorID =
+						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
+						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
 				}
 				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
@@ -1301,10 +1337,14 @@ public class AttractorAI : MonoBehaviour
 			foreach (var hitCollider in hitColliders)
 			{
 				Transform target = hitCollider.transform;
+				Attractor targetAttractor = target.GetComponent<Attractor>();
 
-				if (CheckConeVisibility(target.position, currentSense))
+				if (targetAttractor.attractorType != AttractorType.self || target.IsChildOf(transform))
 				{
-					tempAttractorList.Add(target.GetComponent<Attractor>());
+					if (CheckConeVisibility(target.position, currentSense))
+					{
+						tempAttractorList.Add(target.GetComponent<Attractor>());
+					}
 				}
 			}
 		}
@@ -1343,7 +1383,8 @@ public class AttractorAI : MonoBehaviour
 		{
 			foreach (EnemySense sense in senses)
 				foreach (Transform senseOrgan in sense.senseOrgans)
-					DrawCone(senseOrgan, sense);
+					if (senseOrgan != null)
+						DrawCone(senseOrgan, sense);
 		}
 	}
 
@@ -1478,7 +1519,8 @@ public class AttractorAI : MonoBehaviour
 				{
 					foreach (Attractor attractor in tempDetectedAttractors[thought.attractorType])
 					{
-						if (thought.minIntensity <= attractor.intensity && attractor.intensity < thought.maxIntensity)
+						if (thought.minIntensity <= attractor.intensity && attractor.intensity < thought.maxIntensity && (thought.attractorType !=
+							AttractorType.custom || thought.customAttractorID == attractor.customAttractorID))
 						{
 							tempAttractors.Add(attractor);
 						}
@@ -1670,12 +1712,14 @@ public class AttractorAI : MonoBehaviour
 				{
 					foreach (Attractor attractor in tempDetectedAttractors[reaction.attractorType])
 					{
-						if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity)
+						if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity && (reaction.attractorType !=
+							AttractorType.custom || reaction.customAttractorID == attractor.customAttractorID))
 						{
 							if (reaction.targetDetectedObject && (tempValue < 0 || (reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority &&
 								Vector3.Distance(transform.position, attractor.transform.position) > tempValue) || (!reaction.invertPriority &&
-								Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) || (!reaction.prioritizeDistanceInsteadOfIntensity
-								&& ((reaction.invertPriority && attractor.intensity < tempValue) || (!reaction.invertPriority && attractor.intensity > tempValue)))))
+								Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) ||
+								(!reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority && attractor.intensity < tempValue) ||
+								(!reaction.invertPriority && attractor.intensity > tempValue)))))
 							{
 								tempFocus = attractor.transform;
 							}
