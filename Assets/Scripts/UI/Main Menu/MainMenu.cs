@@ -25,6 +25,7 @@ namespace UI.Main_Menu
         private int savedAct;
         private List<int> savedDrawingIDs;
         private string savedSceneName;
+        public Image Scribble1;
         
         
         private void Start()
@@ -89,7 +90,20 @@ namespace UI.Main_Menu
             
             if(savedSceneName != ""){ Debug.Log("Saved scene name: " + savedSceneName);} else {Debug.Log("No saved scene name found.");}
             if(savedAct != 0){ Debug.Log("Saved act: " + savedAct);} else {Debug.Log("No saved act found.");}
-            if(savedDrawingIDs != null){ Debug.Log("Saved drawing IDs: " + string.Join(", ", savedDrawingIDs));} else {Debug.Log("No saved drawing IDs found.");}
+            if(savedDrawingIDs != null){ 
+                Debug.Log("Saved drawing IDs: " + string.Join(", ", savedDrawingIDs));
+                foreach(int drawing in savedDrawingIDs)
+                {
+                    if (drawing == 1)
+                    {
+                        Scribble1.enabled = true;
+                        Debug.Log("This fired.");
+                    }
+                }
+            } else {
+                Debug.Log("No saved drawing IDs found.");
+                Scribble1.enabled = false;
+            }
    
             
         }
