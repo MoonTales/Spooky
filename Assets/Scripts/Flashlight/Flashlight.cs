@@ -205,7 +205,8 @@ public class Flashlight : Singleton<Flashlight>, ISaveSystemInterface<Flashlight
     private void OnFlashlightToggled(bool isOn, bool playSfx = true)
     {
         if (!_doWePossessTheFlashlight){return;}
-        
+
+        UI.PlayerHUDController.Instance.SetCrosshairVisibility(!isOn);
         // Handle flashlight toggle event
         if (isOn)
         {
