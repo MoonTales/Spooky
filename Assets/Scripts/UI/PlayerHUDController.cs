@@ -14,7 +14,8 @@ namespace UI
         // Internal References to the HUD
         private Canvas _hudCanvas;
         // Crosshair
-        private Image _hudCrosshair;
+        private Image _hudCrosshair; public void SetCrosshairVisibility(bool visible) { Color tempColor = _hudCrosshair.color; tempColor.a = visible ? 50f : 0f;
+            _hudCrosshair.color = tempColor; }
         // Panel
         private Image _hudOverlay;
 
