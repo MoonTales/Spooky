@@ -33,7 +33,20 @@ namespace Interaction
                 data.Send();
                 return;
             }
-        
+            
+            // if its act 4 (the finale), we dont wanna allow sleeping anymore
+            if (GameStateManager.Instance.GetCurrentWorldClockHour() >= 4)
+            {
+                // otherwise, we cant return yet
+                Types.NotificationData data = new(
+                    duration: 1, 
+                    messageKey: new TextKey { place = "prompt", id = "cant_sleep" },
+                    messageOverride: "",
+                    shouldOnlyShowOnce:false
+                );
+                data.Send();
+                return;
+            }
             // we are good to sleep!
             GetComponent<Collider>().enabled = false;
 

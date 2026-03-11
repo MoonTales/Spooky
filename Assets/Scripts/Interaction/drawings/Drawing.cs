@@ -47,6 +47,11 @@ namespace Interaction.drawings
         private Quaternion _returnTargetRotation;
         private Vector3 _returnTargetScale;
         private Transform _returnTargetParent;
+        
+        // OUTLINE DATA
+        private GameObject _outlineObject_WRONG; // reference to the outline child object
+        private GameObject _outlineObject_CORRECT; // reference to the outline child object
+        private bool _isOutlineActive = false; // tracks if the outline is currently active
 
         // Interface Properties - now linked to keys
         [Header("Text Keys (CSV row pointers)")]
@@ -59,12 +64,30 @@ namespace Interaction.drawings
             set { }
         }
 
+        private void Awake()
+        {
+            if (location == Types.WorldLocation.Bedroom)
+            {
+                _outlineObject_CORRECT = transform.Find("OUTLINE_CORRECT").gameObject;
+                _outlineObject_WRONG = transform.Find("OUTLINE_WRONG").gameObject;
+            }
+            
+        }
         private void Start()
         {
             // setup references
             _rigidbody = GetComponent<Rigidbody>();
             _colliders = GetComponentsInChildren<Collider>();
             InitializeDrawingState();
+            // only show the outline if we are in the bedroom, and if the game is in act 4
+            if (IsInBedroom() && GameStateManager.Instance.GetCurrentWorldClockHour() >= 4)
+            {
+                _isOutlineActive = true;
+            }
+            else
+            {
+                _isOutlineActive = false;
+            }
             UpdateIfIsInCorrectPosition();
         }
 
@@ -72,6 +95,25 @@ namespace Interaction.drawings
         {
             
             _isInCorrectPosition = drawingID * 11 == uniqueDrawingID;
+
+            // these are found in Resources/Mats/Drawings
+            if (_isInCorrectPosition )
+            {
+                // we want to set the material to be the Outline_Correct
+                if (_isOutlineActive)
+                {
+                    _outlineObject_CORRECT.SetActive(true);
+                    _outlineObject_WRONG.SetActive(false);
+                }
+            }
+            else
+            {
+                if (_isOutlineActive)
+                {
+                    _outlineObject_CORRECT.SetActive(false);
+                    _outlineObject_WRONG.SetActive(true);
+                }
+            }
         }
     
         public bool CanInteract(Interactor interactor)

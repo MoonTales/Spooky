@@ -105,12 +105,18 @@ namespace Managers
             {
                 if (drawing == null){ continue;}
                 UpdateOrAddDrawingTransform(drawing);
+                drawing.UpdateIfIsInCorrectPosition();
                 // Check if the drawing is in the "correct" position (this is just a placeholder condition, replace with actual logic)
                 if (drawing.IsInCorrectPosition())
                 {
+                    // We will update the material and visuals of this drawing to indicate its in the correct position
+                    
                     count++;
                 }
             }
+            
+            
+            
             if (count >= totalNumberOfDrawings)
             {
                 Types.NotificationData data = new(
@@ -180,6 +186,12 @@ namespace Managers
             }else if (currentHour == 2)
             {
                 if (numberOfCorrectDrawings >= numberOfDrawingsToAdvanceClock * 2)
+                {
+                    GameStateManager.Instance.SetWorldClockHour(currentHour + 1);
+                }
+            } else if (currentHour == 3)
+            {
+                if (numberOfCorrectDrawings >= numberOfDrawingsToAdvanceClock * 3)
                 {
                     GameStateManager.Instance.SetWorldClockHour(currentHour + 1);
                 }
