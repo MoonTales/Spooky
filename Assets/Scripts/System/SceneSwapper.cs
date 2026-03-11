@@ -65,7 +65,7 @@ namespace System
                 if (_oldSceneName.ToLower() != "mainmenu"){SaveSystem.Instance.SaveGame();}
                 
             }
-            if (scene.name.ToLower() == "nightmare1")
+            if (scene.name.ToLower() == "nightmare1" || scene.name.ToLower() == "finalenightmare")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
