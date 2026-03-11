@@ -184,11 +184,12 @@ namespace Interaction.drawings
         private void StartReturnTransition()
         {
             // Unparent from hand first
-            transform.SetParent(_returnTargetParent);
-        
+            transform.SetParent(null);
+            
             // Move to active scene (otherwise it will duplicate and stay in the "dont destroy on load" lol)
             SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
         
+            transform.SetParent(_returnTargetParent);
             // Disable physics during transition
             SetPhysicsState(true);
         
