@@ -25,11 +25,24 @@ namespace UI.Main_Menu
         private int savedAct;
         private List<int> savedDrawingIDs;
         private string savedSceneName;
+
+        // Drawings
+        public Image Scribble1;
+        public Image Scribble2;
+        public Image Scribble3;
+        public Image Scribble4;
+        public Image Scribble5;
         
         
         private void Start()
         {
             mainMenuCanvas.SetActive(true);
+            //set all scribbles to false initially 
+            Scribble1.enabled = false;
+            Scribble2.enabled = false;
+            Scribble3.enabled = false;
+            Scribble4.enabled = false;
+            Scribble5.enabled = false;
             // at the start of the game, get access to our buttons, and add listeners to them
             // the children may be in the children
             Button[] allButtons = GetComponentsInChildren<Button>();
@@ -89,7 +102,41 @@ namespace UI.Main_Menu
             
             if(savedSceneName != ""){ Debug.Log("Saved scene name: " + savedSceneName);} else {Debug.Log("No saved scene name found.");}
             if(savedAct != 0){ Debug.Log("Saved act: " + savedAct);} else {Debug.Log("No saved act found.");}
-            if(savedDrawingIDs != null){ Debug.Log("Saved drawing IDs: " + string.Join(", ", savedDrawingIDs));} else {Debug.Log("No saved drawing IDs found.");}
+            if(savedDrawingIDs != null){ 
+                Debug.Log("Saved drawing IDs: " + string.Join(", ", savedDrawingIDs));
+                foreach(int drawing in savedDrawingIDs)
+                {
+                    if (drawing == 1)
+                    {
+                        Scribble1.enabled = true;
+                    } 
+                    
+                    if (drawing == 2)
+                    {
+                        Scribble2.enabled = true;
+                    }
+                    
+                    if (drawing == 3)
+                    {
+                        Scribble3.enabled = true;
+                    }
+                    if (drawing == 4)
+                    {
+                        Scribble4.enabled = true;
+                    } 
+                    if (drawing == 5)
+                    {
+                        Scribble5.enabled = true;
+                    }
+                }
+            } else {
+                Debug.Log("No saved drawing IDs found.");
+                Scribble1.enabled = false;
+                Scribble2.enabled = false;
+                Scribble3.enabled = false;
+                Scribble4.enabled = false;
+                Scribble5.enabled = false;
+            }
    
             
         }
