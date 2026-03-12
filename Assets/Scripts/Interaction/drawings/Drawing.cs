@@ -8,7 +8,7 @@ using Types = System.Types;
 
 namespace Interaction.drawings
 {
-    public class Drawing : MonoBehaviour, IInteractable
+    public class Drawing : EventSubscriberBase, IInteractable
     {
         [Header("Drawing Settings")]
         [SerializeField, Tooltip("What area does this item exist within?")] 
@@ -47,6 +47,12 @@ namespace Interaction.drawings
         private Quaternion _returnTargetRotation;
         private Vector3 _returnTargetScale;
         private Transform _returnTargetParent;
+        
+        // OUTLINE DATA
+        private GameObject _outlineObject_WRONG; // reference to the outline child object
+        private GameObject _outlineObject_CORRECT; // reference to the outline child object
+        private GameObject _outlineObject_SORTED; // reference to the outline child object
+        private bool _isOutlineActive = false; // tracks if the outline is currently active
 
         // Interface Properties - now linked to keys
         [Header("Text Keys (CSV row pointers)")]
@@ -59,19 +65,89 @@ namespace Interaction.drawings
             set { }
         }
 
+        protected void Awake()
+        {
+            
+            if (location == Types.WorldLocation.Bedroom)
+            {
+                _outlineObject_CORRECT = transform.Find("OUTLINE_CORRECT").gameObject;
+                _outlineObject_WRONG = transform.Find("OUTLINE_WRONG").gameObject;
+                _outlineObject_SORTED = transform.Find("OUTLINE_SORTED").gameObject;
+            }
+            
+        }
         private void Start()
         {
             // setup references
             _rigidbody = GetComponent<Rigidbody>();
             _colliders = GetComponentsInChildren<Collider>();
             InitializeDrawingState();
+            // only show the outline if we are in the bedroom, and if the game is in act 4
+            if (IsInBedroom() && GameStateManager.Instance.GetCurrentWorldClockHour() >= 4)
+            {
+                _isOutlineActive = true;
+            }
+            else
+            {
+                _isOutlineActive = false;
+            }
             UpdateIfIsInCorrectPosition();
+        }
+
+        protected override void RegisterSubscriptions()
+        {
+            TrackSubscription(() => EventBroadcaster.OnAllDrawingsOrdered += AllDrawingsOrdered,
+                () => EventBroadcaster.OnAllDrawingsOrdered -= AllDrawingsOrdered);
+        }
+
+        private void AllDrawingsOrdered()
+        {
+            // this is called when all drawings are correctly placed, and they have been put in the correct order (which is determined by the uniqueDrawingID)
+            if (location == Types.WorldLocation.Bedroom)
+            {
+                // we want to disable the outlines for all of the drawings, since they are no longer needed
+                if (_outlineObject_CORRECT){_outlineObject_CORRECT.SetActive(false);}
+                if (_outlineObject_WRONG){_outlineObject_WRONG.SetActive(false);}
+                // Disable all colliders, since we dont need to interact with these anymore
+                if (_colliders != null)
+                {
+                    foreach (var col in _colliders)
+                    {
+                        if (col != null)
+                        {
+                            col.enabled = false;
+                        }
+                    }
+                }
+                
+                // now enable the Golden outline for all of the drawings, to show they are correct
+                if (_outlineObject_SORTED) { _outlineObject_SORTED.SetActive(true); }
+            }
         }
 
         public void UpdateIfIsInCorrectPosition()
         {
             
             _isInCorrectPosition = drawingID * 11 == uniqueDrawingID;
+
+            // these are found in Resources/Mats/Drawings
+            if (_isInCorrectPosition )
+            {
+                // we want to set the material to be the Outline_Correct
+                if (_isOutlineActive)
+                {
+                    _outlineObject_CORRECT.SetActive(true);
+                    _outlineObject_WRONG.SetActive(false);
+                }
+            }
+            else
+            {
+                if (_isOutlineActive)
+                {
+                    _outlineObject_CORRECT.SetActive(false);
+                    _outlineObject_WRONG.SetActive(true);
+                }
+            }
         }
     
         public bool CanInteract(Interactor interactor)
@@ -184,11 +260,12 @@ namespace Interaction.drawings
         private void StartReturnTransition()
         {
             // Unparent from hand first
-            transform.SetParent(_returnTargetParent);
-        
+            transform.SetParent(null);
+            
             // Move to active scene (otherwise it will duplicate and stay in the "dont destroy on load" lol)
             SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
         
+            transform.SetParent(_returnTargetParent);
             // Disable physics during transition
             SetPhysicsState(true);
         

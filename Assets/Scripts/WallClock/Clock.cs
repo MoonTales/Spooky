@@ -20,6 +20,7 @@ public class Clock : MonoBehaviour
     private float minuteHandDegPerSec;
     //private bool _isInspecting;
     private Types.GameState _currentGameState;
+    private int _currentAct = 1;
     [SerializeField] private float timeToExit = 600f;
     [SerializeField] private float FastForwardSpeed = 3f;
     [SerializeField] private float elapsedTime;
@@ -30,6 +31,7 @@ public class Clock : MonoBehaviour
     {
         // Initialize GameState
         _currentGameState = GameStateManager.Instance.GetCurrentGameState();
+        _currentAct = GameStateManager.Instance.GetCurrentWorldClockHour();
 
         /*
         Deprecated time calculation for 14 hrs in 10 minutes
@@ -46,6 +48,9 @@ public class Clock : MonoBehaviour
         = 72× faster than normal
         and a normal clock is is 0.1° per second so 0.1°x72 = 7.2° per second minute hand, 7.2°/12 = 0.6° per second hour hand 
         */
+        
+        // we only wanna do any of this if we are NOT in act 4
+        if (_currentAct >= 4) { return; }
 
         ClockSpeed = 7.2f;
         damagePerTick = 100/timeToExit;  // Normalized damage per second to player sanity
@@ -100,6 +105,6 @@ public class Clock : MonoBehaviour
             yield return null;
         }
         // we are good to sleep!
-        SceneSwapper.Instance.SwapScene(sceneName);
+        //SceneSwapper.Instance.SwapScene(sceneName);
     }
 }

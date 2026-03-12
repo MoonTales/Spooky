@@ -187,5 +187,8 @@ namespace System
         public delegate void OnRequestScreenFadeHandler(Types.ScreenFadeData screenFadeData);
         public static void Broadcast_OnRequestScreenFade(Types.ScreenFadeData screenFadeData) { OnRequestScreenFade?.Invoke(screenFadeData); }
         
+        public static event OnAllDrawingsOrderedHandler OnAllDrawingsOrdered;
+        public delegate void OnAllDrawingsOrderedHandler();
+        public static void Broadcast_OnAllDrawingsOrdered() { OnAllDrawingsOrdered?.Invoke(); }
     }
 }
