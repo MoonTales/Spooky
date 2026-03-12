@@ -72,6 +72,13 @@ namespace System
                 if (_oldSceneName.ToLower() != "mainmenu"){SaveSystem.Instance.SaveGame();}
             }
 
+            if (scene.name.ToLower() == "finalenightmare")
+            {
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
+                EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.ModeratelyAnxious);
+                if (_oldSceneName.ToLower() != "mainmenu"){SaveSystem.Instance.SaveGame();}
+            }
+
             if (scene.name.ToLower() == "tutorial")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);

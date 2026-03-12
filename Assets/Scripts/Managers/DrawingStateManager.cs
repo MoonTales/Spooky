@@ -105,27 +105,44 @@ namespace Managers
             {
                 if (drawing == null){ continue;}
                 UpdateOrAddDrawingTransform(drawing);
+                drawing.UpdateIfIsInCorrectPosition();
                 // Check if the drawing is in the "correct" position (this is just a placeholder condition, replace with actual logic)
                 if (drawing.IsInCorrectPosition())
                 {
+                    // We will update the material and visuals of this drawing to indicate its in the correct position
+                    
                     count++;
                 }
             }
-            if (count >= totalNumberOfDrawings)
+            
+            Debug.Log($"Number of drawings in correct position: {count}");
+            if (count >= 9)
             {
-                Types.NotificationData data = new(
-                    duration: 3.0f, 
-                    messageKey: new TextKey { place = "Notifications", id = "AllDrawingsCorrect"},
-                    messageOverride: $"All drawings are in the correct position! YOU WIN!!"
-                );
-                data.Send();
-                
-                // Now we will play credits
-                SceneSwapper.Instance.SwapScene("Credits");
+                HandleFinaleTransfer();
             }
             
             return count;
             
+        }
+        
+        private void HandleFinaleTransfer()
+        {
+            // Disable the collider so that we cant interact with this again while the fadeout is happening
+            const int timeToFadeOut = 5;
+            // Mark as good wakeup before turning the tracker on so the correct variant starts immediately.
+            //SleepTrackerManager.Instance.SetIsGoodWakeup(true);
+            //AudioManager.Instance.BeginGoodWakeupAlarmTransition();
+            //SleepTrackerManager.Instance.TurnSleepTrackerOn();
+            EventBroadcaster.Broadcast_OnAllDrawingsOrdered();
+            Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
+            data.Send();
+
+        }
+
+        private void FadeOutCompleted()
+        {
+            SceneSwapper.Instance.SwapScene("FinaleNightmare");
+            GameStateManager.Instance.SetCurrentZoneId(-1);
         }
 
         private void RestoreDrawingsToTransform()
@@ -180,6 +197,12 @@ namespace Managers
             }else if (currentHour == 2)
             {
                 if (numberOfCorrectDrawings >= numberOfDrawingsToAdvanceClock * 2)
+                {
+                    GameStateManager.Instance.SetWorldClockHour(currentHour + 1);
+                }
+            } else if (currentHour == 3)
+            {
+                if (numberOfCorrectDrawings >= numberOfDrawingsToAdvanceClock * 3)
                 {
                     GameStateManager.Instance.SetWorldClockHour(currentHour + 1);
                 }
