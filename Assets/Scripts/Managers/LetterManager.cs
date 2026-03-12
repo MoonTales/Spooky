@@ -91,6 +91,7 @@ namespace Managers
             else if(id == "res_letter_3"){ _hasReadAct3ResearcherLetter = true;}
             
             //SaveSystem.Instance.RequestSave(this);
+            // we have a special edge case for the fren_letter_4, as that will transfer us to the finale
         }
 
 
@@ -117,20 +118,30 @@ namespace Managers
                 }
                 if (currentAct == 2)
                 {
-                    SpawnActOne(spawnLocation);
+                    //SpawnActOne(spawnLocation);
                     SpawnActTwo(spawnLocation);
                 }
 
                 if (currentAct == 3)
                 {
-                    SpawnActOne(spawnLocation);
-                    SpawnActTwo(spawnLocation);
+                    //SpawnActOne(spawnLocation);
+                    //SpawnActTwo(spawnLocation);
                     SpawnActThree(spawnLocation);
                 }
 
             }
             
         }
+
+        public void SpawnFinaleLetter()
+        {
+            // this will only ever be called in Act 4
+            GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
+            SpawnFriendLetter(spawnLocation);
+            // once this letter is read, we will transition to the finale nightmare
+        }
+        
+        
 
         private void SpawnActThree(GameObject spawnLocation)
         {
@@ -171,6 +182,18 @@ namespace Managers
             if (!_hasReadAct1FriendLetter)
             {
                 SpawnFriendLetter(spawnLocation);
+            }
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                SpawnNoteForCurrentAct();
+            }
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                SpawnFinaleLetter();
             }
         }
 

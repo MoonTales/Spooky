@@ -92,6 +92,27 @@ public class InspectionSystem : Singleton<InspectionSystem>
             inspectionStartTime += Time.deltaTime;
         }
     }
+
+
+    public void ForceEndInspection()
+    {
+        /*
+         * This is called externally if something is happening that will
+         * is gonna force change our scene, so we need to ensure that we
+         * clean up all our UI and the rest of the stuff (since we will be instntly changing scenes)
+         * 
+         */
+        if (_isInspecting)
+        {
+            // Force end all the inspection stuff without the transition (since we are gonna be changing scenes and dont want to have to worry about it)
+            _currentInspectedObject.transform.SetParent(_originalParent);
+            _currentInspectedObject.transform.position = _originalPosition;
+            _currentInspectedObject.transform.rotation = _originalRotation;
+            
+            // reset game state to gameplay (in case we were in the middle of an inspection and got sent to the main menu or something)
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+        }
+    }
     
     
     
