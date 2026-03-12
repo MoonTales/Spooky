@@ -110,47 +110,68 @@ namespace Managers
                 // spawn the note prefab at the location of the "NoteSpawnLocation" object
                 if (!spawnLocation) { return;}
 
+                // these stack, making it impossible to miss letters
                 if (currentAct == 1)
                 {
-                    if (!_hasReadAct1ResearcherLetter)
-                    {
-                        // spawn the researcher letter for act 1
-                        SpawnResearcherLetter(spawnLocation);
-                    }
-                    if (!_hasReadAct1FriendLetter)
-                    {
-                        SpawnFriendLetter(spawnLocation);
-                    }
+                    SpawnActOne(spawnLocation);
                 }
                 if (currentAct == 2)
                 {
-                    if (!_hasReadAct2ResearcherLetter)
-                    {
-                        // spawn the researcher letter for act 2
-                        SpawnResearcherLetter(spawnLocation);
-                    }
-                    if (!_hasReadAct2FriendLetter)
-                    {
-                        SpawnFriendLetter(spawnLocation);
-                    }
+                    SpawnActOne(spawnLocation);
+                    SpawnActTwo(spawnLocation);
                 }
 
                 if (currentAct == 3)
                 {
-                    if (!_hasReadAct3ResearcherLetter)
-                    {
-                        // spawn the researcher letter for act 3
-                        SpawnResearcherLetter(spawnLocation);
-                    }
-
-                    if (!_hasReadAct3FriendLetter)
-                    {
-                        SpawnFriendLetter(spawnLocation);
-                    }
+                    SpawnActOne(spawnLocation);
+                    SpawnActTwo(spawnLocation);
+                    SpawnActThree(spawnLocation);
                 }
 
             }
             
+        }
+
+        private void SpawnActThree(GameObject spawnLocation)
+        {
+            if (!_hasReadAct3ResearcherLetter)
+            {
+                // spawn the researcher letter for act 3
+                SpawnResearcherLetter(spawnLocation);
+            }
+
+            if (!_hasReadAct3FriendLetter)
+            {
+                SpawnFriendLetter(spawnLocation);
+            }
+        }
+
+        private void SpawnActTwo(GameObject spawnLocation)
+        {
+            if (!_hasReadAct2ResearcherLetter)
+            {
+                // spawn the researcher letter for act 2
+                SpawnResearcherLetter(spawnLocation);
+            }
+
+            if (!_hasReadAct2FriendLetter)
+            {
+                SpawnFriendLetter(spawnLocation);
+            }
+        }
+
+        private void SpawnActOne(GameObject spawnLocation)
+        {
+            if (!_hasReadAct1ResearcherLetter)
+            {
+                // spawn the researcher letter for act 1
+                SpawnResearcherLetter(spawnLocation);
+            }
+
+            if (!_hasReadAct1FriendLetter)
+            {
+                SpawnFriendLetter(spawnLocation);
+            }
         }
 
         private void SpawnFriendLetter(GameObject spawnLocation)
