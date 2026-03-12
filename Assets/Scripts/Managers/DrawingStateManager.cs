@@ -115,23 +115,34 @@ namespace Managers
                 }
             }
             
-            
-            
-            if (count >= totalNumberOfDrawings)
+            Debug.Log($"Number of drawings in correct position: {count}");
+            if (count >= 3)
             {
-                Types.NotificationData data = new(
-                    duration: 3.0f, 
-                    messageKey: new TextKey { place = "Notifications", id = "AllDrawingsCorrect"},
-                    messageOverride: $"All drawings are in the correct position! YOU WIN!!"
-                );
-                data.Send();
-                
-                // Now we will play credits
-                SceneSwapper.Instance.SwapScene("Credits");
+                HandleFinaleTransfer();
             }
             
             return count;
             
+        }
+        
+        private void HandleFinaleTransfer()
+        {
+            // Disable the collider so that we cant interact with this again while the fadeout is happening
+            const int timeToFadeOut = 5;
+            // Mark as good wakeup before turning the tracker on so the correct variant starts immediately.
+            //SleepTrackerManager.Instance.SetIsGoodWakeup(true);
+            //AudioManager.Instance.BeginGoodWakeupAlarmTransition();
+            //SleepTrackerManager.Instance.TurnSleepTrackerOn();
+            EventBroadcaster.Broadcast_OnAllDrawingsOrdered();
+            Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
+            data.Send();
+
+        }
+
+        private void FadeOutCompleted()
+        {
+            SceneSwapper.Instance.SwapScene("FinaleNightmare");
+            GameStateManager.Instance.SetCurrentZoneId(-1);
         }
 
         private void RestoreDrawingsToTransform()

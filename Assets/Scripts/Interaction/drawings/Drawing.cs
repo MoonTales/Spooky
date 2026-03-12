@@ -8,7 +8,7 @@ using Types = System.Types;
 
 namespace Interaction.drawings
 {
-    public class Drawing : MonoBehaviour, IInteractable
+    public class Drawing : EventSubscriberBase, IInteractable
     {
         [Header("Drawing Settings")]
         [SerializeField, Tooltip("What area does this item exist within?")] 
@@ -51,6 +51,7 @@ namespace Interaction.drawings
         // OUTLINE DATA
         private GameObject _outlineObject_WRONG; // reference to the outline child object
         private GameObject _outlineObject_CORRECT; // reference to the outline child object
+        private GameObject _outlineObject_SORTED; // reference to the outline child object
         private bool _isOutlineActive = false; // tracks if the outline is currently active
 
         // Interface Properties - now linked to keys
@@ -64,12 +65,14 @@ namespace Interaction.drawings
             set { }
         }
 
-        private void Awake()
+        protected void Awake()
         {
+            
             if (location == Types.WorldLocation.Bedroom)
             {
                 _outlineObject_CORRECT = transform.Find("OUTLINE_CORRECT").gameObject;
                 _outlineObject_WRONG = transform.Find("OUTLINE_WRONG").gameObject;
+                _outlineObject_SORTED = transform.Find("OUTLINE_SORTED").gameObject;
             }
             
         }
@@ -80,7 +83,7 @@ namespace Interaction.drawings
             _colliders = GetComponentsInChildren<Collider>();
             InitializeDrawingState();
             // only show the outline if we are in the bedroom, and if the game is in act 4
-            if (IsInBedroom() && GameStateManager.Instance.GetCurrentWorldClockHour() >= 4)
+            if (IsInBedroom() && GameStateManager.Instance.GetCurrentWorldClockHour() >= 2)
             {
                 _isOutlineActive = true;
             }
@@ -89,6 +92,37 @@ namespace Interaction.drawings
                 _isOutlineActive = false;
             }
             UpdateIfIsInCorrectPosition();
+        }
+
+        protected override void RegisterSubscriptions()
+        {
+            TrackSubscription(() => EventBroadcaster.OnAllDrawingsOrdered += AllDrawingsOrdered,
+                () => EventBroadcaster.OnAllDrawingsOrdered -= AllDrawingsOrdered);
+        }
+
+        private void AllDrawingsOrdered()
+        {
+            // this is called when all drawings are correctly placed, and they have been put in the correct order (which is determined by the uniqueDrawingID)
+            if (location == Types.WorldLocation.Bedroom)
+            {
+                // we want to disable the outlines for all of the drawings, since they are no longer needed
+                if (_outlineObject_CORRECT){_outlineObject_CORRECT.SetActive(false);}
+                if (_outlineObject_WRONG){_outlineObject_WRONG.SetActive(false);}
+                // Disable all colliders, since we dont need to interact with these anymore
+                if (_colliders != null)
+                {
+                    foreach (var col in _colliders)
+                    {
+                        if (col != null)
+                        {
+                            col.enabled = false;
+                        }
+                    }
+                }
+                
+                // now enable the Golden outline for all of the drawings, to show they are correct
+                if (_outlineObject_SORTED) { _outlineObject_SORTED.SetActive(true); }
+            }
         }
 
         public void UpdateIfIsInCorrectPosition()
