@@ -116,7 +116,7 @@ namespace Managers
             }
             
             Debug.Log($"Number of drawings in correct position: {count}");
-            if (count >= 3)
+            if (count >= 9)
             {
                 HandleFinaleTransfer();
             }

@@ -83,7 +83,7 @@ namespace Interaction.drawings
             _colliders = GetComponentsInChildren<Collider>();
             InitializeDrawingState();
             // only show the outline if we are in the bedroom, and if the game is in act 4
-            if (IsInBedroom() && GameStateManager.Instance.GetCurrentWorldClockHour() >= 2)
+            if (IsInBedroom() && GameStateManager.Instance.GetCurrentWorldClockHour() >= 4)
             {
                 _isOutlineActive = true;
             }
