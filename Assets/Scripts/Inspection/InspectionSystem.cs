@@ -40,6 +40,8 @@ public class InspectionSystem : Singleton<InspectionSystem>
     private LayerMask _cachedLayerMask;
     
     private bool _isFirstInspection = true; // Flag to track if it's the first inspection
+
+    private bool _isUniqueLogicHappening = false;
     
     // fix:
     // you need to be inspecting an object for atleast 0.5 seconds before you can exit
@@ -294,7 +296,12 @@ public class InspectionSystem : Singleton<InspectionSystem>
                             return;
                         }
                         // if so, we want to do some unique logic for that (like showing the writing UI)
-                        HandleUniqueInspectionLogic();
+                        if (!_isUniqueLogicHappening)
+                        {
+                            // only allow it to happen once
+                            HandleUniqueInspectionLogic();
+                        }
+                        
                         return;
                     }
                     else
@@ -320,6 +327,8 @@ public class InspectionSystem : Singleton<InspectionSystem>
 
     private void HandleUniqueInspectionLogic()
     {
+        
+        _isUniqueLogicHappening = true;
         // step 2) fade to black
         new Types.ScreenFadeData(2f, 2f, 2f,
             HandleFadeFinished,
@@ -360,6 +369,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
     {
         Letter letter = _currentInspectedObject.GetComponent<Letter>();
         letter.SetHasBeenWrittenOn(true);
+        _isUniqueLogicHappening = false;
     }
     
     private void HandleExitTransition()

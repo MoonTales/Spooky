@@ -49,12 +49,12 @@ namespace Managers
         // Act2: Friend Letter
         // Act3: Researcher Letter
         // Act3: Friend Letter
-        private bool _hasReadAct1ResearcherLetter = false;
-        private bool _hasReadAct1FriendLetter = false;
-        private bool _hasReadAct2ResearcherLetter = false;
-        private bool _hasReadAct2FriendLetter = false;
-        private bool _hasReadAct3ResearcherLetter = false;
-        private bool _hasReadAct3FriendLetter = false;
+        private bool _hasReadAct1ResearcherLetter = false; public bool GetHasReadAct1ResearcherLetter() { return _hasReadAct1ResearcherLetter; }
+        private bool _hasReadAct1FriendLetter = false; public bool GetHasReadAct1FriendLetter() { return _hasReadAct1FriendLetter; }
+        private bool _hasReadAct2ResearcherLetter = false; public bool GetHasReadAct2ResearcherLetter() { return _hasReadAct2ResearcherLetter; }
+        private bool _hasReadAct2FriendLetter = false; public bool GetHasReadAct2FriendLetter() { return _hasReadAct2FriendLetter; }
+        private bool _hasReadAct3ResearcherLetter = false; public bool GetHasReadAct3ResearcherLetter() { return _hasReadAct3ResearcherLetter; }
+        private bool _hasReadAct3FriendLetter = false; public bool GetHasReadAct3FriendLetter() { return _hasReadAct3FriendLetter; }
         
         
         
