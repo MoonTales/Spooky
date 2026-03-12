@@ -55,28 +55,28 @@ namespace System
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
             // This is when we want to broadcast the world clock
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(GameStateManager.Instance.GetCurrentWorldClockHour());
-            
+            float saveDelay = 2.5f;
             // for now we will hardcode this
             if (scene.name.ToLower() == "bedroom")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Bedroom);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
                 // only save if we did not come from the mainmenu
-                if (_oldSceneName.ToLower() != "mainmenu"){SaveSystem.Instance.SaveGame();}
+                if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
                 
             }
             if (scene.name.ToLower() == "nightmare1")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
-                if (_oldSceneName.ToLower() != "mainmenu"){SaveSystem.Instance.SaveGame();}
+                if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
             }
 
             if (scene.name.ToLower() == "finalenightmare")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.ModeratelyAnxious);
-                if (_oldSceneName.ToLower() != "mainmenu"){SaveSystem.Instance.SaveGame();}
+                if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
             }
 
             if (scene.name.ToLower() == "tutorial")
@@ -87,7 +87,12 @@ namespace System
             
 
         }
-        
+
+        private void DelayedSave()
+        {
+            // we want to delay to ensure that stuff is fully loaded and saved
+            SaveSystem.Instance.SaveGame();
+        }
         // Async for a smoother scene transition
         private IEnumerator LoadSceneAsync(string sceneName)
         {

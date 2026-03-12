@@ -60,6 +60,9 @@ namespace UI.PauseMenu
         }
         private void OnMainMenuButtonClicked()
         {
+            // save the game when we return to
+            
+            
             // since we are returning to the main menu, we need to adjust time scale back to normal
             // this should probably becoem a function since we need to reuse it
             Time.timeScale = 1f;
