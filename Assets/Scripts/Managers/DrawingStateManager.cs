@@ -118,32 +118,24 @@ namespace Managers
             Debug.Log($"Number of drawings in correct position: {count}");
             if (count >= 9)
             {
-                HandleFinaleTransfer();
+                // updated, this now spawns in our Final letter
+
+                HandleAllDrawingOrdered();
+                //HandleFinaleTransfer();
             }
             
             return count;
             
         }
-        
-        private void HandleFinaleTransfer()
+
+        private void HandleAllDrawingOrdered()
         {
-            // Disable the collider so that we cant interact with this again while the fadeout is happening
-            const int timeToFadeOut = 5;
-            // Mark as good wakeup before turning the tracker on so the correct variant starts immediately.
-            //SleepTrackerManager.Instance.SetIsGoodWakeup(true);
-            //AudioManager.Instance.BeginGoodWakeupAlarmTransition();
-            //SleepTrackerManager.Instance.TurnSleepTrackerOn();
+            // broadcast locks
             EventBroadcaster.Broadcast_OnAllDrawingsOrdered();
-            Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
-            data.Send();
-
+            LetterManager.Instance.SpawnFinaleLetter();
         }
+        
 
-        private void FadeOutCompleted()
-        {
-            SceneSwapper.Instance.SwapScene("FinaleNightmare");
-            GameStateManager.Instance.SetCurrentZoneId(-1);
-        }
 
         private void RestoreDrawingsToTransform()
         {
