@@ -1188,6 +1188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f8d0398a9dfe44bbc162e465568c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameObjectAlternative: 0
   requiredHour: 1
   showState: 2
 --- !u!23 &47469173
@@ -4850,6 +4851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f8d0398a9dfe44bbc162e465568c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameObjectAlternative: 0
   requiredHour: 1
   showState: 2
 --- !u!43 &221296305
@@ -23139,6 +23141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f8d0398a9dfe44bbc162e465568c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameObjectAlternative: 0
   requiredHour: 2
   showState: 2
 --- !u!43 &1098994038
@@ -23802,6 +23805,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f8d0398a9dfe44bbc162e465568c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameObjectAlternative: 0
   requiredHour: 2
   showState: 2
 --- !u!23 &1112318772
@@ -24304,6 +24308,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 880105162}
+    - target: {fileID: 8454728031801091061, guid: cf568205d92c2ce489a0a3e9789eb094, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8677772130687015695, guid: cf568205d92c2ce489a0a3e9789eb094, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -24311,6 +24319,10 @@ PrefabInstance:
     - target: {fileID: 8677772130687015695, guid: cf568205d92c2ce489a0a3e9789eb094, type: 3}
       propertyPath: m_VersionIndex
       value: 3595
+      objectReference: {fileID: 0}
+    - target: {fileID: 9097890644140434990, guid: cf568205d92c2ce489a0a3e9789eb094, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9194497367361724260, guid: cf568205d92c2ce489a0a3e9789eb094, type: 3}
       propertyPath: m_Mesh
@@ -31259,6 +31271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f8d0398a9dfe44bbc162e465568c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameObjectAlternative: 0
   requiredHour: -1
   showState: 0
 --- !u!1 &1529142312
