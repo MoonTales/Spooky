@@ -38,6 +38,11 @@ public class AttractorAI : MonoBehaviour
 		Search,
 		Flee
 	}
+
+	public EnemyState GetCurrentState()
+	{
+		return currentState;
+	}
 	#endregion
 
 	#region InspectorVariables

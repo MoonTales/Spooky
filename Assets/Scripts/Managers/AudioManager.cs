@@ -115,6 +115,18 @@ namespace Managers
         [SerializeField] private EventReference[] tutorialOrbEvents;
 
         [Space(10)]
+        [Header("Environment Audio (Spiders)")]
+        [SerializeField] private bool autoAttachSpiderAudioOnSceneLoad = true;
+        [SerializeField] private string[] spiderAudioSceneNames = { "Tutorial", "Nightmare1" };
+        [SerializeField] private string spiderAnchorName = "TheThingy";
+        [SerializeField] private EventReference spiderLoopEvent;
+        [SerializeField] private string spiderIntensityParameter = "Intensity";
+        [SerializeField] private float spiderIntensityMax = 100f;
+        [SerializeField] private string spiderDangerParameter = "Danger";
+        [SerializeField] private float spiderDangerMax = 100f;
+        [SerializeField] private string spiderStateParameter = "State";
+
+        [Space(10)]
         [Header("Environment Audio (Tutorial Hallway Stretch)")]
         [SerializeField] private EventReference tutorialHallwayStretchEvent;
         [SerializeField] private string tutorialHallwayStretchStateParameter = "StretchState";
@@ -248,6 +260,7 @@ namespace Managers
         #region Objects w/ Audio Scripts
         // Bedroom --> THHEDOORRR: DoorPassbyEmitter
         // Tutorial --> TheBuilding/Orb*: TutorialOrbAudioEmitter
+        // Tutorial/Nightmare --> TheThingy: SpiderAudioEmitter
         #endregion
 
 
@@ -305,6 +318,7 @@ namespace Managers
             CacheSettingsBuses();
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachTutorialOrbAudioEmittersInScene(SceneManager.GetActiveScene());
+            AutoAttachSpiderAudioEmittersInScene(SceneManager.GetActiveScene());
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
         }
@@ -380,6 +394,7 @@ namespace Managers
         {
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
+            AutoAttachSpiderAudioEmittersInScene(scene);
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
         }
@@ -750,6 +765,46 @@ namespace Managers
             instance = CreateEventInstance(tutorialDrawingStaticLoopEvent, fromTransform);
             instance.start();
             return true;
+        }
+
+        public bool TryStartSpiderLoop(
+            Transform fromTransform,
+            float rawIntensity,
+            float rawDangerLevel,
+            int stateValue,
+            out EventInstance instance)
+        {
+            instance = default;
+
+            if (muteSFX || spiderLoopEvent.IsNull)
+            {
+                return false;
+            }
+
+            instance = CreateEventInstance(spiderLoopEvent, fromTransform);
+            SetSpiderLoopParameters(instance, rawIntensity, rawDangerLevel, stateValue);
+            instance.start();
+            return true;
+        }
+
+        public void UpdateSpiderLoop(
+            EventInstance instance,
+            Transform fromTransform,
+            float rawIntensity,
+            float rawDangerLevel,
+            int stateValue)
+        {
+            if (!instance.isValid())
+            {
+                return;
+            }
+
+            if (fromTransform != null)
+            {
+                UpdateEventInstanceTransform(instance, fromTransform);
+            }
+
+            SetSpiderLoopParameters(instance, rawIntensity, rawDangerLevel, stateValue);
         }
 
         public void StopTutorialDrawingStaticLoopsImmediate()
@@ -1941,6 +1996,49 @@ namespace Managers
             LogAudioState($"Tutorial orb audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}, events={assignments.Count}.");
         }
 
+        private void AutoAttachSpiderAudioEmittersInScene(Scene scene)
+        {
+            if (!autoAttachSpiderAudioOnSceneLoad || !scene.IsValid() || !scene.isLoaded || spiderLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            if (!SceneMatchesConfiguredList(scene.name, spiderAudioSceneNames))
+            {
+                return;
+            }
+
+            int attachedCount = 0;
+            int configuredCount = 0;
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                Transform[] transforms = roots[i].GetComponentsInChildren<Transform>(true);
+                for (int j = 0; j < transforms.Length; j++)
+                {
+                    Transform candidate = transforms[j];
+                    if (!IsSpiderAnchorCandidate(candidate))
+                    {
+                        continue;
+                    }
+
+                    SpiderAudioEmitter emitter = candidate.GetComponent<SpiderAudioEmitter>();
+                    if (emitter == null)
+                    {
+                        emitter = candidate.gameObject.AddComponent<SpiderAudioEmitter>();
+                        attachedCount++;
+                    }
+
+                    AttractorAI attractorAI = candidate.GetComponentInParent<AttractorAI>();
+                    Attractor attractor = ResolveSpiderAttractor(candidate, attractorAI);
+                    emitter.Configure(candidate, attractor, attractorAI);
+                    configuredCount++;
+                }
+            }
+
+            LogAudioState($"Spider audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
+        }
+
         private void CollectTutorialOrbCandidatesInHierarchy(
             Transform searchRoot,
             HashSet<Transform> uniqueOrbTargets,
@@ -1972,6 +2070,67 @@ namespace Managers
             }
 
             return candidate.name.StartsWith(tutorialOrbNamePrefix, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsSpiderAnchorCandidate(Transform candidate)
+        {
+            return candidate != null
+                   && !string.IsNullOrWhiteSpace(spiderAnchorName)
+                   && string.Equals(candidate.name, spiderAnchorName, StringComparison.Ordinal);
+        }
+
+        private static Attractor ResolveSpiderAttractor(Transform spiderAnchor, AttractorAI attractorAI)
+        {
+            if (spiderAnchor == null)
+            {
+                return null;
+            }
+
+            Attractor attractor = spiderAnchor.GetComponentInParent<Attractor>();
+            if (attractor != null)
+            {
+                return attractor;
+            }
+
+            Transform searchRoot = attractorAI != null ? attractorAI.transform : spiderAnchor.parent;
+            if (searchRoot == null)
+            {
+                return null;
+            }
+
+            Attractor[] attractors = searchRoot.GetComponentsInChildren<Attractor>(true);
+            for (int i = 0; i < attractors.Length; i++)
+            {
+                if (attractors[i] != null && attractors[i].attractorType == AttractorAI.AttractorType.self)
+                {
+                    return attractors[i];
+                }
+            }
+
+            return attractors.Length > 0 ? attractors[0] : null;
+        }
+
+        private static bool SceneMatchesConfiguredList(string sceneName, string[] configuredSceneNames)
+        {
+            if (string.IsNullOrWhiteSpace(sceneName))
+            {
+                return false;
+            }
+
+            if (configuredSceneNames == null || configuredSceneNames.Length == 0)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < configuredSceneNames.Length; i++)
+            {
+                if (string.Equals(sceneName, configuredSceneNames[i], StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private List<EventReference> BuildTutorialOrbEventAssignments(int targetCount)
@@ -2029,6 +2188,38 @@ namespace Managers
                 events[i] = events[swapIndex];
                 events[swapIndex] = temp;
             }
+        }
+
+        private void SetSpiderLoopParameters(
+            EventInstance instance,
+            float rawIntensity,
+            float rawDangerLevel,
+            int stateValue)
+        {
+            if (!instance.isValid())
+            {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(spiderIntensityParameter))
+            {
+                instance.setParameterByName(spiderIntensityParameter, NormalizeSpiderValue(rawIntensity, spiderIntensityMax));
+            }
+
+            if (!string.IsNullOrWhiteSpace(spiderDangerParameter))
+            {
+                instance.setParameterByName(spiderDangerParameter, NormalizeSpiderValue(rawDangerLevel, spiderDangerMax));
+            }
+
+            if (!string.IsNullOrWhiteSpace(spiderStateParameter))
+            {
+                instance.setParameterByName(spiderStateParameter, stateValue);
+            }
+        }
+
+        private static float NormalizeSpiderValue(float rawValue, float maxValue)
+        {
+            return Mathf.Clamp01(rawValue / Mathf.Max(0.01f, maxValue));
         }
 
         private static bool IsLampCandidate(Light light)
