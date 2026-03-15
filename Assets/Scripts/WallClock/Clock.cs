@@ -92,13 +92,13 @@ public class Clock : MonoBehaviour
             {
                 if (_currentGameState == Types.GameState.Inspecting)
                 {
-                    minHand.transform.Rotate(0, 0, -minuteHandDegPerSec * Time.deltaTime * FastForwardSpeed, Space.World);
-                    hourHand.transform.Rotate(0, 0, -hourHandDegPerSec * Time.deltaTime * FastForwardSpeed, Space.World);
+                    minHand.transform.Rotate(0, 0, -minuteHandDegPerSec * Time.deltaTime * FastForwardSpeed, Space.Self);
+                    hourHand.transform.Rotate(0, 0, -hourHandDegPerSec * Time.deltaTime * FastForwardSpeed, Space.Self);
                 }
                 else
                 {
-                    minHand.transform.Rotate(0, 0, -minuteHandDegPerSec * Time.deltaTime, Space.World);
-                    hourHand.transform.Rotate(0, 0, -hourHandDegPerSec * Time.deltaTime, Space.World);
+                    minHand.transform.Rotate(0, 0, -minuteHandDegPerSec * Time.deltaTime, Space.Self);
+                    hourHand.transform.Rotate(0, 0, -hourHandDegPerSec * Time.deltaTime, Space.Self);
                 }
             }
             // Pause for 1 frame

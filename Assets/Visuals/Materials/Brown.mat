@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 2
   m_ValidKeywords:
   - _ENVIRONMENTREFLECTIONS_OFF
+  - _OCCLUSIONMAP
   m_InvalidKeywords:
   - _GLOSSYREFLECTIONS_OFF
   m_LightmapFlags: 6
@@ -43,12 +44,16 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0.004, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 2800000, guid: 100a50e8b1d0bc04b95bc2f03cb760db, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _EnvironmentReflections: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.477
-    - _OcclusionStrength: 0
+    - _OcclusionStrength: 0.5
     - _Parallax: 0.02
     - _Smoothness: 0.477
     m_Colors:
