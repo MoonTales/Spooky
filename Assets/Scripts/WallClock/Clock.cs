@@ -71,12 +71,12 @@ public class Clock : MonoBehaviour
                 if (_currentGameState == Types.GameState.Inspecting)
                 {
                     elapsedTime = elapsedTime + FastForwardSpeed;
-                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick*FastForwardSpeed);
+                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick*FastForwardSpeed * elapsedTime > 600 ? 5 : 1);
                 }
                 else
                 {
                     elapsedTime++;
-                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick);
+                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick * elapsedTime > 600 ? 5 : 1);
                 }
             }
         }

@@ -108,7 +108,7 @@ public class LightingManager : MonoBehaviour
                 if(IsDayCycleOn)
                 {
                     if (clockToSyncWith != null)
-                        TimeOfDay = (7 / 6) * clockToSyncWith.elapsedTime / 50 + 6.5f;
+                        TimeOfDay = 0.03f * clockToSyncWith.elapsedTime + 6.5f;
                     else
                     {
                         TimeOfDay += (Time.deltaTime / CycleDuration) * 24f;
