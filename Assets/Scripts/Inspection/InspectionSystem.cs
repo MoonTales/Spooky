@@ -40,6 +40,8 @@ public class InspectionSystem : Singleton<InspectionSystem>
     private LayerMask _cachedLayerMask;
     
     private bool _isFirstInspection = true; // Flag to track if it's the first inspection
+
+    private bool _isUniqueLogicHappening = false;
     
     // fix:
     // you need to be inspecting an object for atleast 0.5 seconds before you can exit
@@ -90,6 +92,27 @@ public class InspectionSystem : Singleton<InspectionSystem>
         if (_isInspecting && !canExitInspection)
         {
             inspectionStartTime += Time.deltaTime;
+        }
+    }
+
+
+    public void ForceEndInspection()
+    {
+        /*
+         * This is called externally if something is happening that will
+         * is gonna force change our scene, so we need to ensure that we
+         * clean up all our UI and the rest of the stuff (since we will be instntly changing scenes)
+         * 
+         */
+        if (_isInspecting)
+        {
+            // Force end all the inspection stuff without the transition (since we are gonna be changing scenes and dont want to have to worry about it)
+            _currentInspectedObject.transform.SetParent(_originalParent);
+            _currentInspectedObject.transform.position = _originalPosition;
+            _currentInspectedObject.transform.rotation = _originalRotation;
+            
+            // reset game state to gameplay (in case we were in the middle of an inspection and got sent to the main menu or something)
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
     }
     
@@ -273,7 +296,12 @@ public class InspectionSystem : Singleton<InspectionSystem>
                             return;
                         }
                         // if so, we want to do some unique logic for that (like showing the writing UI)
-                        HandleUniqueInspectionLogic();
+                        if (!_isUniqueLogicHappening)
+                        {
+                            // only allow it to happen once
+                            HandleUniqueInspectionLogic();
+                        }
+                        
                         return;
                     }
                     else
@@ -299,6 +327,8 @@ public class InspectionSystem : Singleton<InspectionSystem>
 
     private void HandleUniqueInspectionLogic()
     {
+        
+        _isUniqueLogicHappening = true;
         // step 2) fade to black
         new Types.ScreenFadeData(2f, 2f, 2f,
             HandleFadeFinished,
@@ -339,6 +369,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
     {
         Letter letter = _currentInspectedObject.GetComponent<Letter>();
         letter.SetHasBeenWrittenOn(true);
+        _isUniqueLogicHappening = false;
     }
     
     private void HandleExitTransition()

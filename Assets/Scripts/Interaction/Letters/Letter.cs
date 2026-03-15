@@ -71,14 +71,37 @@ namespace Interaction.Letters
 
 
 
-        private void HandleFinishedFriendLetter()
+    private void HandleFinishedFriendLetter()
+    {
+        // due to this being a "fake" letter, we want to have it "vanish"
+        int currentAct = GameStateManager.Instance.GetCurrentWorldClockHour();
+        if (currentAct == 4)
         {
-            // due to this being a "fake" letter, we want to have it "vanish"
+
+            // CALL THE END OF GAME TRANSITION
             GetComponent<Collider>().enabled = false;
-            StartCoroutine(FadeOut());
+            HandleFinaleTransfer();
+            return;
         }
+        // otherwise, we just do the standard fade out and destroy
+        GetComponent<Collider>().enabled = false;
+        StartCoroutine(FadeOut());
+        // there is an edge case we need to account for (if its act 4), since we will treat that one differently
+    }
 
-
+    private void HandleFinaleTransfer()
+    {
+        // Disable the collider so that we cant interact with this again while the fadeout is happening
+        const int timeToFadeOut = 5;
+        Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
+        data.Send();
+    }
+    private void FadeOutCompleted()
+    {
+        SceneSwapper.Instance.SwapScene("FinaleNightmare");
+        GameStateManager.Instance.SetCurrentZoneId(-1);
+    }
+    
     private IEnumerator FadeOut()
     {
         // Get ALL mesh renderers (this object + all children)

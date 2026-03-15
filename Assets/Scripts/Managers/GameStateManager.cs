@@ -82,7 +82,7 @@ namespace Managers
             {
                 
                 PlayerStats.Instance.ResetAllStatsToDefault();
-                
+                InspectionSystem.Instance.ForceEndInspection();
                 // check the core state of the player
                 Types.PlayerMentalCoreState coreState = PlayerStats.Instance.GetPlayerStats().GetPlayerMentalCoreState();
                 if (coreState == Types.PlayerMentalCoreState.Anxious)

@@ -49,12 +49,12 @@ namespace Managers
         // Act2: Friend Letter
         // Act3: Researcher Letter
         // Act3: Friend Letter
-        private bool _hasReadAct1ResearcherLetter = false;
-        private bool _hasReadAct1FriendLetter = false;
-        private bool _hasReadAct2ResearcherLetter = false;
-        private bool _hasReadAct2FriendLetter = false;
-        private bool _hasReadAct3ResearcherLetter = false;
-        private bool _hasReadAct3FriendLetter = false;
+        private bool _hasReadAct1ResearcherLetter = false; public bool GetHasReadAct1ResearcherLetter() { return _hasReadAct1ResearcherLetter; }
+        private bool _hasReadAct1FriendLetter = false; public bool GetHasReadAct1FriendLetter() { return _hasReadAct1FriendLetter; }
+        private bool _hasReadAct2ResearcherLetter = false; public bool GetHasReadAct2ResearcherLetter() { return _hasReadAct2ResearcherLetter; }
+        private bool _hasReadAct2FriendLetter = false; public bool GetHasReadAct2FriendLetter() { return _hasReadAct2FriendLetter; }
+        private bool _hasReadAct3ResearcherLetter = false; public bool GetHasReadAct3ResearcherLetter() { return _hasReadAct3ResearcherLetter; }
+        private bool _hasReadAct3FriendLetter = false; public bool GetHasReadAct3FriendLetter() { return _hasReadAct3FriendLetter; }
         
         
         
@@ -89,8 +89,6 @@ namespace Managers
             else if(id == "res_letter_2"){ _hasReadAct2ResearcherLetter = true;}
             else if(id == "fren_letter_3"){ _hasReadAct3FriendLetter = true;}
             else if(id == "res_letter_3"){ _hasReadAct3ResearcherLetter = true;}
-            
-            //SaveSystem.Instance.RequestSave(this);
         }
 
 
@@ -117,20 +115,30 @@ namespace Managers
                 }
                 if (currentAct == 2)
                 {
-                    SpawnActOne(spawnLocation);
+                    //SpawnActOne(spawnLocation);
                     SpawnActTwo(spawnLocation);
                 }
 
                 if (currentAct == 3)
                 {
-                    SpawnActOne(spawnLocation);
-                    SpawnActTwo(spawnLocation);
+                    //SpawnActOne(spawnLocation);
+                    //SpawnActTwo(spawnLocation);
                     SpawnActThree(spawnLocation);
                 }
 
             }
             
         }
+
+        public void SpawnFinaleLetter()
+        {
+            // this will only ever be called in Act 4
+            GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
+            SpawnFriendLetter(spawnLocation);
+            // once this letter is read, we will transition to the finale nightmare
+        }
+        
+        
 
         private void SpawnActThree(GameObject spawnLocation)
         {
@@ -171,6 +179,18 @@ namespace Managers
             if (!_hasReadAct1FriendLetter)
             {
                 SpawnFriendLetter(spawnLocation);
+            }
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                SpawnNoteForCurrentAct();
+            }
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                SpawnFinaleLetter();
             }
         }
 
