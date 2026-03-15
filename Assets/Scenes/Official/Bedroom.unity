@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.97707164, g: 0.965278, b: 0.66502386, a: 1}
+  m_AmbientSkyColor: {r: 0.96925914, g: 0.9466918, b: 0.6463016, a: 1}
   m_AmbientEquatorColor: {r: 0, g: 0, b: 0, a: 1}
   m_AmbientGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_AmbientIntensity: 1
@@ -32884,6 +32884,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SunDirectionalLight: {fileID: 1683722399}
   Preset: {fileID: 11400000, guid: fc8f8d4d96f928d4883c4f2fffb1257a, type: 2}
+  clockToSyncWith: {fileID: 0}
   rotationAxis: 0
   IsDayCycleOn: 1
   RandomStartTime: 0
@@ -35518,8 +35519,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 1
-  m_Color: {r: 0.97707164, g: 0.965278, b: 0.66502386, a: 1}
-  m_Intensity: 1.1666666
+  m_Color: {r: 0.96925914, g: 0.9466918, b: 0.6463016, a: 1}
+  m_Intensity: 1.0833334
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -35581,7 +35582,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1676736132}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.13052616, y: 0, z: 0, w: 0.9914449}
+  m_LocalRotation: {x: 0.06540316, y: 0, z: 0, w: 0.99785894}
   m_LocalPosition: {x: -3.3143432, y: 3.02, z: -15.018}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -38872,11 +38873,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SunDirectionalLight: {fileID: 1676736134}
   Preset: {fileID: 11400000, guid: 9c2902db41d024e4183e50ff3b510af4, type: 2}
+  clockToSyncWith: {fileID: 1955336308}
   rotationAxis: 0
   IsDayCycleOn: 1
   RandomStartTime: 0
-  TimeOfDay: 7
-  StartTime: 7
+  TimeOfDay: 6.5
+  StartTime: 6.5
   CycleDuration: 800
   morningInterval: {x: 0, y: 0.5}
   afterNoonInterval: {x: 0.5, y: 1}
@@ -42078,6 +42080,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d38dcc86a6cc4a74c9072b174aa84405, type: 3}
+--- !u!114 &1955336308 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7980984968445061555, guid: d38dcc86a6cc4a74c9072b174aa84405, type: 3}
+  m_PrefabInstance: {fileID: 1955336307}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 394d768e7431a714680fdf61bee102d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1960105778 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5314501867093882018, guid: dcb7a5e9fe0ed7542a93931596112255, type: 3}

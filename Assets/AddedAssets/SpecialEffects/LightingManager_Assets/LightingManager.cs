@@ -15,6 +15,7 @@ public class LightingManager : MonoBehaviour
         //Scene References
         [SerializeField] private Light SunDirectionalLight;
         [SerializeField] private LightingPreset Preset;
+        public Clock clockToSyncWith;
 
         //Rotation axis
         public enum RotationAxis{X,Y}
@@ -106,8 +107,13 @@ public class LightingManager : MonoBehaviour
                 //(Replace with a reference to your game time if needed)
                 if(IsDayCycleOn)
                 {
-                    TimeOfDay += (Time.deltaTime / CycleDuration) * 24f;
-                    TimeOfDay %= 24; //Modulus to ensure always between 0-24
+                    if (clockToSyncWith != null)
+                        TimeOfDay = (7 / 6) * clockToSyncWith.elapsedTime / 50 + 6.5f;
+                    else
+                    {
+                        TimeOfDay += (Time.deltaTime / CycleDuration) * 24f;
+                        TimeOfDay %= 24;
+                    } //Modulus to ensure always between 0-24
                 }
                 UpdateLighting(TimeOfDay / 24f);
 

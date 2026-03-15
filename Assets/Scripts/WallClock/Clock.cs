@@ -23,7 +23,7 @@ public class Clock : MonoBehaviour
     private int _currentAct = 1;
     [SerializeField] private float timeToExit = 600f;
     [SerializeField] private float FastForwardSpeed = 3f;
-    [SerializeField] private float elapsedTime;
+    [SerializeField] public float elapsedTime;
     [SerializeField] private float ClockSpeed;
     [SerializeField] private float damagePerTick;
 
