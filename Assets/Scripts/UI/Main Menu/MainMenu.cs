@@ -145,6 +145,7 @@ namespace UI.Main_Menu
         {
             DisableButtons();
             //new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToExistGame).Send();
+            SaveSystem.Instance.LoadGame(); // load the game before we swap, so that we load the new scene with the correct data (this does return a bool if we wanna hook that somewhere)
             new Types.ScreenFadeSceneTransitionData(3f, 1f, savedSceneName, null , null, SwapToExistGame).Send();
         }
 
@@ -184,15 +185,17 @@ namespace UI.Main_Menu
         
         private void SwapToNewGame()
         {
-            mainMenuCanvas.SetActive(false);
+            if (mainMenuCanvas){ mainMenuCanvas.SetActive(false); }
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
             //SceneSwapper.Instance.SwapScene("Tutorial"); 
         }
 
         private void SwapToExistGame()
         {
-            mainMenuCanvas.SetActive(false);
-            SaveSystem.Instance.LoadGame();
+            if (mainMenuCanvas)
+            {
+                mainMenuCanvas.SetActive(false);
+            }
         }
 
         private void DeleteSave()

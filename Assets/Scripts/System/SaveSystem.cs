@@ -84,7 +84,7 @@ namespace System
             // Displays the save icon for 2 seconds after a save is requested
         }
 
-        public void LoadGame()
+        public bool LoadGame()
         {
             // read from this file and populate our save data struct
             if (PlayerPrefs.HasKey("SaveData"))
@@ -100,6 +100,7 @@ namespace System
                 saveInterface.LoadData();
             }
             DebugUtils.LogSuccess("Game has been loaded!");
+            return true;
         }
         
         

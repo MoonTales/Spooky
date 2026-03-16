@@ -110,7 +110,8 @@ namespace System
             // Scene is ready — activate it now for a clean, snap-free transition
             asyncLoad.allowSceneActivation = true;
 
-            // Wait one frame for OnSceneLoaded to fire before continuing
+           // pause for half a second as a buffer to ensure the new scene is fully active before we do anything else (like teleporting the player)
+           yield return new WaitForSeconds(0.5f);
             
 
             yield return null;
