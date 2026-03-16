@@ -195,5 +195,9 @@ namespace System
         public static event OnAllDrawingsOrderedHandler OnAllDrawingsOrdered;
         public delegate void OnAllDrawingsOrderedHandler();
         public static void Broadcast_OnAllDrawingsOrdered() { OnAllDrawingsOrdered?.Invoke(); }
+        
+        public static event OnDrawingCollectedHandler OnDrawingCollected;
+        public delegate void OnDrawingCollectedHandler(int drawingID);
+        public static void Broadcast_OnDrawingCollected(int drawingID) { OnDrawingCollected?.Invoke(drawingID); }
     }
 }

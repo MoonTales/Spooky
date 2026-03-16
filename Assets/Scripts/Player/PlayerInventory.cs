@@ -87,7 +87,9 @@ namespace Player
             {
                 _currentDrawingsThisNight ++;
                 _collectedDrawingsThisNight.Add(drawingID);
+                EventBroadcaster.Broadcast_OnDrawingCollected(drawingID);
             }
+            
         }
 
         public bool CanAddDrawing()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Player;
 using TMPro;
 using UnityEngine;
@@ -32,6 +33,10 @@ namespace UI
 
         private IInteractable _hoveredInteractable;
         private bool _isInspecting;
+        
+        // Hookup for the display System (inventory)
+        private TMP_Text _InventoryCountText;
+        private Image _InventoryIcon;
 
 
         protected override void RegisterSubscriptions()
@@ -43,6 +48,48 @@ namespace UI
                 () => EventBroadcaster.OnEndedHoverInteractable -= OnInteractHoverEnded);
             TrackSubscription(() => EventBroadcaster.OnWorldClockHourChanged += OnWorldClockHourChanged,
                 () => EventBroadcaster.OnWorldClockHourChanged -= OnWorldClockHourChanged);
+            TrackSubscription(()=> EventBroadcaster.OnDrawingCollected += OnDrawingCollected,
+                () => EventBroadcaster.OnDrawingCollected -= OnDrawingCollected);
+        }
+
+        private void OnDrawingCollected(int drawingid)
+        {
+            string message = PlayerInventory.Instance.GetCurrentDrawingsThisNight().ToString() + " / " + PlayerInventory.Instance.GetMaxDrawingsPerNight().ToString();
+            _InventoryCountText.text = PlayerInventory.Instance.GetCurrentDrawingsThisNight().ToString();
+            StartCoroutine(OnDrawingCollectedFade(drawingid));
+        }
+
+        private IEnumerator OnDrawingCollectedFade(int drawingid)
+        {
+            
+            float fadeDuration = 0.5f;
+            float duration = 3f;
+            _InventoryIcon.enabled = true;
+            float elapsed = 0f;
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Clamp01(elapsed / fadeDuration);
+                _InventoryIcon.color = new Color(_InventoryIcon.color.r, _InventoryIcon.color.g, _InventoryIcon.color.b, alpha);
+                _InventoryCountText.color = new Color(_InventoryCountText.color.r, _InventoryCountText.color.g, _InventoryCountText.color.b, alpha);
+                yield return null;
+            }
+            
+            yield return new WaitForSeconds(duration);
+            
+            // fade out
+            elapsed = 0f;
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = 1f - Mathf.Clamp01(elapsed / fadeDuration);
+                _InventoryIcon.color = new Color(_InventoryIcon.color.r, _InventoryIcon.color.g, _InventoryIcon.color.b, alpha);
+                _InventoryCountText.color = new Color(_InventoryCountText.color.r, _InventoryCountText.color.g, _InventoryCountText.color.b, alpha);
+                yield return null;
+            }
+            _InventoryIcon.enabled = false;
+            _InventoryCountText.text = "";
+
         }
 
         private void Start()
@@ -52,6 +99,10 @@ namespace UI
             _hudOverlay = transform.Find("Overlay").GetComponent<Image>();
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
             _hudItemNameText = transform.Find("ItemName").GetComponent<TMP_Text>();
+            _InventoryCountText = transform.Find("TEXT_InventoryCounter").GetComponent<TMP_Text>();
+            _InventoryIcon = transform.Find("Icon_Inventory").GetComponent<Image>();
+            _InventoryIcon.enabled = false;
+            _InventoryCountText.text = "";
 
             // ItemDescription is now a Scroll View root (with ScrollRect)
             Transform itemDescRoot = transform.Find("ItemDescription");
