@@ -57,6 +57,17 @@ namespace UI
                 () => EventBroadcaster.OnWorldClockHourChanged -= OnWorldClockHourChanged);
             TrackSubscription(()=> EventBroadcaster.OnDrawingCollected += OnDrawingCollected,
                 () => EventBroadcaster.OnDrawingCollected -= OnDrawingCollected);
+            TrackSubscription(()=> EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+        }
+        
+        private void OnWorldLocationChanged(Types.WorldLocation newLocation)
+        {
+            if (newLocation == Types.WorldLocation.Bedroom)
+            {
+                // if we are returning to the bedroom, we want to reset the inventory display
+                HideInventory();
+            }
         }
 
         private void OnDrawingCollected(int drawingid)
