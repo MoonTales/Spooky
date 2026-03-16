@@ -143,18 +143,23 @@ namespace Managers
         {
             
             // Fade to Black
+            Debug.Log("Starting fade to black for screen swap...");
             yield return StartCoroutine(FadeToBlack(screenfadedata.GetFadeOutDuration()));
             OnScreenFadeOutComplete(screenfadedata.GetOnFadeOutComplete());
             
             if (_ICON_Load_Image != null) { _ICON_Load_Image.enabled = true; }
             // Load in the new scene, and pause untill we are done loading
+            Debug.Log("Loading new scene: " + screenfadedata.GetSceneToTransitionTo());
             yield return StartCoroutine(SceneSwapper.Instance.LoadSceneAsync(screenfadedata.GetSceneToTransitionTo()));
             OnScreenFadeDurationComplete(screenfadedata.GetOnSceneLoaded());
+            yield return new WaitForSeconds(0.25f); // slight buffer to account for any potential loading hiccups
             if (_ICON_Load_Image != null) { _ICON_Load_Image.enabled = false; }
             // Fade to clear
+            Debug.Log("Starting fade to clear for screen swap...");
             yield return StartCoroutine(FadeToClear(screenfadedata.GetFadeInDuration()));
             _isFading = false;
             IsFadeInProgress = false;
+            Debug.Log("Screen swap fade sequence complete.");
         }
 
         private void OnRequestScreenFade(Types.ScreenFadeData screenFadeData)
