@@ -130,7 +130,8 @@ namespace System
         public void OnLoad(SceneSwapSaveData data)
         {
             // when we load, we want to immediately swap to the scene that we were in when we saved
-            SwapScene(data.CurrentSceneName);
+            // we no longer need to worry about this
+            //SwapScene(data.CurrentSceneName);
         }
     }
 }
