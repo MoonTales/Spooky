@@ -144,7 +144,8 @@ namespace UI.Main_Menu
         private void OnContinueButtonClicked()
         {
             DisableButtons();
-            new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToExistGame).Send();
+            //new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToExistGame).Send();
+            new Types.ScreenFadeSceneTransitionData(3f, 1f, savedSceneName, null , null, SwapToExistGame).Send();
         }
 
         private void OnNewGameButtonClicked()

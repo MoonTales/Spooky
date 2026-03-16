@@ -79,7 +79,9 @@ namespace System
             PlayerPrefs.Save();
             
             DebugUtils.LogSuccess("Game has been saved!");
-            
+            // I DONT LIKE HOW THIS IS CONNECTED HERE... BUT OH WELL
+            ScreenFadeManager.Instance.DisplaySaveIconForDuration(4f);
+            // Displays the save icon for 2 seconds after a save is requested
         }
 
         public void LoadGame()

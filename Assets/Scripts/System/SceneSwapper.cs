@@ -94,7 +94,7 @@ namespace System
             SaveSystem.Instance.SaveGame();
         }
         // Async for a smoother scene transition
-        private IEnumerator LoadSceneAsync(string sceneName)
+        public IEnumerator LoadSceneAsync(string sceneName)
         {
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 

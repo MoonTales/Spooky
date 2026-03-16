@@ -264,5 +264,42 @@ namespace System
                 EventBroadcaster.Broadcast_OnRequestScreenFade(this);
             }
         }
+        
+        // Unique type of screenfade, which will be hooked up to the SceneSwapper, to essentially use screenfades as a transition between scenes, and will trigger a scene swap once the fade is fully opaque
+        // while then "stalling" untill that scene is fully loaded, and then fading back in once the new scene is loaded
+        [Serializable]
+        public struct ScreenFadeSceneTransitionData
+        {
+            private float _fadeOutDuration; public float GetFadeOutDuration() { return _fadeOutDuration; }
+            private float _fadeInDuration; public float GetFadeInDuration() { return _fadeInDuration; }
+            private string _sceneToTransitionTo; public string GetSceneToTransitionTo() { return _sceneToTransitionTo; }
+            
+            private Action _onFadeOutComplete; public Action GetOnFadeOutComplete() { return _onFadeOutComplete; }
+            private Action _onFadeInComplete; public Action GetOnFadeInComplete() { return _onFadeInComplete; }
+            private Action _OnSceneLoaded; public Action GetOnSceneLoaded() { return _OnSceneLoaded; }
+
+            
+
+            public ScreenFadeSceneTransitionData(
+                float fadeOutDuration,
+                float fadeInDuration,
+                string sceneToTransitionTo,
+                Action onFadeOutComplete = null,
+                Action onFadeInComplete = null,
+                Action onSceneLoaded = null)
+            {
+                _fadeOutDuration = fadeOutDuration;
+                _fadeInDuration = fadeInDuration;
+                _sceneToTransitionTo = sceneToTransitionTo;
+                _onFadeOutComplete = onFadeOutComplete;
+                _onFadeInComplete = onFadeInComplete;
+                _OnSceneLoaded = onSceneLoaded;
+            }
+
+            public void Send()
+            {
+                EventBroadcaster.Broadcast_OnRequestScreenFadeScreenSwap(this);
+            }
+        }
     }
 }

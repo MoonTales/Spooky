@@ -23,9 +23,37 @@ namespace Managers
         private Image _fadeImage;
         private bool _isFading = false;
         
+        // ICONS
+        private Image _ICON_Save_Image;
+        private Image _ICON_Load_Image;
+        
         // FIX: this is a queue to avoid the case of multiple screenfades called at the same time
         private readonly Queue<Types.ScreenFadeData> _fadeQueue = new Queue<Types.ScreenFadeData>();
-
+        
+        public void DisplaySaveIconForDuration(float duration)
+        {
+            Debug.Log($"Displaying save icon for duration: {duration}");
+            // enable the save icon, and then disable it after the duration
+            if (_ICON_Save_Image == null)
+            {
+                Debug.LogWarning("Save icon image reference is null. Cannot display save icon.");
+                return;
+            }
+            StartCoroutine(DisplayIconForDuration(_ICON_Save_Image, duration));
+        }
+        public void DisplayLoadIconForDuration(float duration)
+        {
+            // enable the load icon, and then disable it after the duration
+            if (_ICON_Load_Image == null) { return;}
+            StartCoroutine(DisplayIconForDuration(_ICON_Load_Image, duration));
+        }
+        
+        private IEnumerator DisplayIconForDuration(Image iconImage, float duration)
+        {
+            iconImage.enabled = true;
+            yield return new WaitForSeconds(duration);
+            iconImage.enabled = false;
+        }
 
         
         private void Start()
@@ -35,6 +63,21 @@ namespace Managers
 
             // Get the Image component from the canvas
             _fadeImage = _screenFadeCanvas.GetComponentInChildren<Image>();
+            // loop through all the children of the canvas to find the icons
+            Image[] allImages = _screenFadeCanvas.GetComponentsInChildren<Image>();
+            foreach (Image image in allImages)
+            {
+                if (image.name == "ICON_Save")
+                {
+                    _ICON_Save_Image = image;
+                    _ICON_Save_Image.enabled = false;
+                }
+                else if (image.name == "ICON_Load")
+                {
+                    _ICON_Load_Image = image;
+                    _ICON_Load_Image.enabled = false;
+                }
+            }
             
             // Start with transparent image
             Color color = _fadeImage.color;
@@ -48,6 +91,35 @@ namespace Managers
             base.RegisterSubscriptions();
             TrackSubscription(() => EventBroadcaster.OnRequestScreenFade += OnRequestScreenFade,
                 () => EventBroadcaster.OnRequestScreenFade -= OnRequestScreenFade);
+            TrackSubscription(() => EventBroadcaster.OnRequestScreenFadeScreenSwap += OnRequestScreenFadeScreenSwap,
+                () => EventBroadcaster.OnRequestScreenFadeScreenSwap -= OnRequestScreenFadeScreenSwap);
+        }
+
+        private void OnRequestScreenFadeScreenSwap(Types.ScreenFadeSceneTransitionData screenfadedata)
+        {
+            // this will
+            //1. Fade out (call the OnFadeOutComplete event once the fade out is complete)
+            //2. Load the new scene (call the OnSceneLoadComplete event once the new scene is loaded)
+            //3. Fade in (call the OnFadeInComplete event once the fade in is complete)
+            if (_fadeImage == null) { return;}
+            
+            
+        }
+
+        private IEnumerator FadeScreenSwapSequence(Types.ScreenFadeSceneTransitionData screenfadedata)
+        {
+            
+            // Fade to Black
+            yield return StartCoroutine(FadeToBlack(screenfadedata.GetFadeOutDuration()));
+            OnScreenFadeOutComplete(screenfadedata.GetOnFadeOutComplete());
+            
+            if (_ICON_Load_Image != null) { _ICON_Load_Image.enabled = true; }
+            // Load in the new scene, and pause untill we are done loading
+            yield return StartCoroutine(SceneSwapper.Instance.LoadSceneAsync(screenfadedata.GetSceneToTransitionTo()));
+            OnScreenFadeDurationComplete(screenfadedata.GetOnSceneLoaded());
+            if (_ICON_Load_Image != null) { _ICON_Load_Image.enabled = false; }
+            // Fade to clear
+            yield return StartCoroutine(FadeToClear(screenfadedata.GetFadeInDuration()));
         }
 
         private void OnRequestScreenFade(Types.ScreenFadeData screenFadeData)
