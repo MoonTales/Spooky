@@ -35,8 +35,15 @@ namespace UI
         private bool _isInspecting;
         
         // Hookup for the display System (inventory)
-        private TMP_Text _InventoryCountText;
-        private Image _InventoryIcon;
+        //private TMP_Text _InventoryCountText;
+        private Image _InventoryIcon_1;
+        private Image _InventoryIcon_2;
+        private Image _InventoryIcon_3;
+        private Color _IconCollectedColor = new Color(1f, 1f, 1f, 1f);
+        private Color _IconUncollectedColor = new Color(0.68f, 0.68f, 0.68f, 0.4f);
+        
+        
+        // 
 
 
         protected override void RegisterSubscriptions()
@@ -54,42 +61,98 @@ namespace UI
 
         private void OnDrawingCollected(int drawingid)
         {
-            string message = PlayerInventory.Instance.GetCurrentDrawingsThisNight().ToString() + " / " + PlayerInventory.Instance.GetMaxDrawingsPerNight().ToString();
-            _InventoryCountText.text = PlayerInventory.Instance.GetCurrentDrawingsThisNight().ToString();
             StartCoroutine(OnDrawingCollectedFade(drawingid));
         }
 
-        private IEnumerator OnDrawingCollectedFade(int drawingid)
+        private void Update()
         {
-            
-            float fadeDuration = 0.5f;
-            float duration = 3f;
-            _InventoryIcon.enabled = true;
-            float elapsed = 0f;
-            while (elapsed < fadeDuration)
+            if (Input.GetKeyDown(KeyCode.H))
             {
-                elapsed += Time.deltaTime;
-                float alpha = Mathf.Clamp01(elapsed / fadeDuration);
-                _InventoryIcon.color = new Color(_InventoryIcon.color.r, _InventoryIcon.color.g, _InventoryIcon.color.b, alpha);
-                _InventoryCountText.color = new Color(_InventoryCountText.color.r, _InventoryCountText.color.g, _InventoryCountText.color.b, alpha);
-                yield return null;
+                // Debug key to test the drawing collected UI
+                int testDrawingID = 1; // This can be any ID, as the current implementation doesn't use it directly
+                OnDrawingCollected(testDrawingID);
             }
-            
-            yield return new WaitForSeconds(duration);
-            
-            // fade out
-            elapsed = 0f;
-            while (elapsed < fadeDuration)
-            {
-                elapsed += Time.deltaTime;
-                float alpha = 1f - Mathf.Clamp01(elapsed / fadeDuration);
-                _InventoryIcon.color = new Color(_InventoryIcon.color.r, _InventoryIcon.color.g, _InventoryIcon.color.b, alpha);
-                _InventoryCountText.color = new Color(_InventoryCountText.color.r, _InventoryCountText.color.g, _InventoryCountText.color.b, alpha);
-                yield return null;
-            }
-            _InventoryIcon.enabled = false;
-            _InventoryCountText.text = "";
+        }
 
+        public void ShowInventory()
+        {
+            int currentDrawings = PlayerInventory.Instance.GetCurrentDrawingsThisNight();
+            StartCoroutine(FadeInInventory(currentDrawings, fadeDuration: 0.5f));
+        }
+        
+        public void HideInventory()
+        {
+            StartCoroutine(FadeOutInventory(fadeDuration: 0.5f, disableAfter: true));
+        }
+
+        private IEnumerator OnDrawingCollectedFade(int drawingId)
+        {
+            int currentDrawings = PlayerInventory.Instance.GetCurrentDrawingsThisNight();
+
+            yield return StartCoroutine(FadeInInventory(currentDrawings, fadeDuration: 0.5f));
+            yield return new WaitForSeconds(3f);
+            yield return StartCoroutine(FadeOutInventory(fadeDuration: 0.5f, disableAfter: true));
+        }
+        
+        private Color GetIconColor(int slot, int currentDrawings)
+        {
+            return currentDrawings >= slot ? _IconCollectedColor : _IconUncollectedColor;
+        }
+
+        private IEnumerator FadeIcons(Color target1, Color target2, Color target3, float duration)
+        {
+            Color start1 = _InventoryIcon_1.color;
+            Color start2 = _InventoryIcon_2.color;
+            Color start3 = _InventoryIcon_3.color;
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                _InventoryIcon_1.color = Color.Lerp(start1, target1, t);
+                _InventoryIcon_2.color = Color.Lerp(start2, target2, t);
+                _InventoryIcon_3.color = Color.Lerp(start3, target3, t);
+                yield return null;
+            }
+        }
+
+        private Color WithZeroAlpha(Color c) => new Color(c.r, c.g, c.b, 0f);
+
+        private IEnumerator FadeInInventory(int currentDrawings, float fadeDuration)
+        {
+            SetIconsEnabled(true);
+
+            // Start from fully transparent
+            _InventoryIcon_1.color = WithZeroAlpha(GetIconColor(1, currentDrawings));
+            _InventoryIcon_2.color = WithZeroAlpha(GetIconColor(2, currentDrawings));
+            _InventoryIcon_3.color = WithZeroAlpha(GetIconColor(3, currentDrawings));
+
+            yield return StartCoroutine(FadeIcons(
+                GetIconColor(1, currentDrawings),
+                GetIconColor(2, currentDrawings),
+                GetIconColor(3, currentDrawings),
+                fadeDuration
+            ));
+        }
+
+        private IEnumerator FadeOutInventory(float fadeDuration, bool disableAfter = true)
+        {
+            yield return StartCoroutine(FadeIcons(
+                WithZeroAlpha(_InventoryIcon_1.color),
+                WithZeroAlpha(_InventoryIcon_2.color),
+                WithZeroAlpha(_InventoryIcon_3.color),
+                fadeDuration
+            ));
+
+            if (disableAfter) SetIconsEnabled(false);
+        }
+
+        private void SetIconsEnabled(bool enabled)
+        {
+            _InventoryIcon_1.enabled = enabled;
+            _InventoryIcon_2.enabled = enabled;
+            _InventoryIcon_3.enabled = enabled;
         }
 
         private void Start()
@@ -99,11 +162,11 @@ namespace UI
             _hudOverlay = transform.Find("Overlay").GetComponent<Image>();
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
             _hudItemNameText = transform.Find("ItemName").GetComponent<TMP_Text>();
-            _InventoryCountText = transform.Find("TEXT_InventoryCounter").GetComponent<TMP_Text>();
-            _InventoryIcon = transform.Find("Icon_Inventory").GetComponent<Image>();
-            _InventoryIcon.enabled = false;
-            _InventoryCountText.text = "";
 
+            _InventoryIcon_1 = transform.Find("Icon_Inventory_1").GetComponent<Image>();
+            _InventoryIcon_2 = transform.Find("Icon_Inventory_2").GetComponent<Image>();
+            _InventoryIcon_3 = transform.Find("Icon_Inventory_3").GetComponent<Image>();
+            
             // ItemDescription is now a Scroll View root (with ScrollRect)
             Transform itemDescRoot = transform.Find("ItemDescription");
             _hudItemDescriptionScrollRect = itemDescRoot.GetComponent<ScrollRect>();
