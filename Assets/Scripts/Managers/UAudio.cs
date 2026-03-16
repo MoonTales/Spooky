@@ -67,6 +67,9 @@ namespace Managers
             {
                 PlayExampleAudio(volume: 1f, deviation: 0.1f, fromObject: null);
             }
+            
+            // always sync the audio (inefficent, but it works)
+            sfxValue = AudioManager.Instance.GetSfxVolume();
         }
 
         private void PlaySFX(AudioClip clip, float volume = 1f, float deviation = 0f, GameObject fromObject = null)
