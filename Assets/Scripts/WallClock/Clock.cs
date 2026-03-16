@@ -63,7 +63,7 @@ public class Clock : MonoBehaviour
 
     IEnumerator Timer()
     {
-        while (elapsedTime < timeToExit)
+        while (elapsedTime < 700)
         {
             yield return new WaitForSeconds(1f);
             if (_currentGameState != Types.GameState.Paused)
@@ -71,12 +71,12 @@ public class Clock : MonoBehaviour
                 if (_currentGameState == Types.GameState.Inspecting)
                 {
                     elapsedTime = elapsedTime + FastForwardSpeed;
-                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick*FastForwardSpeed * elapsedTime > 600 ? 5 : 1);
+                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick*FastForwardSpeed);
                 }
                 else
                 {
                     elapsedTime++;
-                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick * elapsedTime > 600 ? 5 : 1);
+                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick);
                 }
             }
         }
@@ -84,7 +84,7 @@ public class Clock : MonoBehaviour
     IEnumerator ClockTick()
     {
         
-        while (elapsedTime < timeToExit)
+        while (elapsedTime < 700)
         {
             //_isInspecting = PlayerController.Instance.IsPlayerInspecting();
             _currentGameState = GameStateManager.Instance.GetCurrentGameState();
