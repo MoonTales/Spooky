@@ -152,7 +152,7 @@ namespace Managers
             Debug.Log("Loading new scene: " + screenfadedata.GetSceneToTransitionTo());
             yield return StartCoroutine(SceneSwapper.Instance.LoadSceneAsync(screenfadedata.GetSceneToTransitionTo()));
             OnScreenFadeDurationComplete(screenfadedata.GetOnSceneLoaded());
-            yield return new WaitForSeconds(0.25f); // slight buffer to account for any potential loading hiccups
+            yield return new WaitForSeconds(1); // slight buffer to account for any potential loading hiccups
             if (_ICON_Load_Image != null) { _ICON_Load_Image.enabled = false; }
             // Fade to clear
             Debug.Log("Starting fade to clear for screen swap...");

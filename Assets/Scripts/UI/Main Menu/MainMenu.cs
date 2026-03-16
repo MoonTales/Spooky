@@ -157,7 +157,8 @@ namespace UI.Main_Menu
             else
             {
                 DisableButtons();
-                new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToNewGame).Send();
+                //new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToNewGame).Send();
+                new Types.ScreenFadeSceneTransitionData(3f, 1f, "Tutorial", null , null, SwapToNewGame).Send();
             }
         }
 
@@ -185,7 +186,7 @@ namespace UI.Main_Menu
         {
             mainMenuCanvas.SetActive(false);
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-            SceneSwapper.Instance.SwapScene("Tutorial"); 
+            //SceneSwapper.Instance.SwapScene("Tutorial"); 
         }
 
         private void SwapToExistGame()
