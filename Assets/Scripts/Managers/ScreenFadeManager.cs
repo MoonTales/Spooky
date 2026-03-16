@@ -48,10 +48,32 @@ namespace Managers
             StartCoroutine(DisplayIconForDuration(_ICON_Load_Image, duration));
         }
         
-        private IEnumerator DisplayIconForDuration(Image iconImage, float duration)
+        private IEnumerator DisplayIconForDuration(Image iconImage, float duration = 3, float fadeDuration = 0.5f)
         {
+            // Fade in
             iconImage.enabled = true;
+            float elapsed = 0f;
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Clamp01(elapsed / fadeDuration);
+                iconImage.color = new Color(iconImage.color.r, iconImage.color.g, iconImage.color.b, alpha);
+                yield return null;
+            }
+
+            // Hold at full opacity
             yield return new WaitForSeconds(duration);
+
+            // Fade out
+            elapsed = 0f;
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Clamp01(1f - (elapsed / fadeDuration));
+                iconImage.color = new Color(iconImage.color.r, iconImage.color.g, iconImage.color.b, alpha);
+                yield return null;
+            }
+
             iconImage.enabled = false;
         }
 
@@ -131,6 +153,8 @@ namespace Managers
             if (_ICON_Load_Image != null) { _ICON_Load_Image.enabled = false; }
             // Fade to clear
             yield return StartCoroutine(FadeToClear(screenfadedata.GetFadeInDuration()));
+            _isFading = false;
+            IsFadeInProgress = false;
         }
 
         private void OnRequestScreenFade(Types.ScreenFadeData screenFadeData)

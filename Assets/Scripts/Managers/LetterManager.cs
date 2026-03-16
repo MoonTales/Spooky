@@ -181,19 +181,7 @@ namespace Managers
                 SpawnFriendLetter(spawnLocation);
             }
         }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                SpawnNoteForCurrentAct();
-            }
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                SpawnFinaleLetter();
-            }
-        }
-
+        
         private void SpawnFriendLetter(GameObject spawnLocation)
         {
             // now we will also send a friend letter, but we will delay it by a few seconds and have it slide in after the researcher letter
