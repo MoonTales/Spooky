@@ -102,6 +102,17 @@ namespace Managers
             //2. Load the new scene (call the OnSceneLoadComplete event once the new scene is loaded)
             //3. Fade in (call the OnFadeInComplete event once the fade in is complete)
             if (_fadeImage == null) { return;}
+            if (_isFading)
+            {
+                // Disregard any new screen swap requests
+                Debug.LogWarning("Screen fade already in progress. New screen swap request disregarded.");
+            }
+            else
+            {
+                _isFading = true;
+                IsFadeInProgress = true;
+                StartCoroutine(FadeScreenSwapSequence(screenfadedata));
+            }
             
             
         }
