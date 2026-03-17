@@ -29,7 +29,7 @@ namespace Managers
         private GameObject _currentNoteFriend;
         
         [Header("Note Slide Settings")]
-        [SerializeField] private float slideDistance = 1.5f; // Base distance the note slides
+        [SerializeField] private float slideDistance = 2.25f; // Base distance the note slides
         [SerializeField] private float slideDistanceVariation = 0.5f; // Random variation in slide distance (+/-)
         [SerializeField] private float slideDuration = 0.5f; // How long the slide takes
         [SerializeField] private AnimationCurve slideCurve = AnimationCurve.EaseInOut(0, 0, 1, 1); // Smooth movement
@@ -181,19 +181,7 @@ namespace Managers
                 SpawnFriendLetter(spawnLocation);
             }
         }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                SpawnNoteForCurrentAct();
-            }
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                SpawnFinaleLetter();
-            }
-        }
-
+        
         private void SpawnFriendLetter(GameObject spawnLocation)
         {
             // now we will also send a friend letter, but we will delay it by a few seconds and have it slide in after the researcher letter
@@ -227,7 +215,7 @@ namespace Managers
             // Calculate random offset destination with varied distance
             float randomXOffset = UnityEngine.Random.Range(-horizontalOffsetRange, horizontalOffsetRange);
             float randomDistance = slideDistance + UnityEngine.Random.Range(-slideDistanceVariation, slideDistanceVariation);
-            Vector3 endPosition = startPosition + new Vector3(randomXOffset, 0, randomDistance);
+            Vector3 endPosition = startPosition + new Vector3(randomXOffset, 0, -randomDistance);
             
             // Start with no rotation
             Quaternion startRotation = Quaternion.Euler(-90f, 0f, -90f);
