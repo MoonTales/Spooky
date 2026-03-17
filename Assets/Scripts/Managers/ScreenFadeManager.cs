@@ -148,6 +148,8 @@ namespace Managers
             OnScreenFadeOutComplete(screenfadedata.GetOnFadeOutComplete());
             
             if (_ICON_Load_Image != null) { _ICON_Load_Image.enabled = true; }
+            // wait a single frame to ensure the Icon gets initialized
+            yield return null;
             // Load in the new scene, and pause untill we are done loading
             Debug.Log("Loading new scene: " + screenfadedata.GetSceneToTransitionTo());
             yield return StartCoroutine(SceneSwapper.Instance.LoadSceneAsync(screenfadedata.GetSceneToTransitionTo()));
