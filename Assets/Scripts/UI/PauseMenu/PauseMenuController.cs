@@ -58,11 +58,19 @@ namespace UI.PauseMenu
             PauseMenuCanvas.SetActive(false);
             SettingsController.Instance.OpenPauseSettings();
         }
+
         private void OnMainMenuButtonClicked()
         {
+            UiPopupConfirmation.Instance.RequestPopupConfirmation(
+                TextDB.GetText("popup", "mainmenu"),
+                ConfirmReturnToMainMenu
+            );
+        }
+
+        private void ConfirmReturnToMainMenu()
+        {
             // save the game when we return to
-            
-            
+
             // since we are returning to the main menu, we need to adjust time scale back to normal
             // this should probably becoem a function since we need to reuse it
             Time.timeScale = 1f;
@@ -76,6 +84,7 @@ namespace UI.PauseMenu
             SceneSwapper.Instance.SwapScene("MainMenu");
 
         }
+
         // Update is called once per frame
         void Update()
         {

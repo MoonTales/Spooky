@@ -11806,6 +11806,7 @@ GameObject:
   - component: {fileID: 611152237819627152}
   - component: {fileID: 2518911105225911815}
   - component: {fileID: 4508537228020634620}
+  - component: {fileID: 2591853365336348000}
   m_Layer: 7
   m_Name: TheTestMonster
   m_TagString: Enemy
@@ -11867,6 +11868,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tracksDrawingCount: 1
+  drawingsIncreaseDanger: 0
+  dangerPerDrawing: 0
   teleportLocations:
   - {x: 440, y: 0, z: 494}
   - {x: 670, y: 8, z: 366}
@@ -12679,6 +12682,7 @@ MonoBehaviour:
   minFleeTime: 3
   maxFleeTime: 4
   avoidTarget: 1
+  fleeInAnyDirection: 0
   fleeTargetAvoidanceRange: 20
 --- !u!65 &4508537228020634620
 BoxCollider:
@@ -12701,6 +12705,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 20, y: 20, z: 20}
   m_Center: {x: 0, y: 10, z: 0}
+--- !u!114 &2591853365336348000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3661079220390916582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33f8d0398a9dfe44bbc162e465568c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameObjectAlternative: 1
+  requiredHour: 3
+  showState: 0
 --- !u!1 &3662752285436117453
 GameObject:
   m_ObjectHideFlags: 0

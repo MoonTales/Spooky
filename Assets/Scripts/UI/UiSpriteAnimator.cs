@@ -34,13 +34,22 @@ namespace UI
         private IEnumerator AnimateSprite()
         {
             int currentSpriteIndex = 0;
+            float timer = 0f;
             float timePerFrame = 1f / animationSpeed;
 
             while (true)
             {
-                _image.sprite = sprites[currentSpriteIndex];
-                currentSpriteIndex = (currentSpriteIndex + 1) % sprites.Length;
-                yield return new WaitForSeconds(timePerFrame);
+                timer += Time.unscaledDeltaTime;
+
+                if (timer >= timePerFrame)
+                {
+                    timer -= timePerFrame;
+
+                    _image.sprite = sprites[currentSpriteIndex];
+                    currentSpriteIndex = (currentSpriteIndex + 1) % sprites.Length;
+                }
+
+                yield return null; // run every frame
             }
         }
     }
