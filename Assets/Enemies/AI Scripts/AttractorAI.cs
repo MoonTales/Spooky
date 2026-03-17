@@ -1275,6 +1275,7 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float minFleeTime;
 	[SerializeField] private float maxFleeTime;
 	[SerializeField] private bool avoidTarget = false;
+	[SerializeField] private bool fleeInAnyDirection = false;
 	[SerializeField] private float fleeTargetAvoidanceRange;
 
 	private float fleeTime;
@@ -2384,7 +2385,7 @@ public class AttractorAI : MonoBehaviour
 			if (!fleeing)
 			{
 				fleeTime = Random.Range(minFleeTime, maxFleeTime);
-				Vector3 directionToFocus = transform.position - currentFocus.position;
+				Vector3 directionToFocus = fleeInAnyDirection ? (Random.onUnitSphere) : transform.position - currentFocus.position;
 
 				// Normalize the direction to ensure consistent movement speed
 				Vector3 fleeDirection = directionToFocus.normalized;
