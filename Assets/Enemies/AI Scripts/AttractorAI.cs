@@ -692,27 +692,7 @@ public class AttractorAI : MonoBehaviour
 		// define equality
 		public bool Equals(BoolCondition other)
 		{
-			if (other == null)
-			{
-				Debug.Log("no way");
-				return false;
-			}
-			if (boolName == other.boolName)
-			{
-				Debug.Log("name is true");
-			}
-			if (boolValue == other.boolValue)
-			{
-				Debug.Log("value is true");
-			}
-			if (boolName == other.boolName && boolValue == other.boolValue)
-			{
-				Debug.Log("both name and value are true");
-			}
-			else
-			{
-				Debug.Log("Fuck you they're both false actually LMAOOOOOO");
-			}
+			if (other == null) return false;
 
 			if (ReferenceEquals(this, other)) return true;
 
