@@ -123,26 +123,26 @@ namespace Interaction
 
             const int timeToFadeOut = 2; 
             const int fadeInDuration = 2;
-            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:fadeInDuration, 1.5f, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted, FadeDurationCompleted);
-
-            fadeData.Send();
+            //Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:fadeInDuration, 1.5f, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted, FadeDurationCompleted);
+            Types.ScreenFadeSceneTransitionData sceneTransitionData = new Types.ScreenFadeSceneTransitionData(fadeOutDuration:timeToFadeOut, fadeInDuration:1.5f, sceneName, null, FadeOutCompleted, FadeDurationCompleted);
+            
+            sceneTransitionData.Send();
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
         }
         
         private void FadeOutCompleted()
         {
-            SceneSwapper.Instance.SwapScene(sceneName);
             // Display the notification here!
             Types.NotificationData data = new(
                 duration: 3, 
                 messageKey: new TextKey { place = "cutscene", id = "act1" }
             );
             data.Send();
-            
         }
 
         private void FadeDurationCompleted()
         {
+
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
         }
     }

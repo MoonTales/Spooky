@@ -187,8 +187,17 @@ namespace System
         public delegate void OnRequestScreenFadeHandler(Types.ScreenFadeData screenFadeData);
         public static void Broadcast_OnRequestScreenFade(Types.ScreenFadeData screenFadeData) { OnRequestScreenFade?.Invoke(screenFadeData); }
         
+        public static event OnRequestScreenFadeScreenSwapHandler OnRequestScreenFadeScreenSwap;
+        public delegate void OnRequestScreenFadeScreenSwapHandler(Types.ScreenFadeSceneTransitionData screenFadeData);
+        public static void Broadcast_OnRequestScreenFadeScreenSwap(Types.ScreenFadeSceneTransitionData screenFadeData) { OnRequestScreenFadeScreenSwap?.Invoke(screenFadeData); }
+        
+        
         public static event OnAllDrawingsOrderedHandler OnAllDrawingsOrdered;
         public delegate void OnAllDrawingsOrderedHandler();
         public static void Broadcast_OnAllDrawingsOrdered() { OnAllDrawingsOrdered?.Invoke(); }
+        
+        public static event OnDrawingCollectedHandler OnDrawingCollected;
+        public delegate void OnDrawingCollectedHandler(int drawingID);
+        public static void Broadcast_OnDrawingCollected(int drawingID) { OnDrawingCollected?.Invoke(drawingID); }
     }
 }

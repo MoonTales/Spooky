@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Player;
 using TMPro;
 using UnityEngine;
@@ -32,6 +33,20 @@ namespace UI
 
         private IInteractable _hoveredInteractable;
         private bool _isInspecting;
+        
+        // Hookup for the display System (inventory)
+        //private TMP_Text _InventoryCountText;
+        private Image _InventoryIcon_1;
+        private Image _InventoryIcon_2;
+        private Image _InventoryIcon_3;
+        private Color _IconCollectedColor = new Color(1f, 1f, 1f, 1f);
+        private Color _IconUncollectedColor = new Color(0.68f, 0.68f, 0.68f, 0.4f);
+        
+        [SerializeField] private Sprite EmptyIcon; 
+        [SerializeField] private Sprite CollectedIcon;
+        
+        
+        // 
 
 
         protected override void RegisterSubscriptions()
@@ -43,6 +58,124 @@ namespace UI
                 () => EventBroadcaster.OnEndedHoverInteractable -= OnInteractHoverEnded);
             TrackSubscription(() => EventBroadcaster.OnWorldClockHourChanged += OnWorldClockHourChanged,
                 () => EventBroadcaster.OnWorldClockHourChanged -= OnWorldClockHourChanged);
+            TrackSubscription(()=> EventBroadcaster.OnDrawingCollected += OnDrawingCollected,
+                () => EventBroadcaster.OnDrawingCollected -= OnDrawingCollected);
+            TrackSubscription(()=> EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
+                () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+        }
+        
+        private void OnWorldLocationChanged(Types.WorldLocation newLocation)
+        {
+            if (newLocation == Types.WorldLocation.Bedroom)
+            {
+                // if we are returning to the bedroom, we want to reset the inventory display
+                
+                HideInventory();
+            }
+        }
+
+        private void OnDrawingCollected(int drawingid)
+        {
+            StartCoroutine(OnDrawingCollectedFade(drawingid));
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                // Debug key to test the drawing collected UI
+                int testDrawingID = 1; // This can be any ID, as the current implementation doesn't use it directly
+                OnDrawingCollected(testDrawingID);
+            }
+        }
+
+        public void ShowInventory()
+        {
+            int currentDrawings = PlayerInventory.Instance.GetCurrentDrawingsThisNight();
+            StartCoroutine(FadeInInventory(currentDrawings, fadeDuration: 0.5f));
+        }
+        
+        public void HideInventory()
+        {
+            StartCoroutine(FadeOutInventory(fadeDuration: 0.5f, disableAfter: true));
+        }
+
+        private IEnumerator OnDrawingCollectedFade(int drawingId)
+        {
+            int currentDrawings = PlayerInventory.Instance.GetCurrentDrawingsThisNight();
+
+            yield return StartCoroutine(FadeInInventory(currentDrawings, fadeDuration: 0.5f));
+            yield return new WaitForSeconds(3f);
+            yield return StartCoroutine(FadeOutInventory(fadeDuration: 0.5f, disableAfter: true));
+        }
+        
+        private Color GetIconColor(int slot, int currentDrawings)
+        {
+            return currentDrawings >= slot ? _IconCollectedColor : _IconUncollectedColor;
+        }
+
+        private IEnumerator FadeIcons(Color target1, Color target2, Color target3, float duration)
+        {
+            Color start1 = _InventoryIcon_1.color;
+            Color start2 = _InventoryIcon_2.color;
+            Color start3 = _InventoryIcon_3.color;
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                _InventoryIcon_1.color = Color.Lerp(start1, target1, t);
+                _InventoryIcon_2.color = Color.Lerp(start2, target2, t);
+                _InventoryIcon_3.color = Color.Lerp(start3, target3, t);
+                yield return null;
+            }
+        }
+
+        private Color WithZeroAlpha(Color c) => new Color(c.r, c.g, c.b, 0f);
+
+        private IEnumerator FadeInInventory(int currentDrawings, float fadeDuration)
+        {
+            SetIconsEnabled(true);
+
+            // Start from fully transparent
+            _InventoryIcon_1.color = WithZeroAlpha(GetIconColor(1, currentDrawings));
+            _InventoryIcon_2.color = WithZeroAlpha(GetIconColor(2, currentDrawings));
+            _InventoryIcon_3.color = WithZeroAlpha(GetIconColor(3, currentDrawings));
+            // We need to set all of the icons to be either the collected or not coollected sprites
+            _InventoryIcon_1.sprite = currentDrawings >= 1 ? CollectedIcon : EmptyIcon;
+            _InventoryIcon_2.sprite = currentDrawings >= 2 ? CollectedIcon : EmptyIcon;
+            _InventoryIcon_3.sprite = currentDrawings >= 3 ? CollectedIcon : EmptyIcon;
+
+            yield return StartCoroutine(FadeIcons(
+                GetIconColor(1, currentDrawings),
+                GetIconColor(2, currentDrawings),
+                GetIconColor(3, currentDrawings),
+                fadeDuration
+            ));
+        }
+
+        private IEnumerator FadeOutInventory(float fadeDuration, bool disableAfter = true)
+        {
+            if (_InventoryIcon_1 == null || _InventoryIcon_2 == null || _InventoryIcon_3 == null)
+            {
+                yield break; // safety check
+            }
+            yield return StartCoroutine(FadeIcons(
+                WithZeroAlpha(_InventoryIcon_1.color),
+                WithZeroAlpha(_InventoryIcon_2.color),
+                WithZeroAlpha(_InventoryIcon_3.color),
+                fadeDuration
+            ));
+
+            if (disableAfter) SetIconsEnabled(false);
+        }
+
+        private void SetIconsEnabled(bool enabled)
+        {
+            _InventoryIcon_1.enabled = enabled;
+            _InventoryIcon_2.enabled = enabled;
+            _InventoryIcon_3.enabled = enabled;
         }
 
         private void Start()
@@ -53,6 +186,10 @@ namespace UI
             _hudInteractionPromptText = transform.Find("InteractionPrompt").GetComponent<TMP_Text>();
             _hudItemNameText = transform.Find("ItemName").GetComponent<TMP_Text>();
 
+            _InventoryIcon_1 = transform.Find("Icon_Inventory_1").GetComponent<Image>();
+            _InventoryIcon_2 = transform.Find("Icon_Inventory_2").GetComponent<Image>();
+            _InventoryIcon_3 = transform.Find("Icon_Inventory_3").GetComponent<Image>();
+            
             // ItemDescription is now a Scroll View root (with ScrollRect)
             Transform itemDescRoot = transform.Find("ItemDescription");
             _hudItemDescriptionScrollRect = itemDescRoot.GetComponent<ScrollRect>();

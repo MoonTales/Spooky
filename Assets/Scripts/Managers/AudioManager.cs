@@ -795,6 +795,15 @@ namespace Managers
             }
             muteSFX = clamped <= 0.0001f;
         }
+        public float GetSfxVolume()
+        {
+            float normalizedVolume = 1f;
+            if (_sfxBus.isValid())
+            {
+                _sfxBus.getVolume(out normalizedVolume);
+            }
+            return normalizedVolume;
+        }
 
         public void SetMasterVolume(float normalizedVolume)
         {
