@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Water
+  m_Name: Tutorial Water
   m_Shader: {fileID: -6465566751694194690, guid: 219d90e4797ad584a948152be91edf2d, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -38,10 +38,21 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Depth_Fade_Distance: 0.15
+    - _Depth_Fade_Distance: 1
+    - _Horizon_Distance: 4
     - _QueueControl: 1
     - _QueueOffset: 0
-    m_Colors: []
+    - _Refraction_Scale: 0.1
+    - _Refraction_Speed: 0.1
+    - _Refraction_Strength: 0.1
+    - _Steps: 30
+    - _Wave_Speed: 0.5
+    - _Wave_Strength: 0.1
+    m_Colors:
+    - _Deep_Color: {r: 0.12936099, g: 0.15207615, b: 0.1792453, a: 0.74509805}
+    - _Horizon_Color: {r: 0.19341324, g: 0.1728818, b: 0.1981132, a: 0.20784314}
+    - _Shallow_Color: {r: 0.21404414, g: 0.24528301, b: 0.23706225, a: 0.74509805}
+    - _UV: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &8523615820199693530
