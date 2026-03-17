@@ -11,6 +11,8 @@ public class AttractorAI : MonoBehaviour
 {
 	#region InitialSetup
 	public bool tracksDrawingCount = false;
+	public bool drawingsIncreaseDanger = false;
+	public float dangerPerDrawing = 0;
 	public List<Vector3> teleportLocations = new List<Vector3>();
 	private NavMeshAgent agent;
 
@@ -67,7 +69,7 @@ public class AttractorAI : MonoBehaviour
 		EnemyVisible_boolVisible,
 		ChangeStats_STATS,
 		AddStatuses_LISTstringStatuses_boolRemove,
-		Teleport_floatX_floatY_floatZ,
+		Teleport_OPTIONAL_floatX_floatY_floatZ,
 		TeleportCycle,
 		ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount,
 		ReprogramThoughts_THOUGHTREPROGRAM,
@@ -442,10 +444,18 @@ public class AttractorAI : MonoBehaviour
 	}
 	public void Teleport(List<string> arguments)
 	{
-		float x = float.Parse(arguments[0]);
-		float y = float.Parse(arguments[1]);
-		float z = float.Parse(arguments[2]);
-		Vector3 location = new Vector3(x, y, z);
+		Vector3 location;
+		if (arguments.Count < 3)
+		{
+			location = currentFocus.position;
+		}
+		else
+		{
+			float x = float.Parse(arguments[0]);
+			float y = float.Parse(arguments[1]);
+			float z = float.Parse(arguments[2]);
+			location = new Vector3(x, y, z);
+		}
 
 		if (hasAgent)
 			agent.Warp(location);
@@ -683,7 +693,18 @@ public class AttractorAI : MonoBehaviour
 		public bool Equals(BoolCondition other)
 		{
 			if (other == null) return false;
+
+			if (ReferenceEquals(this, other)) return true;
+
 			return (boolName == other.boolName && boolValue == other.boolValue);
+		}
+
+		public override bool Equals(object obj) => Equals(obj as BoolCondition);
+
+		public override int GetHashCode()
+		{
+			// Combine hash codes of the properties used for equality
+			return (boolName, boolValue).GetHashCode();
 		}
 	}
 	[System.Serializable]
@@ -1275,6 +1296,7 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float minFleeTime;
 	[SerializeField] private float maxFleeTime;
 	[SerializeField] private bool avoidTarget = false;
+	[SerializeField] private bool fleeInAnyDirection = false;
 	[SerializeField] private float fleeTargetAvoidanceRange;
 
 	private float fleeTime;
@@ -1428,7 +1450,7 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.AddStatuses_LISTstringStatuses_boolRemove:
 				AddStatuses(function.arguments);
 				break;
-			case FunctionType.Teleport_floatX_floatY_floatZ:
+			case FunctionType.Teleport_OPTIONAL_floatX_floatY_floatZ:
 				Teleport(function.arguments);
 				break;
 			case FunctionType.TeleportCycle:
@@ -1464,6 +1486,10 @@ public class AttractorAI : MonoBehaviour
 		if (tracksDrawingCount)
 		{
 			currentConditions.intConditions[0].intValue = Player.PlayerInventory.Instance.GetDrawingCount();
+			if (drawingsIncreaseDanger)
+			{
+				currentDangerLevel = dangerPerDrawing * currentConditions.intConditions[0].intValue;
+			}
 		}
 
 		if (hasAnimator)
@@ -1511,7 +1537,9 @@ public class AttractorAI : MonoBehaviour
 		bool tempCheck = false;
 		int tempPriority = 0;
 
-		foreach (ThoughtProcess thought in thoughts)
+		List<ThoughtProcess> safeThoughts = new List<ThoughtProcess>(thoughts);
+
+		foreach (ThoughtProcess thought in safeThoughts)
 		{
 			if ((thought.stateRestriction.Count < 1 || thought.stateRestriction.Contains(currentState)) && (thought.statusRestrictions.Count < 1 ||
 				(thought.allStatusesRequired ? currentStatuses.Intersect(thought.statusRestrictions).Count() == thought.statusRestrictions.Count() :
@@ -1664,7 +1692,7 @@ public class AttractorAI : MonoBehaviour
 					Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
 
 					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!   wait I think?? I fixed this
 					if ((thought.thoughtConditions.boolConditions.Count > 0 &&
 						thought.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((thought.thoughtConditions.floatCompare
 						== Comparison.equals || thought.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
@@ -1702,7 +1730,9 @@ public class AttractorAI : MonoBehaviour
 			}
 		}
 
-		foreach (EnemyReactions reaction in behaviourHierarchy)
+		List<EnemyReactions> safeBehaviourHierarchy = new List<EnemyReactions>(behaviourHierarchy);
+
+		foreach (EnemyReactions reaction in safeBehaviourHierarchy)
 		{
 			if ((reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState)) && (reaction.statusRestrictions.Count < 1 ||
 				reaction.allStatusesRequired ? currentStatuses.Intersect(reaction.statusRestrictions).Count() == reaction.statusRestrictions.Count() :
@@ -2384,7 +2414,7 @@ public class AttractorAI : MonoBehaviour
 			if (!fleeing)
 			{
 				fleeTime = Random.Range(minFleeTime, maxFleeTime);
-				Vector3 directionToFocus = transform.position - currentFocus.position;
+				Vector3 directionToFocus = fleeInAnyDirection ? (Random.onUnitSphere) : transform.position - currentFocus.position;
 
 				// Normalize the direction to ensure consistent movement speed
 				Vector3 fleeDirection = directionToFocus.normalized;
