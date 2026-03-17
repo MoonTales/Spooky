@@ -42,6 +42,9 @@ namespace UI
         private Color _IconCollectedColor = new Color(1f, 1f, 1f, 1f);
         private Color _IconUncollectedColor = new Color(0.68f, 0.68f, 0.68f, 0.4f);
         
+        [SerializeField] private Sprite EmptyIcon; 
+        [SerializeField] private Sprite CollectedIcon;
+        
         
         // 
 
@@ -66,6 +69,7 @@ namespace UI
             if (newLocation == Types.WorldLocation.Bedroom)
             {
                 // if we are returning to the bedroom, we want to reset the inventory display
+                
                 HideInventory();
             }
         }
@@ -138,6 +142,10 @@ namespace UI
             _InventoryIcon_1.color = WithZeroAlpha(GetIconColor(1, currentDrawings));
             _InventoryIcon_2.color = WithZeroAlpha(GetIconColor(2, currentDrawings));
             _InventoryIcon_3.color = WithZeroAlpha(GetIconColor(3, currentDrawings));
+            // We need to set all of the icons to be either the collected or not coollected sprites
+            _InventoryIcon_1.sprite = currentDrawings >= 1 ? CollectedIcon : EmptyIcon;
+            _InventoryIcon_2.sprite = currentDrawings >= 2 ? CollectedIcon : EmptyIcon;
+            _InventoryIcon_3.sprite = currentDrawings >= 3 ? CollectedIcon : EmptyIcon;
 
             yield return StartCoroutine(FadeIcons(
                 GetIconColor(1, currentDrawings),
@@ -149,6 +157,10 @@ namespace UI
 
         private IEnumerator FadeOutInventory(float fadeDuration, bool disableAfter = true)
         {
+            if (_InventoryIcon_1 == null || _InventoryIcon_2 == null || _InventoryIcon_3 == null)
+            {
+                yield break; // safety check
+            }
             yield return StartCoroutine(FadeIcons(
                 WithZeroAlpha(_InventoryIcon_1.color),
                 WithZeroAlpha(_InventoryIcon_2.color),
