@@ -94,7 +94,7 @@ namespace System
             SaveSystem.Instance.SaveGame();
         }
         // Async for a smoother scene transition
-        private IEnumerator LoadSceneAsync(string sceneName)
+        public IEnumerator LoadSceneAsync(string sceneName)
         {
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
@@ -110,7 +110,8 @@ namespace System
             // Scene is ready — activate it now for a clean, snap-free transition
             asyncLoad.allowSceneActivation = true;
 
-            // Wait one frame for OnSceneLoaded to fire before continuing
+           // pause for half a second as a buffer to ensure the new scene is fully active before we do anything else (like teleporting the player)
+           yield return new WaitForSeconds(0.5f);
             
 
             yield return null;
@@ -130,7 +131,8 @@ namespace System
         public void OnLoad(SceneSwapSaveData data)
         {
             // when we load, we want to immediately swap to the scene that we were in when we saved
-            SwapScene(data.CurrentSceneName);
+            // we no longer need to worry about this
+            //SwapScene(data.CurrentSceneName);
         }
     }
 }

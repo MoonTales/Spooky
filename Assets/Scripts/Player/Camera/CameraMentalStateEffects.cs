@@ -286,11 +286,13 @@ namespace Player.Camera
 
         private void HandleBreakdownEffects()
         {
+            
         }
 
         private IEnumerator TiredSwayCoroutine(TiredSwaySettings settings)
         {
             
+            Debug.Log($"Starting tired sway with intensity {settings.intensity} and speed {settings.speed}");
             float time = 0f;
 
             while (_currentMentalState != Types.PlayerMentalState.Normal)
