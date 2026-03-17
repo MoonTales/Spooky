@@ -11,6 +11,8 @@ public class AttractorAI : MonoBehaviour
 {
 	#region InitialSetup
 	public bool tracksDrawingCount = false;
+	public bool drawingsIncreaseDanger = false;
+	public float dangerPerDrawing = 0;
 	public List<Vector3> teleportLocations = new List<Vector3>();
 	private NavMeshAgent agent;
 
@@ -1465,6 +1467,10 @@ public class AttractorAI : MonoBehaviour
 		if (tracksDrawingCount)
 		{
 			currentConditions.intConditions[0].intValue = Player.PlayerInventory.Instance.GetDrawingCount();
+			if (drawingsIncreaseDanger)
+			{
+				currentDangerLevel = dangerPerDrawing * currentConditions.intConditions[0].intValue;
+			}
 		}
 
 		if (hasAnimator)
