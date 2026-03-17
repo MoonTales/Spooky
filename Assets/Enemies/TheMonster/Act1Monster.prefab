@@ -10535,7 +10535,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5834325327892404709
 Transform:
   m_ObjectHideFlags: 0
@@ -10582,7 +10582,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3714953308560147365}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a160fcc9797d634cb469011d677e0a3, type: 3}
   m_Name: 
@@ -10590,12 +10590,12 @@ MonoBehaviour:
   terrorAudioSourceTransform: {fileID: 0}
   veryClose: 5
   close: 10
-  midRange: 20
-  far: 30
-  veryCloseDmg: 80
+  midRange: 25
+  far: 50
+  veryCloseDmg: 50
   closeDmg: 15
-  midRangeDmg: 2
-  farDmg: 0.5
+  midRangeDmg: 5
+  farDmg: 2
 --- !u!1 &3716651708963572587
 GameObject:
   m_ObjectHideFlags: 0
@@ -19530,21 +19530,1246 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad5d1f8a5ee5304abeff8b265d36a36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tracksDrawingCount: 0
+  tracksDrawingCount: 1
+  drawingsIncreaseDanger: 1
+  dangerPerDrawing: 20
   teleportLocations: []
   currentDangerLevel: 0
   currentStatuses: []
   defaultState: 0
   defaultFocus: {fileID: 0}
   currentConditions:
-    boolConditions: []
+    boolConditions:
+    - boolName: WeOutHere
+      boolValue: 0
     floatConditions: []
-    intConditions: []
-  behaviourHierarchy: []
-  thoughts: []
-  senses: []
+    intConditions:
+    - intName: DRAWINGS
+      intValue: 0
+  behaviourHierarchy:
+  - attractorType: 2
+    customAttractorID: Avoid
+    minIntensity: 1
+    maxIntensity: 2
+    reactionConditions:
+      boolConditions: []
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 0
+    statusRestrictions:
+    - Event1
+    - Waiting
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 3
+      arguments:
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 5
+      arguments:
+      - Ready
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions: []
+    stateChange: 8
+    targetDetectedObject: 0
+    prioritizeDistanceInsteadOfIntensity: 0
+    invertPriority: 0
+  - attractorType: 3
+    customAttractorID: 
+    minIntensity: 2
+    maxIntensity: 3
+    reactionConditions:
+      boolConditions:
+      - boolName: WeOutHere
+        boolValue: 0
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 1
+    statusRestrictions:
+    - Event1
+    - Done
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions: []
+    eventExecutions: []
+    stateChange: 0
+    targetDetectedObject: 0
+    prioritizeDistanceInsteadOfIntensity: 0
+    invertPriority: 0
+  - attractorType: 4
+    customAttractorID: 
+    minIntensity: 0
+    maxIntensity: 0
+    reactionConditions:
+      boolConditions:
+      - boolName: WeOutHere
+        boolValue: 0
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 1
+    statusRestrictions:
+    - Event1
+    - Done
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 3
+      arguments:
+      - true
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 8
+      arguments:
+      - WeOutHere
+      - true
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions: []
+    stateChange: 2
+    targetDetectedObject: 0
+    prioritizeDistanceInsteadOfIntensity: 0
+    invertPriority: 0
+  - attractorType: 3
+    customAttractorID: 
+    minIntensity: 2
+    maxIntensity: 3
+    reactionConditions:
+      boolConditions:
+      - boolName: WeOutHere
+        boolValue: 1
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 1
+    statusRestrictions:
+    - Event1
+    - Done
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions: []
+    eventExecutions: []
+    stateChange: 0
+    targetDetectedObject: 0
+    prioritizeDistanceInsteadOfIntensity: 0
+    invertPriority: 0
+  - attractorType: 4
+    customAttractorID: 
+    minIntensity: 0
+    maxIntensity: 0
+    reactionConditions:
+      boolConditions:
+      - boolName: WeOutHere
+        boolValue: 1
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 1
+    statusRestrictions:
+    - Event1
+    - Done
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions: []
+    eventExecutions:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3023478099367305701}
+          m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+          m_MethodName: set_enabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    stateChange: 2
+    targetDetectedObject: 0
+    prioritizeDistanceInsteadOfIntensity: 0
+    invertPriority: 0
+  thoughts:
+  - attractorType: 4
+    customAttractorID: 
+    minIntensity: 0
+    maxIntensity: 0
+    thoughtConditions:
+      boolConditions: []
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 0
+    statusRestrictions:
+    - ReadyToRumble
+    - StartingEvent
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 3
+      arguments:
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 6
+      arguments: []
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 5
+      arguments:
+      - Event1 Waiting
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions: []
+    repeatBuffer: 0.1
+    forceBuffer: 0
+    timer: 0
+  - attractorType: 4
+    customAttractorID: 
+    minIntensity: 0
+    maxIntensity: 0
+    thoughtConditions:
+      boolConditions: []
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 0
+    statusRestrictions:
+    - ReadyToRumble
+    - StartingEvent
+    - Event1
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 5
+      arguments:
+      - StartingEvent
+      - true
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 4
+      arguments: []
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 1b000000
+      changeStatsBy: 4
+      statsChangeAmount: 30
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 4
+      arguments: []
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 1c000000
+      changeStatsBy: 4
+      statsChangeAmount: 35
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 4
+      arguments: []
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 1f000000
+      changeStatsBy: 4
+      statsChangeAmount: 20
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions: []
+    repeatBuffer: 0.1
+    forceBuffer: 0
+    timer: 0
+  - attractorType: 4
+    customAttractorID: 
+    minIntensity: 0
+    maxIntensity: 0
+    thoughtConditions:
+      boolConditions: []
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 0
+    allConditionsRequired: 0
+    statusRestrictions:
+    - ReadyToRumble
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 9
+      arguments: []
+      possiblePriorityReprograms: 00000000
+      reprogramParameters:
+      - balancesChanges: 1
+        possibleAttractorTypeChanges: 
+        attractorTypeLowerBoundDangerRange: 0
+        attractorTypeUpperBoundDangerRange: 0
+        possibleCustomAttractorIDChanges: []
+        customAttractorIDLowerBoundDangerRange: 0
+        customAttractorIDUpperBoundDangerRange: 0
+        possibleMinIntensityChanges: []
+        minIntensityLowerBoundDangerRange: 0
+        minIntensityUpperBoundDangerRange: 0
+        possibleMaxIntensityChanges: []
+        maxIntensityLowerBoundDangerRange: 0
+        maxIntensityUpperBoundDangerRange: 0
+        possibleThoughtConditionsChanges: []
+        thoughtConditionsLowerBoundDangerRange: 0
+        thoughtConditionsUpperBoundDangerRange: 0
+        possibleAllConditionsRequiredChanges: 
+        allConditionsRequiredLowerBoundDangerRange: 0
+        allConditionsRequiredUpperBoundDangerRange: 0
+        possibleStatusRestrictionsChanges: []
+        statusRestrictionsLowerBoundDangerRange: 0
+        statusRestrictionsUpperBoundDangerRange: 0
+        possibleAllStatusesRequiredChanges: 
+        allStatusesRequiredLowerBoundDangerRange: 0
+        allStatusesRequiredUpperBoundDangerRange: 0
+        possibleStateRestrictionChanges: []
+        stateRestrictionLowerBoundDangerRange: 0
+        stateRestrictionUpperBoundDangerRange: 0
+        possibleFunctionExecutionsChanges:
+        - functionExecutions:
+          - function: 3
+            arguments:
+            - false
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 
+            changeStatsBy: 0
+            statsChangeAmount: 0
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 6
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 
+            changeStatsBy: 0
+            statsChangeAmount: 0
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 5
+            arguments:
+            - Event1 Waiting
+            - false
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 
+            changeStatsBy: 0
+            statsChangeAmount: 0
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+        functionExecutionsLowerBoundDangerRange: 100
+        functionExecutionsUpperBoundDangerRange: 0
+        possibleEventExecutionsChanges: []
+        eventExecutionsLowerBoundDangerRange: 0
+        eventExecutionsUpperBoundDangerRange: 0
+        possibleStateChangeChanges: 
+        stateChangeLowerBoundDangerRange: 0
+        stateChangeUpperBoundDangerRange: 0
+        possibleTargetDetectedObjectChanges: 
+        targetDetectedObjectLowerBoundDangerRange: 0
+        targetDetectedObjectUpperBoundDangerRange: 0
+        possiblePrioritizeDistanceInsteadOfIntensityChanges: 
+        prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange: 0
+        prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange: 0
+        possibleInvertPriorityChanges: 
+        invertPriorityLowerBoundDangerRange: 0
+        invertPriorityUpperBoundDangerRange: 0
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 9
+      arguments: []
+      possiblePriorityReprograms: 01000000
+      reprogramParameters:
+      - balancesChanges: 1
+        possibleAttractorTypeChanges: 
+        attractorTypeLowerBoundDangerRange: 0
+        attractorTypeUpperBoundDangerRange: 0
+        possibleCustomAttractorIDChanges: []
+        customAttractorIDLowerBoundDangerRange: 0
+        customAttractorIDUpperBoundDangerRange: 0
+        possibleMinIntensityChanges: []
+        minIntensityLowerBoundDangerRange: 0
+        minIntensityUpperBoundDangerRange: 0
+        possibleMaxIntensityChanges: []
+        maxIntensityLowerBoundDangerRange: 0
+        maxIntensityUpperBoundDangerRange: 0
+        possibleThoughtConditionsChanges: []
+        thoughtConditionsLowerBoundDangerRange: 0
+        thoughtConditionsUpperBoundDangerRange: 0
+        possibleAllConditionsRequiredChanges: 
+        allConditionsRequiredLowerBoundDangerRange: 0
+        allConditionsRequiredUpperBoundDangerRange: 0
+        possibleStatusRestrictionsChanges: []
+        statusRestrictionsLowerBoundDangerRange: 0
+        statusRestrictionsUpperBoundDangerRange: 0
+        possibleAllStatusesRequiredChanges: 
+        allStatusesRequiredLowerBoundDangerRange: 0
+        allStatusesRequiredUpperBoundDangerRange: 0
+        possibleStateRestrictionChanges: []
+        stateRestrictionLowerBoundDangerRange: 0
+        stateRestrictionUpperBoundDangerRange: 0
+        possibleFunctionExecutionsChanges:
+        - functionExecutions:
+          - function: 5
+            arguments:
+            - StartingEvent
+            - true
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 
+            changeStatsBy: 0
+            statsChangeAmount: 0
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1b000000
+            changeStatsBy: 4
+            statsChangeAmount: 30
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1c000000
+            changeStatsBy: 4
+            statsChangeAmount: 35
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1f000000
+            changeStatsBy: 4
+            statsChangeAmount: 20
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+        - functionExecutions:
+          - function: 5
+            arguments:
+            - StartingEvent
+            - true
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 
+            changeStatsBy: 0
+            statsChangeAmount: 0
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1b000000
+            changeStatsBy: 4
+            statsChangeAmount: 25
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1c000000
+            changeStatsBy: 4
+            statsChangeAmount: 30
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1f000000
+            changeStatsBy: 4
+            statsChangeAmount: 15
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+        - functionExecutions:
+          - function: 5
+            arguments:
+            - StartingEvent
+            - true
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 
+            changeStatsBy: 0
+            statsChangeAmount: 0
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1b000000
+            changeStatsBy: 4
+            statsChangeAmount: 20
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1c000000
+            changeStatsBy: 4
+            statsChangeAmount: 25
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1f000000
+            changeStatsBy: 4
+            statsChangeAmount: 10
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+        - functionExecutions:
+          - function: 5
+            arguments:
+            - StartingEvent
+            - true
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 
+            changeStatsBy: 0
+            statsChangeAmount: 0
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1b000000
+            changeStatsBy: 4
+            statsChangeAmount: 15
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1c000000
+            changeStatsBy: 4
+            statsChangeAmount: 20
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1f000000
+            changeStatsBy: 4
+            statsChangeAmount: 5
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+        - functionExecutions:
+          - function: 5
+            arguments:
+            - StartingEvent
+            - true
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 
+            changeStatsBy: 0
+            statsChangeAmount: 0
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1b000000
+            changeStatsBy: 4
+            statsChangeAmount: 10
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1c000000
+            changeStatsBy: 4
+            statsChangeAmount: 15
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+          - function: 4
+            arguments: []
+            possiblePriorityReprograms: 
+            reprogramParameters: []
+            thoughtReprogramParameters: []
+            statsToChange: 1f000000
+            changeStatsBy: 4
+            statsChangeAmount: 1
+            addReactions: []
+            addReactionLowerBoundDangerRange: 0
+            addReactionUpperBoundDangerRange: 0
+            addThoughts: []
+            addThoughtsLowerBoundDangerRange: 0
+            addThoughtsUpperBoundDangerRange: 0
+            changeDefaultState: 0
+            newDefaultState: 0
+            alsoChangeDefaultFocus: {fileID: 0}
+        functionExecutionsLowerBoundDangerRange: 100
+        functionExecutionsUpperBoundDangerRange: 0
+        possibleEventExecutionsChanges: []
+        eventExecutionsLowerBoundDangerRange: 0
+        eventExecutionsUpperBoundDangerRange: 0
+        possibleStateChangeChanges: 
+        stateChangeLowerBoundDangerRange: 0
+        stateChangeUpperBoundDangerRange: 0
+        possibleTargetDetectedObjectChanges: 
+        targetDetectedObjectLowerBoundDangerRange: 0
+        targetDetectedObjectUpperBoundDangerRange: 0
+        possiblePrioritizeDistanceInsteadOfIntensityChanges: 
+        prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange: 0
+        prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange: 0
+        possibleInvertPriorityChanges: 
+        invertPriorityLowerBoundDangerRange: 0
+        invertPriorityUpperBoundDangerRange: 0
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 5
+      arguments:
+      - Event1 Event2 Event3 BeenSeen Done
+      - true
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 5
+      arguments:
+      - StartingEvent
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 8
+      arguments:
+      - WeOutHere
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions: []
+    repeatBuffer: 30
+    forceBuffer: 1
+    timer: 0
+  - attractorType: 4
+    customAttractorID: 
+    minIntensity: 0
+    maxIntensity: 0
+    thoughtConditions:
+      boolConditions: []
+      floatConditions: []
+      floatCompare: 0
+      intConditions:
+      - intName: DRAWINGS
+        intValue: 1
+      intCompare: 3
+    allConditionsRequired: 1
+    statusRestrictions: []
+    allStatusesRequired: 0
+    stateRestriction: 
+    functionExecutions:
+    - function: 5
+      arguments:
+      - ReadyToRumble
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 11
+      arguments:
+      - 3
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions: []
+    repeatBuffer: 5
+    forceBuffer: 0
+    timer: 0
+  - attractorType: 3
+    customAttractorID: 
+    minIntensity: 2
+    maxIntensity: 3
+    thoughtConditions:
+      boolConditions:
+      - boolName: WeOutHere
+        boolValue: 1
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 3
+    allConditionsRequired: 1
+    statusRestrictions:
+    - ReadyToRumble
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 5
+      arguments:
+      - BeenSeen
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3023478099367305701}
+          m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+          m_MethodName: set_enabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+    repeatBuffer: 8
+    forceBuffer: 0
+    timer: 0
+  - attractorType: 4
+    customAttractorID: 
+    minIntensity: 0
+    maxIntensity: 0
+    thoughtConditions:
+      boolConditions:
+      - boolName: WeOutHere
+        boolValue: 1
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 3
+    allConditionsRequired: 1
+    statusRestrictions:
+    - ReadyToRumble
+    - BeenSeen
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 3
+      arguments:
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 8
+      arguments:
+      - WeOutHere
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 5
+      arguments:
+      - Event1 Done
+      - true
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3023478099367305701}
+          m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+          m_MethodName: set_enabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    repeatBuffer: 3
+    forceBuffer: 1
+    timer: 3
+  senses:
+  - detectionRadius: 5
+    detectionAngle: 180
+    targetLayer:
+      serializedVersion: 2
+      m_Bits: 512
+    customAttractorIDs:
+    - Avoid
+    obstacleLayer:
+      serializedVersion: 2
+      m_Bits: 0
+    senseOrgans:
+    - {fileID: 3383150302482677300}
+    invertDetection: 0
+    lightSensitive: 0
+  - detectionRadius: 50
+    detectionAngle: 60
+    targetLayer:
+      serializedVersion: 2
+      m_Bits: 8192
+    customAttractorIDs: []
+    obstacleLayer:
+      serializedVersion: 2
+      m_Bits: 1024
+    senseOrgans:
+    - {fileID: 0}
+    invertDetection: 0
+    lightSensitive: 0
   animator: {fileID: 0}
-  walkSpdAnimMult: 0
+  walkSpdAnimMult: 1
   screamTime: 1
   attackBox: {fileID: 0}
   wanderSpeed: 0
@@ -19552,7 +20777,7 @@ MonoBehaviour:
   minPatrolTimer: 0
   maxPatrolTimer: 0
   optionalPatrolPoint: {fileID: 0}
-  investigateSpeed: 0
+  investigateSpeed: 3
   permanenceTime: 0
   giveUpTime: 0
   rushOverSpeed: 0
@@ -19585,13 +20810,14 @@ MonoBehaviour:
   hideRadius: 0
   avoidHideTarget: 0
   hideTargetAvoidanceRange: 0
-  fleeSpeed: 0
-  minFleeDistance: 0
-  maxFleeDistance: 0
-  minFleeTime: 0
-  maxFleeTime: 0
-  avoidTarget: 0
-  fleeTargetAvoidanceRange: 0
+  fleeSpeed: 50
+  minFleeDistance: 30
+  maxFleeDistance: 35
+  minFleeTime: 10
+  maxFleeTime: 11
+  avoidTarget: 1
+  fleeInAnyDirection: 1
+  fleeTargetAvoidanceRange: 20
 --- !u!65 &7802696013037720879
 BoxCollider:
   m_ObjectHideFlags: 0
