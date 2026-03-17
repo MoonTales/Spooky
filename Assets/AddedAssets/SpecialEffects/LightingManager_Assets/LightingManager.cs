@@ -15,6 +15,7 @@ public class LightingManager : MonoBehaviour
         //Scene References
         [SerializeField] private Light SunDirectionalLight;
         [SerializeField] private LightingPreset Preset;
+        public Clock clockToSyncWith;
 
         //Rotation axis
         public enum RotationAxis{X,Y}
@@ -29,7 +30,7 @@ public class LightingManager : MonoBehaviour
         [Range(0, 24)] public float TimeOfDay = 12f;
         [Range(0, 24)] public float StartTime = 12f;
             //How long the day cycle will be in seconds
-        [Range(1, 600)] public float CycleDuration = 360f;
+        [Range(1, 1200)] public float CycleDuration = 360f;
         public Vector2 morningInterval = new Vector2(0f, 0.5f);
         public Vector2 afterNoonInterval = new Vector2(0.5f, 1f);
         public Vector2 lightIntensity = new Vector2(0f, 1f);
@@ -106,8 +107,13 @@ public class LightingManager : MonoBehaviour
                 //(Replace with a reference to your game time if needed)
                 if(IsDayCycleOn)
                 {
-                    TimeOfDay += (Time.deltaTime / CycleDuration) * 24f;
-                    TimeOfDay %= 24; //Modulus to ensure always between 0-24
+                    if (clockToSyncWith != null)
+                        TimeOfDay = 0.03f * clockToSyncWith.elapsedTime + 6.5f;
+                    else
+                    {
+                        TimeOfDay += (Time.deltaTime / CycleDuration) * 24f;
+                        TimeOfDay %= 24;
+                    } //Modulus to ensure always between 0-24
                 }
                 UpdateLighting(TimeOfDay / 24f);
 
