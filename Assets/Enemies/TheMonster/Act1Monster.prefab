@@ -19584,7 +19584,7 @@ MonoBehaviour:
       alsoChangeDefaultFocus: {fileID: 0}
     - function: 5
       arguments:
-      - Ready
+      - Done
       - false
       possiblePriorityReprograms: 
       reprogramParameters: []
@@ -19624,7 +19624,26 @@ MonoBehaviour:
     - Done
     allStatusesRequired: 1
     stateRestriction: 
-    functionExecutions: []
+    functionExecutions:
+    - function: 5
+      arguments:
+      - Waiting
+      - true
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
     eventExecutions: []
     stateChange: 0
     targetDetectedObject: 0
@@ -19670,6 +19689,25 @@ MonoBehaviour:
     - function: 8
       arguments:
       - WeOutHere
+      - true
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 5
+      arguments:
+      - Waiting
       - true
       possiblePriorityReprograms: 
       reprogramParameters: []
