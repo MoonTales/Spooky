@@ -6188,8 +6188,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: blocks
   promptKey:
     place: 
     id: 
@@ -68023,6 +68023,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 3.571
       objectReference: {fileID: 0}
+    - target: {fileID: -5116617085424760469, guid: dcb7a5e9fe0ed7542a93931596112255, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -5070316787830718713, guid: dcb7a5e9fe0ed7542a93931596112255, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -68968,12 +68972,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rowKey:
-    place: 
-    id: 
+    place: bedroom
+    id: blocks
   promptKey:
     place: 
     id: 
-  requiredHour: -1
+  requiredHour: 2
 --- !u!1 &518006388
 GameObject:
   m_ObjectHideFlags: 0
