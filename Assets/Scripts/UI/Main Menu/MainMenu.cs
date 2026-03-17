@@ -202,7 +202,8 @@ namespace UI.Main_Menu
         {
             SaveSystem.Instance.DeleteSaveData();
             DisableButtons();
-            new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToNewGame).Send();
+            //new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToNewGame).Send();
+            new Types.ScreenFadeSceneTransitionData(3f, 1f, "Tutorial", null , null, SwapToNewGame).Send();
         }
 
         private void OnSettingsButtonClicked()
