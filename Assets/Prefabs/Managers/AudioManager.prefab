@@ -150,8 +150,6 @@ MonoBehaviour:
   tutorialOrbAudioSceneName: Tutorial
   tutorialOrbRootName: TheBuilding
   tutorialOrbNamePrefix: Orb
-  tutorialOrbPinnedName: 
-  tutorialOrbPinnedEventPathToken: orb-peace
   tutorialOrbEvents:
   - Guid:
       Data1: 879235584
@@ -201,6 +199,23 @@ MonoBehaviour:
       Data3: -1418913891
       Data4: 1908068273
     Path: event:/amb/env/tutorial/ORB/orb-sadness
+  autoAttachSpiderAudioOnSceneLoad: 1
+  spiderAudioSceneNames:
+  - Tutorial
+  - Nightmare1
+  spiderAnchorName: TheThingy
+  spiderLoopEvent:
+    Guid:
+      Data1: 979041027
+      Data2: 1221985961
+      Data3: 806022809
+      Data4: 761343448
+    Path: event:/sfx/npcs/spider-scuttle
+  spiderIntensityParameter: Intensity
+  spiderIntensityMax: 100
+  spiderDangerParameter: Danger
+  spiderDangerMax: 100
+  spiderStateParameter: State
   tutorialHallwayStretchEvent:
     Guid:
       Data1: 351463793
@@ -213,9 +228,8 @@ MonoBehaviour:
   tutorialHallwayRunPressureParameter: RunPressure
   tutorialHallwayPlayerSpeedParameter: PlayerSpeed
   tutorialHallwayPlayerSpeedMax: 8
+  tutorialHallwayPlayerSpeedFloor: 0.2
   tutorialHallwaySweepDurationSeconds: 12
-  debugTutorialHallwayParameters: 0
-  debugTutorialHallwayPlayerSpeed: 1
   tutorialHallwayStateStretchingLabel: Stretching
   tutorialHallwayStateContractedLabel: Contracted
   tutorialDrawingAudioSceneName: Tutorial
