@@ -1,6 +1,4 @@
-using System;
 using FMOD.Studio;
-using FMODUnity;
 using Managers;
 using UnityEngine;
 
@@ -13,14 +11,9 @@ public class LampAudioEmitter : MonoBehaviour
     [Header("Behavior")]
     [SerializeField] private bool playBuzzOnLightOff = false;
 
-    private const string DebugLampSceneName = "Tutorial";
-    private const string DebugLampObjectName = "P_Lamp";
-    private const float DebugLogIntervalSeconds = 0.5f;
-
     private EventInstance _humLoopInstance;
     private bool _hasInitializedState;
     private bool _previousIsOn;
-    private float _nextDebugLogTime;
 
     public void Configure(Light lightTarget, bool enableBuzzOnLightOff)
     {
@@ -53,7 +46,6 @@ public class LampAudioEmitter : MonoBehaviour
         Transform emitterTransform = GetEmitterTransform();
         bool isOn = IsLampOn();
         bool hasValidHumLoop = _humLoopInstance.isValid();
-        LogDebugState(audioManager, emitterTransform, isOn, hasValidHumLoop);
 
         if (!hasValidHumLoop)
         {
@@ -145,82 +137,5 @@ public class LampAudioEmitter : MonoBehaviour
     private Transform GetEmitterTransform()
     {
         return targetLight != null ? targetLight.transform : transform;
-    }
-
-    private void LogDebugState(AudioManager audioManager, Transform emitterTransform, bool isOn, bool hasValidHumLoop)
-    {
-        if (!ShouldLogDebugState())
-        {
-            return;
-        }
-
-        if (Time.unscaledTime < _nextDebugLogTime)
-        {
-            return;
-        }
-
-        _nextDebugLogTime = Time.unscaledTime + DebugLogIntervalSeconds;
-
-        Animator animator = GetComponent<Animator>();
-        if (animator == null && targetLight != null)
-        {
-            animator = targetLight.GetComponentInParent<Animator>();
-        }
-
-        string listenerText;
-        if (TryGetListenerTransform(out Transform listenerTransform))
-        {
-            float listenerDistance = Vector3.Distance(listenerTransform.position, emitterTransform.position);
-            listenerText =
-                $"listenerPos={FormatVector(listenerTransform.position)}, listenerDistance={listenerDistance:F2}";
-        }
-        else
-        {
-            listenerText = "listenerPos=<none>, listenerDistance=<none>";
-        }
-
-        string animatorText = animator == null
-            ? "animator=<none>"
-            : $"animator={animator.name}, animatorEnabled={animator.enabled}, animatorCulling={animator.cullingMode}";
-
-        string lightText = targetLight == null
-            ? "light=<none>"
-            : $"lightName={targetLight.name}, lightEnabled={targetLight.enabled}, lightActive={targetLight.gameObject.activeInHierarchy}, lightIntensity={targetLight.intensity:F2}";
-
-        Debug.Log(
-            $"[LampDebug] scene={gameObject.scene.name}, object={name}, rootPos={FormatVector(transform.position)}, emitterPos={FormatVector(emitterTransform.position)}, isOn={isOn}, humLoopValid={hasValidHumLoop}, muteSfx={audioManager.muteSFX}, {listenerText}, {lightText}, {animatorText}");
-    }
-
-    private bool ShouldLogDebugState()
-    {
-        return string.Equals(gameObject.scene.name, DebugLampSceneName, StringComparison.Ordinal)
-               && string.Equals(name, DebugLampObjectName, StringComparison.Ordinal);
-    }
-
-    private static bool TryGetListenerTransform(out Transform listenerTransform)
-    {
-        listenerTransform = null;
-
-        StudioListener studioListener = UnityEngine.Object.FindAnyObjectByType<StudioListener>();
-        if (studioListener != null)
-        {
-            listenerTransform = studioListener.AttenuationObject != null
-                ? studioListener.AttenuationObject.transform
-                : studioListener.transform;
-            return true;
-        }
-
-        if (Camera.main != null)
-        {
-            listenerTransform = Camera.main.transform;
-            return true;
-        }
-
-        return false;
-    }
-
-    private static string FormatVector(Vector3 value)
-    {
-        return $"({value.x:F2}, {value.y:F2}, {value.z:F2})";
     }
 }
