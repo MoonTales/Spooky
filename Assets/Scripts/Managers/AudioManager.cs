@@ -140,6 +140,7 @@ namespace Managers
         [SerializeField] private string tutorialHallwayStateContractedLabel = "Contracted";
         [SerializeField] private string tutorialDrawingAudioSceneName = "Tutorial";
         [SerializeField] private EventReference tutorialDrawingStaticLoopEvent;
+        [SerializeField] private string bedroomWallClockActiveParameter = "ClockActive";
         #endregion
 
         #region Mental Audio
@@ -223,6 +224,7 @@ namespace Managers
 
         // Persistent FMOD instances - world ambience and mental stack.
         private EventInstance _bedroomAmbienceInstance;
+        private EventInstance _bedroomWallClockInstance;
         private EventInstance _tutorialAmbienceInstance;
         private EventInstance _tutorialHallwayStretchInstance;
         private EventInstance _nightmareAmbienceInstance;
@@ -252,6 +254,8 @@ namespace Managers
         private Vector3 _tutorialHallwayLastPlayerPosition;
         private bool _tutorialHallwayHasLastPlayerPosition;
         private bool _tutorialHallwayPlayerSpeedFloorActive;
+        private PARAMETER_ID _bedroomWallClockActiveParameterId;
+        private bool _hasBedroomWallClockActiveParameterId;
 
         // Runtime audio state - snapshot control.
         private bool _pauseSnapshotActive;
@@ -294,6 +298,9 @@ namespace Managers
                 () => EventBroadcaster.OnRequestScreenFade += OnRequestScreenFade,
                 () => EventBroadcaster.OnRequestScreenFade -= OnRequestScreenFade);
             TrackSubscription(
+                () => EventBroadcaster.OnRequestScreenFadeScreenSwap += OnRequestScreenFadeScreenSwap,
+                () => EventBroadcaster.OnRequestScreenFadeScreenSwap -= OnRequestScreenFadeScreenSwap);
+            TrackSubscription(
                 () => EventBroadcaster.OnTutorialHallwayStretchStart += OnTutorialHallwayStretchStart,
                 () => EventBroadcaster.OnTutorialHallwayStretchStart -= OnTutorialHallwayStretchStart);
             TrackSubscription(
@@ -332,12 +339,14 @@ namespace Managers
             StopAndReleaseSleepTrackerAlarm(true);
             StopAndReleaseGoodWakeupTransition(true);
             StopAndReleaseBedroomAmbience();
+            StopAndReleaseBedroomWallClock(true);
             StopAndReleaseTutorialAmbience();
             StopAndReleaseTutorialHallwayStretch(true);
             StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
         }
+
         #endregion
 
     //-------------------------//
@@ -380,6 +389,7 @@ namespace Managers
             {
                 StopAndReleaseSleepTrackerAlarm(true);
                 StopAndReleaseGoodWakeupTransition(true);
+                StopAndReleaseBedroomWallClock(true);
             }
             if (newLocation != Types.WorldLocation.Tutorial)
             {
@@ -390,8 +400,23 @@ namespace Managers
             ApplyTutorialAmbience();
         }
 
+        private void OnRequestScreenFadeScreenSwap(Types.ScreenFadeSceneTransitionData screenFadeData)
+        {
+            if (!IsBedroomWorldLocation())
+            {
+                return;
+            }
+
+            SetBedroomWallClockActive(false);
+        }
+
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            if (!string.Equals(scene.name, "Bedroom", StringComparison.Ordinal))
+            {
+                StopAndReleaseBedroomWallClock(true);
+            }
+
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
             AutoAttachSpiderAudioEmittersInScene(scene);
@@ -415,6 +440,7 @@ namespace Managers
                 PlayMainMenuMusicIfNeeded();
                 StopAndReleaseSleepTrackerAlarm(true);
                 StopAndReleaseGoodWakeupTransition(true);
+                StopAndReleaseBedroomWallClock(true);
                 StopAndReleaseTutorialHallwayStretch(true);
             }
             else
@@ -456,6 +482,32 @@ namespace Managers
             }
 
             PlaySfx(SfxId.LetterScribble, sourceTransform);
+        }
+
+        public void StartBedroomWallClock(Transform sourceTransform)
+        {
+            EventReference eventReference = GetSfxEvent(SfxId.ClockTick);
+            if (eventReference.IsNull)
+            {
+                Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{SfxId.ClockTick}'.");
+                return;
+            }
+
+            if (_bedroomWallClockInstance.isValid())
+            {
+                if (sourceTransform != null && EventInstanceIs3D(_bedroomWallClockInstance))
+                {
+                    _bedroomWallClockInstance.set3DAttributes(RuntimeUtils.To3DAttributes(sourceTransform.position));
+                }
+
+                SetBedroomWallClockActive(true);
+                return;
+            }
+
+            _bedroomWallClockInstance = CreateEventInstance(eventReference, sourceTransform);
+            CacheBedroomWallClockActiveParameterId();
+            _bedroomWallClockInstance.start();
+            SetBedroomWallClockActive(true);
         }
 
         private void OnSleepTrackerAudioStateChanged(bool isActive, bool isGoodWakeup, Transform sourceTransform)
@@ -1409,6 +1461,12 @@ namespace Managers
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial;
         }
 
+        private static bool IsBedroomWorldLocation()
+        {
+            return GameStateManager.Instance != null
+                && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom;
+        }
+
         private bool ShouldPlayBedroomAmbience()
         {
             if (GameStateManager.Instance == null)
@@ -1756,6 +1814,20 @@ namespace Managers
             }
         }
 
+        private void StopAndReleaseBedroomWallClock(bool immediate)
+        {
+            if (_bedroomWallClockInstance.isValid())
+            {
+                LogAudioState($"Bedroom wall clock stopped via code fallback. immediate={immediate}.");
+                _bedroomWallClockInstance.stop(immediate ? FMOD.Studio.STOP_MODE.IMMEDIATE : FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _bedroomWallClockInstance.release();
+                _bedroomWallClockInstance = default;
+            }
+
+            _hasBedroomWallClockActiveParameterId = false;
+            _bedroomWallClockActiveParameterId = default;
+        }
+
         private void StopAndReleaseTutorialAmbience()
         {
             if (_tutorialAmbienceInstance.isValid())
@@ -1868,6 +1940,56 @@ namespace Managers
             {
                 _ambienceBus = RuntimeManager.GetBus(ambienceBusPath);
             }
+        }
+
+        private void SetBedroomWallClockActive(bool isActive)
+        {
+            if (_bedroomWallClockInstance.isValid() && !string.IsNullOrWhiteSpace(bedroomWallClockActiveParameter))
+            {
+                float requestedValue = isActive ? 1f : 0f;
+                if (!_hasBedroomWallClockActiveParameterId)
+                {
+                    CacheBedroomWallClockActiveParameterId();
+                }
+
+                if (_hasBedroomWallClockActiveParameterId)
+                {
+                    _bedroomWallClockInstance.setParameterByID(_bedroomWallClockActiveParameterId, requestedValue);
+                }
+                else
+                {
+                    _bedroomWallClockInstance.setParameterByName(bedroomWallClockActiveParameter, requestedValue);
+                }
+            }
+        }
+
+        private void CacheBedroomWallClockActiveParameterId()
+        {
+            _hasBedroomWallClockActiveParameterId = false;
+            _bedroomWallClockActiveParameterId = default;
+
+            if (!_bedroomWallClockInstance.isValid() || string.IsNullOrWhiteSpace(bedroomWallClockActiveParameter))
+            {
+                return;
+            }
+
+            FMOD.RESULT descriptionResult = _bedroomWallClockInstance.getDescription(out EventDescription description);
+            if (descriptionResult != FMOD.RESULT.OK)
+            {
+                return;
+            }
+
+            FMOD.RESULT parameterDescriptionResult = description.getParameterDescriptionByName(
+                bedroomWallClockActiveParameter,
+                out PARAMETER_DESCRIPTION parameterDescription);
+
+            if (parameterDescriptionResult != FMOD.RESULT.OK)
+            {
+                return;
+            }
+
+            _bedroomWallClockActiveParameterId = parameterDescription.id;
+            _hasBedroomWallClockActiveParameterId = true;
         }
 
         #endregion
