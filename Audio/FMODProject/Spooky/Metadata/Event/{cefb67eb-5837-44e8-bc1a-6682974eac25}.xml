@@ -5,7 +5,7 @@
 			<value>door-locked</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{41c9f988-5f1c-46cb-a6cb-39d36e127e60}</destination>
@@ -90,7 +90,7 @@
 	<object class="MixerBusPanner" id="{6d622450-56ef-4b69-b096-fe70692b9c20}" />
 	<object class="MultiSound" id="{94b0886c-ba6d-43cf-af00-b836a169d233}">
 		<property name="length">
-			<value>0.25</value>
+			<value>0.68000000000000005</value>
 		</property>
 		<relationship name="sounds">
 			<destination>{bb150602-dce9-44a3-bc0d-e20eee244e2d}</destination>
@@ -144,17 +144,32 @@
 		<relationship name="effects">
 			<destination>{53f5b5d4-2291-4661-a9f9-07c4ce1c5700}</destination>
 			<destination>{061e22a5-a443-4b25-aacf-71f5cda076ca}</destination>
+			<destination>{1adcb7ad-e268-4dd7-b4d0-5619505a5c56}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{cf7f82d4-d883-4959-9914-325be61271a8}" />
 	<object class="MixerBusFader" id="{7979cf18-678b-468e-abaf-2420d14176bb}" />
 	<object class="SFXReverbEffect" id="{53f5b5d4-2291-4661-a9f9-07c4ce1c5700}">
 		<property name="decayTime">
-			<value>1600</value>
+			<value>1100</value>
 		</property>
 		<property name="wetLevel">
 			<value>-13.5</value>
 		</property>
 	</object>
 	<object class="MixerBusFader" id="{061e22a5-a443-4b25-aacf-71f5cda076ca}" />
+	<object class="SpatialiserEffect" id="{1adcb7ad-e268-4dd7-b4d0-5619505a5c56}">
+		<property name="distanceRolloffType">
+			<value>2</value>
+		</property>
+		<property name="minimumDistance">
+			<value>0.200000003</value>
+		</property>
+		<property name="maximumDistance">
+			<value>2</value>
+		</property>
+		<property name="overrideRange">
+			<value>true</value>
+		</property>
+	</object>
 </objects>
