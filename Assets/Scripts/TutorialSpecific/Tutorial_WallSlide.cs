@@ -1,4 +1,5 @@
 using Managers;
+using Player;
 using UnityEngine;
 
 public class Tutorial_WallSlide : MonoBehaviour
@@ -13,8 +14,9 @@ public class Tutorial_WallSlide : MonoBehaviour
         
         // play some SFX for now to make it feel a bit nicer
         AudioManager audioManager = AudioManager.Instance;
+        
         // this will never be null, but im mostly keeping the coding style being used
-        if (audioManager != null)
+        if (audioManager != null && !PlayerInventory.Instance.HasDrawing(0)) // don't play slide sound when picking up the drawing
         {
             audioManager.PlaySfx(doorCloseSfxId, transform);
         }
