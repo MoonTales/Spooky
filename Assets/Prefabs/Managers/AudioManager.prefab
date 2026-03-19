@@ -117,6 +117,22 @@ MonoBehaviour:
         Data3: 662171791
         Data4: -1114051719
       Path: event:/sfx/interactable/tutorial/door-slide
+  - id: 11
+    eventRef:
+      Guid:
+        Data1: 1262808161
+        Data2: 1076129755
+        Data3: -1091160937
+        Data4: -2125241584
+      Path: event:/sfx/interactable/clock
+  - id: 7
+    eventRef:
+      Guid:
+        Data1: -822384661
+        Data2: 1156077623
+        Data3: -2107237700
+        Data4: 632049303
+      Path: event:/sfx/interactable/door-locked
   debugAudioLogs: 0
   footstepPlayer:
     Guid:
@@ -150,8 +166,6 @@ MonoBehaviour:
   tutorialOrbAudioSceneName: Tutorial
   tutorialOrbRootName: TheBuilding
   tutorialOrbNamePrefix: Orb
-  tutorialOrbPinnedName: 
-  tutorialOrbPinnedEventPathToken: orb-peace
   tutorialOrbEvents:
   - Guid:
       Data1: 879235584
@@ -201,21 +215,37 @@ MonoBehaviour:
       Data3: -1418913891
       Data4: 1908068273
     Path: event:/amb/env/tutorial/ORB/orb-sadness
+  autoAttachSpiderAudioOnSceneLoad: 1
+  spiderAudioSceneNames:
+  - Tutorial
+  - Nightmare1
+  spiderAnchorName: TheThingy
+  spiderLoopEvent:
+    Guid:
+      Data1: 979041027
+      Data2: 1221985961
+      Data3: 806022809
+      Data4: 761343448
+    Path: event:/sfx/npcs/spider-scuttle
+  spiderIntensityParameter: Intensity
+  spiderIntensityMax: 100
+  spiderDangerParameter: Danger
+  spiderDangerMax: 100
+  spiderStateParameter: State
   tutorialHallwayStretchEvent:
     Guid:
-      Data1: 351463793
-      Data2: 1250743252
-      Data3: 1475581866
-      Data4: 373874254
-    Path: event:/amb/env/tutorial/hallway-stretch
+      Data1: 1240122567
+      Data2: 1230136536
+      Data3: 1299489968
+      Data4: 267243005
+    Path: event:/amb/env/tutorial/hall/hallway-stretch-simple
   tutorialHallwayStretchStateParameter: StretchState
   tutorialHallwayStretchProgressParameter: StretchProgress
   tutorialHallwayRunPressureParameter: RunPressure
   tutorialHallwayPlayerSpeedParameter: PlayerSpeed
   tutorialHallwayPlayerSpeedMax: 8
+  tutorialHallwayPlayerSpeedFloor: 0.2
   tutorialHallwaySweepDurationSeconds: 12
-  debugTutorialHallwayParameters: 0
-  debugTutorialHallwayPlayerSpeed: 1
   tutorialHallwayStateStretchingLabel: Stretching
   tutorialHallwayStateContractedLabel: Contracted
   tutorialDrawingAudioSceneName: Tutorial
@@ -226,6 +256,7 @@ MonoBehaviour:
       Data3: 1456920727
       Data4: 2144522301
     Path: event:/amb/env/tutorial/general/drawing-end
+  bedroomWallClockActiveParameter: ClockActive
   terrorDistortionParameter: Terror
   mentalHealthDistortionParameter: MentalHealth
   terrorParameterIsGlobal: 1

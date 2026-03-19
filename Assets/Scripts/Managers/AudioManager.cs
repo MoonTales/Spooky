@@ -29,6 +29,8 @@ namespace Managers
             // Tutorial Interactions
             TutorialButtonClick,
             TutorialDoorSlide,
+            // Environment
+            ClockTick,
         }
 
         // Inspector entry mapping SfxId -> FMOD event.
@@ -113,6 +115,18 @@ namespace Managers
         [SerializeField] private EventReference[] tutorialOrbEvents;
 
         [Space(10)]
+        [Header("Environment Audio (Spiders)")]
+        [SerializeField] private bool autoAttachSpiderAudioOnSceneLoad = true;
+        [SerializeField] private string[] spiderAudioSceneNames = { "Tutorial", "Nightmare1" };
+        [SerializeField] private string spiderAnchorName = "TheThingy";
+        [SerializeField] private EventReference spiderLoopEvent;
+        [SerializeField] private string spiderIntensityParameter = "Intensity";
+        [SerializeField] private float spiderIntensityMax = 100f;
+        [SerializeField] private string spiderDangerParameter = "Danger";
+        [SerializeField] private float spiderDangerMax = 100f;
+        [SerializeField] private string spiderStateParameter = "State";
+
+        [Space(10)]
         [Header("Environment Audio (Tutorial Hallway Stretch)")]
         [SerializeField] private EventReference tutorialHallwayStretchEvent;
         [SerializeField] private string tutorialHallwayStretchStateParameter = "StretchState";
@@ -126,6 +140,7 @@ namespace Managers
         [SerializeField] private string tutorialHallwayStateContractedLabel = "Contracted";
         [SerializeField] private string tutorialDrawingAudioSceneName = "Tutorial";
         [SerializeField] private EventReference tutorialDrawingStaticLoopEvent;
+        [SerializeField] private string bedroomWallClockActiveParameter = "ClockActive";
         #endregion
 
         #region Mental Audio
@@ -209,6 +224,7 @@ namespace Managers
 
         // Persistent FMOD instances - world ambience and mental stack.
         private EventInstance _bedroomAmbienceInstance;
+        private EventInstance _bedroomWallClockInstance;
         private EventInstance _tutorialAmbienceInstance;
         private EventInstance _tutorialHallwayStretchInstance;
         private EventInstance _nightmareAmbienceInstance;
@@ -238,6 +254,8 @@ namespace Managers
         private Vector3 _tutorialHallwayLastPlayerPosition;
         private bool _tutorialHallwayHasLastPlayerPosition;
         private bool _tutorialHallwayPlayerSpeedFloorActive;
+        private PARAMETER_ID _bedroomWallClockActiveParameterId;
+        private bool _hasBedroomWallClockActiveParameterId;
 
         // Runtime audio state - snapshot control.
         private bool _pauseSnapshotActive;
@@ -246,6 +264,7 @@ namespace Managers
         #region Objects w/ Audio Scripts
         // Bedroom --> THHEDOORRR: DoorPassbyEmitter
         // Tutorial --> TheBuilding/Orb*: TutorialOrbAudioEmitter
+        // Tutorial/Nightmare --> TheThingy: SpiderAudioEmitter
         #endregion
 
 
@@ -279,6 +298,9 @@ namespace Managers
                 () => EventBroadcaster.OnRequestScreenFade += OnRequestScreenFade,
                 () => EventBroadcaster.OnRequestScreenFade -= OnRequestScreenFade);
             TrackSubscription(
+                () => EventBroadcaster.OnRequestScreenFadeScreenSwap += OnRequestScreenFadeScreenSwap,
+                () => EventBroadcaster.OnRequestScreenFadeScreenSwap -= OnRequestScreenFadeScreenSwap);
+            TrackSubscription(
                 () => EventBroadcaster.OnTutorialHallwayStretchStart += OnTutorialHallwayStretchStart,
                 () => EventBroadcaster.OnTutorialHallwayStretchStart -= OnTutorialHallwayStretchStart);
             TrackSubscription(
@@ -303,6 +325,7 @@ namespace Managers
             CacheSettingsBuses();
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachTutorialOrbAudioEmittersInScene(SceneManager.GetActiveScene());
+            AutoAttachSpiderAudioEmittersInScene(SceneManager.GetActiveScene());
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
         }
@@ -316,12 +339,14 @@ namespace Managers
             StopAndReleaseSleepTrackerAlarm(true);
             StopAndReleaseGoodWakeupTransition(true);
             StopAndReleaseBedroomAmbience();
+            StopAndReleaseBedroomWallClock(true);
             StopAndReleaseTutorialAmbience();
             StopAndReleaseTutorialHallwayStretch(true);
             StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
             base.OnDestroy();
         }
+
         #endregion
 
     //-------------------------//
@@ -364,6 +389,7 @@ namespace Managers
             {
                 StopAndReleaseSleepTrackerAlarm(true);
                 StopAndReleaseGoodWakeupTransition(true);
+                StopAndReleaseBedroomWallClock(true);
             }
             if (newLocation != Types.WorldLocation.Tutorial)
             {
@@ -374,10 +400,26 @@ namespace Managers
             ApplyTutorialAmbience();
         }
 
+        private void OnRequestScreenFadeScreenSwap(Types.ScreenFadeSceneTransitionData screenFadeData)
+        {
+            if (!IsBedroomWorldLocation())
+            {
+                return;
+            }
+
+            SetBedroomWallClockActive(false);
+        }
+
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            if (!string.Equals(scene.name, "Bedroom", StringComparison.Ordinal))
+            {
+                StopAndReleaseBedroomWallClock(true);
+            }
+
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
+            AutoAttachSpiderAudioEmittersInScene(scene);
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
         }
@@ -398,6 +440,7 @@ namespace Managers
                 PlayMainMenuMusicIfNeeded();
                 StopAndReleaseSleepTrackerAlarm(true);
                 StopAndReleaseGoodWakeupTransition(true);
+                StopAndReleaseBedroomWallClock(true);
                 StopAndReleaseTutorialHallwayStretch(true);
             }
             else
@@ -439,6 +482,32 @@ namespace Managers
             }
 
             PlaySfx(SfxId.LetterScribble, sourceTransform);
+        }
+
+        public void StartBedroomWallClock(Transform sourceTransform)
+        {
+            EventReference eventReference = GetSfxEvent(SfxId.ClockTick);
+            if (eventReference.IsNull)
+            {
+                Debug.LogWarning($"AudioManager: Missing FMOD EventReference for SfxId '{SfxId.ClockTick}'.");
+                return;
+            }
+
+            if (_bedroomWallClockInstance.isValid())
+            {
+                if (sourceTransform != null && EventInstanceIs3D(_bedroomWallClockInstance))
+                {
+                    _bedroomWallClockInstance.set3DAttributes(RuntimeUtils.To3DAttributes(sourceTransform.position));
+                }
+
+                SetBedroomWallClockActive(true);
+                return;
+            }
+
+            _bedroomWallClockInstance = CreateEventInstance(eventReference, sourceTransform);
+            CacheBedroomWallClockActiveParameterId();
+            _bedroomWallClockInstance.start();
+            SetBedroomWallClockActive(true);
         }
 
         private void OnSleepTrackerAudioStateChanged(bool isActive, bool isGoodWakeup, Transform sourceTransform)
@@ -748,6 +817,46 @@ namespace Managers
             instance = CreateEventInstance(tutorialDrawingStaticLoopEvent, fromTransform);
             instance.start();
             return true;
+        }
+
+        public bool TryStartSpiderLoop(
+            Transform fromTransform,
+            float rawIntensity,
+            float rawDangerLevel,
+            int stateValue,
+            out EventInstance instance)
+        {
+            instance = default;
+
+            if (muteSFX || spiderLoopEvent.IsNull)
+            {
+                return false;
+            }
+
+            instance = CreateEventInstance(spiderLoopEvent, fromTransform);
+            SetSpiderLoopParameters(instance, rawIntensity, rawDangerLevel, stateValue);
+            instance.start();
+            return true;
+        }
+
+        public void UpdateSpiderLoop(
+            EventInstance instance,
+            Transform fromTransform,
+            float rawIntensity,
+            float rawDangerLevel,
+            int stateValue)
+        {
+            if (!instance.isValid())
+            {
+                return;
+            }
+
+            if (fromTransform != null)
+            {
+                UpdateEventInstanceTransform(instance, fromTransform);
+            }
+
+            SetSpiderLoopParameters(instance, rawIntensity, rawDangerLevel, stateValue);
         }
 
         public void StopTutorialDrawingStaticLoopsImmediate()
@@ -1352,6 +1461,12 @@ namespace Managers
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial;
         }
 
+        private static bool IsBedroomWorldLocation()
+        {
+            return GameStateManager.Instance != null
+                && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom;
+        }
+
         private bool ShouldPlayBedroomAmbience()
         {
             if (GameStateManager.Instance == null)
@@ -1699,6 +1814,20 @@ namespace Managers
             }
         }
 
+        private void StopAndReleaseBedroomWallClock(bool immediate)
+        {
+            if (_bedroomWallClockInstance.isValid())
+            {
+                LogAudioState($"Bedroom wall clock stopped via code fallback. immediate={immediate}.");
+                _bedroomWallClockInstance.stop(immediate ? FMOD.Studio.STOP_MODE.IMMEDIATE : FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _bedroomWallClockInstance.release();
+                _bedroomWallClockInstance = default;
+            }
+
+            _hasBedroomWallClockActiveParameterId = false;
+            _bedroomWallClockActiveParameterId = default;
+        }
+
         private void StopAndReleaseTutorialAmbience()
         {
             if (_tutorialAmbienceInstance.isValid())
@@ -1811,6 +1940,56 @@ namespace Managers
             {
                 _ambienceBus = RuntimeManager.GetBus(ambienceBusPath);
             }
+        }
+
+        private void SetBedroomWallClockActive(bool isActive)
+        {
+            if (_bedroomWallClockInstance.isValid() && !string.IsNullOrWhiteSpace(bedroomWallClockActiveParameter))
+            {
+                float requestedValue = isActive ? 1f : 0f;
+                if (!_hasBedroomWallClockActiveParameterId)
+                {
+                    CacheBedroomWallClockActiveParameterId();
+                }
+
+                if (_hasBedroomWallClockActiveParameterId)
+                {
+                    _bedroomWallClockInstance.setParameterByID(_bedroomWallClockActiveParameterId, requestedValue);
+                }
+                else
+                {
+                    _bedroomWallClockInstance.setParameterByName(bedroomWallClockActiveParameter, requestedValue);
+                }
+            }
+        }
+
+        private void CacheBedroomWallClockActiveParameterId()
+        {
+            _hasBedroomWallClockActiveParameterId = false;
+            _bedroomWallClockActiveParameterId = default;
+
+            if (!_bedroomWallClockInstance.isValid() || string.IsNullOrWhiteSpace(bedroomWallClockActiveParameter))
+            {
+                return;
+            }
+
+            FMOD.RESULT descriptionResult = _bedroomWallClockInstance.getDescription(out EventDescription description);
+            if (descriptionResult != FMOD.RESULT.OK)
+            {
+                return;
+            }
+
+            FMOD.RESULT parameterDescriptionResult = description.getParameterDescriptionByName(
+                bedroomWallClockActiveParameter,
+                out PARAMETER_DESCRIPTION parameterDescription);
+
+            if (parameterDescriptionResult != FMOD.RESULT.OK)
+            {
+                return;
+            }
+
+            _bedroomWallClockActiveParameterId = parameterDescription.id;
+            _hasBedroomWallClockActiveParameterId = true;
         }
 
         #endregion
@@ -1948,6 +2127,49 @@ namespace Managers
             LogAudioState($"Tutorial orb audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}, events={assignments.Count}.");
         }
 
+        private void AutoAttachSpiderAudioEmittersInScene(Scene scene)
+        {
+            if (!autoAttachSpiderAudioOnSceneLoad || !scene.IsValid() || !scene.isLoaded || spiderLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            if (!SceneMatchesConfiguredList(scene.name, spiderAudioSceneNames))
+            {
+                return;
+            }
+
+            int attachedCount = 0;
+            int configuredCount = 0;
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                Transform[] transforms = roots[i].GetComponentsInChildren<Transform>(true);
+                for (int j = 0; j < transforms.Length; j++)
+                {
+                    Transform candidate = transforms[j];
+                    if (!IsSpiderAnchorCandidate(candidate))
+                    {
+                        continue;
+                    }
+
+                    SpiderAudioEmitter emitter = candidate.GetComponent<SpiderAudioEmitter>();
+                    if (emitter == null)
+                    {
+                        emitter = candidate.gameObject.AddComponent<SpiderAudioEmitter>();
+                        attachedCount++;
+                    }
+
+                    AttractorAI attractorAI = candidate.GetComponentInParent<AttractorAI>();
+                    Attractor attractor = ResolveSpiderAttractor(candidate, attractorAI);
+                    emitter.Configure(candidate, attractor, attractorAI);
+                    configuredCount++;
+                }
+            }
+
+            LogAudioState($"Spider audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
+        }
+
         private void CollectTutorialOrbCandidatesInHierarchy(
             Transform searchRoot,
             HashSet<Transform> uniqueOrbTargets,
@@ -1979,6 +2201,67 @@ namespace Managers
             }
 
             return candidate.name.StartsWith(tutorialOrbNamePrefix, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsSpiderAnchorCandidate(Transform candidate)
+        {
+            return candidate != null
+                   && !string.IsNullOrWhiteSpace(spiderAnchorName)
+                   && string.Equals(candidate.name, spiderAnchorName, StringComparison.Ordinal);
+        }
+
+        private static Attractor ResolveSpiderAttractor(Transform spiderAnchor, AttractorAI attractorAI)
+        {
+            if (spiderAnchor == null)
+            {
+                return null;
+            }
+
+            Attractor attractor = spiderAnchor.GetComponentInParent<Attractor>();
+            if (attractor != null)
+            {
+                return attractor;
+            }
+
+            Transform searchRoot = attractorAI != null ? attractorAI.transform : spiderAnchor.parent;
+            if (searchRoot == null)
+            {
+                return null;
+            }
+
+            Attractor[] attractors = searchRoot.GetComponentsInChildren<Attractor>(true);
+            for (int i = 0; i < attractors.Length; i++)
+            {
+                if (attractors[i] != null && attractors[i].attractorType == AttractorAI.AttractorType.self)
+                {
+                    return attractors[i];
+                }
+            }
+
+            return attractors.Length > 0 ? attractors[0] : null;
+        }
+
+        private static bool SceneMatchesConfiguredList(string sceneName, string[] configuredSceneNames)
+        {
+            if (string.IsNullOrWhiteSpace(sceneName))
+            {
+                return false;
+            }
+
+            if (configuredSceneNames == null || configuredSceneNames.Length == 0)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < configuredSceneNames.Length; i++)
+            {
+                if (string.Equals(sceneName, configuredSceneNames[i], StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private List<EventReference> BuildTutorialOrbEventAssignments(int targetCount)
@@ -2036,6 +2319,38 @@ namespace Managers
                 events[i] = events[swapIndex];
                 events[swapIndex] = temp;
             }
+        }
+
+        private void SetSpiderLoopParameters(
+            EventInstance instance,
+            float rawIntensity,
+            float rawDangerLevel,
+            int stateValue)
+        {
+            if (!instance.isValid())
+            {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(spiderIntensityParameter))
+            {
+                instance.setParameterByName(spiderIntensityParameter, NormalizeSpiderValue(rawIntensity, spiderIntensityMax));
+            }
+
+            if (!string.IsNullOrWhiteSpace(spiderDangerParameter))
+            {
+                instance.setParameterByName(spiderDangerParameter, NormalizeSpiderValue(rawDangerLevel, spiderDangerMax));
+            }
+
+            if (!string.IsNullOrWhiteSpace(spiderStateParameter))
+            {
+                instance.setParameterByName(spiderStateParameter, stateValue);
+            }
+        }
+
+        private static float NormalizeSpiderValue(float rawValue, float maxValue)
+        {
+            return Mathf.Clamp01(rawValue / Mathf.Max(0.01f, maxValue));
         }
 
         private static bool IsLampCandidate(Light light)

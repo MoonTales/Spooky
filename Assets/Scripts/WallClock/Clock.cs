@@ -56,6 +56,7 @@ public class Clock : MonoBehaviour
         damagePerTick = 100/timeToExit;  // Normalized damage per second to player sanity
         minuteHandDegPerSec = ClockSpeed; // 7.2° per second for minute hand
         hourHandDegPerSec = minuteHandDegPerSec / 12; // 0.6° per second for hour hand
+        AudioManager.Instance?.StartBedroomWallClock(transform);
         StartCoroutine(Timer());
         StartCoroutine(ClockTick());
 
