@@ -48,6 +48,9 @@ public class InspectionSystem : Singleton<InspectionSystem>
     // this is to stop the low fsp issue of it returning to the og position
     float inspectionStartTime = 0f;
     bool canExitInspection => inspectionStartTime >= 0.5f;
+
+    // This is a custom return location when we finish an inspection
+    [SerializeField] private GameObject _returnlocation = null; public void SetReturnLocation(GameObject returnLocation) { _returnlocation = returnLocation; }
     
     
     void Start()
@@ -119,10 +122,11 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
     
     // Public function which can be called from any other script to start inspecting an object (itself or another)
-    public void StartInspection(GameObject objectToInspect)
+    public void StartInspection(GameObject objectToInspect, GameObject returnLocation = null)
     {
         // Prevent starting a new inspection if already inspecting an object, or if we have no object
         if (_isInspecting || objectToInspect == null){ return;}
+        _returnlocation = returnLocation;
         _isExitingInspection = false;
         // Set current inspected object
         _currentInspectedObject = objectToInspect;
@@ -374,6 +378,13 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
     private void HandleExitTransition()
     {
+
+        if (_returnlocation != null)
+        {
+            _originalPosition = _returnlocation.transform.position;
+            _originalRotation = _returnlocation.transform.rotation;
+        }
+
         // Smoothly move back to original position
         _currentInspectedObject.transform.position = Vector3.Lerp(
             _currentInspectedObject.transform.position, 

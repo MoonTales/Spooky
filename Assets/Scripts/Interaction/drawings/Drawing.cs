@@ -21,6 +21,7 @@ namespace Interaction.drawings
         [SerializeField] private float pickupTransitionSpeed = 8f;
         [SerializeField] private float returnTransitionSpeed = 8f;
         [SerializeField] private Vector3 handOffset = new Vector3(0, 0, 0.3f);
+        [SerializeField] private GameObject _returnLocation;
         
         
         // We will be able to determine if a drawing is in the correct position, IF:
@@ -127,27 +128,7 @@ namespace Interaction.drawings
 
         public void UpdateIfIsInCorrectPosition()
         {
-            
-            _isInCorrectPosition = drawingID * 11 == uniqueDrawingID;
 
-            // these are found in Resources/Mats/Drawings
-            if (_isInCorrectPosition )
-            {
-                // we want to set the material to be the Outline_Correct
-                if (_isOutlineActive)
-                {
-                    _outlineObject_CORRECT.SetActive(true);
-                    _outlineObject_WRONG.SetActive(false);
-                }
-            }
-            else
-            {
-                if (_isOutlineActive)
-                {
-                    _outlineObject_CORRECT.SetActive(false);
-                    _outlineObject_WRONG.SetActive(true);
-                }
-            }
         }
     
         public bool CanInteract(Interactor interactor)
@@ -183,10 +164,10 @@ namespace Interaction.drawings
 
         public virtual void Interact(Interactor interactor)
         {
-            // If player is holding a drawing and this slot has a drawing, swap them
-            if (_currentlyHeldDrawing != null)
+            
+            if(GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom)
             {
-                SwapDrawings(_currentlyHeldDrawing);
+                InspectionSystem.Instance.StartInspection(gameObject, _returnLocation);
                 return;
             }
     
