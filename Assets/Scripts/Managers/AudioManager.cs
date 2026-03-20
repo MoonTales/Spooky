@@ -42,6 +42,17 @@ namespace Managers
             public EventReference eventRef;
         }
 
+        [Serializable]
+        public class DoorwayBlendConfig
+        {
+            public string sceneName = "Nightmare1";
+            public string rootObjectName;
+            public string objectName;
+            public bool forwardPointsOutside = true;
+
+            [NonSerialized] public Transform cachedTransform;
+        }
+
         // Per-call parameter payload for FMOD events.
         public readonly struct SfxParam
         {
@@ -184,11 +195,10 @@ namespace Managers
         [SerializeField] private EventReference nightmareAmbLoopEvent;
         [SerializeField] private EventReference nightmareInteriorExteriorAmbLoopEvent;
         [SerializeField] private string nightmareInteriorAmountParameter = "InteriorAmount";
-        [SerializeField] private string nightmareInteriorDoorSceneName = "Nightmare1";
-        [SerializeField] private string nightmareInteriorDoorObjectName = "Door_1B";
-        [SerializeField] private bool nightmareDoorForwardPointsOutside = true;
+        [SerializeField] private DoorwayBlendConfig[] nightmareInteriorDoorways;
         [SerializeField] private float nightmareInteriorDoorHalfWidth = 1.5f;
         [SerializeField] private float nightmareInteriorBlendDepth = 4f;
+        [SerializeField] private float nightmareInteriorDoorMaxInfluenceDistance = 20f;
         #endregion
 
         #region Menu and Mix
@@ -248,7 +258,6 @@ namespace Managers
         private float _mentalStateSeverity;
         private float _terrorSeverity;
         private Transform _terrorSourceTransform;
-        private Transform _nightmareInteriorDoorTransform;
         private bool _terrorLoopIsPlaying;
 
         // Runtime audio state - sleep tracker flow.
@@ -333,7 +342,7 @@ namespace Managers
             BuildSfxMap();
             CachePlayerMovementBus();
             CacheSettingsBuses();
-            CacheNightmareInteriorDoorTransform(SceneManager.GetActiveScene());
+            CacheNightmareInteriorDoorTransforms(SceneManager.GetActiveScene());
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachTutorialOrbAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachSpiderAudioEmittersInScene(SceneManager.GetActiveScene());
@@ -436,7 +445,7 @@ namespace Managers
                 StopAndReleaseBedroomWallClock(true);
             }
 
-            CacheNightmareInteriorDoorTransform(scene);
+            CacheNightmareInteriorDoorTransforms(scene);
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
             AutoAttachSpiderAudioEmittersInScene(scene);
@@ -1508,19 +1517,41 @@ namespace Managers
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom;
         }
 
-        private void CacheNightmareInteriorDoorTransform(Scene scene)
+        private void CacheNightmareInteriorDoorTransforms(Scene scene)
         {
-            _nightmareInteriorDoorTransform = null;
-            if (!scene.IsValid()
-                || !scene.isLoaded
-                || string.IsNullOrWhiteSpace(nightmareInteriorDoorSceneName)
-                || !string.Equals(scene.name, nightmareInteriorDoorSceneName, StringComparison.Ordinal)
-                || string.IsNullOrWhiteSpace(nightmareInteriorDoorObjectName))
+            if (nightmareInteriorDoorways == null)
             {
                 return;
             }
 
-            _nightmareInteriorDoorTransform = FindTransformInSceneByName(scene, nightmareInteriorDoorObjectName);
+            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
+            {
+                if (nightmareInteriorDoorways[i] != null)
+                {
+                    nightmareInteriorDoorways[i].cachedTransform = null;
+                }
+            }
+
+            if (!scene.IsValid() || !scene.isLoaded)
+            {
+                return;
+            }
+
+            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
+            {
+                DoorwayBlendConfig doorway = nightmareInteriorDoorways[i];
+                if (doorway == null
+                    || string.IsNullOrWhiteSpace(doorway.sceneName)
+                    || !string.Equals(scene.name, doorway.sceneName, StringComparison.Ordinal)
+                    || string.IsNullOrWhiteSpace(doorway.objectName))
+                {
+                    continue;
+                }
+
+                doorway.cachedTransform = string.IsNullOrWhiteSpace(doorway.rootObjectName)
+                    ? FindTransformInSceneByName(scene, doorway.objectName)
+                    : FindTransformInRootHierarchy(scene, doorway.rootObjectName, doorway.objectName);
+            }
         }
 
         private bool ShouldPlayBedroomAmbience()
@@ -1567,30 +1598,60 @@ namespace Managers
         {
             if (!_nightmareInteriorExteriorAmbienceInstance.isValid()
                 || string.IsNullOrWhiteSpace(nightmareInteriorAmountParameter)
-                || _nightmareInteriorDoorTransform == null
-                || PlayerController.Instance == null)
+                || PlayerController.Instance == null
+                || nightmareInteriorDoorways == null)
             {
                 return;
             }
 
-            Vector3 toPlayer = PlayerController.Instance.transform.position - _nightmareInteriorDoorTransform.position;
-            float signedDepth = Vector3.Dot(_nightmareInteriorDoorTransform.forward, toPlayer);
-            if (!nightmareDoorForwardPointsOutside)
-            {
-                signedDepth = -signedDepth;
-            }
-
+            Vector3 playerPosition = PlayerController.Instance.transform.position;
             float clampedBlendDepth = Mathf.Max(0.01f, nightmareInteriorBlendDepth);
-            float interiorAmount = 1f - Mathf.InverseLerp(-clampedBlendDepth, clampedBlendDepth, signedDepth);
+            float clampedMaxInfluenceDistance = Mathf.Max(0.01f, nightmareInteriorDoorMaxInfluenceDistance);
+            float lowestInteriorAmount = 1f;
+            bool foundRelevantDoorway = false;
 
-            // Restrict the blend to the doorway opening so nearby walls do not behave like exterior space.
-            float lateralOffset = Mathf.Abs(Vector3.Dot(_nightmareInteriorDoorTransform.right, toPlayer));
-            if (lateralOffset > nightmareInteriorDoorHalfWidth)
+            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
             {
-                interiorAmount = signedDepth <= 0f ? 1f : 0f;
+                DoorwayBlendConfig doorway = nightmareInteriorDoorways[i];
+                if (doorway == null || doorway.cachedTransform == null)
+                {
+                    continue;
+                }
+
+                Vector3 toPlayer = playerPosition - doorway.cachedTransform.position;
+                float planarDistance = Vector3.ProjectOnPlane(toPlayer, Vector3.up).magnitude;
+                if (planarDistance > clampedMaxInfluenceDistance)
+                {
+                    continue;
+                }
+
+                foundRelevantDoorway = true;
+
+                float signedDepth = Vector3.Dot(doorway.cachedTransform.forward, toPlayer);
+                if (!doorway.forwardPointsOutside)
+                {
+                    signedDepth = -signedDepth;
+                }
+
+                float interiorAmount = 1f - Mathf.InverseLerp(-clampedBlendDepth, clampedBlendDepth, signedDepth);
+
+                // Restrict the blend to the doorway opening so nearby walls do not behave like exterior space.
+                float lateralOffset = Mathf.Abs(Vector3.Dot(doorway.cachedTransform.right, toPlayer));
+                if (lateralOffset > nightmareInteriorDoorHalfWidth)
+                {
+                    interiorAmount = signedDepth <= 0f ? 1f : 0f;
+                }
+
+                lowestInteriorAmount = Mathf.Min(lowestInteriorAmount, interiorAmount);
             }
 
-            _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareInteriorAmountParameter, interiorAmount);
+            if (!foundRelevantDoorway)
+            {
+                return;
+            }
+
+            _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareInteriorAmountParameter, lowestInteriorAmount);
+            Debug.Log($"AudioManager: InteriorAmount={lowestInteriorAmount:0.000}");
         }
 
         private void SetTutorialHallwayStretchStateLabel(string stateLabel)
@@ -2273,13 +2334,40 @@ namespace Managers
             GameObject[] roots = scene.GetRootGameObjects();
             for (int i = 0; i < roots.Length; i++)
             {
-                Transform[] transforms = roots[i].GetComponentsInChildren<Transform>(true);
-                for (int j = 0; j < transforms.Length; j++)
+                Transform match = FindTransformInHierarchyByName(roots[i].transform, objectName);
+                if (match != null)
                 {
-                    if (string.Equals(transforms[j].name, objectName, StringComparison.Ordinal))
-                    {
-                        return transforms[j];
-                    }
+                    return match;
+                }
+            }
+
+            return null;
+        }
+
+        private static Transform FindTransformInRootHierarchy(Scene scene, string rootObjectName, string objectName)
+        {
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                if (!string.Equals(roots[i].name, rootObjectName, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                return FindTransformInHierarchyByName(roots[i].transform, objectName);
+            }
+
+            return null;
+        }
+
+        private static Transform FindTransformInHierarchyByName(Transform root, string objectName)
+        {
+            Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                if (string.Equals(transforms[i].name, objectName, StringComparison.Ordinal))
+                {
+                    return transforms[i];
                 }
             }
 

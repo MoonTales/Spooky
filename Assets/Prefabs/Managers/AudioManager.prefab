@@ -327,15 +327,14 @@ MonoBehaviour:
   - sceneName: Nightmare1
     rootObjectName: 
     objectName: Door_1B
-    forwardPointsOutside: 0
-    halfWidth: 1.5
-    blendDepth: 4
+    forwardPointsOutside: 1
   - sceneName: Nightmare1
     rootObjectName: MysteriousNeighbor
     objectName: Exterior_Door_Frame
     forwardPointsOutside: 1
-    halfWidth: 1.5
-    blendDepth: 4
+  nightmareInteriorDoorHalfWidth: 1.5
+  nightmareInteriorBlendDepth: 5
+  nightmareInteriorDoorMaxInfluenceDistance: 50
   mainMenuMusicEvent:
     Guid:
       Data1: -578515550
