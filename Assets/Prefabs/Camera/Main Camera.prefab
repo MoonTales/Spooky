@@ -366,7 +366,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 3
+  far clip plane: 8
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -520,6 +520,14 @@ PrefabInstance:
     - target: {fileID: 3874213745340489112, guid: 05d37013a667eaa43b4f4d78b899c45d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7448241575134660896, guid: 05d37013a667eaa43b4f4d78b899c45d, type: 3}
+      propertyPath: m_ColorTemperature
+      value: 6500
+      objectReference: {fileID: 0}
+    - target: {fileID: 8592162496514335197, guid: 05d37013a667eaa43b4f4d78b899c45d, type: 3}
+      propertyPath: m_ColorTemperature
+      value: 6500
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
