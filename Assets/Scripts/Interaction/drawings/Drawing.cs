@@ -131,7 +131,8 @@ namespace Interaction.drawings
         {
             if (!IsInBedroom()){ return;}
             // if we are "close enough" to our return location, then we will consider ourselves to be in the correct position
-            if (Vector3.Distance(transform.position, _returnLocation.transform.position) < 0.5f)
+            if (Vector3.Distance(transform.position, _returnLocation.transform.position) < 0.25f &&
+                Quaternion.Angle(transform.rotation, _returnLocation.transform.rotation) < 2f)
             {
                 _isInCorrectPosition = true;
                 if (_isOutlineActive)
