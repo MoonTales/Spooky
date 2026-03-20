@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Managers;
 using Player;
 using UnityEngine;
@@ -128,7 +129,26 @@ namespace Interaction.drawings
 
         public void UpdateIfIsInCorrectPosition()
         {
-
+            if (!IsInBedroom()){ return;}
+            // if we are "close enough" to our return location, then we will consider ourselves to be in the correct position
+            if (Vector3.Distance(transform.position, _returnLocation.transform.position) < 0.5f)
+            {
+                _isInCorrectPosition = true;
+                if (_isOutlineActive)
+                {
+                    if (_outlineObject_CORRECT){_outlineObject_CORRECT.SetActive(true);}
+                    if (_outlineObject_WRONG){_outlineObject_WRONG.SetActive(false);}
+                }
+            }
+            else
+            {
+                _isInCorrectPosition = false;
+                if (_isOutlineActive)
+                {
+                    if (_outlineObject_CORRECT){_outlineObject_CORRECT.SetActive(false);}
+                    if (_outlineObject_WRONG){_outlineObject_WRONG.SetActive(true);}
+                }
+            }
         }
     
         public bool CanInteract(Interactor interactor)
@@ -140,6 +160,21 @@ namespace Interaction.drawings
         }
 
 
+        public void OnInspectionFinished()
+        {
+            if (IsInBedroom())
+            {
+                StartCoroutine(DelayedCheck());
+            }
+            
+        }
+
+        private IEnumerator DelayedCheck()
+        {
+            yield return new WaitForSeconds(0.5f);
+            UpdateIfIsInCorrectPosition();
+            DrawingStateManager.Instance.UpdateDrawingTransformData();
+        }
     
     
         private void Update()

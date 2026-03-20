@@ -78,17 +78,7 @@ namespace UI
         {
             StartCoroutine(OnDrawingCollectedFade(drawingid));
         }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                // Debug key to test the drawing collected UI
-                int testDrawingID = 1; // This can be any ID, as the current implementation doesn't use it directly
-                OnDrawingCollected(testDrawingID);
-            }
-        }
-
+        
         public void ShowInventory()
         {
             int currentDrawings = PlayerInventory.Instance.GetCurrentDrawingsThisNight();
@@ -104,9 +94,9 @@ namespace UI
         {
             int currentDrawings = PlayerInventory.Instance.GetCurrentDrawingsThisNight();
 
-            yield return StartCoroutine(FadeInInventory(currentDrawings, fadeDuration: 0.5f));
+            yield return StartCoroutine(FadeInInventory(currentDrawings, fadeDuration: 0.5f, drawingId));
             yield return new WaitForSeconds(3f);
-            yield return StartCoroutine(FadeOutInventory(fadeDuration: 0.5f, disableAfter: true));
+            yield return StartCoroutine(FadeOutInventory(fadeDuration: 0.5f, disableAfter: true, drawingId));
         }
         
         private Color GetIconColor(int slot, int currentDrawings)
@@ -134,10 +124,18 @@ namespace UI
 
         private Color WithZeroAlpha(Color c) => new Color(c.r, c.g, c.b, 0f);
 
-        private IEnumerator FadeInInventory(int currentDrawings, float fadeDuration)
+        private IEnumerator FadeInInventory(int currentDrawings, float fadeDuration, int drawingId = -1)
         {
             SetIconsEnabled(true);
 
+            // EDGE CASE OVER-RIDE:
+            // if we picked up drawing 0 (the tutorial drawing), we will ONLY apply stuff to the first icon,
+            // and we will ignore the currentDrawings count.
+            if (drawingId == 0)
+            {
+                _InventoryIcon_2.enabled = false;
+                _InventoryIcon_3.enabled = false;
+            }
             // Start from fully transparent
             _InventoryIcon_1.color = WithZeroAlpha(GetIconColor(1, currentDrawings));
             _InventoryIcon_2.color = WithZeroAlpha(GetIconColor(2, currentDrawings));
@@ -155,7 +153,7 @@ namespace UI
             ));
         }
 
-        private IEnumerator FadeOutInventory(float fadeDuration, bool disableAfter = true)
+        private IEnumerator FadeOutInventory(float fadeDuration, bool disableAfter = true, int drawingId = -1)
         {
             if (_InventoryIcon_1 == null || _InventoryIcon_2 == null || _InventoryIcon_3 == null)
             {

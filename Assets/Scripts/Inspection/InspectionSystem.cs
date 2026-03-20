@@ -4,6 +4,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 using Inspection;
+using Interaction.drawings;
 using Interaction.Letters;
 using Managers;
 using UI;
@@ -203,6 +204,12 @@ public class InspectionSystem : Singleton<InspectionSystem>
         if (inspectable != null)
         {
             inspectable.OnInspectionFinished();
+        }
+        // edge case cause im lasy
+        Drawing drawing = _currentInspectedObject.GetComponent<Drawing>();
+        if (drawing != null)
+        {
+            drawing.OnInspectionFinished();
         }
         
         // reset the inspection start time for the next inspection
