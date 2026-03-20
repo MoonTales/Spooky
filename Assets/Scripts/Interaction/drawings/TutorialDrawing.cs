@@ -73,20 +73,6 @@ namespace Interaction.drawings
             PlayerInventory.Instance.AddDrawing(0);
             gameObject.SetActive(false);
             Destroy(gameObject);
-            return;
-
-            const int timeToFadeOut = 5;
-            SleepTrackerManager.Instance.SetIsGoodWakeup(true);
-            AudioManager.Instance.BeginGoodWakeupAlarmTransition();
-            SleepTrackerManager.Instance.TurnSleepTrackerOn();
-
-            Types.ScreenFadeData data = new Types.ScreenFadeData(
-                fadeInDuration: 1,
-                2,
-                fadeOutDuration: timeToFadeOut,
-                null,
-                FadeOutCompleted);
-            data.Send();
         }
 
         private void FadeOutCompleted()
