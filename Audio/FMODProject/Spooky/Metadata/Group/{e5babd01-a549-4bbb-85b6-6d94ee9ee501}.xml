@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="MixerGroup" id="{e5babd01-a549-4bbb-85b6-6d94ee9ee501}">
+		<property name="name">
+			<value>Nightmare</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{bf98d871-92a4-45f3-8801-d3e34923ff7e}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{d7f8f95a-75d3-48c6-ae32-a156c0e57759}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{7db39808-d1f6-418d-b039-d68d265dd37d}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{bf98d871-92a4-45f3-8801-d3e34923ff7e}">
+		<relationship name="effects">
+			<destination>{cb196b9b-b4f1-4194-8362-ef71be76534a}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{d7f8f95a-75d3-48c6-ae32-a156c0e57759}" />
+	<object class="MixerBusFader" id="{cb196b9b-b4f1-4194-8362-ef71be76534a}" />
+</objects>

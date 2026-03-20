@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using FMODUnity;
 using FMOD.Studio;
+using Player;
 using Types = System.Types;
 
 namespace Managers
@@ -152,7 +153,6 @@ namespace Managers
         [SerializeField] private bool terrorParameterIsGlobal = true;
         [SerializeField] private bool mentalHealthParameterIsGlobal = true;
         [SerializeField] private EventReference terrorLoopEvent;
-        [SerializeField] private EventReference nightmareAmbLoopEvent;
         [SerializeField] private EventReference heartbeatLoopEvent;
         [SerializeField] private string heartbeatTerrorParameter = "Terror";
         [SerializeField] private string heartbeatMentalHealthParameter = "MentalHealth";
@@ -181,6 +181,14 @@ namespace Managers
         [SerializeField] private bool bedroomAmbienceRequiresGameplay = true;
         [SerializeField] private EventReference tutorialAmbLoopEvent;
         [SerializeField] private bool tutorialAmbienceRequiresGameplay = true;
+        [SerializeField] private EventReference nightmareAmbLoopEvent;
+        [SerializeField] private EventReference nightmareInteriorExteriorAmbLoopEvent;
+        [SerializeField] private string nightmareInteriorAmountParameter = "InteriorAmount";
+        [SerializeField] private string nightmareInteriorDoorSceneName = "Nightmare1";
+        [SerializeField] private string nightmareInteriorDoorObjectName = "Door_1B";
+        [SerializeField] private bool nightmareDoorForwardPointsOutside = true;
+        [SerializeField] private float nightmareInteriorDoorHalfWidth = 1.5f;
+        [SerializeField] private float nightmareInteriorBlendDepth = 4f;
         #endregion
 
         #region Menu and Mix
@@ -226,6 +234,7 @@ namespace Managers
         private EventInstance _bedroomAmbienceInstance;
         private EventInstance _bedroomWallClockInstance;
         private EventInstance _tutorialAmbienceInstance;
+        private EventInstance _nightmareInteriorExteriorAmbienceInstance;
         private EventInstance _tutorialHallwayStretchInstance;
         private EventInstance _nightmareAmbienceInstance;
         private EventInstance _terrorLoopInstance;
@@ -239,6 +248,7 @@ namespace Managers
         private float _mentalStateSeverity;
         private float _terrorSeverity;
         private Transform _terrorSourceTransform;
+        private Transform _nightmareInteriorDoorTransform;
         private bool _terrorLoopIsPlaying;
 
         // Runtime audio state - sleep tracker flow.
@@ -323,11 +333,18 @@ namespace Managers
             BuildSfxMap();
             CachePlayerMovementBus();
             CacheSettingsBuses();
+            CacheNightmareInteriorDoorTransform(SceneManager.GetActiveScene());
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachTutorialOrbAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachSpiderAudioEmittersInScene(SceneManager.GetActiveScene());
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+            ApplyNightmareWorldAmbience();
+        }
+
+        private void Update()
+        {
+            UpdateNightmareInteriorBlend();
         }
 
         protected override void OnDestroy()
@@ -341,6 +358,7 @@ namespace Managers
             StopAndReleaseBedroomAmbience();
             StopAndReleaseBedroomWallClock(true);
             StopAndReleaseTutorialAmbience();
+            StopAndReleaseNightmareInteriorExteriorAmbience();
             StopAndReleaseTutorialHallwayStretch(true);
             StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
@@ -398,6 +416,7 @@ namespace Managers
             RefreshMentalAudio();
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+            ApplyNightmareWorldAmbience();
         }
 
         private void OnRequestScreenFadeScreenSwap(Types.ScreenFadeSceneTransitionData screenFadeData)
@@ -417,11 +436,13 @@ namespace Managers
                 StopAndReleaseBedroomWallClock(true);
             }
 
+            CacheNightmareInteriorDoorTransform(scene);
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
             AutoAttachSpiderAudioEmittersInScene(scene);
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+            ApplyNightmareWorldAmbience();
         }
 
         protected override void OnGameStateChanged(Types.GameState newState)
@@ -450,6 +471,7 @@ namespace Managers
 
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+            ApplyNightmareWorldAmbience();
         }
 
           //---------------//
@@ -1202,7 +1224,6 @@ namespace Managers
         {
             float terrorSeverityForAudio = IsNightmareWorldLocation() ? _terrorSeverity : 0f;
             ApplyTerrorLoop(terrorSeverityForAudio);
-            ApplyNightmareAmbience();
             ApplyHeartbeat();
         }
         #endregion
@@ -1304,11 +1325,18 @@ namespace Managers
             LogAudioState("Bedroom ambience started.");
         }
 
+        private void ApplyNightmareWorldAmbience()
+        {
+            ApplyNightmareAmbience();
+            ApplyNightmareInteriorExteriorAmbience();
+        }
+
         private void ApplyNightmareAmbience()
         {
             if (!IsNightmareWorldLocation())
             {
                 StopAndReleaseNightmareAmbience();
+                StopAndReleaseNightmareInteriorExteriorAmbience();
                 return;
             }
 
@@ -1321,18 +1349,31 @@ namespace Managers
             {
                 _nightmareAmbienceInstance = CreateEventInstance(nightmareAmbLoopEvent);
                 _nightmareAmbienceInstance.start();
-                LogAudioState("Nightmare ambience started. Expected: continuous ambience in Nightmare.");
+                LogAudioState("Nightmare base ambience started.");
+            }
+        }
+
+        private void ApplyNightmareInteriorExteriorAmbience()
+        {
+            if (!IsNightmareWorldLocation())
+            {
+                StopAndReleaseNightmareInteriorExteriorAmbience();
+                return;
             }
 
-            if (!string.IsNullOrWhiteSpace(terrorDistortionParameter))
+            if (nightmareInteriorExteriorAmbLoopEvent.IsNull)
             {
-                SetFmodParameter(_nightmareAmbienceInstance, terrorDistortionParameter, _terrorSeverity, terrorParameterIsGlobal);
+                return;
             }
 
-            if (!string.IsNullOrWhiteSpace(mentalHealthDistortionParameter))
+            if (!_nightmareInteriorExteriorAmbienceInstance.isValid())
             {
-                SetFmodParameter(_nightmareAmbienceInstance, mentalHealthDistortionParameter, _mentalStateSeverity, mentalHealthParameterIsGlobal);
+                _nightmareInteriorExteriorAmbienceInstance = CreateEventInstance(nightmareInteriorExteriorAmbLoopEvent);
+                _nightmareInteriorExteriorAmbienceInstance.start();
+                LogAudioState("Nightmare interior/exterior ambience started.");
             }
+
+            UpdateNightmareInteriorBlend();
         }
 
         private void ApplyTerrorLoop(float terrorSeverity)
@@ -1467,6 +1508,21 @@ namespace Managers
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom;
         }
 
+        private void CacheNightmareInteriorDoorTransform(Scene scene)
+        {
+            _nightmareInteriorDoorTransform = null;
+            if (!scene.IsValid()
+                || !scene.isLoaded
+                || string.IsNullOrWhiteSpace(nightmareInteriorDoorSceneName)
+                || !string.Equals(scene.name, nightmareInteriorDoorSceneName, StringComparison.Ordinal)
+                || string.IsNullOrWhiteSpace(nightmareInteriorDoorObjectName))
+            {
+                return;
+            }
+
+            _nightmareInteriorDoorTransform = FindTransformInSceneByName(scene, nightmareInteriorDoorObjectName);
+        }
+
         private bool ShouldPlayBedroomAmbience()
         {
             if (GameStateManager.Instance == null)
@@ -1505,6 +1561,36 @@ namespace Managers
             }
 
             return GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
+        }
+
+        private void UpdateNightmareInteriorBlend()
+        {
+            if (!_nightmareInteriorExteriorAmbienceInstance.isValid()
+                || string.IsNullOrWhiteSpace(nightmareInteriorAmountParameter)
+                || _nightmareInteriorDoorTransform == null
+                || PlayerController.Instance == null)
+            {
+                return;
+            }
+
+            Vector3 toPlayer = PlayerController.Instance.transform.position - _nightmareInteriorDoorTransform.position;
+            float signedDepth = Vector3.Dot(_nightmareInteriorDoorTransform.forward, toPlayer);
+            if (!nightmareDoorForwardPointsOutside)
+            {
+                signedDepth = -signedDepth;
+            }
+
+            float clampedBlendDepth = Mathf.Max(0.01f, nightmareInteriorBlendDepth);
+            float interiorAmount = 1f - Mathf.InverseLerp(-clampedBlendDepth, clampedBlendDepth, signedDepth);
+
+            // Restrict the blend to the doorway opening so nearby walls do not behave like exterior space.
+            float lateralOffset = Mathf.Abs(Vector3.Dot(_nightmareInteriorDoorTransform.right, toPlayer));
+            if (lateralOffset > nightmareInteriorDoorHalfWidth)
+            {
+                interiorAmount = signedDepth <= 0f ? 1f : 0f;
+            }
+
+            _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareInteriorAmountParameter, interiorAmount);
         }
 
         private void SetTutorialHallwayStretchStateLabel(string stateLabel)
@@ -1799,7 +1885,19 @@ namespace Managers
             {
                 _nightmareAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 _nightmareAmbienceInstance.release();
+                _nightmareAmbienceInstance = default;
                 LogAudioState("Nightmare ambience stopped.");
+            }
+        }
+
+        private void StopAndReleaseNightmareInteriorExteriorAmbience()
+        {
+            if (_nightmareInteriorExteriorAmbienceInstance.isValid())
+            {
+                _nightmareInteriorExteriorAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _nightmareInteriorExteriorAmbienceInstance.release();
+                _nightmareInteriorExteriorAmbienceInstance = default;
+                LogAudioState("Nightmare interior/exterior ambience stopped.");
             }
         }
 
@@ -2168,6 +2266,24 @@ namespace Managers
             }
 
             LogAudioState($"Spider audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
+        }
+
+        private static Transform FindTransformInSceneByName(Scene scene, string objectName)
+        {
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                Transform[] transforms = roots[i].GetComponentsInChildren<Transform>(true);
+                for (int j = 0; j < transforms.Length; j++)
+                {
+                    if (string.Equals(transforms[j].name, objectName, StringComparison.Ordinal))
+                    {
+                        return transforms[j];
+                    }
+                }
+            }
+
+            return null;
         }
 
         private void CollectTutorialOrbCandidatesInHierarchy(
