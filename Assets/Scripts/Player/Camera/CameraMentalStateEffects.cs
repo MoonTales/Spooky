@@ -12,6 +12,10 @@ namespace Player.Camera
     
     public class CameraMentalStateEffects : Singleton<CameraMentalStateEffects>
     {
+        [Range(-1.0f, 1.0f)]
+
+        public float gameBrightness;
+
         // Setting up structs (these can be private, since I know no other class will need these)
         [Serializable]
         private struct TiredSwaySettings
@@ -29,6 +33,7 @@ namespace Player.Camera
         private List<Volume> _postProcessVolumes = new List<Volume>();
         private List<DepthOfField> _depthOfFields = new List<DepthOfField>();
         private List<ChromaticAberration> _chromaticAberrations = new List<ChromaticAberration>();
+        private List<ColorAdjustments> _colorAdjustments = new List<ColorAdjustments>();
 
         // Track current mental state and active coroutine
         private Types.PlayerMentalState _currentMentalState;
@@ -162,6 +167,18 @@ namespace Player.Camera
                 foreach (ChromaticAberration ca in _chromaticAberrations)
                 {
                     if (ca != null){ ca.intensity.Override(0f);}
+                }
+            }
+
+            if (gameBrightness != 0)
+			{
+                SetGameBrightnessAmount(0.25f + gameBrightness * 1.25f);
+			}
+            else
+			{
+                foreach (ColorAdjustments ca in _colorAdjustments)
+                {
+                    if (ca != null) { ca.postExposure.Override(0.25f); }
                 }
             }
         }
@@ -365,7 +382,23 @@ namespace Player.Camera
                 ca.intensity.Override(amount);
             }
         }
-        
+
+        private void SetGameBrightnessAmount(float amount)
+        {
+            if (_postProcessVolumes.Count == 0 || _colorAdjustments.Count == 0)
+            {
+                Debug.LogWarning("awaawawawawa");
+                return;
+            }
+
+
+            foreach (ColorAdjustments ca in _colorAdjustments)
+            {
+                if (ca == null) continue;
+                ca.postExposure.Override(amount);
+            }
+        }
+
         #region Utility Functions
 
         private void TrySetPostProcessing()
@@ -420,6 +453,21 @@ namespace Player.Camera
                 _depthOfFields.Add(dof);
             }
         }
+        private void TrySetColorAdjustments()
+        {
+            _colorAdjustments.Clear();
+
+            foreach (Volume volume in _postProcessVolumes)
+            {
+                if (volume?.profile == null) continue;
+
+                if (!volume.profile.TryGet(out ColorAdjustments ca))
+                {
+                    ca = volume.profile.Add<ColorAdjustments>(true);
+                }
+                _colorAdjustments.Add(ca);
+            }
+        }
 
         private void InitializePostProcessing()
         {
@@ -429,6 +477,9 @@ namespace Player.Camera
             TrySetChromaticAberration();
             // tries to set the depth of field effect from the post processing volume
             TrySetFieldOfDepth();
+
+            // brightness timee
+            TrySetColorAdjustments();
         }
 
         #endregion
