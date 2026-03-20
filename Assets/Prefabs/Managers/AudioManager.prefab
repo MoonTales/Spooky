@@ -323,11 +323,19 @@ MonoBehaviour:
       Data4: 1600399410
     Path: event:/amb/env/nightmare/act1-wind
   nightmareInteriorAmountParameter: InteriorAmount
-  nightmareInteriorDoorSceneName: Nightmare1
-  nightmareInteriorDoorObjectName: Door_1B
-  nightmareDoorForwardPointsOutside: 1
-  nightmareInteriorDoorHalfWidth: 1.5
-  nightmareInteriorBlendDepth: 2
+  nightmareInteriorDoorways:
+  - sceneName: Nightmare1
+    rootObjectName: 
+    objectName: Door_1B
+    forwardPointsOutside: 0
+    halfWidth: 1.5
+    blendDepth: 4
+  - sceneName: Nightmare1
+    rootObjectName: MysteriousNeighbor
+    objectName: Exterior_Door_Frame
+    forwardPointsOutside: 1
+    halfWidth: 1.5
+    blendDepth: 4
   mainMenuMusicEvent:
     Guid:
       Data1: -578515550
