@@ -99,7 +99,7 @@ namespace Interaction
             bool hasSpawnedDrawingOne = false;
             bool hasSpawnedDrawingTwo = false;
             bool hasSpawnedDrawingThree = false;
-            HashSet<int> collectedDrawingIds = PlayerInventory.Instance.GetCollectedDrawingIDs();
+            HashSet<int> collectedDrawingIds = PlayerInventory.Instance.GetCollectedDrawingsThisNight();
             foreach (int drawingID in collectedDrawingIds)
             {
                 string prefabName = "";

@@ -12,7 +12,7 @@ namespace Player
         
         // Internal variables to help this new system
         private int _currentDrawingsThisNight = 0; public int GetCurrentDrawingsThisNight() { return _currentDrawingsThisNight; }
-        private List<int> _collectedDrawingsThisNight = new List<int>();
+        private List<int> _collectedDrawingsThisNight = new List<int>(); public HashSet<int> GetCollectedDrawingsThisNight() { return new HashSet<int>(_collectedDrawingsThisNight); }
         
         
         // Store only the IDs of collected drawings
