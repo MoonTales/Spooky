@@ -101,6 +101,9 @@
 		<property name="length">
 			<value>0.40000000000000002</value>
 		</property>
+		<property name="pitch">
+			<value>-4.5</value>
+		</property>
 		<relationship name="modulators">
 			<destination>{0e9fbfc6-de3d-42ee-9e39-c34c06804a94}</destination>
 		</relationship>
@@ -174,6 +177,7 @@
 	</object>
 	<object class="MixerBusEffectChain" id="{b94dbbe3-582a-4c50-8976-f9a33c875e86}">
 		<relationship name="effects">
+			<destination>{965afc01-622d-44fb-8951-dcdb9b47bb51}</destination>
 			<destination>{c6724b7d-f1e3-4b0e-8492-a917101f7589}</destination>
 			<destination>{e1c00d5c-6e7f-4a70-9efa-11edc1b32e59}</destination>
 			<destination>{5546798c-28f4-40e2-b7b3-575c54f2d4e0}</destination>
@@ -207,12 +211,23 @@
 			<value>5.03453827</value>
 		</property>
 	</object>
+	<object class="PitchShifterEffect" id="{965afc01-622d-44fb-8951-dcdb9b47bb51}">
+		<property name="bypass">
+			<value>true</value>
+		</property>
+		<property name="pitch">
+			<value>0.899999976</value>
+		</property>
+	</object>
 	<object class="MultibandEqEffect" id="{c6724b7d-f1e3-4b0e-8492-a917101f7589}">
+		<property name="bypass">
+			<value>true</value>
+		</property>
 		<property name="frequencyA">
-			<value>7970.95898</value>
+			<value>7188.86182</value>
 		</property>
 		<property name="qualityA">
-			<value>0.360131115</value>
+			<value>0.296989292</value>
 		</property>
 	</object>
 	<object class="MixerBusFader" id="{e1c00d5c-6e7f-4a70-9efa-11edc1b32e59}" />
