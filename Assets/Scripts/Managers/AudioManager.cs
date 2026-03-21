@@ -142,6 +142,16 @@ namespace Managers
         [SerializeField] private string spiderStateParameter = "State";
 
         [Space(10)]
+        [Header("Environment Audio (Nightmare Roofs)")]
+        [SerializeField] private bool autoAttachNightmareRoofAudioOnSceneLoad = true;
+        [SerializeField] private string nightmareRoofAudioSceneName = "Nightmare1";
+        [SerializeField] private string nightmareRoofRootName = "MysteriousNeighbor";
+        [SerializeField] private string nightmareRoofParentName = "Roofs";
+        [SerializeField] private EventReference nightmareRoofLoopEvent;
+        [SerializeField] private int nightmareRoofEmitterTargetCount = 5;
+        [SerializeField] private float nightmareRoofMinimumSpacing = 8f;
+
+        [Space(10)]
         [Header("Environment Audio (Tutorial Hallway Stretch)")]
         [SerializeField] private EventReference tutorialHallwayStretchEvent;
         [SerializeField] private string tutorialHallwayStretchStateParameter = "StretchState";
@@ -349,6 +359,7 @@ namespace Managers
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachTutorialOrbAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachSpiderAudioEmittersInScene(SceneManager.GetActiveScene());
+            AutoAttachNightmareRoofAudioEmittersInScene(SceneManager.GetActiveScene());
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
             ApplyNightmareWorldAmbience();
@@ -452,6 +463,7 @@ namespace Managers
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
             AutoAttachSpiderAudioEmittersInScene(scene);
+            AutoAttachNightmareRoofAudioEmittersInScene(scene);
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
             ApplyNightmareWorldAmbience();
@@ -789,6 +801,40 @@ namespace Managers
             if (EventInstanceIs3D(instance))
             {
                 instance.set3DAttributes(RuntimeUtils.To3DAttributes(worldPosition));
+            }
+
+            instance.start();
+            return true;
+        }
+
+        public bool TryStartSfxEventInstance(
+            EventReference eventReference,
+            Vector3 worldPosition,
+            bool randomizeTimelinePosition,
+            out EventInstance instance)
+        {
+            instance = default;
+
+            if (muteSFX || eventReference.IsNull)
+            {
+                return false;
+            }
+
+            instance = RuntimeManager.CreateInstance(eventReference);
+            if (EventInstanceIs3D(instance))
+            {
+                instance.set3DAttributes(RuntimeUtils.To3DAttributes(worldPosition));
+            }
+
+            if (randomizeTimelinePosition
+                && instance.isValid()
+                && instance.getDescription(out EventDescription description) == FMOD.RESULT.OK
+                && description.isValid()
+                && description.getLength(out int eventLengthMs) == FMOD.RESULT.OK
+                && eventLengthMs > 1)
+            {
+                int randomTimelinePositionMs = UnityEngine.Random.Range(0, eventLengthMs);
+                instance.setTimelinePosition(randomTimelinePositionMs);
             }
 
             instance.start();
@@ -1669,7 +1715,6 @@ namespace Managers
             }
 
             _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareInteriorAmountParameter, lowestInteriorAmount);
-            Debug.Log($"AudioManager: InteriorAmount={lowestInteriorAmount:0.000}, activeDoor={winningDoorwayName ?? "<none>"}");
         }
 
         private void SetTutorialHallwayStretchStateLabel(string stateLabel)
@@ -2347,6 +2392,68 @@ namespace Managers
             LogAudioState($"Spider audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
         }
 
+        private void AutoAttachNightmareRoofAudioEmittersInScene(Scene scene)
+        {
+            if (!autoAttachNightmareRoofAudioOnSceneLoad
+                || !scene.IsValid()
+                || !scene.isLoaded
+                || nightmareRoofLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(nightmareRoofAudioSceneName)
+                && !string.Equals(scene.name, nightmareRoofAudioSceneName, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            Transform roofsRoot = string.IsNullOrWhiteSpace(nightmareRoofRootName)
+                ? FindTransformInSceneByName(scene, nightmareRoofParentName)
+                : FindTransformInRootHierarchy(scene, nightmareRoofRootName, nightmareRoofParentName);
+            if (roofsRoot == null)
+            {
+                return;
+            }
+
+            List<Transform> roofCandidates = new List<Transform>();
+            for (int i = 0; i < roofsRoot.childCount; i++)
+            {
+                Transform candidate = roofsRoot.GetChild(i);
+                if (candidate != null)
+                {
+                    roofCandidates.Add(candidate);
+                }
+            }
+
+            List<Transform> selectedRoofs = SelectSpacedTransforms(
+                roofCandidates,
+                Mathf.Max(0, nightmareRoofEmitterTargetCount),
+                Mathf.Max(0f, nightmareRoofMinimumSpacing));
+            if (selectedRoofs.Count == 0)
+            {
+                return;
+            }
+
+            int attachedCount = 0;
+            int configuredCount = 0;
+            for (int i = 0; i < selectedRoofs.Count; i++)
+            {
+                Transform roofTransform = selectedRoofs[i];
+                RoofRandomEmitter emitter = roofTransform.GetComponent<RoofRandomEmitter>();
+                if (emitter == null)
+                {
+                    emitter = roofTransform.gameObject.AddComponent<RoofRandomEmitter>();
+                    attachedCount++;
+                }
+
+                emitter.Configure(nightmareRoofLoopEvent);
+                configuredCount++;
+            }
+
+            LogAudioState($"Nightmare roof audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
+        }
+
         private static Transform FindTransformInSceneByName(Scene scene, string objectName)
         {
             GameObject[] roots = scene.GetRootGameObjects();
@@ -2390,6 +2497,57 @@ namespace Managers
             }
 
             return null;
+        }
+
+        private static List<Transform> SelectSpacedTransforms(List<Transform> candidates, int targetCount, float minimumSpacing)
+        {
+            List<Transform> selected = new List<Transform>();
+            if (candidates == null || candidates.Count == 0 || targetCount <= 0)
+            {
+                return selected;
+            }
+
+            if (minimumSpacing <= 0f)
+            {
+                int takeCount = Mathf.Min(targetCount, candidates.Count);
+                for (int i = 0; i < takeCount; i++)
+                {
+                    selected.Add(candidates[i]);
+                }
+
+                return selected;
+            }
+
+            List<Transform> shuffledCandidates = new List<Transform>(candidates);
+            for (int i = shuffledCandidates.Count - 1; i > 0; i--)
+            {
+                int swapIndex = UnityEngine.Random.Range(0, i + 1);
+                Transform temp = shuffledCandidates[i];
+                shuffledCandidates[i] = shuffledCandidates[swapIndex];
+                shuffledCandidates[swapIndex] = temp;
+            }
+
+            float minimumSpacingSqr = minimumSpacing * minimumSpacing;
+            for (int i = 0; i < shuffledCandidates.Count && selected.Count < targetCount; i++)
+            {
+                Transform candidate = shuffledCandidates[i];
+                bool isFarEnoughFromExisting = true;
+                for (int j = 0; j < selected.Count; j++)
+                {
+                    if ((candidate.position - selected[j].position).sqrMagnitude < minimumSpacingSqr)
+                    {
+                        isFarEnoughFromExisting = false;
+                        break;
+                    }
+                }
+
+                if (isFarEnoughFromExisting)
+                {
+                    selected.Add(candidate);
+                }
+            }
+
+            return selected;
         }
 
         private void CollectTutorialOrbCandidatesInHierarchy(
