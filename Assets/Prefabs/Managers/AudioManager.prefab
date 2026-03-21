@@ -232,13 +232,26 @@ MonoBehaviour:
   spiderDangerParameter: Danger
   spiderDangerMax: 100
   spiderStateParameter: State
+  autoAttachNightmareRoofAudioOnSceneLoad: 1
+  nightmareRoofAudioSceneName: Nightmare1
+  nightmareRoofRootName: MysteriousNeighbor
+  nightmareRoofParentName: Roofs
+  nightmareRoofLoopEvent:
+    Guid:
+      Data1: 2064594433
+      Data2: 1253550319
+      Data3: 1760976056
+      Data4: -941077781
+    Path: event:/amb/env/nightmare/scratching
+  nightmareRoofEmitterTargetCount: 5
+  nightmareRoofMinimumSpacing: 8
   tutorialHallwayStretchEvent:
     Guid:
-      Data1: 1240122567
-      Data2: 1230136536
-      Data3: 1299489968
-      Data4: 267243005
-    Path: event:/amb/env/tutorial/hall/hallway-stretch-simple
+      Data1: 351463793
+      Data2: 1250743252
+      Data3: 1475581866
+      Data4: 373874254
+    Path: event:/amb/env/tutorial/hall/hallway-stretch
   tutorialHallwayStretchStateParameter: StretchState
   tutorialHallwayStretchProgressParameter: StretchProgress
   tutorialHallwayRunPressureParameter: RunPressure
@@ -268,19 +281,12 @@ MonoBehaviour:
       Data3: 555803024
       Data4: 1634982556
     Path: event:/amb/nightmare/mental-terror-loop
-  nightmareAmbLoopEvent:
-    Guid:
-      Data1: -198520460
-      Data2: 1165664335
-      Data3: 580708496
-      Data4: -533915791
-    Path: event:/amb/nightmare/mental-amb-loop
   heartbeatLoopEvent:
     Guid:
-      Data1: 1493692059
-      Data2: 1300314028
-      Data3: -807272307
-      Data4: 673174759
+      Data1: 1405176995
+      Data2: 1242528515
+      Data3: 672105892
+      Data4: -902285344
     Path: event:/sfx/player/hearbeat/heartbeat
   heartbeatTerrorParameter: Terror
   heartbeatMentalHealthParameter: MentalHealth
@@ -315,6 +321,53 @@ MonoBehaviour:
       Data4: 1881523798
     Path: event:/amb/bg/indoors-nm
   tutorialAmbienceRequiresGameplay: 1
+  nightmareAmbLoopEvent:
+    Guid:
+      Data1: -198520460
+      Data2: 1165664335
+      Data3: 580708496
+      Data4: -533915791
+    Path: event:/amb/nightmare/mental-amb-loop
+  nightmareInteriorExteriorAmbLoopEvent:
+    Guid:
+      Data1: -886720084
+      Data2: 1228769479
+      Data3: -373386594
+      Data4: 1600399410
+    Path: event:/amb/env/nightmare/act1-wind
+  nightmareInteriorAmountParameter: InteriorAmount
+  nightmareInteriorDoorways:
+  - sceneName: Nightmare1
+    rootObjectName: 
+    objectName: Door_1B
+    forwardPointsOutside: 1
+    halfWidthOverride: 0
+    blendDepthOverride: 0
+    maxInfluenceDistanceOverride: 0
+  - sceneName: Nightmare1
+    rootObjectName: MysteriousNeighbor
+    objectName: Exterior_Door_Frame
+    forwardPointsOutside: 1
+    halfWidthOverride: 0
+    blendDepthOverride: 0
+    maxInfluenceDistanceOverride: 0
+  - sceneName: Nightmare1
+    rootObjectName: 
+    objectName: Tunnel3
+    forwardPointsOutside: 0
+    halfWidthOverride: 5
+    blendDepthOverride: 10
+    maxInfluenceDistanceOverride: 10
+  - sceneName: Nightmare1
+    rootObjectName: TunnelTo2
+    objectName: Tunnel2
+    forwardPointsOutside: 1
+    halfWidthOverride: 5
+    blendDepthOverride: 10
+    maxInfluenceDistanceOverride: 20
+  nightmareInteriorDoorHalfWidth: 1.5
+  nightmareInteriorBlendDepth: 5
+  nightmareInteriorDoorMaxInfluenceDistance: 50
   mainMenuMusicEvent:
     Guid:
       Data1: -578515550

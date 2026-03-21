@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using FMODUnity;
 using FMOD.Studio;
+using Player;
 using Types = System.Types;
 
 namespace Managers
@@ -39,6 +40,20 @@ namespace Managers
         {
             public SfxId id;
             public EventReference eventRef;
+        }
+
+        [Serializable]
+        public class DoorwayBlendConfig
+        {
+            public string sceneName = "Nightmare1";
+            public string rootObjectName;
+            public string objectName;
+            public bool forwardPointsOutside = true;
+            public float halfWidthOverride;
+            public float blendDepthOverride;
+            public float maxInfluenceDistanceOverride;
+
+            [NonSerialized] public Transform cachedTransform;
         }
 
         // Per-call parameter payload for FMOD events.
@@ -127,6 +142,16 @@ namespace Managers
         [SerializeField] private string spiderStateParameter = "State";
 
         [Space(10)]
+        [Header("Environment Audio (Nightmare Roofs)")]
+        [SerializeField] private bool autoAttachNightmareRoofAudioOnSceneLoad = true;
+        [SerializeField] private string nightmareRoofAudioSceneName = "Nightmare1";
+        [SerializeField] private string nightmareRoofRootName = "MysteriousNeighbor";
+        [SerializeField] private string nightmareRoofParentName = "Roofs";
+        [SerializeField] private EventReference nightmareRoofLoopEvent;
+        [SerializeField] private int nightmareRoofEmitterTargetCount = 5;
+        [SerializeField] private float nightmareRoofMinimumSpacing = 8f;
+
+        [Space(10)]
         [Header("Environment Audio (Tutorial Hallway Stretch)")]
         [SerializeField] private EventReference tutorialHallwayStretchEvent;
         [SerializeField] private string tutorialHallwayStretchStateParameter = "StretchState";
@@ -152,7 +177,6 @@ namespace Managers
         [SerializeField] private bool terrorParameterIsGlobal = true;
         [SerializeField] private bool mentalHealthParameterIsGlobal = true;
         [SerializeField] private EventReference terrorLoopEvent;
-        [SerializeField] private EventReference nightmareAmbLoopEvent;
         [SerializeField] private EventReference heartbeatLoopEvent;
         [SerializeField] private string heartbeatTerrorParameter = "Terror";
         [SerializeField] private string heartbeatMentalHealthParameter = "MentalHealth";
@@ -181,6 +205,13 @@ namespace Managers
         [SerializeField] private bool bedroomAmbienceRequiresGameplay = true;
         [SerializeField] private EventReference tutorialAmbLoopEvent;
         [SerializeField] private bool tutorialAmbienceRequiresGameplay = true;
+        [SerializeField] private EventReference nightmareAmbLoopEvent;
+        [SerializeField] private EventReference nightmareInteriorExteriorAmbLoopEvent;
+        [SerializeField] private string nightmareInteriorAmountParameter = "InteriorAmount";
+        [SerializeField] private DoorwayBlendConfig[] nightmareInteriorDoorways;
+        [SerializeField] private float nightmareInteriorDoorHalfWidth = 1.5f;
+        [SerializeField] private float nightmareInteriorBlendDepth = 4f;
+        [SerializeField] private float nightmareInteriorDoorMaxInfluenceDistance = 20f;
         #endregion
 
         #region Menu and Mix
@@ -226,6 +257,7 @@ namespace Managers
         private EventInstance _bedroomAmbienceInstance;
         private EventInstance _bedroomWallClockInstance;
         private EventInstance _tutorialAmbienceInstance;
+        private EventInstance _nightmareInteriorExteriorAmbienceInstance;
         private EventInstance _tutorialHallwayStretchInstance;
         private EventInstance _nightmareAmbienceInstance;
         private EventInstance _terrorLoopInstance;
@@ -323,11 +355,20 @@ namespace Managers
             BuildSfxMap();
             CachePlayerMovementBus();
             CacheSettingsBuses();
+            CacheNightmareInteriorDoorTransforms(SceneManager.GetActiveScene());
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachTutorialOrbAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachSpiderAudioEmittersInScene(SceneManager.GetActiveScene());
+            AutoAttachNightmareRoofAudioEmittersInScene(SceneManager.GetActiveScene());
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+            ApplyNightmareWorldAmbience();
+        }
+
+        private void Update()
+        {
+            UpdateNightmareInteriorBlend();
+            UpdateMentalAudioFrameParameters();
         }
 
         protected override void OnDestroy()
@@ -341,6 +382,7 @@ namespace Managers
             StopAndReleaseBedroomAmbience();
             StopAndReleaseBedroomWallClock(true);
             StopAndReleaseTutorialAmbience();
+            StopAndReleaseNightmareInteriorExteriorAmbience();
             StopAndReleaseTutorialHallwayStretch(true);
             StopMainMenuMusic(true);
             SetPauseSnapshotEnabled(false);
@@ -398,6 +440,7 @@ namespace Managers
             RefreshMentalAudio();
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+            ApplyNightmareWorldAmbience();
         }
 
         private void OnRequestScreenFadeScreenSwap(Types.ScreenFadeSceneTransitionData screenFadeData)
@@ -417,11 +460,14 @@ namespace Managers
                 StopAndReleaseBedroomWallClock(true);
             }
 
+            CacheNightmareInteriorDoorTransforms(scene);
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
             AutoAttachSpiderAudioEmittersInScene(scene);
+            AutoAttachNightmareRoofAudioEmittersInScene(scene);
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+            ApplyNightmareWorldAmbience();
         }
 
         protected override void OnGameStateChanged(Types.GameState newState)
@@ -450,6 +496,7 @@ namespace Managers
 
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
+            ApplyNightmareWorldAmbience();
         }
 
           //---------------//
@@ -593,8 +640,8 @@ namespace Managers
         //----------------//
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
         {
-            _mentalStateSeverity = GetMentalStateSeverity(newMentalState);
-            LogAudioState($"Mental state changed -> {newMentalState} ({_mentalStateSeverity:0.00}). Expected: nightmare ambience/heartbeat parameters update.");
+            _mentalStateSeverity = GetNormalizedMentalHealth();
+            LogAudioState($"Mental state changed -> {newMentalState} (normalized mental health {_mentalStateSeverity:0.00}). Expected: nightmare ambience/heartbeat parameters update.");
             RefreshMentalAudio();
         }
 
@@ -755,6 +802,40 @@ namespace Managers
             if (EventInstanceIs3D(instance))
             {
                 instance.set3DAttributes(RuntimeUtils.To3DAttributes(worldPosition));
+            }
+
+            instance.start();
+            return true;
+        }
+
+        public bool TryStartSfxEventInstance(
+            EventReference eventReference,
+            Vector3 worldPosition,
+            bool randomizeTimelinePosition,
+            out EventInstance instance)
+        {
+            instance = default;
+
+            if (muteSFX || eventReference.IsNull)
+            {
+                return false;
+            }
+
+            instance = RuntimeManager.CreateInstance(eventReference);
+            if (EventInstanceIs3D(instance))
+            {
+                instance.set3DAttributes(RuntimeUtils.To3DAttributes(worldPosition));
+            }
+
+            if (randomizeTimelinePosition
+                && instance.isValid()
+                && instance.getDescription(out EventDescription description) == FMOD.RESULT.OK
+                && description.isValid()
+                && description.getLength(out int eventLengthMs) == FMOD.RESULT.OK
+                && eventLengthMs > 1)
+            {
+                int randomTimelinePositionMs = UnityEngine.Random.Range(0, eventLengthMs);
+                instance.setTimelinePosition(randomTimelinePositionMs);
             }
 
             instance.start();
@@ -1202,8 +1283,17 @@ namespace Managers
         {
             float terrorSeverityForAudio = IsNightmareWorldLocation() ? _terrorSeverity : 0f;
             ApplyTerrorLoop(terrorSeverityForAudio);
-            ApplyNightmareAmbience();
             ApplyHeartbeat();
+        }
+
+        private void UpdateMentalAudioFrameParameters()
+        {
+            _mentalStateSeverity = GetNormalizedMentalHealth();
+
+            if (IsNightmareWorldLocation() || _heartbeatInstance.isValid() || _terrorLoopInstance.isValid())
+            {
+                RefreshMentalAudio();
+            }
         }
         #endregion
 
@@ -1304,11 +1394,18 @@ namespace Managers
             LogAudioState("Bedroom ambience started.");
         }
 
+        private void ApplyNightmareWorldAmbience()
+        {
+            ApplyNightmareAmbience();
+            ApplyNightmareInteriorExteriorAmbience();
+        }
+
         private void ApplyNightmareAmbience()
         {
             if (!IsNightmareWorldLocation())
             {
                 StopAndReleaseNightmareAmbience();
+                StopAndReleaseNightmareInteriorExteriorAmbience();
                 return;
             }
 
@@ -1321,18 +1418,31 @@ namespace Managers
             {
                 _nightmareAmbienceInstance = CreateEventInstance(nightmareAmbLoopEvent);
                 _nightmareAmbienceInstance.start();
-                LogAudioState("Nightmare ambience started. Expected: continuous ambience in Nightmare.");
+                LogAudioState("Nightmare base ambience started.");
+            }
+        }
+
+        private void ApplyNightmareInteriorExteriorAmbience()
+        {
+            if (!IsNightmareWorldLocation())
+            {
+                StopAndReleaseNightmareInteriorExteriorAmbience();
+                return;
             }
 
-            if (!string.IsNullOrWhiteSpace(terrorDistortionParameter))
+            if (nightmareInteriorExteriorAmbLoopEvent.IsNull)
             {
-                SetFmodParameter(_nightmareAmbienceInstance, terrorDistortionParameter, _terrorSeverity, terrorParameterIsGlobal);
+                return;
             }
 
-            if (!string.IsNullOrWhiteSpace(mentalHealthDistortionParameter))
+            if (!_nightmareInteriorExteriorAmbienceInstance.isValid())
             {
-                SetFmodParameter(_nightmareAmbienceInstance, mentalHealthDistortionParameter, _mentalStateSeverity, mentalHealthParameterIsGlobal);
+                _nightmareInteriorExteriorAmbienceInstance = CreateEventInstance(nightmareInteriorExteriorAmbLoopEvent);
+                _nightmareInteriorExteriorAmbienceInstance.start();
+                LogAudioState("Nightmare interior/exterior ambience started.");
             }
+
+            UpdateNightmareInteriorBlend();
         }
 
         private void ApplyTerrorLoop(float terrorSeverity)
@@ -1425,28 +1535,17 @@ namespace Managers
             }
         }
 
-        private float GetMentalStateSeverity(Types.PlayerMentalState mentalState)
+        private float GetNormalizedMentalHealth()
         {
-            switch (mentalState)
+            if (PlayerStats.Instance == null)
             {
-                case Types.PlayerMentalState.Normal:
-                    return 0f;
-                case Types.PlayerMentalState.MildlyAnxious:
-                case Types.PlayerMentalState.MildlySleepDeprived:
-                    return 0.25f;
-                case Types.PlayerMentalState.ModeratelyAnxious:
-                case Types.PlayerMentalState.ModeratelySleepDeprived:
-                    return 0.5f;
-                case Types.PlayerMentalState.SeverelyAnxious:
-                case Types.PlayerMentalState.SeverelySleepDeprived:
-                    return 0.75f;
-                case Types.PlayerMentalState.Panic:
-                case Types.PlayerMentalState.Exhausted:
-                case Types.PlayerMentalState.Breakdown:
-                    return 1f;
-                default:
-                    return 0f;
+                return 0f;
             }
+
+            Types.FPlayerStats playerStats = PlayerStats.Instance.GetPlayerStats();
+            float maxMentalHealth = Mathf.Max(0.0001f, playerStats.GetMaxMentalHealth());
+            float normalizedMentalHealth = Mathf.Clamp01(playerStats.GetCurrentMentalHealth() / maxMentalHealth);
+            return 1f - normalizedMentalHealth;
         }
 
         private static bool IsNightmareWorldLocation()
@@ -1465,6 +1564,43 @@ namespace Managers
         {
             return GameStateManager.Instance != null
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom;
+        }
+
+        private void CacheNightmareInteriorDoorTransforms(Scene scene)
+        {
+            if (nightmareInteriorDoorways == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
+            {
+                if (nightmareInteriorDoorways[i] != null)
+                {
+                    nightmareInteriorDoorways[i].cachedTransform = null;
+                }
+            }
+
+            if (!scene.IsValid() || !scene.isLoaded)
+            {
+                return;
+            }
+
+            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
+            {
+                DoorwayBlendConfig doorway = nightmareInteriorDoorways[i];
+                if (doorway == null
+                    || string.IsNullOrWhiteSpace(doorway.sceneName)
+                    || !string.Equals(scene.name, doorway.sceneName, StringComparison.Ordinal)
+                    || string.IsNullOrWhiteSpace(doorway.objectName))
+                {
+                    continue;
+                }
+
+                doorway.cachedTransform = string.IsNullOrWhiteSpace(doorway.rootObjectName)
+                    ? FindTransformInSceneByName(scene, doorway.objectName)
+                    : FindTransformInRootHierarchy(scene, doorway.rootObjectName, doorway.objectName);
+            }
         }
 
         private bool ShouldPlayBedroomAmbience()
@@ -1505,6 +1641,80 @@ namespace Managers
             }
 
             return GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Gameplay;
+        }
+
+        private void UpdateNightmareInteriorBlend()
+        {
+            if (!_nightmareInteriorExteriorAmbienceInstance.isValid()
+                || string.IsNullOrWhiteSpace(nightmareInteriorAmountParameter)
+                || PlayerController.Instance == null
+                || nightmareInteriorDoorways == null)
+            {
+                return;
+            }
+
+            Vector3 playerPosition = PlayerController.Instance.transform.position;
+            float clampedBlendDepth = Mathf.Max(0.01f, nightmareInteriorBlendDepth);
+            float clampedMaxInfluenceDistance = Mathf.Max(0.01f, nightmareInteriorDoorMaxInfluenceDistance);
+            float lowestInteriorAmount = 1f;
+            string winningDoorwayName = null;
+            bool foundRelevantDoorway = false;
+
+            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
+            {
+                DoorwayBlendConfig doorway = nightmareInteriorDoorways[i];
+                if (doorway == null || doorway.cachedTransform == null)
+                {
+                    continue;
+                }
+
+                float doorwayBlendDepth = doorway.blendDepthOverride > 0f
+                    ? doorway.blendDepthOverride
+                    : clampedBlendDepth;
+                float doorwayHalfWidth = doorway.halfWidthOverride > 0f
+                    ? doorway.halfWidthOverride
+                    : nightmareInteriorDoorHalfWidth;
+                float doorwayMaxInfluenceDistance = doorway.maxInfluenceDistanceOverride > 0f
+                    ? doorway.maxInfluenceDistanceOverride
+                    : clampedMaxInfluenceDistance;
+
+                Vector3 toPlayer = playerPosition - doorway.cachedTransform.position;
+                float planarDistance = Vector3.ProjectOnPlane(toPlayer, Vector3.up).magnitude;
+                if (planarDistance > doorwayMaxInfluenceDistance)
+                {
+                    continue;
+                }
+
+                foundRelevantDoorway = true;
+
+                float signedDepth = Vector3.Dot(doorway.cachedTransform.forward, toPlayer);
+                if (!doorway.forwardPointsOutside)
+                {
+                    signedDepth = -signedDepth;
+                }
+
+                float interiorAmount = 1f - Mathf.InverseLerp(-doorwayBlendDepth, doorwayBlendDepth, signedDepth);
+
+                // Restrict the blend to the doorway opening so nearby walls do not behave like exterior space.
+                float lateralOffset = Mathf.Abs(Vector3.Dot(doorway.cachedTransform.right, toPlayer));
+                if (lateralOffset > doorwayHalfWidth)
+                {
+                    interiorAmount = signedDepth <= 0f ? 1f : 0f;
+                }
+
+                if (interiorAmount < lowestInteriorAmount)
+                {
+                    lowestInteriorAmount = interiorAmount;
+                    winningDoorwayName = doorway.cachedTransform.name;
+                }
+            }
+
+            if (!foundRelevantDoorway)
+            {
+                return;
+            }
+
+            _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareInteriorAmountParameter, lowestInteriorAmount);
         }
 
         private void SetTutorialHallwayStretchStateLabel(string stateLabel)
@@ -1799,7 +2009,19 @@ namespace Managers
             {
                 _nightmareAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 _nightmareAmbienceInstance.release();
+                _nightmareAmbienceInstance = default;
                 LogAudioState("Nightmare ambience stopped.");
+            }
+        }
+
+        private void StopAndReleaseNightmareInteriorExteriorAmbience()
+        {
+            if (_nightmareInteriorExteriorAmbienceInstance.isValid())
+            {
+                _nightmareInteriorExteriorAmbienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                _nightmareInteriorExteriorAmbienceInstance.release();
+                _nightmareInteriorExteriorAmbienceInstance = default;
+                LogAudioState("Nightmare interior/exterior ambience stopped.");
             }
         }
 
@@ -2168,6 +2390,164 @@ namespace Managers
             }
 
             LogAudioState($"Spider audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
+        }
+
+        private void AutoAttachNightmareRoofAudioEmittersInScene(Scene scene)
+        {
+            if (!autoAttachNightmareRoofAudioOnSceneLoad
+                || !scene.IsValid()
+                || !scene.isLoaded
+                || nightmareRoofLoopEvent.IsNull)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(nightmareRoofAudioSceneName)
+                && !string.Equals(scene.name, nightmareRoofAudioSceneName, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            Transform roofsRoot = string.IsNullOrWhiteSpace(nightmareRoofRootName)
+                ? FindTransformInSceneByName(scene, nightmareRoofParentName)
+                : FindTransformInRootHierarchy(scene, nightmareRoofRootName, nightmareRoofParentName);
+            if (roofsRoot == null)
+            {
+                return;
+            }
+
+            List<Transform> roofCandidates = new List<Transform>();
+            for (int i = 0; i < roofsRoot.childCount; i++)
+            {
+                Transform candidate = roofsRoot.GetChild(i);
+                if (candidate != null)
+                {
+                    roofCandidates.Add(candidate);
+                }
+            }
+
+            List<Transform> selectedRoofs = SelectSpacedTransforms(
+                roofCandidates,
+                Mathf.Max(0, nightmareRoofEmitterTargetCount),
+                Mathf.Max(0f, nightmareRoofMinimumSpacing));
+            if (selectedRoofs.Count == 0)
+            {
+                return;
+            }
+
+            int attachedCount = 0;
+            int configuredCount = 0;
+            for (int i = 0; i < selectedRoofs.Count; i++)
+            {
+                Transform roofTransform = selectedRoofs[i];
+                RoofRandomEmitter emitter = roofTransform.GetComponent<RoofRandomEmitter>();
+                if (emitter == null)
+                {
+                    emitter = roofTransform.gameObject.AddComponent<RoofRandomEmitter>();
+                    attachedCount++;
+                }
+
+                emitter.Configure(nightmareRoofLoopEvent);
+                configuredCount++;
+            }
+
+            LogAudioState($"Nightmare roof audio auto-attach in scene '{scene.name}': configured={configuredCount}, newlyAdded={attachedCount}.");
+        }
+
+        private static Transform FindTransformInSceneByName(Scene scene, string objectName)
+        {
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                Transform match = FindTransformInHierarchyByName(roots[i].transform, objectName);
+                if (match != null)
+                {
+                    return match;
+                }
+            }
+
+            return null;
+        }
+
+        private static Transform FindTransformInRootHierarchy(Scene scene, string rootObjectName, string objectName)
+        {
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                if (!string.Equals(roots[i].name, rootObjectName, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                return FindTransformInHierarchyByName(roots[i].transform, objectName);
+            }
+
+            return null;
+        }
+
+        private static Transform FindTransformInHierarchyByName(Transform root, string objectName)
+        {
+            Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                if (string.Equals(transforms[i].name, objectName, StringComparison.Ordinal))
+                {
+                    return transforms[i];
+                }
+            }
+
+            return null;
+        }
+
+        private static List<Transform> SelectSpacedTransforms(List<Transform> candidates, int targetCount, float minimumSpacing)
+        {
+            List<Transform> selected = new List<Transform>();
+            if (candidates == null || candidates.Count == 0 || targetCount <= 0)
+            {
+                return selected;
+            }
+
+            if (minimumSpacing <= 0f)
+            {
+                int takeCount = Mathf.Min(targetCount, candidates.Count);
+                for (int i = 0; i < takeCount; i++)
+                {
+                    selected.Add(candidates[i]);
+                }
+
+                return selected;
+            }
+
+            List<Transform> shuffledCandidates = new List<Transform>(candidates);
+            for (int i = shuffledCandidates.Count - 1; i > 0; i--)
+            {
+                int swapIndex = UnityEngine.Random.Range(0, i + 1);
+                Transform temp = shuffledCandidates[i];
+                shuffledCandidates[i] = shuffledCandidates[swapIndex];
+                shuffledCandidates[swapIndex] = temp;
+            }
+
+            float minimumSpacingSqr = minimumSpacing * minimumSpacing;
+            for (int i = 0; i < shuffledCandidates.Count && selected.Count < targetCount; i++)
+            {
+                Transform candidate = shuffledCandidates[i];
+                bool isFarEnoughFromExisting = true;
+                for (int j = 0; j < selected.Count; j++)
+                {
+                    if ((candidate.position - selected[j].position).sqrMagnitude < minimumSpacingSqr)
+                    {
+                        isFarEnoughFromExisting = false;
+                        break;
+                    }
+                }
+
+                if (isFarEnoughFromExisting)
+                {
+                    selected.Add(candidate);
+                }
+            }
+
+            return selected;
         }
 
         private void CollectTutorialOrbCandidatesInHierarchy(
