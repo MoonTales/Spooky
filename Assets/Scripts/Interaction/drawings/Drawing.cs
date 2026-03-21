@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Managers;
 using Player;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace Interaction.drawings
         [SerializeField] private float pickupTransitionSpeed = 8f;
         [SerializeField] private float returnTransitionSpeed = 8f;
         [SerializeField] private Vector3 handOffset = new Vector3(0, 0, 0.3f);
+        [SerializeField] private GameObject _returnLocation;
         
         
         // We will be able to determine if a drawing is in the correct position, IF:
@@ -127,25 +129,25 @@ namespace Interaction.drawings
 
         public void UpdateIfIsInCorrectPosition()
         {
-            
-            _isInCorrectPosition = drawingID * 11 == uniqueDrawingID;
-
-            // these are found in Resources/Mats/Drawings
-            if (_isInCorrectPosition )
+            if (!IsInBedroom()){ return;}
+            // if we are "close enough" to our return location, then we will consider ourselves to be in the correct position
+            if (Vector3.Distance(transform.position, _returnLocation.transform.position) < 0.25f &&
+                Quaternion.Angle(transform.rotation, _returnLocation.transform.rotation) < 2f)
             {
-                // we want to set the material to be the Outline_Correct
+                _isInCorrectPosition = true;
                 if (_isOutlineActive)
                 {
-                    _outlineObject_CORRECT.SetActive(true);
-                    _outlineObject_WRONG.SetActive(false);
+                    if (_outlineObject_CORRECT){_outlineObject_CORRECT.SetActive(true);}
+                    if (_outlineObject_WRONG){_outlineObject_WRONG.SetActive(false);}
                 }
             }
             else
             {
+                _isInCorrectPosition = false;
                 if (_isOutlineActive)
                 {
-                    _outlineObject_CORRECT.SetActive(false);
-                    _outlineObject_WRONG.SetActive(true);
+                    if (_outlineObject_CORRECT){_outlineObject_CORRECT.SetActive(false);}
+                    if (_outlineObject_WRONG){_outlineObject_WRONG.SetActive(true);}
                 }
             }
         }
@@ -159,6 +161,21 @@ namespace Interaction.drawings
         }
 
 
+        public void OnInspectionFinished()
+        {
+            if (IsInBedroom())
+            {
+                StartCoroutine(DelayedCheck());
+            }
+            
+        }
+
+        private IEnumerator DelayedCheck()
+        {
+            yield return new WaitForSeconds(0.5f);
+            UpdateIfIsInCorrectPosition();
+            DrawingStateManager.Instance.UpdateDrawingTransformData();
+        }
     
     
         private void Update()
@@ -183,10 +200,10 @@ namespace Interaction.drawings
 
         public virtual void Interact(Interactor interactor)
         {
-            // If player is holding a drawing and this slot has a drawing, swap them
-            if (_currentlyHeldDrawing != null)
+            
+            if(GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom)
             {
-                SwapDrawings(_currentlyHeldDrawing);
+                InspectionSystem.Instance.StartInspection(gameObject, _returnLocation);
                 return;
             }
     
