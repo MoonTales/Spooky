@@ -81,7 +81,8 @@ public class AttractorAI : MonoBehaviour
 		RemoveReaction_LISTintPossiblePriorities,
 		RemoveThought_LISTintPossiblePriorities,
 		AddReaction_LISTintPossiblePriorities_ADDREACTIONS,
-		AddThought_LISTintPossiblePriorities_ADDTHOUGHTS
+		AddThought_LISTintPossiblePriorities_ADDTHOUGHTS,
+		// MakePlayerLook_floatVisualEffect_floatForceLook    not sure how to do this
 	}
 
 	[System.Serializable]
@@ -478,6 +479,14 @@ public class AttractorAI : MonoBehaviour
 		nextTeleportIndex++;
 		if (nextTeleportIndex >= teleportLocations.Count())
 			nextTeleportIndex = 0;
+	}
+
+	public void MakePlayerLook(List<string> arguments)
+	{
+		float VisualEffects = float.Parse(arguments[0]);
+		float ForceLook = float.Parse(arguments[1]);
+
+		//do something idk
 	}
 
 	public enum Stats
