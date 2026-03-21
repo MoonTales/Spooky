@@ -368,6 +368,7 @@ namespace Managers
         private void Update()
         {
             UpdateNightmareInteriorBlend();
+            UpdateMentalAudioFrameParameters();
         }
 
         protected override void OnDestroy()
@@ -639,8 +640,8 @@ namespace Managers
         //----------------//
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
         {
-            _mentalStateSeverity = GetMentalStateSeverity(newMentalState);
-            LogAudioState($"Mental state changed -> {newMentalState} ({_mentalStateSeverity:0.00}). Expected: nightmare ambience/heartbeat parameters update.");
+            _mentalStateSeverity = GetNormalizedMentalHealth();
+            LogAudioState($"Mental state changed -> {newMentalState} (normalized mental health {_mentalStateSeverity:0.00}). Expected: nightmare ambience/heartbeat parameters update.");
             RefreshMentalAudio();
         }
 
@@ -1284,6 +1285,16 @@ namespace Managers
             ApplyTerrorLoop(terrorSeverityForAudio);
             ApplyHeartbeat();
         }
+
+        private void UpdateMentalAudioFrameParameters()
+        {
+            _mentalStateSeverity = GetNormalizedMentalHealth();
+
+            if (IsNightmareWorldLocation() || _heartbeatInstance.isValid() || _terrorLoopInstance.isValid())
+            {
+                RefreshMentalAudio();
+            }
+        }
         #endregion
 
     //-----------------------------------------//
@@ -1524,28 +1535,17 @@ namespace Managers
             }
         }
 
-        private float GetMentalStateSeverity(Types.PlayerMentalState mentalState)
+        private float GetNormalizedMentalHealth()
         {
-            switch (mentalState)
+            if (PlayerStats.Instance == null)
             {
-                case Types.PlayerMentalState.Normal:
-                    return 0f;
-                case Types.PlayerMentalState.MildlyAnxious:
-                case Types.PlayerMentalState.MildlySleepDeprived:
-                    return 0.25f;
-                case Types.PlayerMentalState.ModeratelyAnxious:
-                case Types.PlayerMentalState.ModeratelySleepDeprived:
-                    return 0.5f;
-                case Types.PlayerMentalState.SeverelyAnxious:
-                case Types.PlayerMentalState.SeverelySleepDeprived:
-                    return 0.75f;
-                case Types.PlayerMentalState.Panic:
-                case Types.PlayerMentalState.Exhausted:
-                case Types.PlayerMentalState.Breakdown:
-                    return 1f;
-                default:
-                    return 0f;
+                return 0f;
             }
+
+            Types.FPlayerStats playerStats = PlayerStats.Instance.GetPlayerStats();
+            float maxMentalHealth = Mathf.Max(0.0001f, playerStats.GetMaxMentalHealth());
+            float normalizedMentalHealth = Mathf.Clamp01(playerStats.GetCurrentMentalHealth() / maxMentalHealth);
+            return 1f - normalizedMentalHealth;
         }
 
         private static bool IsNightmareWorldLocation()

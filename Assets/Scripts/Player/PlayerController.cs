@@ -742,7 +742,7 @@ namespace Player
             // Valid gameplay jump: apply velocity, mark airborne token for landing validation, and emit jump SFX once.
             BeginGameplayAirborneToken();
             _verticalVelocity = jumpForce;
-            Debug.Log("PlayerAudio: Jump SFX");
+            //Debug.Log("PlayerAudio: Jump SFX");
             AudioManager.Instance.PlayPlayerJumping(fromTransform: transform);
             _jumpSfxArmed = false;
         }
