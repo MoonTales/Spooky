@@ -49,6 +49,9 @@ namespace Managers
             public string rootObjectName;
             public string objectName;
             public bool forwardPointsOutside = true;
+            public float halfWidthOverride;
+            public float blendDepthOverride;
+            public float maxInfluenceDistanceOverride;
 
             [NonSerialized] public Transform cachedTransform;
         }
@@ -1608,6 +1611,7 @@ namespace Managers
             float clampedBlendDepth = Mathf.Max(0.01f, nightmareInteriorBlendDepth);
             float clampedMaxInfluenceDistance = Mathf.Max(0.01f, nightmareInteriorDoorMaxInfluenceDistance);
             float lowestInteriorAmount = 1f;
+            string winningDoorwayName = null;
             bool foundRelevantDoorway = false;
 
             for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
@@ -1618,9 +1622,19 @@ namespace Managers
                     continue;
                 }
 
+                float doorwayBlendDepth = doorway.blendDepthOverride > 0f
+                    ? doorway.blendDepthOverride
+                    : clampedBlendDepth;
+                float doorwayHalfWidth = doorway.halfWidthOverride > 0f
+                    ? doorway.halfWidthOverride
+                    : nightmareInteriorDoorHalfWidth;
+                float doorwayMaxInfluenceDistance = doorway.maxInfluenceDistanceOverride > 0f
+                    ? doorway.maxInfluenceDistanceOverride
+                    : clampedMaxInfluenceDistance;
+
                 Vector3 toPlayer = playerPosition - doorway.cachedTransform.position;
                 float planarDistance = Vector3.ProjectOnPlane(toPlayer, Vector3.up).magnitude;
-                if (planarDistance > clampedMaxInfluenceDistance)
+                if (planarDistance > doorwayMaxInfluenceDistance)
                 {
                     continue;
                 }
@@ -1633,16 +1647,20 @@ namespace Managers
                     signedDepth = -signedDepth;
                 }
 
-                float interiorAmount = 1f - Mathf.InverseLerp(-clampedBlendDepth, clampedBlendDepth, signedDepth);
+                float interiorAmount = 1f - Mathf.InverseLerp(-doorwayBlendDepth, doorwayBlendDepth, signedDepth);
 
                 // Restrict the blend to the doorway opening so nearby walls do not behave like exterior space.
                 float lateralOffset = Mathf.Abs(Vector3.Dot(doorway.cachedTransform.right, toPlayer));
-                if (lateralOffset > nightmareInteriorDoorHalfWidth)
+                if (lateralOffset > doorwayHalfWidth)
                 {
                     interiorAmount = signedDepth <= 0f ? 1f : 0f;
                 }
 
-                lowestInteriorAmount = Mathf.Min(lowestInteriorAmount, interiorAmount);
+                if (interiorAmount < lowestInteriorAmount)
+                {
+                    lowestInteriorAmount = interiorAmount;
+                    winningDoorwayName = doorway.cachedTransform.name;
+                }
             }
 
             if (!foundRelevantDoorway)
@@ -1651,7 +1669,7 @@ namespace Managers
             }
 
             _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareInteriorAmountParameter, lowestInteriorAmount);
-            Debug.Log($"AudioManager: InteriorAmount={lowestInteriorAmount:0.000}");
+            Debug.Log($"AudioManager: InteriorAmount={lowestInteriorAmount:0.000}, activeDoor={winningDoorwayName ?? "<none>"}");
         }
 
         private void SetTutorialHallwayStretchStateLabel(string stateLabel)
