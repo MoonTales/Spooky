@@ -9,33 +9,17 @@ public class WindSway : MonoBehaviour
     [SerializeField] private float swaySpeed = 1f; // how fast the object sways
     
     private Quaternion _initialRotation;
-    private GameObject[] _childObjects;
+    
     
     private void Start()
     {
         _initialRotation = transform.localRotation;
-        foreach (Transform child in transform)
-        {
-            _childObjects = new GameObject[transform.childCount];
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                _childObjects[i] = transform.GetChild(i).gameObject;
-            }
-        }
     }
     private void Update()
     {
-        foreach (GameObject child in _childObjects)
-        {
-            if (child == null)
-            {
-                return;
-            }
-            float swayX = Mathf.Sin(Time.time * swaySpeed) * swayAmount;
-            float swayZ = Mathf.Cos(Time.time * swaySpeed) * swayAmount;
-            Quaternion swayRotation = Quaternion.Euler(swayX, 0f, swayZ);
-            child.transform.localRotation = _initialRotation * swayRotation;
-        }
-
+        float swayX = Mathf.Sin(Time.time * swaySpeed) * swayAmount;
+        float swayZ = Mathf.Cos(Time.time * swaySpeed) * swayAmount;
+        Quaternion swayRotation = Quaternion.Euler(swayX, 0f, swayZ);
+        transform.localRotation = _initialRotation * swayRotation;
     }
 }
