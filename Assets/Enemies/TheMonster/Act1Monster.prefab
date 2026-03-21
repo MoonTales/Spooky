@@ -26246,9 +26246,9 @@ MonoBehaviour:
       newDefaultState: 0
       alsoChangeDefaultFocus: {fileID: 0}
     eventExecutions: []
-    repeatBuffer: 30
+    repeatBuffer: 15
     forceBuffer: 1
-    timer: 0
+    timer: 12
   - attractorType: 4
     customAttractorID: 
     minIntensity: 0
@@ -26288,6 +26288,24 @@ MonoBehaviour:
     - function: 11
       arguments:
       - 3
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 11
+      arguments:
+      - 6
       possiblePriorityReprograms: 
       reprogramParameters: []
       thoughtReprogramParameters: []
@@ -26455,6 +26473,80 @@ MonoBehaviour:
     repeatBuffer: 3
     forceBuffer: 1
     timer: 3
+  - attractorType: 4
+    customAttractorID: 
+    minIntensity: 0
+    maxIntensity: 0
+    thoughtConditions:
+      boolConditions: []
+      floatConditions: []
+      floatCompare: 0
+      intConditions: []
+      intCompare: 3
+    allConditionsRequired: 1
+    statusRestrictions: []
+    allStatusesRequired: 1
+    stateRestriction: 
+    functionExecutions:
+    - function: 5
+      arguments:
+      - ReadyToRumble
+      - false
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 11
+      arguments:
+      - 3
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    - function: 11
+      arguments:
+      - 6
+      possiblePriorityReprograms: 
+      reprogramParameters: []
+      thoughtReprogramParameters: []
+      statsToChange: 
+      changeStatsBy: 0
+      statsChangeAmount: 0
+      addReactions: []
+      addReactionLowerBoundDangerRange: 0
+      addReactionUpperBoundDangerRange: 0
+      addThoughts: []
+      addThoughtsLowerBoundDangerRange: 0
+      addThoughtsUpperBoundDangerRange: 0
+      changeDefaultState: 0
+      newDefaultState: 0
+      alsoChangeDefaultFocus: {fileID: 0}
+    eventExecutions: []
+    repeatBuffer: 30
+    forceBuffer: 1
+    timer: 30
   senses:
   - detectionRadius: 5
     detectionAngle: 180
