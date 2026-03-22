@@ -288,7 +288,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
             //TODO: fix this so that we can use F
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
             {
-                AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true);
+                if(!SleepTrackerManager.Instance.GetIsSleepTrackerActive()) { AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true); }
 
                 // ensure enough time has pass
                 if (!canExitInspection) { return; }
@@ -346,7 +346,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
             HandleFadeFinished,
             HandleScribbleNote
         ).Send();
-        AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true);
+        if(!SleepTrackerManager.Instance.GetIsSleepTrackerActive()) { AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true); }
 
     }
 

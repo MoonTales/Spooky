@@ -587,7 +587,6 @@ namespace Player
             // debug visualize the raycast
             Debug.DrawRay(transform.position, Vector3.down * hit.distance, Color.red);
             // drop a debug text of the surface type at the hit point
-            Debug.Log($"Surface Type: {_surfaceType}");
         }
         private IEnumerator PlayFootstepSounds()
         {
