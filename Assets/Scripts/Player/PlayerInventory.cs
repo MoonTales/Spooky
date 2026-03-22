@@ -90,6 +90,11 @@ namespace Player
                 EventBroadcaster.Broadcast_OnDrawingCollected(drawingID);
             }
             
+            if (_currentDrawingsThisNight >= _maxDrawingsPerNight)
+            {
+                EventBroadcaster.Broadcast_OnAllAllowedDrawingsForNightCollected();
+            }
+            
         }
 
         public bool CanAddDrawing()
@@ -99,7 +104,8 @@ namespace Player
                 Types.NotificationData data = new(
                     duration: 3.0f, 
                     messageKey: new TextKey { place = "Notifications", id = "CollectedDrawingFail"},
-                    messageOverride: $"Unable to hold more drawings. You have reached the maximum for the night."
+                    messageOverride: $"Unable to hold more drawings. You have reached the maximum for the night.",
+                    shouldOnlyShowOnce: false
                 );
                 data.Send();
                 return false;

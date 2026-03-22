@@ -25,6 +25,7 @@ public class SpiderPivot : MonoBehaviour
     void UpdatePivot()
     {
         List<(Vector3 pos, Quaternion rot, float weight)> points = scan.Points();
+        if (points.Count == 0){ return;}
 
         Quaternion rotAvg;
         List<Quaternion> rots = new List<Quaternion>();
