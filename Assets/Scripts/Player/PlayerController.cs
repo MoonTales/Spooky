@@ -373,6 +373,16 @@ namespace Player
                 
             }
             _isCrouching = !_isCrouching;
+            
+            // if we uncrouch, check our cached sprint state to see if we should be sprinting again
+            if (!_isCrouching && _cachedSprintState)
+            {
+                _isSprinting = true;
+            }
+            else if (!_isCrouching && !_cachedSprintState)
+            {
+                _isSprinting = false;
+            }
         }
         
         private void HandleCrouchInput()
@@ -402,6 +412,9 @@ namespace Player
                     {
                         _isCrouching = false;
                         _targetHeight = standHeight;
+                        
+                        _isSprinting = _cachedSprintState && sprintAction.action.IsPressed();
+                        _cachedSprintState = _isSprinting;
                     }
                 }
                 _crouchHeldTime = 0f;
@@ -504,6 +517,12 @@ namespace Player
                 QueryTriggerInteraction.Ignore
             );
 
+            // if we can stand up, lets check the cached sprint, so that if we are no longer holding sprint when we stand up,
+            // we wont just randomly be sprinting
+            if (!hit)
+            {
+                _isSprinting = _cachedSprintState;
+            }
             return !hit;
         }
         private void OnMovePerformed(InputAction.CallbackContext obj)
