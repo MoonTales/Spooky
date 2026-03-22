@@ -567,6 +567,11 @@ namespace Player
                 // keep whatever speed we had when we left the ground (this fixes the drop in speed in the air)
                 targetSpeed = _currentSpeed;
             }
+            
+            if (_surfaceType == "water")
+            {
+                targetSpeed *= 0.7f; // slow down in water
+            }
 
             // Smoothly interpolate speed
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.fixedDeltaTime);

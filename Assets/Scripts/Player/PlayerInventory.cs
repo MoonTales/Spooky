@@ -104,7 +104,8 @@ namespace Player
                 Types.NotificationData data = new(
                     duration: 3.0f, 
                     messageKey: new TextKey { place = "Notifications", id = "CollectedDrawingFail"},
-                    messageOverride: $"Unable to hold more drawings. You have reached the maximum for the night."
+                    messageOverride: $"Unable to hold more drawings. You have reached the maximum for the night.",
+                    shouldOnlyShowOnce: false
                 );
                 data.Send();
                 return false;
