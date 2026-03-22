@@ -47,6 +47,8 @@ namespace Interaction.Letters
             // Tell the letter system that we have been read
             var id = (_letterType == Types.LetterType.Researcher ? "res_letter_" : "fren_letter_") + GameStateManager.Instance.GetCurrentWorldClockHour();            
             LetterManager.Instance.HandleLetterRead(id);
+            
+            AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true);
         }
         
         public override void OnReturnedToOriginalPosition()

@@ -100,8 +100,19 @@ namespace Interaction.drawings
         {
             TrackSubscription(() => EventBroadcaster.OnAllDrawingsOrdered += AllDrawingsOrdered,
                 () => EventBroadcaster.OnAllDrawingsOrdered -= AllDrawingsOrdered);
+            TrackSubscription(()=>EventBroadcaster.OnAllAllowedDrawingsForNightCollected += AllDrawingsCollected,
+                () => EventBroadcaster.OnAllAllowedDrawingsForNightCollected -= AllDrawingsCollected);
         }
 
+        private void AllDrawingsCollected()
+        {
+            DebugUtils.Log("All allowed drawings for the night have been collected!");
+            // when all 3 drawinfs for the night have been collected, we want to disable ourselves, since we dont need to be in the nightmare anymore
+            if (IsInNightmare())
+            {
+                gameObject.SetActive(false);
+            }
+        }
         private void AllDrawingsOrdered()
         {
             // this is called when all drawings are correctly placed, and they have been put in the correct order (which is determined by the uniqueDrawingID)

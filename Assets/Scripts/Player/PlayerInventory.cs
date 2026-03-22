@@ -90,6 +90,11 @@ namespace Player
                 EventBroadcaster.Broadcast_OnDrawingCollected(drawingID);
             }
             
+            if (_currentDrawingsThisNight >= _maxDrawingsPerNight)
+            {
+                EventBroadcaster.Broadcast_OnAllAllowedDrawingsForNightCollected();
+            }
+            
         }
 
         public bool CanAddDrawing()
