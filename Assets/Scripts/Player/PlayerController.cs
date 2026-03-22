@@ -570,7 +570,7 @@ namespace Player
             
             if (_surfaceType == "water")
             {
-                targetSpeed *= 0.7f; // slow down in water
+                targetSpeed *= 0.5f; // slow down in water :)
             }
 
             // Smoothly interpolate speed
