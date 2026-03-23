@@ -168,6 +168,17 @@ namespace Interaction.drawings
             // Can't interact with yourself if you're being held or returning
             if (_isPickedUp || _isReturningToPosition){ return false;}
             // otherwise, we will allow interaction
+            
+            //EDGE CASE (I hate this, but ima do it here)
+            // this stops us from being able to interact with the tutorial drawing after its been placed LOL
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial)
+            {
+                if (PlayerInventory.Instance.GetCurrentDrawingsThisNight() > 0)
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 

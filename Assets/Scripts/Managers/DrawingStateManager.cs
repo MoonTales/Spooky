@@ -116,7 +116,7 @@ namespace Managers
             }
             
             Debug.Log($"Number of drawings in correct position: {count}");
-            if (count >= 9)
+            if (count >= totalNumberOfDrawings)
             {
                 // updated, this now spawns in our Final letter
 
