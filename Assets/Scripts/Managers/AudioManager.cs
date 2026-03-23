@@ -1960,7 +1960,7 @@ namespace Managers
             }
         }
 
-        private void StopAndReleaseSleepTrackerAlarm(bool immediate)
+        public void StopAndReleaseSleepTrackerAlarm(bool immediate)
         {
             if (_sleepTrackerAlarmInstance.isValid())
             {

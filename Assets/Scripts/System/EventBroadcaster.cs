@@ -199,5 +199,9 @@ namespace System
         public static event OnDrawingCollectedHandler OnDrawingCollected;
         public delegate void OnDrawingCollectedHandler(int drawingID);
         public static void Broadcast_OnDrawingCollected(int drawingID) { OnDrawingCollected?.Invoke(drawingID); }
+        
+        public static event OnAllAllowedDrawingsForNightCollectedHandler OnAllAllowedDrawingsForNightCollected;
+        public delegate void OnAllAllowedDrawingsForNightCollectedHandler();
+        public static void Broadcast_OnAllAllowedDrawingsForNightCollected() { OnAllAllowedDrawingsForNightCollected?.Invoke(); }
     }
 }

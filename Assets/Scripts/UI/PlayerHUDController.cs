@@ -62,8 +62,21 @@ namespace UI
                 () => EventBroadcaster.OnDrawingCollected -= OnDrawingCollected);
             TrackSubscription(()=> EventBroadcaster.OnWorldLocationChangedEvent += OnWorldLocationChanged,
                 () => EventBroadcaster.OnWorldLocationChangedEvent -= OnWorldLocationChanged);
+            TrackSubscription(()=>EventBroadcaster.OnAllAllowedDrawingsForNightCollected += AllDrawingsCollected,
+                () => EventBroadcaster.OnAllAllowedDrawingsForNightCollected -= AllDrawingsCollected);
         }
-        
+
+        private void AllDrawingsCollected()
+        {
+            // this is called when the player collects the 3rd (last) drawings for a night
+            Types.NotificationData data = new(
+                duration: 2.0f, 
+                messageKey: new TextKey { place = "Notifications", id = "AllDrawingsCollected" },
+                messageOverride: "I should probably bring these back to the room now..."
+            );
+            data.Send();
+        }
+
         private void OnWorldLocationChanged(Types.WorldLocation newLocation)
         {
             if (newLocation == Types.WorldLocation.Bedroom)

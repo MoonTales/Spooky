@@ -126,6 +126,7 @@ namespace Managers
         private void HandleBadWakeupPostFadeOut()
         {
             SleepTrackerManager.Instance.SetIsGoodWakeup(false);
+            SleepTrackerManager.Instance.TurnSleepTrackerOn();
             SceneSwapper.Instance.SwapScene("Bedroom");
             // swap the core state to sleep deprived
             PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
