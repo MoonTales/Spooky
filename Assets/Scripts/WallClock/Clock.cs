@@ -21,11 +21,15 @@ public class Clock : MonoBehaviour
     //private bool _isInspecting;
     private Types.GameState _currentGameState;
     private int _currentAct = 1;
+    private float inspectTimeElapsed;
+    private bool isInspecting = false;
+
     [SerializeField] private float timeToExit = 600f;
-    [SerializeField] private float FastForwardSpeed = 3f;
+    [SerializeField] private float FastForwardSpeed = 20f;
     [SerializeField] public float elapsedTime;
     [SerializeField] private float ClockSpeed;
     [SerializeField] private float damagePerTick;
+    [SerializeField] private float alottedInspectTime = 100; // 50 == 1 hr
 
     void Start()
     {
@@ -59,36 +63,87 @@ public class Clock : MonoBehaviour
         AudioManager.Instance?.StartBedroomWallClock(transform);
         StartCoroutine(Timer());
         StartCoroutine(ClockTick());
+        StartCoroutine(InspectCheck());
 
+    }
+
+    IEnumerator InspectCheck()
+    {
+        while (elapsedTime < 700)
+        {
+            // Pause for one frame
+            yield return null;
+            // Check if player is already inspecting when they inspect and if not, start a timer to lock the clock after 2hrs
+            if (!isInspecting && _currentGameState == Types.GameState.Inspecting)
+            {
+                isInspecting = true;
+                StartCoroutine(InspectTimer());
+            }
+        }
+    }
+
+    IEnumerator InspectTimer()
+    {
+        inspectTimeElapsed = 0;
+        while (_currentGameState == Types.GameState.Inspecting)
+        {
+            // Pause for one second
+            yield return new WaitForSeconds(1f);
+
+            // Increment timer
+            if (_currentGameState != Types.GameState.Paused && inspectTimeElapsed <= alottedInspectTime)
+            {
+                inspectTimeElapsed = inspectTimeElapsed + FastForwardSpeed;
+            }
+        }
+        isInspecting = false;
     }
 
     IEnumerator Timer()
     {
         while (elapsedTime < 700)
         {
+            // Pause for one second
             yield return new WaitForSeconds(1f);
-            if(elapsedTime >= 450 &&
-                GameStateManager.Instance.GetCurrentWorldClockHour() == 2) 
+
+            // Have we read the notes?
+            if  (elapsedTime >= 450 &&
+                GameStateManager.Instance.GetCurrentWorldClockHour() == 1 &&
+                (!LetterManager.Instance.GetHasReadAct1ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct1FriendLetter()) )
             {
-                if (!LetterManager.Instance.GetHasReadAct2ResearcherLetter() ||
-                    !LetterManager.Instance.GetHasReadAct2FriendLetter())
-                {
-                    continue;
-                }
+                continue;
+            }
+            if  (elapsedTime >= 450 &&
+                GameStateManager.Instance.GetCurrentWorldClockHour() == 2 &&
+                (!LetterManager.Instance.GetHasReadAct2ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct2FriendLetter()) )
+            {
+                continue;
+            }
+                if  (elapsedTime >= 450 &&
+                GameStateManager.Instance.GetCurrentWorldClockHour() == 3 &&
+                (!LetterManager.Instance.GetHasReadAct3ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct3FriendLetter()) )
+            {
+                continue;
             }
 
+            // Increment timer. If inspecting, increment * fast forward speed
             if (_currentGameState != Types.GameState.Paused)
             {
-                if (_currentGameState == Types.GameState.Inspecting)
+                if (isInspecting && inspectTimeElapsed <= alottedInspectTime)
                 {
                     elapsedTime = elapsedTime + FastForwardSpeed;
                     EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick*FastForwardSpeed);
                 }
+                /*
                 else
                 {
                     elapsedTime++;
                     EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick);
                 }
+                */
             }
         }
     }
@@ -99,30 +154,47 @@ public class Clock : MonoBehaviour
         {
             // Pause for 1 frame
             yield return null;
-            if(elapsedTime >= 450 &&
-                GameStateManager.Instance.GetCurrentWorldClockHour() == 2) 
+
+            // Have we read the notes?
+            if  (elapsedTime >= 450 &&
+                GameStateManager.Instance.GetCurrentWorldClockHour() == 1 &&
+                (!LetterManager.Instance.GetHasReadAct1ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct1FriendLetter()) )
             {
-                if (!LetterManager.Instance.GetHasReadAct2ResearcherLetter() ||
-                    !LetterManager.Instance.GetHasReadAct2FriendLetter())
-                {
-                    continue;
-                }
+                continue;
+            }
+            if  (elapsedTime >= 450 &&
+                GameStateManager.Instance.GetCurrentWorldClockHour() == 2 &&
+                (!LetterManager.Instance.GetHasReadAct2ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct2FriendLetter()) )
+            {
+                continue;
+            }
+                if  (elapsedTime >= 450 &&
+                GameStateManager.Instance.GetCurrentWorldClockHour() == 3 &&
+                (!LetterManager.Instance.GetHasReadAct3ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct3FriendLetter()) )
+            {
+                continue;
             }
 
             //_isInspecting = PlayerController.Instance.IsPlayerInspecting();
+            // Turn clock hand. If fast forwarding, turn it * fast forward speed
             _currentGameState = GameStateManager.Instance.GetCurrentGameState();
             if (_currentGameState != Types.GameState.Paused)
             {
-                if (_currentGameState == Types.GameState.Inspecting)
+                if (isInspecting && inspectTimeElapsed <= alottedInspectTime)
                 {
                     minHand.transform.Rotate(0, 0, -minuteHandDegPerSec * Time.deltaTime * FastForwardSpeed, Space.Self);
                     hourHand.transform.Rotate(0, 0, -hourHandDegPerSec * Time.deltaTime * FastForwardSpeed, Space.Self);
                 }
+                /*
                 else
                 {
                     minHand.transform.Rotate(0, 0, -minuteHandDegPerSec * Time.deltaTime, Space.Self);
                     hourHand.transform.Rotate(0, 0, -hourHandDegPerSec * Time.deltaTime, Space.Self);
                 }
+                */
             }
             
         }

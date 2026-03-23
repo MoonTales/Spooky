@@ -1,5 +1,11 @@
 using System;
+using System.Collections;
+using Managers;
+using Player;
+using Unity.Cinemachine;
 using UnityEngine;
+using Types = System.Types;
+using Interaction;
 
 namespace Inspection
 {
@@ -33,6 +39,49 @@ namespace Inspection
         // Interface Implementation
         public bool CanInteract(Interactor interactor)
         {
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom && 
+            PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth() <= 25)  // This correlates to 6pm exactly
+            {
+                if(GameStateManager.Instance.GetCurrentWorldClockHour() == 1 && 
+                (!LetterManager.Instance.GetHasReadAct1ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct1FriendLetter()))
+                {
+                    // Play notification
+                    Types.NotificationData data = new(
+                        duration: 1.0f, 
+                        messageKey: new TextKey(),
+                        messageOverride: "Can’t. Too tired.",
+                        shouldOnlyShowOnce: false
+                    );
+                    return false;
+                }
+                if(GameStateManager.Instance.GetCurrentWorldClockHour() == 2 && 
+                (!LetterManager.Instance.GetHasReadAct2ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct2FriendLetter()))
+                {
+                    // Play notification
+                    Types.NotificationData data = new(
+                        duration: 1.0f, 
+                        messageKey: new TextKey(),
+                        messageOverride: "Can’t. Too tired.",
+                        shouldOnlyShowOnce: false
+                    );
+                    return false;
+                }
+                if(GameStateManager.Instance.GetCurrentWorldClockHour() == 3 && 
+                (!LetterManager.Instance.GetHasReadAct3ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct3FriendLetter()))
+                {
+                    // Play notification
+                    Types.NotificationData data = new(
+                        duration: 1.0f, 
+                        messageKey: new TextKey(),
+                        messageOverride: "Can’t. Too tired.",
+                        shouldOnlyShowOnce: false
+                    );
+                    return false;
+                }
+            }
             return true;
         }
 
