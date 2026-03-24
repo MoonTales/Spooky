@@ -271,6 +271,7 @@ namespace Managers
         private float _mentalStateSeverity;
         private float _terrorSeverity;
         private Transform _terrorSourceTransform;
+        private bool _terrorRadiusIsActive;
         private bool _terrorLoopIsPlaying;
 
         // Runtime audio state - sleep tracker flow.
@@ -425,6 +426,7 @@ namespace Managers
             {
                 _terrorSeverity = 0f;
                 _terrorSourceTransform = null;
+                _terrorRadiusIsActive = false;
             }
 
             if (newLocation != Types.WorldLocation.Bedroom)
@@ -575,6 +577,14 @@ namespace Managers
                 return;
             }
 
+            if (!isActive)
+            {
+                StopAndReleaseSleepTrackerAlarm(true);
+                StopAndReleaseGoodWakeupTransition(true);
+                LogAudioState("Sleep tracker deactivated in Bedroom. Expected: active sleep tracker FMOD instances stop and unload.");
+                return;
+            }
+
             if (isGoodWakeup)
             {
                 if (goodWakeupTransitionEvent.IsNull)
@@ -645,23 +655,25 @@ namespace Managers
             RefreshMentalAudio();
         }
 
-        private void OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform)
+        private void OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform, bool isTerrorRadiusActive)
         {
             if (!IsNightmareWorldLocation())
             {
                 _terrorSeverity = 0f;
                 _terrorSourceTransform = null;
+                _terrorRadiusIsActive = false;
                 RefreshMentalAudio();
                 return;
             }
 
             _terrorSeverity = Mathf.Clamp01(normalizedIntensity);
-            _terrorSourceTransform = terrorSourceTransform;
+            _terrorRadiusIsActive = isTerrorRadiusActive;
+            _terrorSourceTransform = isTerrorRadiusActive ? terrorSourceTransform : null;
             if (debugAudioLogs && logTerrorParameterValue)
             {
                 Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
             }
-            LogAudioState($"Terror changed -> {_terrorSeverity:0.00} (source={(terrorSourceTransform != null ? terrorSourceTransform.name : "null")}). Expected: terror loop follows source in Nightmare.");
+            LogAudioState($"Terror changed -> {_terrorSeverity:0.00} (active={_terrorRadiusIsActive}, source={(terrorSourceTransform != null ? terrorSourceTransform.name : "null")}). Expected: terror loop follows source in Nightmare.");
             RefreshMentalAudio();
         }
         #endregion
@@ -1458,7 +1470,7 @@ namespace Managers
                 return;
             }
 
-            bool shouldPlay = terrorSeverity > 0.0001f && _terrorSourceTransform != null;
+            bool shouldPlay = _terrorRadiusIsActive && terrorSeverity > 0.0001f && _terrorSourceTransform != null;
             if (!shouldPlay)
             {
                 StopAndReleaseTerrorLoop();
