@@ -30,6 +30,13 @@ public class PavementSwap : MonoBehaviour
 
             for (int i = 0; i < renderers.Length; i++)
             {
+                // add a null check
+                if (renderers[i] == null || materialArray[i] == null)
+                {
+                    //Debug.LogWarning($"Renderer or material is null at index {i}. Skipping.");
+                    continue;
+                }
+                
                 Material[] mats = renderers[i].materials;
                 mats[0] = materialArray[i];   // array of transparent materials
                 renderers[i].materials = mats;     // apply back
