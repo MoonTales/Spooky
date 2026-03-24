@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Linq;
 
 namespace Placeables
 {
@@ -21,6 +22,7 @@ namespace Placeables
         // internal 
         private MeshRenderer[] _meshRenderers;
         private Collider[] _objColliders;
+        private Transform[] _gameObjects;
         
         protected override void OnEnable()
         {
@@ -28,6 +30,7 @@ namespace Placeables
             
             _meshRenderers = GetComponentsInChildren<MeshRenderer>();
             _objColliders = GetComponentsInChildren<Collider>();
+            _gameObjects = GetComponentsInChildren<Transform>().Skip(1).ToArray();
         }
         protected override void OnWorldClockTicked(int newHour)
         {
@@ -37,7 +40,10 @@ namespace Placeables
             {
                 if (gameObjectAlternative)
                 {
-                    gameObject.SetActive(true);
+                    for (int i = 0; i < _gameObjects.Length; i++)
+                    {
+                        _gameObjects[i].gameObject.SetActive(true);
+                    }
                 }
                 else
                 {
@@ -59,7 +65,10 @@ namespace Placeables
             {
                 if (gameObjectAlternative)
                 {
-                    gameObject.SetActive(true);
+                    for (int i = 0; i < _gameObjects.Length; i++)
+                    {
+                        _gameObjects[i].gameObject.SetActive(true);
+                    }
                 }
                 else
                 {
@@ -77,7 +86,10 @@ namespace Placeables
             {
                 if (gameObjectAlternative)
                 {
-                    gameObject.SetActive(false);
+                    for (int i = 0; i < _gameObjects.Length; i++)
+                    {
+                        _gameObjects[i].gameObject.SetActive(false);
+                    }
                 }
                 else
                 {
