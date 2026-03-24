@@ -59,11 +59,12 @@ namespace UI.Main_Menu
                 else if (button.name == "Continue")
                 {
                     _continueButton = button;
-                    _continueButton.enabled = true;
                     if (SaveSystem.Instance.DoesSaveGameExist()){
+                        _continueButton.enabled = true;
                         _continueButton.interactable = true; 
                         _continueButton.onClick.AddListener(OnContinueButtonClicked);
                     } else {
+                        _continueButton.enabled = false;
                         _continueButton.interactable = false;  
                     }
                 }
