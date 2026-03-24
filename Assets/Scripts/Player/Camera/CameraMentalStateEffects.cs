@@ -246,7 +246,6 @@ namespace Player.Camera
             {
                 if (ca != null){ ca.intensity.Override(0f);}
             }
-
             transitionSpeed = 2f;
         }
 
@@ -254,7 +253,6 @@ namespace Player.Camera
         {
             // unique effects
             SetCustomVisualEffects(blurIntensity:0f, focusDistance:10f, chromaticAberration:1f, newTransitionSpeed:5f);
-            
         }
 
         private void HandleModeratelyAnxiousEffects()
@@ -279,26 +277,26 @@ namespace Player.Camera
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(mildlyTiredSwaySettings));
             // Add blur effect
-            SetCustomVisualEffects(blurIntensity: 10f, focusDistance: 3f, chromaticAberration: 1f, newTransitionSpeed: 0.5f);
+            SetCustomVisualEffects(blurIntensity: 10f, focusDistance: 3f, chromaticAberration: 0.5f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleModeratelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(moderatelyTiredSwaySettings));
-            SetCustomVisualEffects(blurIntensity: 15f, focusDistance: 2f, chromaticAberration: 2f, newTransitionSpeed: 0.5f);
+            SetCustomVisualEffects(blurIntensity: 15f, focusDistance: 2f, chromaticAberration: 1f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleSeverelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(severelyTiredSwaySettings));
-            SetCustomVisualEffects(blurIntensity: 20f, focusDistance: 1f, chromaticAberration: 3f, newTransitionSpeed: 0.5f);
+            SetCustomVisualEffects(blurIntensity: 20f, focusDistance: 1f, chromaticAberration: 1.5f, newTransitionSpeed: 0.5f);
         }
 
 
         private void HandleExhaustedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(exhaustedTiredSwaySettings));
-            SetCustomVisualEffects(blurIntensity: 25f, focusDistance: 0.5f, chromaticAberration: 4f, newTransitionSpeed: 0.5f);
+            SetCustomVisualEffects(blurIntensity: 25f, focusDistance: 0.5f, chromaticAberration: 2f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleBreakdownEffects()

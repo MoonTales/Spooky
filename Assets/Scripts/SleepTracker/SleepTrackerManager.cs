@@ -40,11 +40,6 @@ public class SleepTrackerManager : Singleton<SleepTrackerManager>
             _sleepTrackerSourceTransform = null;
             return;
         }
-
-        // this will be called whenever the world location changed, and we will pull if it was a good or bad wakeup
-        // ensure we are in the bedroom, as thats the only location of the sleeptracker is present
-        //DebugUtils.Log(_isGoodWakeup ? "Good Wakeup!" : "Bad Wakeup!");
-        TurnSleepTrackerOn();
     }
 
     // edge case for returning to the main menu

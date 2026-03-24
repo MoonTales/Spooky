@@ -39,6 +39,8 @@ namespace Managers
         
         [Header("Rotation Settings")]
         [SerializeField] private float maxRotationAngle = 15f; // Max degrees to rotate left or right (Y-axis)
+        
+        private bool _hasSpawnedFinaleLetter = false; public bool GetHasSpawnedFinaleLetter() { return _hasSpawnedFinaleLetter; }
 
         
         // we will hold a little reference of what letters the player has read, and only spawn ones they havent read yet.
@@ -132,9 +134,11 @@ namespace Managers
 
         public void SpawnFinaleLetter()
         {
+            if (_hasSpawnedFinaleLetter) { return;}
             // this will only ever be called in Act 4
             GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
             SpawnFriendLetter(spawnLocation);
+            _hasSpawnedFinaleLetter = true;
             // once this letter is read, we will transition to the finale nightmare
         }
         

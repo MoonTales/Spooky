@@ -67,6 +67,16 @@ public class Clock : MonoBehaviour
         while (elapsedTime < 700)
         {
             yield return new WaitForSeconds(1f);
+            if(elapsedTime >= 450 &&
+                GameStateManager.Instance.GetCurrentWorldClockHour() == 2) 
+            {
+                if (!LetterManager.Instance.GetHasReadAct2ResearcherLetter() ||
+                    !LetterManager.Instance.GetHasReadAct2FriendLetter())
+                {
+                    continue;
+                }
+            }
+
             if (_currentGameState != Types.GameState.Paused)
             {
                 if (_currentGameState == Types.GameState.Inspecting)
@@ -87,6 +97,18 @@ public class Clock : MonoBehaviour
         
         while (elapsedTime < 700)
         {
+            // Pause for 1 frame
+            yield return null;
+            if(elapsedTime >= 450 &&
+                GameStateManager.Instance.GetCurrentWorldClockHour() == 2) 
+            {
+                if (!LetterManager.Instance.GetHasReadAct2ResearcherLetter() ||
+                    !LetterManager.Instance.GetHasReadAct2FriendLetter())
+                {
+                    continue;
+                }
+            }
+
             //_isInspecting = PlayerController.Instance.IsPlayerInspecting();
             _currentGameState = GameStateManager.Instance.GetCurrentGameState();
             if (_currentGameState != Types.GameState.Paused)
@@ -102,8 +124,7 @@ public class Clock : MonoBehaviour
                     hourHand.transform.Rotate(0, 0, -hourHandDegPerSec * Time.deltaTime, Space.Self);
                 }
             }
-            // Pause for 1 frame
-            yield return null;
+            
         }
         // we are good to sleep!
         //SceneSwapper.Instance.SwapScene(sceneName);

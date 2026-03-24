@@ -4,6 +4,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 using Inspection;
+using Interaction.drawings;
 using Interaction.Letters;
 using Managers;
 using UI;
@@ -48,6 +49,9 @@ public class InspectionSystem : Singleton<InspectionSystem>
     // this is to stop the low fsp issue of it returning to the og position
     float inspectionStartTime = 0f;
     bool canExitInspection => inspectionStartTime >= 0.5f;
+
+    // This is a custom return location when we finish an inspection
+    [SerializeField] private GameObject _returnlocation = null; public void SetReturnLocation(GameObject returnLocation) { _returnlocation = returnLocation; }
     
     
     void Start()
@@ -119,10 +123,11 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
     
     // Public function which can be called from any other script to start inspecting an object (itself or another)
-    public void StartInspection(GameObject objectToInspect)
+    public void StartInspection(GameObject objectToInspect, GameObject returnLocation = null)
     {
         // Prevent starting a new inspection if already inspecting an object, or if we have no object
         if (_isInspecting || objectToInspect == null){ return;}
+        _returnlocation = returnLocation;
         _isExitingInspection = false;
         // Set current inspected object
         _currentInspectedObject = objectToInspect;
@@ -199,6 +204,12 @@ public class InspectionSystem : Singleton<InspectionSystem>
         if (inspectable != null)
         {
             inspectable.OnInspectionFinished();
+        }
+        // edge case cause im lasy
+        Drawing drawing = _currentInspectedObject.GetComponent<Drawing>();
+        if (drawing != null)
+        {
+            drawing.OnInspectionFinished();
         }
         
         // reset the inspection start time for the next inspection
@@ -277,6 +288,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
             //TODO: fix this so that we can use F
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
             {
+                if(!SleepTrackerManager.Instance.GetIsSleepTrackerActive()) { AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true); }
 
                 // ensure enough time has pass
                 if (!canExitInspection) { return; }
@@ -334,6 +346,7 @@ public class InspectionSystem : Singleton<InspectionSystem>
             HandleFadeFinished,
             HandleScribbleNote
         ).Send();
+        if(!SleepTrackerManager.Instance.GetIsSleepTrackerActive()) { AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true); }
 
     }
 
@@ -374,6 +387,13 @@ public class InspectionSystem : Singleton<InspectionSystem>
     
     private void HandleExitTransition()
     {
+
+        if (_returnlocation != null)
+        {
+            _originalPosition = _returnlocation.transform.position;
+            _originalRotation = _returnlocation.transform.rotation;
+        }
+
         // Smoothly move back to original position
         _currentInspectedObject.transform.position = Vector3.Lerp(
             _currentInspectedObject.transform.position, 
