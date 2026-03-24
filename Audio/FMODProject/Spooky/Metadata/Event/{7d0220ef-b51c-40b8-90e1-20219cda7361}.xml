@@ -380,7 +380,7 @@
 	</object>
 	<object class="SFXReverbEffect" id="{bb8f9732-b2d0-44f9-9089-0fab5553947c}">
 		<property name="decayTime">
-			<value>9000</value>
+			<value>4000</value>
 		</property>
 		<property name="HFReference">
 			<value>800</value>
@@ -431,7 +431,7 @@
 	<object class="MixerBusFader" id="{77d54fe9-74b5-4e28-92fc-2b4d9efcf1d2}" />
 	<object class="CompressorEffect" id="{51a8ec30-cb56-4d3e-af81-c437719d5ea5}">
 		<property name="threshold">
-			<value>-6</value>
+			<value>-15</value>
 		</property>
 		<property name="gain">
 			<value>-6</value>
@@ -558,6 +558,7 @@
 		<relationship name="automationPoints">
 			<destination>{6d8929f7-f4f1-455f-9777-f0903d492427}</destination>
 			<destination>{457d6193-18d9-4b81-b628-86c7c717c3f3}</destination>
+			<destination>{054a1ebb-d47c-4f50-8d91-ac3504385b3a}</destination>
 		</relationship>
 	</object>
 	<object class="AutomationCurve" id="{b315a5de-1509-4fa5-bbef-39f5f4ff39c4}">
@@ -663,7 +664,7 @@
 			<value>1</value>
 		</property>
 		<property name="value">
-			<value>0</value>
+			<value>-80</value>
 		</property>
 	</object>
 	<object class="AutomationPoint" id="{457d6193-18d9-4b81-b628-86c7c717c3f3}">
@@ -672,6 +673,14 @@
 		</property>
 		<property name="value">
 			<value>-80</value>
+		</property>
+	</object>
+	<object class="AutomationPoint" id="{054a1ebb-d47c-4f50-8d91-ac3504385b3a}">
+		<property name="position">
+			<value>0.9263771186440678</value>
+		</property>
+		<property name="value">
+			<value>-3.09215927</value>
 		</property>
 	</object>
 	<object class="AutomationPoint" id="{6b2f7f51-3273-4a16-b80c-65a9e486b95a}">

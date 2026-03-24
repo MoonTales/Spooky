@@ -341,9 +341,9 @@ MonoBehaviour:
     rootObjectName: 
     objectName: Door_1B
     forwardPointsOutside: 1
-    halfWidthOverride: 0
-    blendDepthOverride: 0
-    maxInfluenceDistanceOverride: 0
+    halfWidthOverride: 5
+    blendDepthOverride: 10
+    maxInfluenceDistanceOverride: 20
   - sceneName: Nightmare1
     rootObjectName: MysteriousNeighbor
     objectName: Exterior_Door_Frame
@@ -365,6 +365,13 @@ MonoBehaviour:
     halfWidthOverride: 5
     blendDepthOverride: 10
     maxInfluenceDistanceOverride: 20
+  - sceneName: Nightmare1
+    rootObjectName: RampUp
+    objectName: Tunnel1
+    forwardPointsOutside: 0
+    halfWidthOverride: 2.5
+    blendDepthOverride: 5
+    maxInfluenceDistanceOverride: 10
   nightmareInteriorDoorHalfWidth: 1.5
   nightmareInteriorBlendDepth: 5
   nightmareInteriorDoorMaxInfluenceDistance: 50
