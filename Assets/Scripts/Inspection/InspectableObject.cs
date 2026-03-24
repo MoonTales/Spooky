@@ -39,6 +39,7 @@ namespace Inspection
         // Interface Implementation
         public bool CanInteract(Interactor interactor)
         {
+            /*
             if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom && 
             PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth() <= 25)  // This correlates to 6pm exactly
             {
@@ -81,7 +82,9 @@ namespace Inspection
                     );
                     return false;
                 }
+                
             }
+            */
             return true;
         }
 

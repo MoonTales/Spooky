@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Wet Surface 5
-  m_Shader: {fileID: -6465566751694194690, guid: 8dc47b903d64ded4aaf65f30e4675521, type: 3}
+  m_Name: Cobweb Shader Thick Alt 2
+  m_Shader: {fileID: -6465566751694194690, guid: 541a086d6d3091e42ae4bd5a80eeb885, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 2
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -24,20 +24,8 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _Diffuse:
-        m_Texture: {fileID: 2800000, guid: 7b14802af7044314eabe42de33f24ad2, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Normal:
-        m_Texture: {fileID: 2800000, guid: e36399be8ca385d42a2509cc4065fff1, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Puddle:
-        m_Texture: {fileID: 2800000, guid: aeece5554ac31444095754c6a40497a9, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Ripple:
-        m_Texture: {fileID: 2800000, guid: 6250ca63ad192eb45bb98a7407d454e9, type: 3}
+    - _Base_Texture:
+        m_Texture: {fileID: 2800000, guid: 096695e6e30e9ed4fafae07beeed251d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -54,18 +42,19 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Flow: 0.01
-    - _FlowTiling: 213
+    - _Noise_Scale: 50
+    - _Noise_Strength: 0.25
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Texture_Speed: 0.1
+    - _Threshold: 0.01
+    - _Wave_Speed: 0.5
+    - _Wave_Strength: 0.1
     m_Colors:
-    - _MainTiling: {r: 10, g: 10, b: 0, a: 0}
-    - _RippleSpeed: {r: 0.4, g: 0.2, b: 0, a: 0}
-    - _RippleTiling: {r: 204, g: 200, b: 0, a: 0}
-    - _SmoothTiling: {r: 0.004, g: 0.006, b: 0, a: 0}
+    - _Base_Color: {r: 0.34117648, g: 0.043137256, b: 0.101960786, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &8626879435875217664
+--- !u!114 &472432682464163879
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

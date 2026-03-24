@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Wet Surface 9
-  m_Shader: {fileID: -6465566751694194690, guid: 4ea862057800b4a4480c67c450ad169a, type: 3}
+  m_Name: Wet Surface 17
+  m_Shader: {fileID: -6465566751694194690, guid: a94696e123d395d4183e5b3dcaf680b4, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -25,7 +25,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Diffuse:
-        m_Texture: {fileID: 2800000, guid: 7b14802af7044314eabe42de33f24ad2, type: 3}
+        m_Texture: {fileID: 2800000, guid: 518e16b07bdeee841b3301cc30197934, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal:
@@ -55,7 +55,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Flow: 0.01
-    - _FlowTiling: 213
+    - _FlowTiling: 204
     - _Noise_Strength: 10
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -65,7 +65,7 @@ Material:
     - _RippleTiling: {r: 204, g: 200, b: 0, a: 0}
     - _SmoothTiling: {r: 0.009, g: 0.009, b: 0, a: 0}
     - _WaterTiling: {r: 1, g: 0, b: 0, a: 0}
-    - _pavementTiling: {r: 5, g: 5, b: 0, a: 0}
+    - _pavementTiling: {r: 0.1, g: 0.1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &8626879435875217664
