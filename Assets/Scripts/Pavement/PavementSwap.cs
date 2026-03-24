@@ -21,7 +21,7 @@ public class PavementSwap : MonoBehaviour
 
     IEnumerator SwapMaterials()
     {
-        if (GameStateManager.Instance.GetCurrentWorldClockHour() >= 2)
+        if (GameStateManager.Instance.GetCurrentWorldClockHour() == 2)
         {
             // Get ALL mesh renderers (this object + all children)
             MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
