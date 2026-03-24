@@ -59,23 +59,16 @@ public class TerrorRadius : MonoBehaviour
 
     }
 
+    private void OnDisable()
+    {
+        EventBroadcaster.Broadcast_OnTerrorIntensityChanged(0f, null, false);
+    }
+
     // Update is called once per frame
     void Update()
     {
         distance = PlayerManager.Instance.GetDistance(transform.position);
-
-        bool isNightmare = GameStateManager.Instance != null
-            && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare;
-
-        if (isNightmare)
-        {
-            float terrorIntensity = CalculateNormalizedTerrorIntensity();
-            EventBroadcaster.Broadcast_OnTerrorIntensityChanged(terrorIntensity, GetTerrorAudioSourceTransform());
-        }
-        else
-        {
-            EventBroadcaster.Broadcast_OnTerrorIntensityChanged(0f, null);
-        }
+        BroadcastCurrentTerrorState();
 
         // Timer keeps damage cadence separate from audio updates.
         timer += Time.deltaTime;
@@ -137,6 +130,17 @@ public class TerrorRadius : MonoBehaviour
     {
         // Default to this GameObject for quick testing scenes without a monster hierarchy.
         return terrorAudioSourceTransform != null ? terrorAudioSourceTransform : transform;
+    }
+
+    private void BroadcastCurrentTerrorState()
+    {
+        bool isNightmare = GameStateManager.Instance != null
+            && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare;
+
+        bool isTerrorRadiusActive = isActiveAndEnabled && isNightmare;
+        float terrorIntensity = isTerrorRadiusActive ? CalculateNormalizedTerrorIntensity() : 0f;
+        Transform sourceTransform = isTerrorRadiusActive ? GetTerrorAudioSourceTransform() : null;
+        EventBroadcaster.Broadcast_OnTerrorIntensityChanged(terrorIntensity, sourceTransform, isTerrorRadiusActive);
     }
 
     /*
