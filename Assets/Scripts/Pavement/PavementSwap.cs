@@ -7,7 +7,7 @@ using UnityEngine;
 using Types = System.Types;
 using Interaction;
 
-public class PavementSwap : EventSubscriberBase
+public class PavementSwap : MonoBehaviour
 {
     // Expose the material to be set for the swap script
     public Material[] materialArray;
@@ -15,11 +15,6 @@ public class PavementSwap : EventSubscriberBase
 
     void Start()
     {
-        StartCoroutine(SwapMaterials());
-    }
-
-    protected override void OnWorldClockTicked(int newHour)
-	{
         StartCoroutine(SwapMaterials());
     }
 
