@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Linq;
 
 namespace Placeables
 {
@@ -29,7 +30,7 @@ namespace Placeables
             
             _meshRenderers = GetComponentsInChildren<MeshRenderer>();
             _objColliders = GetComponentsInChildren<Collider>();
-            _gameObjects = GetComponentsInChildren<Transform>();
+            _gameObjects = GetComponentsInChildren<Transform>().Skip(1).ToArray();
         }
         protected override void OnWorldClockTicked(int newHour)
         {
