@@ -577,6 +577,14 @@ namespace Managers
                 return;
             }
 
+            if (!isActive)
+            {
+                StopAndReleaseSleepTrackerAlarm(true);
+                StopAndReleaseGoodWakeupTransition(true);
+                LogAudioState("Sleep tracker deactivated in Bedroom. Expected: active sleep tracker FMOD instances stop and unload.");
+                return;
+            }
+
             if (isGoodWakeup)
             {
                 if (goodWakeupTransitionEvent.IsNull)
