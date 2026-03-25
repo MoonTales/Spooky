@@ -32,9 +32,17 @@ public class CreditScript : MonoBehaviour
         if (timer <= 0)
         {
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu); 
-            SceneSwapper.Instance.SwapScene("MainMenu");
+            Types.ScreenFadeSceneTransitionData data = new Types.ScreenFadeSceneTransitionData(3f, 3f, "MainMenu", null, null, null);
+            data.Send();
+        }
+
+        if (Input.GetKey(KeyCode.O))
+        {
+            Types.ScreenFadeSceneTransitionData data = new Types.ScreenFadeSceneTransitionData(3f, 3f, "MainMenu", null, null, null);
+            data.Send();
         }
 
         rectTransform.anchoredPosition += new Vector2(0, scrollSpeed * Time.deltaTime);
+        Debug.Log("Timer: " + timer);
     }
 }

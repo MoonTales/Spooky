@@ -46,7 +46,16 @@ namespace Managers
             // we can start the cutscene now,
             _playableDirector.gameObject.SetActive(true);
             _playableDirector.Play();
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
+            // Edge case for the credits Scene
+            if (_currentCutscene.UseGameStateOverride)
+            {
+                EventBroadcaster.Broadcast_GameStateChanged(_currentCutscene.GameStateOverride);
+            }
+            else
+            {
+                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
+            }
+            
         }
         
         public void OnRequestSkipCutscene()
