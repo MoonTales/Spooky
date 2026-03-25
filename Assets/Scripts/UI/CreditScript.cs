@@ -7,7 +7,7 @@ using Types = System.Types;
 public class CreditScript : MonoBehaviour
 {
     public float scrollSpeed = 100f;
-    int timer = 9000;
+    int timer = 8500;
     private RectTransform rectTransform;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -17,7 +17,7 @@ public class CreditScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (Input.GetKey(KeyCode.Tab))
         {
