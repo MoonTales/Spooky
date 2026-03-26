@@ -28,9 +28,9 @@ namespace Placeables
         {
             base.OnEnable();
             
-            _meshRenderers = GetComponentsInChildren<MeshRenderer>();
-            _objColliders = GetComponentsInChildren<Collider>();
-            _gameObjects = GetComponentsInChildren<Transform>().Skip(1).ToArray();
+            _meshRenderers = GetComponentsInChildren<MeshRenderer>(true);
+            _objColliders = GetComponentsInChildren<Collider>(true);
+            _gameObjects = GetComponentsInChildren<Transform>(true).Skip(1).ToArray();
         }
         protected override void OnWorldClockTicked(int newHour)
         {
