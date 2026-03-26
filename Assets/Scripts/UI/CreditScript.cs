@@ -7,7 +7,7 @@ using Types = System.Types;
 public class CreditScript : MonoBehaviour
 {
     public float scrollSpeed = 100f;
-    int timer = 1280;
+    int timer = 10000;
     private RectTransform rectTransform;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -17,7 +17,7 @@ public class CreditScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (Input.GetKey(KeyCode.Tab))
         {
@@ -32,9 +32,17 @@ public class CreditScript : MonoBehaviour
         if (timer <= 0)
         {
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu); 
-            SceneSwapper.Instance.SwapScene("MainMenu");
+            Types.ScreenFadeSceneTransitionData data = new Types.ScreenFadeSceneTransitionData(3f, 3f, "MainMenu", null, null, null);
+            data.Send();
+        }
+
+        if (Input.GetKey(KeyCode.O))
+        {
+            Types.ScreenFadeSceneTransitionData data = new Types.ScreenFadeSceneTransitionData(3f, 3f, "MainMenu", null, null, null);
+            data.Send();
         }
 
         rectTransform.anchoredPosition += new Vector2(0, scrollSpeed * Time.deltaTime);
+        Debug.Log("Timer: " + timer);
     }
 }
