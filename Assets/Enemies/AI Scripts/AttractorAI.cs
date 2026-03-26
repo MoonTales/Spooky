@@ -731,7 +731,18 @@ public class AttractorAI : MonoBehaviour
 		public bool Equals(FloatCondition other)
 		{
 			if (other == null) return false;
+
+			if (ReferenceEquals(this, other)) return true;
+
 			return (floatName == other.floatName && floatValue == other.floatValue);
+		}
+
+		public override bool Equals(object obj) => Equals(obj as FloatCondition);
+
+		public override int GetHashCode()
+		{
+			// Combine hash codes of the properties used for equality
+			return (floatName, floatValue).GetHashCode();
 		}
 	}
 	[System.Serializable]
@@ -744,7 +755,18 @@ public class AttractorAI : MonoBehaviour
 		public bool Equals(IntCondition other)
 		{
 			if (other == null) return false;
+
+			if (ReferenceEquals(this, other)) return true;
+
 			return (intName == other.intName && intValue == other.intValue);
+		}
+
+		public override bool Equals(object obj) => Equals(obj as IntCondition);
+
+		public override int GetHashCode()
+		{
+			// Combine hash codes of the properties used for equality
+			return (intName, intValue).GetHashCode();
 		}
 	}
 	[System.Serializable]
@@ -1214,6 +1236,8 @@ public class AttractorAI : MonoBehaviour
 
 	[Header("Animation Setup")]
 	[SerializeField] private Animator animator;
+	[Tooltip("These animators will not be considered if the animator variable is not assigned.")]
+	[SerializeField] private Animator[] additionalAnimators;
 	[Tooltip("How fast is navmesh speed per walk animation speed, for syncing up animations")]
 	[SerializeField] private float walkSpdAnimMult;
 	[SerializeField] private float screamTime = 1;
@@ -1325,6 +1349,8 @@ public class AttractorAI : MonoBehaviour
 			defaultFocus = Player.PlayerManager.Instance.GetPlayer().transform;
 		if (animator != null)
 			hasAnimator = true;
+		if (additionalAnimators == null)
+			additionalAnimators = new Animator[0];
 		currentFocus = defaultFocus;
 		currentState = defaultState;
 		nextState = defaultState;
@@ -1507,7 +1533,13 @@ public class AttractorAI : MonoBehaviour
 		}
 
 		if (hasAnimator)
-			animator.SetFloat("Speed", (hasAgent ? agent.velocity.magnitude : hasNonAgentDestination ? nonAgentSpeed : 0) / walkSpdAnimMult); 
+		{
+			animator.SetFloat("Speed", (hasAgent ? agent.velocity.magnitude : hasNonAgentDestination ? nonAgentSpeed : 0) / walkSpdAnimMult);
+			foreach (Animator anim in additionalAnimators)
+			{
+				anim.SetFloat("Speed", (hasAgent ? agent.velocity.magnitude : hasNonAgentDestination ? nonAgentSpeed : 0) / walkSpdAnimMult);
+			}
+		}
 			// this keeps the animation in sync with the enemy speed
 
 		if (!(currentState == EnemyState.RushOver))
@@ -1521,13 +1553,21 @@ public class AttractorAI : MonoBehaviour
 		if (!(currentState == EnemyState.Inspect))
 		{
 			if (hasAnimator)
+			{
 				animator.SetBool("Inspecting", false);
+				foreach (Animator anim in additionalAnimators)
+					anim.SetBool("Inspecting", false);
+			}
 			currentInspect = 0;
 		}
 		if (!(currentState == EnemyState.Search))
 		{
 			if (hasAnimator)
+			{
 				animator.SetBool("LookingAround", false);
+				foreach (Animator anim in additionalAnimators)
+					animator.SetBool("LookingAround", false);
+			}
 			searchTimer = 0;
 			if (searchLocations.Count > 1)
 				searchLocations.Clear();
@@ -2246,13 +2286,21 @@ public class AttractorAI : MonoBehaviour
 			else
 				nonAgentSpeed = 0;
 			if (hasAnimator)
+			{
 				animator.SetBool("Inspecting", true);
+				foreach (Animator anim in additionalAnimators)
+					anim.SetBool("Inspecting", true);
+			}
 			currentInspect += Time.deltaTime;
 			if (currentInspect >= inspectTime)
 			{
 				currentInspect = 0;
 				if (hasAnimator)
+				{
 					animator.SetBool("Inspecting", false);
+					foreach (Animator anim in additionalAnimators)
+						anim.SetBool("Inspecting", false);
+				}
 				currentFocus = nextFocus;
 				currentState = nextState;
 				if (nextStatePriority != currentStatePriority)
@@ -2329,7 +2377,11 @@ public class AttractorAI : MonoBehaviour
 					else
 					{
 						if (hasAnimator)
+						{
 							animator.SetBool("LookingAround", false);
+							foreach (Animator anim in additionalAnimators)
+								anim.SetBool("LookingAround", false);
+						}
 						searchTimer = 0;
 						searching = false;
 						if (currentAvoidedTarget != null)
@@ -2394,7 +2446,11 @@ public class AttractorAI : MonoBehaviour
 				if (searchTimer <= 0)
 				{
 					if (hasAnimator)
+					{
 						animator.SetBool("LookingAround", false);
+						foreach (Animator anim in additionalAnimators)
+							anim.SetBool("LookingAround", false);
+					}
 					searchTimer = 0;
 					searching = false;
 					hiddenStationary = false;
@@ -2485,14 +2541,22 @@ public class AttractorAI : MonoBehaviour
 	IEnumerator ScreamRoutine()
 	{
 		if (hasAnimator)
+		{
 			animator.SetBool("Screaming", true);
+			foreach (Animator anim in additionalAnimators)
+				anim.SetBool("Screaming", true);
+		}
 		if (hasAgent)
 			agent.speed = 0;
 		else
 			nonAgentSpeed = 0;
 		yield return new WaitForSeconds(screamTime);
 		if (hasAnimator)
+		{
 			animator.SetBool("Screaming", false);
+			foreach (Animator anim in additionalAnimators)
+				anim.SetBool("Screaming", false);
+		}
 		finishedScream = true;
 	}
 
@@ -2501,7 +2565,11 @@ public class AttractorAI : MonoBehaviour
 		if (attackBox != null)
 			attackBox.enabled = true;
 		if (hasAnimator)
+		{
 			animator.SetBool("Attacking", true);
+			foreach (Animator anim in additionalAnimators)
+				anim.SetBool("Attacking", true);
+		}
 		if (hasAgent)
 			agent.speed = 0;
 		else
@@ -2518,7 +2586,11 @@ public class AttractorAI : MonoBehaviour
 			nonAgentSpeed = 0;
 		yield return new WaitForSeconds(attackCooldownTime);
 		if (hasAnimator)
+		{
 			animator.SetBool("Attacking", false);
+			foreach (Animator anim in additionalAnimators)
+				anim.SetBool("Attacking", false);
+		}
 		finishedAttack = true;
 	}
 
