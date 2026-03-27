@@ -99,7 +99,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Crouch Run
-  m_Speed: 0.444
+  m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
@@ -216,7 +216,7 @@ AnimatorStateTransition:
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
-  m_CanTransitionToSelf: 1
+  m_CanTransitionToSelf: 0
 --- !u!1102 &-3985066762811257673
 AnimatorState:
   serializedVersion: 6
@@ -336,7 +336,7 @@ AnimatorStateTransition:
     m_EventTreshold: 0
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
-    m_EventTreshold: 15.1
+    m_EventTreshold: 1.1
   - m_ConditionMode: 2
     m_ConditionEvent: Screaming
     m_EventTreshold: 0
@@ -463,7 +463,7 @@ AnimatorStateTransition:
     m_EventTreshold: 0.09
   - m_ConditionMode: 4
     m_ConditionEvent: Speed
-    m_EventTreshold: 15
+    m_EventTreshold: 3
   - m_ConditionMode: 2
     m_ConditionEvent: Screaming
     m_EventTreshold: 0
@@ -489,7 +489,7 @@ AnimatorStateTransition:
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
-  m_CanTransitionToSelf: 1
+  m_CanTransitionToSelf: 0
 --- !u!1102 &2276464021515517244
 AnimatorState:
   serializedVersion: 6
@@ -607,7 +607,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Crouch Walk
-  m_Speed: 0.274
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
@@ -690,7 +690,7 @@ AnimatorStateTransition:
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
-  m_CanTransitionToSelf: 1
+  m_CanTransitionToSelf: 0
 --- !u!1102 &5619121582992915961
 AnimatorState:
   serializedVersion: 6
