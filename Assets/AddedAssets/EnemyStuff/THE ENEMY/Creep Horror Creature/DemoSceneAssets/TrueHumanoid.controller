@@ -16,7 +16,7 @@ AnimatorStateTransition:
     m_EventTreshold: 0.09
   - m_ConditionMode: 4
     m_ConditionEvent: Speed
-    m_EventTreshold: 3
+    m_EventTreshold: 15
   - m_ConditionMode: 2
     m_ConditionEvent: Screaming
     m_EventTreshold: 0
@@ -173,7 +173,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Crouch Run
-  m_Speed: 1
+  m_Speed: 0.565
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
@@ -204,7 +204,7 @@ AnimatorStateTransition:
     m_EventTreshold: 0
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
-    m_EventTreshold: 3.1
+    m_EventTreshold: 15.1
   - m_ConditionMode: 2
     m_ConditionEvent: Screaming
     m_EventTreshold: 0
@@ -442,7 +442,7 @@ AnimatorStateTransition:
     m_EventTreshold: 0
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
-    m_EventTreshold: 3.1
+    m_EventTreshold: 15.1
   - m_ConditionMode: 2
     m_ConditionEvent: Screaming
     m_EventTreshold: 0
@@ -477,7 +477,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Crouch Walk
-  m_Speed: 1
+  m_Speed: 0.565
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
@@ -575,7 +575,7 @@ AnimatorController:
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
-    m_DefaultBool: 0
+    m_DefaultBool: 1
     m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
@@ -917,13 +917,13 @@ AnimatorStateMachine:
     m_Position: {x: -240, y: -110, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -6253087860795388453}
-    m_Position: {x: 500, y: 20, z: 0}
+    m_Position: {x: 510, y: 40, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 8768688490888675619}
     m_Position: {x: 50, y: 130, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2774475292666227642}
-    m_Position: {x: 250, y: -170, z: 0}
+    m_Position: {x: 260, y: -170, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 8282448889270288536}
     m_Position: {x: 730, y: -250, z: 0}
@@ -950,7 +950,7 @@ AnimatorStateMachine:
     m_Position: {x: 449.73932, y: -306.81216, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5490842031498004803}
-    m_Position: {x: 420, y: -70, z: 0}
+    m_Position: {x: 430, y: -50, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -1051197898862700459}
     m_Position: {x: 450, y: -130, z: 0}
@@ -1002,7 +1002,7 @@ AnimatorStateTransition:
     m_EventTreshold: 0.09
   - m_ConditionMode: 4
     m_ConditionEvent: Speed
-    m_EventTreshold: 3
+    m_EventTreshold: 15
   - m_ConditionMode: 2
     m_ConditionEvent: Screaming
     m_EventTreshold: 0
