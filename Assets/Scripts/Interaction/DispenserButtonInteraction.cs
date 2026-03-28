@@ -53,7 +53,7 @@ public class DispenserButtonInteraction : MonoBehaviour, IInteractable
         // trying out button movement, i have no idea how thsis works
         if (buttonVisual != null)
         {
-            buttonVisual.localPosition = buttonStartLocalPos + new Vector3(-pressDistance, 0f, 0f);
+            buttonVisual.localPosition = buttonStartLocalPos + new Vector3(0f, -pressDistance, 0f);
             CancelInvoke(nameof(ResetButtonVisual));
             Invoke(nameof(ResetButtonVisual), 0.1f);
         }
