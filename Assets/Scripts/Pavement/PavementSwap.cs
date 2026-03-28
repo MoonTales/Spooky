@@ -31,12 +31,13 @@ public class PavementSwap : MonoBehaviour
             for (int i = 0; i < renderers.Length; i++)
             {
                 // add a null check
-                if (renderers[i] == null || materialArray[i] == null)
+                if (i >= materialArray.Length || renderers[i] == null || materialArray[i] == null)
+                //if (i >= materialArray.Length)
                 {
                     //Debug.LogWarning($"Renderer or material is null at index {i}. Skipping.");
                     continue;
                 }
-                
+                //Debug.LogWarning($"Renderer or material found at index {i}!");
                 Material[] mats = renderers[i].materials;
                 mats[0] = materialArray[i];   // array of transparent materials
                 renderers[i].materials = mats;     // apply back
@@ -44,7 +45,6 @@ public class PavementSwap : MonoBehaviour
                 // store for alpha fading
                 fadeMats[i] = renderers[i].materials[0];
             }
-
 
             yield return null;            
         }
