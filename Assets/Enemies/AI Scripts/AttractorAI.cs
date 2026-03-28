@@ -948,7 +948,7 @@ public class AttractorAI : MonoBehaviour
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
 		[Space(20)]
-		[Header("Define your utility values here!")]
+		[Header("Define your utility considerations here!")]
 		public string wuhOh;
 
 		[Space(20)]
