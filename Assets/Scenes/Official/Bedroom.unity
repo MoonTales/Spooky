@@ -331929,6 +331929,8 @@ GameObject:
   - component: {fileID: 1271208311485906207}
   - component: {fileID: 5346935070162625737}
   - component: {fileID: 7330095381635283972}
+  - component: {fileID: 7330095381635283974}
+  - component: {fileID: 7330095381635283973}
   m_Layer: 0
   m_Name: pCylinder10
   m_TagString: Untagged
@@ -339623,6 +339625,50 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7330095381635283973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855812948796081507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66883f9a65a203a42b9d6dc26ad13eed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  promptKey:
+    place: 
+    id: 
+  buttonPressSfx: {fileID: 8300000, guid: 416e4960e65ce5d4593399e1924a0a3e, type: 3}
+  first: {fileID: 8300000, guid: b445e25f179edfa4faef3a4e87a6d2b8, type: 3}
+  second: {fileID: 8300000, guid: 16abc2c22a2821f42906a40ee8500e88, type: 3}
+  buttonPressVolume: 1
+  buttonPressDeviation: 0.05
+  buttonVisual: {fileID: 1271208311485906207}
+  pressDistance: 20
+--- !u!64 &7330095381635283974
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855812948796081507}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2721331549007201028, guid: df115ea4052c91647b61e6cc1ea4d224, type: 3}
 --- !u!1 &7369038947109107331
 GameObject:
   m_ObjectHideFlags: 0
