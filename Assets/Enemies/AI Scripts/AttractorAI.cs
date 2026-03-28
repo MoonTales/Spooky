@@ -121,70 +121,99 @@ public class AttractorAI : MonoBehaviour
 		public AttractorType[] possibleAttractorTypeChanges;
 		[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float attractorTypeUpperBoundDangerRange = 100;
 
 		public string[] possibleCustomAttractorIDChanges;
+		[ShowIf("balancesChanges")]
 		public float customAttractorIDLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
+		[ShowIf("balancesChanges")]
 		public float minIntensityLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float minIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
+		[ShowIf("balancesChanges")]
 		public float maxIntensityLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float maxIntensityUpperBoundDangerRange = 100;
 
 		public CheckConditions[] possibleThoughtConditionsChanges;
+		[ShowIf("balancesChanges")]
 		public float thoughtConditionsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float thoughtConditionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllConditionsRequiredChanges;
+		[ShowIf("balancesChanges")]
 		public float allConditionsRequiredLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float allConditionsRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
+		[ShowIf("balancesChanges")]
 		public float statusRestrictionsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float statusRestrictionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllStatusesRequiredChanges;
+		[ShowIf("balancesChanges")]
 		public float allStatusesRequiredLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
+		[ShowIf("balancesChanges")]
 		public float stateRestrictionLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
+		[ShowIf("balancesChanges")]
 		public float functionExecutionsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float functionExecutionsUpperBoundDangerRange = 100;
 
 		[SerializeField] public UnityEventListWrapper[] possibleEventExecutionsChanges;
+		[ShowIf("balancesChanges")]
 		public float eventExecutionsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float eventExecutionsUpperBoundDangerRange = 100;
 
 		public EnemyState[] possibleStateChangeChanges;
+		[ShowIf("balancesChanges")]
 		public float stateChangeLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float stateChangeUpperBoundDangerRange = 100;
 
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
 		public bool[] possibleTargetDetectedObjectChanges;
+		[ShowIf("balancesChanges")]
 		public float targetDetectedObjectLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float targetDetectedObjectUpperBoundDangerRange = 100;
 
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
 		public bool[] possiblePrioritizeDistanceInsteadOfIntensityChanges;
+		[ShowIf("balancesChanges")]
 		public float prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
 		public bool[] possibleInvertPriorityChanges;
+		[ShowIf("balancesChanges")]
 		public float invertPriorityLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float invertPriorityUpperBoundDangerRange = 100;
 	}
 
@@ -196,61 +225,89 @@ public class AttractorAI : MonoBehaviour
 		public bool balancesChanges = false;
 
 		public AttractorType[] possibleAttractorTypeChanges;
+		[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float attractorTypeUpperBoundDangerRange = 100;
 
 		public string[] possibleCustomAttractorIDChanges;
+		[ShowIf("balancesChanges")]
 		public float customAttractorIDLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
+		[ShowIf("balancesChanges")]
 		public float minIntensityLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float minIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
+		[ShowIf("balancesChanges")]
 		public float maxIntensityLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float maxIntensityUpperBoundDangerRange = 100;
 
 		public CheckConditions[] possibleReactionConditionsChanges;
+		[ShowIf("balancesChanges")]
 		public float reactionConditionsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float reactionConditionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllConditionsRequiredChanges;
+		[ShowIf("balancesChanges")]
 		public float allConditionsRequiredLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float allConditionsRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
+		[ShowIf("balancesChanges")]
 		public float statusRestrictionsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float statusRestrictionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllStatusesRequiredChanges;
+		[ShowIf("balancesChanges")]
 		public float allStatusesRequiredLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
+		[ShowIf("balancesChanges")]
 		public float stateRestrictionLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
+		[ShowIf("balancesChanges")]
 		public float functionExecutionsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float functionExecutionsUpperBoundDangerRange = 100;
 
 		[SerializeField] public UnityEventListWrapper[] possibleEventExecutionsChanges;
+		[ShowIf("balancesChanges")]
 		public float eventExecutionsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float eventExecutionsUpperBoundDangerRange = 100;
 
 		public float[] possibleRepeatBufferChanges;
+		[ShowIf("balancesChanges")]
 		public float repeatBufferLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float repeatBufferUpperBoundDangerRange = 100;
 
 		public bool[] possibleForceBufferChanges;
+		[ShowIf("balancesChanges")]
 		public float forceBufferLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float forceBufferUpperBoundDangerRange = 100;
 
 		public float[] possibleTimerChanges;
+		[ShowIf("balancesChanges")]
 		public float timerLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
 		public float timerUpperBoundDangerRange = 100;
 	}
 
@@ -259,31 +316,48 @@ public class AttractorAI : MonoBehaviour
 	{
 		public FunctionType function;
 		[Header("Note: use spaces to seperate items in LISTs")]
+		[ShowIfEnum(true, "function", FunctionType.ChangeStats_STATS, FunctionType.DeleteFocus, FunctionType.ReprogramReaction_REPROGRAM,
+			FunctionType.ReprogramThoughts_THOUGHTREPROGRAM, FunctionType.TeleportCycle)]
 		public List<string> arguments;
+		[ShowIfEnum("function", FunctionType.ReprogramReaction_REPROGRAM, FunctionType.ReprogramThoughts_THOUGHTREPROGRAM)]
 		[Tooltip("This is only for functions that reprogram reactions or thoughts in the behaviour hierarchy or thought processes. The array contains possible" +
 			"reactions or thoughts to reprogram  based on their index in the list")]
 		public int[] possiblePriorityReprograms;
+		[ShowIfEnum("function", FunctionType.ReprogramReaction_REPROGRAM)]
 		[Tooltip("Only useful for functions that reprogram a reaction. All elements in this list will be run. (If this list is reprogrammed during the" +
 			"execution of running all reprogram parameters, the list initially run will continue without changes)")]
 		[SerializeField]public List<EnemyReactionReprogram> reprogramParameters = new List<EnemyReactionReprogram>();
+		[ShowIfEnum("function", FunctionType.ReprogramThoughts_THOUGHTREPROGRAM)]
 		[Tooltip("Only useful for functions that reprogram a thought. All elements in this list will be run. (If this list is reprogrammed during the" +
 			"execution of running all reprogram parameters, the list initially run will continue without changes)")]
 		[SerializeField]public List<EnemyThoughtReprogram> thoughtReprogramParameters = new List<EnemyThoughtReprogram>();
 		[Header("StatChanges")]
+		[ShowIfEnum("function", FunctionType.ChangeStats_STATS)]
 		public Stats[] statsToChange;
+		[ShowIfEnum("function", FunctionType.ChangeStats_STATS,
+			FunctionType.ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount)]
 		public Alteration changeStatsBy;
+		[ShowIfEnum("function", FunctionType.ChangeStats_STATS,
+			FunctionType.ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount)]
 		public float statsChangeAmount;
 		[Header("AddReactionsAndThoughts")]
+		[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		[Tooltip("One of these will be chosen randomly within the danger range")]
 		[SerializeField] public List<EnemyReactions> addReactions;
+		[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		public float addReactionLowerBoundDangerRange = 100;
+		[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		public float addReactionUpperBoundDangerRange = 100;
+		[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		[SerializeField] public List<ThoughtProcess> addThoughts;
+		[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		public float addThoughtsLowerBoundDangerRange = 100;
+		[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		public float addThoughtsUpperBoundDangerRange = 100;
 
 		[Header("Other Stuff")]
 		public bool changeDefaultState = false;
+		[ShowIf("changeDefaultState")]
 		public EnemyState newDefaultState;
 		public Transform alsoChangeDefaultFocus;
 	}
