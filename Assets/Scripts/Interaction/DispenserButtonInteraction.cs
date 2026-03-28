@@ -30,16 +30,11 @@ public class DispenserButtonInteraction : MonoBehaviour, IInteractable
 
     private void Awake()
     {
-        GameObject sourceObject = buttonVisual != null ? buttonVisual.gameObject : gameObject;
-
-        longSource = sourceObject.AddComponent<AudioSource>();
+        longSource = gameObject.AddComponent<AudioSource>();
         longSource.playOnAwake = false;
         longSource.loop = false;
         longSource.spatialBlend = 1f;
         longSource.volume = buttonPressVolume;
-        longSource.rolloffMode = AudioRolloffMode.Logarithmic;
-        longSource.minDistance = 1f;
-        longSource.maxDistance = 10f;
 
         if (buttonVisual != null)
             buttonStartLocalPos = buttonVisual.localPosition;
