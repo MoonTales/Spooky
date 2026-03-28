@@ -912,6 +912,71 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	[System.Serializable]
+	public class UtilityBehavior
+	{
+		[Header("These values are not necessary and should only be used if you want to force the enemy to not consider this behavior at all if certain" +
+			"strict conditions are met")]
+		public bool useStrictConditions = false;
+		[ShowIf("useStrictConditions")]
+		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		[ShowIf("useStrictConditions")]
+		[ShowIfEnum("attractorType", AttractorType.custom)]
+		public string customAttractorID;
+		[Tooltip("Inclusve")]
+		[ShowIf("useStrictConditions")]
+		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		public float minIntensity;
+		[Tooltip("Non-inclusve")]
+		[ShowIf("useStrictConditions")]
+		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		public float maxIntensity;
+		[ShowIf("useStrictConditions")]
+		public CheckConditions reactionConditions;
+		[ShowIf("useStrictConditions")]
+		public bool allConditionsRequired = false;
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
+		[ShowIf("useStrictConditions")]
+		public List<string> statusRestrictions = new List<string>();
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
+		[ShowIf("useStrictConditions")]
+		public bool allStatusesRequired = false;
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
+		[ShowIf("useStrictConditions")]
+		public List<EnemyState> stateRestriction = new List<EnemyState>();
+
+		[Space(20)]
+		[Header("Define your utility values here!")]
+		public string wuhOh;
+
+		[Space(20)]
+		[Header("Construct the behavior here!")]
+		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
+		public EnemyState stateChange;
+		//[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
+		//"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
+		//public bool immediateStateTransition = true;
+		//[Tooltip("Forces the new state to finish its buffer before changing to any other states")]
+		//public bool forceStateBuffer = false;
+		//[Tooltip("Forces the new state to skip its buffer when changing to any other states")]
+		//public bool forceSkipStateBuffer = false;
+		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
+			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
+			"it will automatically target the defaultFocus/Player")]
+		public bool targetDetectedObject = false;
+		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
+			"instead of the Attractor with the highest intensity")]
+		[ShowIf("targetDetectedObject")]
+		public bool prioritizeDistanceInsteadOfIntensity = false;
+		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
+		[ShowIf("targetDetectedObject")]
+		public bool invertPriority = false;
+	}
+
+	[System.Serializable]
 	public class ThoughtProcess
 	{
 		public AttractorType attractorType;
