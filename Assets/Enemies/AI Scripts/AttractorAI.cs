@@ -870,10 +870,13 @@ public class AttractorAI : MonoBehaviour
 	{
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		[ShowIfEnum("attractorType", AttractorType.custom)]
 		public string customAttractorID;
 		[Tooltip("Inclusve")]
+		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
+		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
 		public CheckConditions reactionConditions;
 		public bool allConditionsRequired = false;
@@ -901,8 +904,10 @@ public class AttractorAI : MonoBehaviour
 		public bool targetDetectedObject = false;
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
+		[ShowIf("targetDetectedObject")]
 		public bool prioritizeDistanceInsteadOfIntensity = false;
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
+		[ShowIf("targetDetectedObject")]
 		public bool invertPriority = false;
 	}
 
@@ -911,10 +916,13 @@ public class AttractorAI : MonoBehaviour
 	{
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		[ShowIfEnum("attractorType", AttractorType.custom)]
 		public string customAttractorID;
 		[Tooltip("Inclusve")]
+		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
+		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
 		public CheckConditions thoughtConditions;
 		public bool allConditionsRequired = false;
