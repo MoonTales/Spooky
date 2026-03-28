@@ -28,6 +28,14 @@ namespace UI.PauseMenu
         private Button _pauseMenuBackButton;
         private bool _audioSlidersInitialized;
 
+        // CONTROLS CODE move later probably
+        [Header("Controls screen")]
+        [SerializeField] private GameObject PauseControls;
+        [SerializeField] private GameObject MainMenuControls;
+        private Button _mainMenuBackControls;
+        private Button _pauseMenuBackControls;
+        [SerializeField] private GameObject ControlsCanvas;
+
         public void Start()
         {
             InitializeAudioSliders();
@@ -54,6 +62,30 @@ namespace UI.PauseMenu
                 {
                     _pauseMenuBackButton = button;
                     _pauseMenuBackButton.onClick.AddListener(OnPauseMenuBackButtonClicked);
+                }
+            }
+
+            // CONTROLS CODE
+            Button[] mainMenuButtonControl = MainMenuControls.GetComponentsInChildren<Button>();
+            foreach (Button button in mainMenuButtonControl)
+            {
+                UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
+
+                if (button.name == "Back")
+                {
+                    _mainMenuBackControls = button;
+                    _mainMenuBackControls.onClick.AddListener(OnMainMenuControlsBackButtonClicked);
+                }
+            }
+            Button[] pauseMenuButtonControl = PauseControls.GetComponentsInChildren<Button>();
+            foreach (Button button in pauseMenuButtonControl)
+            {
+                UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
+
+                if (button.name == "Back")
+                {
+                    _pauseMenuBackControls = button;
+                    _pauseMenuBackControls.onClick.AddListener(OnPauseMenuControlsBackButtonClicked);
                 }
             }
         
@@ -266,6 +298,51 @@ namespace UI.PauseMenu
         private void OnPauseMenuBackButtonClicked()
         {
             ReturnToPauseMenu();
+        }
+
+        // CONTROL MENU
+        // probably should move this to another script D: laterrrrrr
+
+        public void CloseControlSettings()
+        {
+            PauseControls.SetActive(false);
+            MainMenuControls.SetActive(false);
+            ControlsCanvas.SetActive(false);
+        
+            // if we are in the main menu, we want to make sure the main menu is visible again
+            if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu)
+            {
+                // Look for the main menu in the scene can make this a broadcast if we want)
+                MainMenu mainMenu = FindFirstObjectByType<MainMenu>();
+                if (mainMenu != null) { mainMenu.MainMenuVisible(); }
+            }
+        }
+
+        public void OpenMainMenuControls()
+        {
+            MainMenuControls.SetActive(true);
+            ControlsCanvas.SetActive(true);
+        }
+        public void OpenPauseControls()
+        {
+            PauseControls.SetActive(true);
+            ControlsCanvas.SetActive(true);
+        }
+
+        private void ReturnToPauseMenuFromControls()
+        {
+            CloseControlSettings();
+            PauseMenuController.Instance.ShowMenu(true);
+        }
+
+        private void OnMainMenuControlsBackButtonClicked()
+        {
+            CloseControlSettings();
+        }
+
+        private void OnPauseMenuControlsBackButtonClicked()
+        {
+            ReturnToPauseMenuFromControls();
         }
 
     }
