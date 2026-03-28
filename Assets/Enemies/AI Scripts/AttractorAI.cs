@@ -11,7 +11,9 @@ public class AttractorAI : MonoBehaviour
 {
 	#region InitialSetup
 	public bool tracksDrawingCount = false;
+	[ShowIf("tracksDrawingCount")]
 	public bool drawingsIncreaseDanger = false;
+	[ShowIf("drawingsIncreaseDanger")]
 	public float dangerPerDrawing = 0;
 	public List<Vector3> teleportLocations = new List<Vector3>();
 	private NavMeshAgent agent;
@@ -117,6 +119,7 @@ public class AttractorAI : MonoBehaviour
 		public bool balancesChanges = false;
 
 		public AttractorType[] possibleAttractorTypeChanges;
+		[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
 		public float attractorTypeUpperBoundDangerRange = 100;
 
