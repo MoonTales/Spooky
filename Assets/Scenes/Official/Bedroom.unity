@@ -3208,6 +3208,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &22308381 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -3983,6 +3987,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &27340346
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6194,6 +6202,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 8300000, guid: 810249a0e5764db49a8369b4ac30ec8b, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 537910204ac8a844da12a898d22dc93f, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &42846297
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8091,6 +8103,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &54873192
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14035,6 +14051,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &96327210
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15322,6 +15342,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &103152112 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -15521,6 +15545,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &104397560
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15933,6 +15961,10 @@ MonoBehaviour:
     place: bedroom
     id: notebook
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &109515827
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -17174,6 +17206,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &119349910
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20439,6 +20475,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &147142766
 GameObject:
   m_ObjectHideFlags: 0
@@ -22913,6 +22953,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &165554575 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -23825,6 +23869,10 @@ MonoBehaviour:
     place: bedroom
     id: pencase
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: aa59bc5bcca82ec48a695515c5c71a9f, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 7ac921a98ccf2764388990d76559915b, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &167786668
 GameObject:
   m_ObjectHideFlags: 0
@@ -25767,6 +25815,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &181651230
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -29900,6 +29952,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cutsceneToPlay: {fileID: 0}
   cutsceneType: 2
+  useGameStateOverride: 0
+  gameStateOverride: 0
 --- !u!1 &202889455
 GameObject:
   m_ObjectHideFlags: 0
@@ -34917,6 +34971,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &238440384
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -35584,6 +35642,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &245699311 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -51140,6 +51202,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cutsceneToPlay: {fileID: 1734835427}
   cutsceneType: 2
+  useGameStateOverride: 0
+  gameStateOverride: 0
 --- !u!65 &370119806
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -54764,6 +54828,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!23 &404660121
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -55374,6 +55442,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &409599653
 GameObject:
   m_ObjectHideFlags: 0
@@ -56219,6 +56291,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &415978369 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -56355,6 +56431,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &418870037
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -58627,6 +58707,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1001 &435164136
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -60247,6 +60331,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &445115249 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -66592,6 +66680,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &491563736 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -71231,6 +71323,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!114 &517730725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71250,6 +71346,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 8300000, guid: 810249a0e5764db49a8369b4ac30ec8b, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 537910204ac8a844da12a898d22dc93f, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &518006388
 GameObject:
   m_ObjectHideFlags: 0
@@ -85558,6 +85658,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cutsceneToPlay: {fileID: 1414124883}
   cutsceneType: 0
+  useGameStateOverride: 0
+  gameStateOverride: 0
 --- !u!4 &570293099
 Transform:
   m_ObjectHideFlags: 0
@@ -86973,6 +87075,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &581969305 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -101507,6 +101613,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &690914050 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -106418,6 +106528,10 @@ MonoBehaviour:
     place: bedroom
     id: chess
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 47b1011eac219c6428637d4e7d5b7c9f, type: 3}
+  putDownSfx: {fileID: 8300000, guid: b366fbcbb106dbf408a870d13b6d4445, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &723115844 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6791023195854448688, guid: 04530b01cfbd5f044a2cc04ba39e91df, type: 3}
@@ -106654,6 +106768,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &724205964 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -109718,6 +109836,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &741515673
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -114537,6 +114659,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &774388160
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -120166,6 +120292,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &816501603 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -138181,6 +138311,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &942016169
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -140364,6 +140498,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &955841167
 GameObject:
   m_ObjectHideFlags: 0
@@ -144710,6 +144848,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &985284700
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -149143,6 +149285,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1026453781 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -155222,6 +155368,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!64 &1070628396
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -159523,6 +159673,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &1099912584
 GameObject:
   m_ObjectHideFlags: 0
@@ -164238,6 +164392,10 @@ MonoBehaviour:
     place: prompt
     id: drawing_examine
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: c8de8387af01fe847b7775e868eb2724, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &1129016587
 GameObject:
   m_ObjectHideFlags: 0
@@ -167003,6 +167161,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1155721644
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -177000,6 +177162,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cutsceneToPlay: {fileID: 1152441649}
   cutsceneType: 2
+  useGameStateOverride: 0
+  gameStateOverride: 0
 --- !u!1 &1225903756
 GameObject:
   m_ObjectHideFlags: 0
@@ -182161,6 +182325,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1263133373
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -185260,6 +185428,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1283725422 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -195188,6 +195360,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &1356614414
 GameObject:
   m_ObjectHideFlags: 0
@@ -198262,6 +198438,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1376324363
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -199134,6 +199314,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1380612393
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -206484,6 +206668,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1428496081
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -234984,6 +235172,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1519531210
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -254109,6 +254301,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1621831107
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -259943,6 +260139,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1663445135 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -268294,6 +268494,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1708769822
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -274234,6 +274438,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!64 &1750811034
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -274881,6 +275089,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1753577271
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -280349,6 +280561,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1791417567
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -282858,6 +283074,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1809474990
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -295943,6 +296163,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1905375637 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -296428,6 +296652,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &1908230311
 GameObject:
   m_ObjectHideFlags: 0
@@ -303914,6 +304142,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1960105783
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -304999,6 +305231,10 @@ MonoBehaviour:
     place: bedroom
     id: frame
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 014280a4c925d4144a5bebdfb24311ee, type: 3}
+  putDownSfx: {fileID: 8300000, guid: f0a64f040b9dc6e4ea93e43f98a198b0, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1969636519
 Transform:
   m_ObjectHideFlags: 0
@@ -308363,6 +308599,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!23 &2002010194
 MeshRenderer:
   m_ObjectHideFlags: 0

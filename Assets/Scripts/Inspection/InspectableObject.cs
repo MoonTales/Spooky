@@ -32,6 +32,13 @@ namespace Inspection
         private MeshRenderer[] _meshRenderers;
         private Collider[] _objColliders;
 
+        // audio stuff
+        [Header("Audio for Inspect / Un-inspect")]
+        [SerializeField] private AudioClip pickupSfx;
+        [SerializeField] private AudioClip putDownSfx;
+        [SerializeField] private float sfxVolume = 1f;
+        [SerializeField] private float sfxPitchVariation = 0.05f;
+
         // Getters
         public TextKey RowKey => rowKey;
         public TextKey PromptKey => promptKey;
@@ -90,6 +97,9 @@ namespace Inspection
 
         public void Interact(Interactor interactor)
         {
+            if (pickupSfx != null)
+                UAudio.Instance.PlayClip(pickupSfx, gameObject, sfxVolume, sfxPitchVariation);
+
             InspectionSystem.Instance.StartInspection(gameObject);
         }
 
@@ -134,7 +144,10 @@ namespace Inspection
         public virtual void OnReturnedToOriginalPosition()
         {
             // Custom logic that can run once the inspected object has been returned to its original position
-            // this is the VERY end of the inspection
+            // this is the VERY end of the inspection{
+            if (putDownSfx != null)
+                UAudio.Instance.PlayClip(putDownSfx, gameObject, sfxVolume, sfxPitchVariation);
         }
+
     }
 }
