@@ -321,12 +321,35 @@ namespace UI.PauseMenu
         public void OpenMainMenuControls()
         {
             MainMenuControls.SetActive(true);
+
+            foreach (Transform child in MainMenuControls.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+
             ControlsCanvas.SetActive(true);
+
+            foreach (Transform child in ControlsCanvas.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
         }
+
         public void OpenPauseControls()
         {
             PauseControls.SetActive(true);
+
+            foreach (Transform child in PauseControls.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+
             ControlsCanvas.SetActive(true);
+
+            foreach (Transform child in ControlsCanvas.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
         }
 
         private void ReturnToPauseMenuFromControls()
