@@ -4892,7 +4892,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4551186575705008052}
   m_Father: {fileID: 5109109829041962469}
@@ -10101,6 +10101,7 @@ MonoBehaviour:
   pickupTransitionSpeed: 8
   returnTransitionSpeed: 8
   handOffset: {x: 0, y: 0, z: 0.3}
+  _returnLocation: {fileID: 0}
   _isInCorrectPosition: 0
   promptCollectKey:
     place: prompt
