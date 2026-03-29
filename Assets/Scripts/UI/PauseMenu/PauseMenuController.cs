@@ -15,6 +15,7 @@ namespace UI.PauseMenu
         // pause menu buttons
         private Button _continueButton;
         private Button _settingsButton;
+        private Button _controlsButton;
         private Button _mainMenuButton;
 
     
@@ -40,6 +41,11 @@ namespace UI.PauseMenu
                     _settingsButton = button;
                     _settingsButton.onClick.AddListener(OnSettingsButtonClicked);
                 }
+                else if (button.name == "Controls")
+                {
+                    _controlsButton = button;
+                    _controlsButton.onClick.AddListener(OnControlsButtonClicked);
+                }
                 else if (button.name == "MainMenu")
                 {
                     _mainMenuButton = button;
@@ -57,6 +63,12 @@ namespace UI.PauseMenu
             // hide these current settings
             PauseMenuCanvas.SetActive(false);
             SettingsController.Instance.OpenPauseSettings();
+        }
+
+        private void OnControlsButtonClicked()
+        {
+            PauseMenuCanvas.SetActive(false);
+            SettingsController.Instance.OpenPauseControls();
         }
 
         private void OnMainMenuButtonClicked()
