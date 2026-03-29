@@ -15,7 +15,12 @@ namespace Interaction.Letters
         
         private Types.LetterType _letterType; public void SetLetterType(Types.LetterType letterType) { _letterType = letterType; } public Types.LetterType GetLetterType() { return _letterType; }
         private bool _hasBeenWrittenOn = false; public void SetHasBeenWrittenOn(bool value) { _hasBeenWrittenOn = value; } public bool GetHasBeenWrittenOn() { return _hasBeenWrittenOn; }
-        
+
+        [SerializeField] private AudioClip researcherPickupSfx;
+        [SerializeField] private AudioClip researcherDropSfx;
+        [SerializeField] private float researcherSfxVolume = 1f;
+        [SerializeField] private float researcherSfxDeviation = 0.05f;
+
         // Expose the material to be set for the fade script
         public Material[] materialArray;
 
@@ -43,6 +48,10 @@ namespace Interaction.Letters
         
         public new void Interact(Interactor interactor)
         {
+            if (_letterType == Types.LetterType.Researcher)
+            {
+                PlayPickupSfx();
+            }
             InspectionSystem.Instance.StartInspection(gameObject);
             // Tell the letter system that we have been read
             var id = (_letterType == Types.LetterType.Researcher ? "res_letter_" : "fren_letter_") + GameStateManager.Instance.GetCurrentWorldClockHour();            
@@ -69,6 +78,7 @@ namespace Interaction.Letters
             // this will actually be the opposite effect, where it will slide back to the original position it slid in from, and then destroy itself
             // disable the collider so we cant interact again
             GetComponent<Collider>().enabled = false;
+            PlayDropSfx();
             StartCoroutine(LetterManager.Instance.ReverseSlideNote(gameObject));
         }
 
@@ -91,6 +101,8 @@ namespace Interaction.Letters
         StartCoroutine(FadeOut());
         // there is an edge case we need to account for (if its act 4), since we will treat that one differently
     }
+
+
 
     private void HandleFinaleTransfer()
     {
@@ -159,5 +171,20 @@ namespace Interaction.Letters
         Destroy(gameObject);
     }
 
+    private void PlayPickupSfx()    
+    {
+           if (researcherPickupSfx != null)
+           {
+               UAudio.Instance.PlayClip(researcherPickupSfx, gameObject, researcherSfxVolume, researcherSfxDeviation);
+           } 
+    }    
+
+    private void PlayDropSfx()
+    { 
+          if (researcherDropSfx != null)
+          {
+              UAudio.Instance.PlayClip(researcherDropSfx, gameObject, researcherSfxVolume, researcherSfxVolume);
+          }
+    }
     }
 }
