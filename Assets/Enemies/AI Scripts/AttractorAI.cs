@@ -911,6 +911,101 @@ public class AttractorAI : MonoBehaviour
 		public bool invertPriority = false;
 	}
 
+	public enum ConsiderationType
+	{
+		attractorIntensity,
+		attractorDistance,
+		boolCondition,
+		floatCondition,
+		intCondition,
+		status,
+		state,
+		compositeConsideration,
+		constant
+	}
+
+	public enum OperationType { Average, Multiply, Add, Subtract, Divide, Max, Min }
+
+	[System.Serializable]
+	public class Consideration
+	{
+		public ConsiderationType considerationType;
+
+		// Attractor Considerations
+		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public AttractorType attractorTypeConsidered;
+		[ShowIfEnum("attractorTypeConsidered", AttractorType.custom)]
+		public AttractorType customAttractorIDConsidered;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public float minIntensityConsidered;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public float maxIntensityConsidered;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public bool considerClosestInsteadOfMostIntense = false;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public bool invertConsideredAttractorPriority = false;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity)]
+		public float minIntensityClamp;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity)]
+		public float maxIntensityClamp;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
+		public float minDistanceClamp;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
+		public float maxDistanceClamp;
+
+		// Bool Condition Consideration
+		[ShowIfEnum("considerationType", ConsiderationType.boolCondition)]
+		[Tooltip("false = 0; true = 1")]
+		public string boolID;
+
+		// Float Condition Consideration
+		[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		public string floatID;
+		[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		public float minFloatClamp;
+		[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		public float maxFloatClamp;
+
+		// Int Condition Consideration
+		[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		public string intID;
+		[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		public float minIntClamp;
+		[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		public float maxIntClamp;
+
+		// Status Consideration
+		[ShowIfEnum("considerationType", ConsiderationType.status)]
+		[Tooltip("does not have status = 0; has status = 1")]
+		public string statusName;
+
+		// State Consideration
+		[ShowIfEnum("considerationType", ConsiderationType.state)]
+		[Tooltip("is not currently in this state = 0; is currently in this state = 1")]
+		public EnemyState state;
+
+		// Composite Condiderations
+		[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		public OperationType operationToPerform;
+		[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		[Tooltip("Utility values of 0 within the composite will not be included in the operation")]
+		public bool ignoreZeroValues = true;
+		[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		[Tooltip("If there are any values of 0 within the composite, then the composite will always return 0")]
+		public bool allMustBeNonZero = false;
+		[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		public Consideration[] compositeConsiderations;
+
+		// Constant Consideration
+		[Range(0f, 1f)]
+		[ShowIfEnum("considerationType", ConsiderationType.constant)]
+		public float constantUtility;
+
+		[Space(20)]
+		[ShowIfEnum(true, "considerationType", ConsiderationType.compositeConsideration, ConsiderationType.constant)]
+		public AnimationCurve utilityCurve;
+	}
+
 	[System.Serializable]
 	public class UtilityBehavior
 	{
@@ -949,20 +1044,13 @@ public class AttractorAI : MonoBehaviour
 
 		[Space(20)]
 		[Header("Define your utility considerations here!")]
-		public string wuhOh;
+		public Consideration considerations;
 
 		[Space(20)]
 		[Header("Construct the behavior here!")]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
 		public EnemyState stateChange;
-		//[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
-		//"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
-		//public bool immediateStateTransition = true;
-		//[Tooltip("Forces the new state to finish its buffer before changing to any other states")]
-		//public bool forceStateBuffer = false;
-		//[Tooltip("Forces the new state to skip its buffer when changing to any other states")]
-		//public bool forceSkipStateBuffer = false;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
