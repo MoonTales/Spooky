@@ -864,10 +864,18 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	public ReactConditions currentConditions;
+	public enum DecisionType
+	{
+		finiteState,
+		utilityFunction
+	}
 
 	[System.Serializable]
 	public class EnemyReactions
 	{
+		DecisionType behaviorType;
+
+		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
 		[ShowIfEnum("attractorType", AttractorType.custom)]
@@ -888,26 +896,35 @@ public class AttractorAI : MonoBehaviour
 		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
+
+		[Space(20)]
+		[Header("UtilityFunctions")]
+		[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		[Range(0f, 1f)]
+		public float minRequiredUtility;
+		[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		public List<UtilityBehavior> utilityBehaviors = new List<UtilityBehavior>();
+
+		[Header("FiniteStates")]
+		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
+		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public EnemyState stateChange;
-		//[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
-			//"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
-		//public bool immediateStateTransition = true;
-		//[Tooltip("Forces the new state to finish its buffer before changing to any other states")]
-		//public bool forceStateBuffer = false;
-		//[Tooltip("Forces the new state to skip its buffer when changing to any other states")]
-		//public bool forceSkipStateBuffer = false;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
+		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public bool targetDetectedObject = false;
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
 		[ShowIf("targetDetectedObject")]
+		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public bool prioritizeDistanceInsteadOfIntensity = false;
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
 		[ShowIf("targetDetectedObject")]
+		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public bool invertPriority = false;
 	}
 
@@ -1067,6 +1084,9 @@ public class AttractorAI : MonoBehaviour
 	[System.Serializable]
 	public class ThoughtProcess
 	{
+		DecisionType thoughtType;
+
+		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
 		[ShowIfEnum("attractorType", AttractorType.custom)]
@@ -1087,6 +1107,71 @@ public class AttractorAI : MonoBehaviour
 		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
+
+		[Space(20)]
+		[Header("UtilityFunctions")]
+		[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
+		[Range(0f, 1f)]
+		public float minRequiredUtility;
+		[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
+		public List<UtilityThought> utilityThoughts = new List<UtilityThought>();
+
+		[Header("FiniteStates")]
+		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
+
+		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		public float repeatBuffer = 1;
+		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		public bool forceBuffer = false;
+		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		public float timer = 0;
+	}
+
+	[System.Serializable]
+	public class UtilityThought
+	{
+		[Header("These values are not necessary and should only be used if you want to force the enemy to not consider this behavior at all if certain" +
+			"strict conditions are met")]
+		public bool useStrictConditions = false;
+		[ShowIf("useStrictConditions")]
+		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		[ShowIf("useStrictConditions")]
+		[ShowIfEnum("attractorType", AttractorType.custom)]
+		public string customAttractorID;
+		[Tooltip("Inclusve")]
+		[ShowIf("useStrictConditions")]
+		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		public float minIntensity;
+		[Tooltip("Non-inclusve")]
+		[ShowIf("useStrictConditions")]
+		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		public float maxIntensity;
+		[ShowIf("useStrictConditions")]
+		public CheckConditions reactionConditions;
+		[ShowIf("useStrictConditions")]
+		public bool allConditionsRequired = false;
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
+		[ShowIf("useStrictConditions")]
+		public List<string> statusRestrictions = new List<string>();
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
+		[ShowIf("useStrictConditions")]
+		public bool allStatusesRequired = false;
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
+		[ShowIf("useStrictConditions")]
+		public List<EnemyState> stateRestriction = new List<EnemyState>();
+
+		[Space(20)]
+		[Header("Define your utility considerations here!")]
+		public Consideration considerations;
+
+		[Space(20)]
+		[Header("Construct the thought here!")]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
 
