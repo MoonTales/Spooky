@@ -100,7 +100,11 @@ namespace Managers
         }
         #endregion
 
-        
+        public void PlayClip(AudioClip clip, GameObject fromObject = null, float volume = 1f, float deviation = 0f)
+        {
+            PlaySFX(clip, volume, deviation, fromObject);
+        }
+
         private AudioSource GetFreeSource()
         {
             foreach (var src in _sources)
