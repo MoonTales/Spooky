@@ -19,6 +19,7 @@ namespace UI.Main_Menu
         private Button _newgameButton;
         private Button _continueButton;
         private Button _settingsButton;
+        private Button _controlsButton;
         private Button _quitButton;
         
         // Internal Variables for polish
@@ -73,6 +74,12 @@ namespace UI.Main_Menu
                     _settingsButton = button;
                     _settingsButton.onClick.AddListener(OnSettingsButtonClicked);
                     _settingsButton.enabled = true;
+                }
+                else if (button.name == "Controls")
+                {
+                    _controlsButton = button;
+                    _controlsButton.onClick.AddListener(OnControlsButtonClicked);
+                    _controlsButton.enabled = true;
                 }
                 else if (button.name == "Quit")
                 {
@@ -173,6 +180,8 @@ namespace UI.Main_Menu
             _continueButton.interactable = false;
             _settingsButton.enabled = false;
             _settingsButton.interactable = false;
+            _controlsButton.enabled = false;
+            _controlsButton.interactable = false;
             _quitButton.enabled = false;
             _quitButton.interactable = false;
 
@@ -211,6 +220,12 @@ namespace UI.Main_Menu
         {
             mainMenuCanvas.SetActive(false);
             SettingsController.Instance.OpenMainMenuSettings();
+        }
+
+        private void OnControlsButtonClicked()
+        {
+            mainMenuCanvas.SetActive(false);
+            SettingsController.Instance.OpenMainMenuControls();
         }
 
         private void OnQuitButtonClicked()
