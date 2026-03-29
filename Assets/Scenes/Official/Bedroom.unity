@@ -3208,6 +3208,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &22308381 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -3983,6 +3987,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &27340346
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6194,6 +6202,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 8300000, guid: 810249a0e5764db49a8369b4ac30ec8b, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 537910204ac8a844da12a898d22dc93f, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &42846297
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8091,6 +8103,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &54873192
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14035,6 +14051,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &96327210
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15322,6 +15342,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &103152112 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -15521,6 +15545,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &104397560
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15933,6 +15961,10 @@ MonoBehaviour:
     place: bedroom
     id: notebook
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &109515827
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16470,6 +16502,93 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 112406382}
   m_Mesh: {fileID: -6625638570544527262, guid: e0147f4678533444ca8209554a9ead22, type: 3}
+--- !u!1 &112648212
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 112648214}
+  - component: {fileID: 112648213}
+  m_Layer: 0
+  m_Name: FoodInstructionsPoster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!212 &112648213
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 112648212}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: 1760e009b24b6ba43b1aeb9227c08085, type: 3}
+  m_Color: {r: 0.62352943, g: 0.62352943, b: 0.62352943, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 17.279999, y: 23.039999}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!4 &112648214
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 112648212}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.50077975, z: -0, w: 0.8655748}
+  m_LocalPosition: {x: -11.451, y: 1.927, z: -0.934}
+  m_LocalScale: {x: 0.013, y: 0.013, z: 0.013}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -60.103, z: 0}
 --- !u!1001 &113451792
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17174,6 +17293,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &119349910
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20439,6 +20562,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &147142766
 GameObject:
   m_ObjectHideFlags: 0
@@ -22913,6 +23040,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &165554575 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -23825,6 +23956,10 @@ MonoBehaviour:
     place: bedroom
     id: pencase
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: aa59bc5bcca82ec48a695515c5c71a9f, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 7ac921a98ccf2764388990d76559915b, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &167786668
 GameObject:
   m_ObjectHideFlags: 0
@@ -25767,6 +25902,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &181651230
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -29900,6 +30039,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cutsceneToPlay: {fileID: 0}
   cutsceneType: 2
+  useGameStateOverride: 0
+  gameStateOverride: 0
 --- !u!1 &202889455
 GameObject:
   m_ObjectHideFlags: 0
@@ -34917,6 +35058,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &238440384
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -35584,6 +35729,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &245699311 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -51140,6 +51289,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cutsceneToPlay: {fileID: 1734835427}
   cutsceneType: 2
+  useGameStateOverride: 0
+  gameStateOverride: 0
 --- !u!65 &370119806
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -54764,6 +54915,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!23 &404660121
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -55374,6 +55529,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &409599653
 GameObject:
   m_ObjectHideFlags: 0
@@ -56219,6 +56378,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &415978369 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -56355,6 +56518,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &418870037
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -58627,6 +58794,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1001 &435164136
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -60247,6 +60418,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &445115249 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -61472,6 +61647,79 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 458454945}
   m_Mesh: {fileID: -4212556844691197876, guid: 793c4f24c5832e446ad3d20299918e23, type: 3}
+--- !u!1001 &458639735
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.17
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.17
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.17
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -10.921
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.6099
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.024
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
+      propertyPath: m_Name
+      value: PlasticCup_LowPoly
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7b37c3ecf74f34f41878baccb1186fb8, type: 3}
 --- !u!1 &460700583
 GameObject:
   m_ObjectHideFlags: 0
@@ -66592,6 +66840,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &491563736 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -71231,6 +71483,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!114 &517730725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71250,6 +71506,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 8300000, guid: 810249a0e5764db49a8369b4ac30ec8b, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 537910204ac8a844da12a898d22dc93f, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &518006388
 GameObject:
   m_ObjectHideFlags: 0
@@ -85558,6 +85818,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cutsceneToPlay: {fileID: 1414124883}
   cutsceneType: 0
+  useGameStateOverride: 0
+  gameStateOverride: 0
 --- !u!4 &570293099
 Transform:
   m_ObjectHideFlags: 0
@@ -86973,6 +87235,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &581969305 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -101507,6 +101773,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &690914050 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -106418,6 +106688,10 @@ MonoBehaviour:
     place: bedroom
     id: chess
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 47b1011eac219c6428637d4e7d5b7c9f, type: 3}
+  putDownSfx: {fileID: 8300000, guid: b366fbcbb106dbf408a870d13b6d4445, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &723115844 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6791023195854448688, guid: 04530b01cfbd5f044a2cc04ba39e91df, type: 3}
@@ -106654,6 +106928,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &724205964 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -109718,6 +109996,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &741515673
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -114537,6 +114819,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &774388160
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -120166,6 +120452,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &816501603 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -138181,6 +138471,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &942016169
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -140364,6 +140658,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &955841167
 GameObject:
   m_ObjectHideFlags: 0
@@ -144710,6 +145008,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &985284700
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -149143,6 +149445,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1026453781 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -155222,6 +155528,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!64 &1070628396
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -159523,6 +159833,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &1099912584
 GameObject:
   m_ObjectHideFlags: 0
@@ -164238,6 +164552,10 @@ MonoBehaviour:
     place: prompt
     id: drawing_examine
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: c8de8387af01fe847b7775e868eb2724, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &1129016587
 GameObject:
   m_ObjectHideFlags: 0
@@ -167003,6 +167321,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1155721644
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -177000,6 +177322,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cutsceneToPlay: {fileID: 1152441649}
   cutsceneType: 2
+  useGameStateOverride: 0
+  gameStateOverride: 0
 --- !u!1 &1225903756
 GameObject:
   m_ObjectHideFlags: 0
@@ -182161,6 +182485,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1263133373
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -185260,6 +185588,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1283725422 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -190355,6 +190687,93 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1313717498}
   m_Mesh: {fileID: -8723309310818444368, guid: e0147f4678533444ca8209554a9ead22, type: 3}
+--- !u!1 &1313923517
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1313923519}
+  - component: {fileID: 1313923518}
+  m_Layer: 0
+  m_Name: WaterInstructionsPoster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!212 &1313923518
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1313923517}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: 6c4207bf4fd3104429ef408d41738984, type: 3}
+  m_Color: {r: 0.6226415, g: 0.6226415, b: 0.6226415, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 17.279999, y: 23.039999}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!4 &1313923519
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1313923517}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.5281842, z: -0, w: 0.84912986}
+  m_LocalPosition: {x: -10.909, y: 1.89, z: 0.158}
+  m_LocalScale: {x: 0.013, y: 0.013, z: 0.013}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -63.766, z: 0}
 --- !u!1 &1317585472
 GameObject:
   m_ObjectHideFlags: 0
@@ -195188,6 +195607,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &1356614414
 GameObject:
   m_ObjectHideFlags: 0
@@ -198262,6 +198685,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1376324363
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -199134,6 +199561,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 3
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1380612393
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -206484,6 +206915,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1428496081
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -234984,6 +235419,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1519531210
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -239440,6 +239879,93 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1547538193}
   m_Mesh: {fileID: -2672827306540640584, guid: 1501646006cdc7044887ef0ae9bb4124, type: 3}
+--- !u!1 &1547646217
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1547646219}
+  - component: {fileID: 1547646218}
+  m_Layer: 0
+  m_Name: TimeSheetPoster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!212 &1547646218
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547646217}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: 89594fd20b2bc8b41805dff839242e81, type: 3}
+  m_Color: {r: 0.62352943, g: 0.62352943, b: 0.62352943, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 17.279999, y: 23.039999}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!4 &1547646219
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547646217}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.50077975, z: -0, w: 0.8655748}
+  m_LocalPosition: {x: -11.598, y: 1.924, z: -1.19}
+  m_LocalScale: {x: 0.013, y: 0.013, z: 0.013}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -60.103, z: 0}
 --- !u!1 &1547659217
 GameObject:
   m_ObjectHideFlags: 0
@@ -254109,6 +254635,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1621831107
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -259943,6 +260473,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1663445135 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -268294,6 +268828,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1708769822
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -274234,6 +274772,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!64 &1750811034
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -274881,6 +275423,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1753577271
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -280349,6 +280895,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: 2
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1791417567
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -282858,6 +283408,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1809474990
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -295943,6 +296497,10 @@ MonoBehaviour:
     place: bedroom
     id: books
   requiredHour: 2
+  pickupSfx: {fileID: 8300000, guid: 070d88418c4770c4588da880221515c2, type: 3}
+  putDownSfx: {fileID: 8300000, guid: 9fd0042369e7f1c44b04f4017390b010, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1905375637 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 973ee5ef5d16dc346a831910ebb37229, type: 3}
@@ -296428,6 +296986,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!1 &1908230311
 GameObject:
   m_ObjectHideFlags: 0
@@ -303914,6 +304476,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!65 &1960105783
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -304999,6 +305565,10 @@ MonoBehaviour:
     place: bedroom
     id: frame
   requiredHour: -1
+  pickupSfx: {fileID: 8300000, guid: 014280a4c925d4144a5bebdfb24311ee, type: 3}
+  putDownSfx: {fileID: 8300000, guid: f0a64f040b9dc6e4ea93e43f98a198b0, type: 3}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!4 &1969636519
 Transform:
   m_ObjectHideFlags: 0
@@ -308363,6 +308933,10 @@ MonoBehaviour:
     place: 
     id: 
   requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
 --- !u!23 &2002010194
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -331671,6 +332245,8 @@ GameObject:
   - component: {fileID: 1271208310704169748}
   - component: {fileID: 5346935068796451522}
   - component: {fileID: 7330095380873732623}
+  - component: {fileID: 7330095380873732625}
+  - component: {fileID: 7330095380873732624}
   m_Layer: 0
   m_Name: pCylinder10
   m_TagString: Untagged
@@ -331689,6 +332265,8 @@ GameObject:
   - component: {fileID: 1271208311485906207}
   - component: {fileID: 5346935070162625737}
   - component: {fileID: 7330095381635283972}
+  - component: {fileID: 7330095381635283974}
+  - component: {fileID: 7330095381635283973}
   m_Layer: 0
   m_Name: pCylinder10
   m_TagString: Untagged
@@ -339338,6 +339916,50 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7330095380873732624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855812947413064552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66883f9a65a203a42b9d6dc26ad13eed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  promptKey:
+    place: prompt
+    id: button_machine
+  buttonPressSfx: {fileID: 8300000, guid: 416e4960e65ce5d4593399e1924a0a3e, type: 3}
+  first: {fileID: 8300000, guid: b445e25f179edfa4faef3a4e87a6d2b8, type: 3}
+  second: {fileID: 8300000, guid: 7c5636e5b4e3f7e439dd4a848c8bba8f, type: 3}
+  buttonPressVolume: 1
+  buttonPressDeviation: 0.05
+  buttonVisual: {fileID: 1271208310704169748}
+  pressDistance: 10
+--- !u!64 &7330095380873732625
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855812947413064552}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2721331549007201028, guid: df115ea4052c91647b61e6cc1ea4d224, type: 3}
 --- !u!23 &7330095381635283972
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -339383,6 +340005,50 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7330095381635283973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855812948796081507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66883f9a65a203a42b9d6dc26ad13eed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  promptKey:
+    place: prompt
+    id: button_machine
+  buttonPressSfx: {fileID: 8300000, guid: 416e4960e65ce5d4593399e1924a0a3e, type: 3}
+  first: {fileID: 8300000, guid: b445e25f179edfa4faef3a4e87a6d2b8, type: 3}
+  second: {fileID: 8300000, guid: 7c5636e5b4e3f7e439dd4a848c8bba8f, type: 3}
+  buttonPressVolume: 1
+  buttonPressDeviation: 0.05
+  buttonVisual: {fileID: 1271208311485906207}
+  pressDistance: 20
+--- !u!64 &7330095381635283974
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855812948796081507}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2721331549007201028, guid: df115ea4052c91647b61e6cc1ea4d224, type: 3}
 --- !u!1 &7369038947109107331
 GameObject:
   m_ObjectHideFlags: 0
@@ -341921,6 +342587,10 @@ SceneRoots:
   - {fileID: 1683722400}
   - {fileID: 1676736135}
   - {fileID: 1080584638}
+  - {fileID: 112648214}
+  - {fileID: 1547646219}
+  - {fileID: 1313923519}
   - {fileID: 874281090}
   - {fileID: 49744477}
   - {fileID: 491485355}
+  - {fileID: 458639735}
