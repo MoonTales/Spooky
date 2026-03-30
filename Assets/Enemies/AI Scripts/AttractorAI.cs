@@ -112,18 +112,38 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	[System.Serializable]
+	public class UtilityBehaviorListWrapper
+	{
+		public List<UtilityBehavior> utilityBehaviors;
+	}
+
+	[System.Serializable]
+	public class UtilityThoughtListWrapper
+	{
+		public List<UtilityThought> utilityThoughts;
+	}
+
+	[System.Serializable]
 	public class EnemyReactionReprogram
 	{
 		[Tooltip("If set to true, each change's randomness will only include elements determined by the enemy's danger level and the respective change's danger" +
 			"range")]
 		public bool balancesChanges = false;
 
+		public DecisionType[] possibleBehaviorTypeChanges;
+		[ShowIf("balancesChanges")]
+		public float behaviorTypeLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
+		public float behaviorTypeUpperBoundDangerRange = 100;
+
+		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType[] possibleAttractorTypeChanges;
 		[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
 		[ShowIf("balancesChanges")]
 		public float attractorTypeUpperBoundDangerRange = 100;
 
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
 		public string[] possibleCustomAttractorIDChanges;
 		[ShowIf("balancesChanges")]
 		public float customAttractorIDLowerBoundDangerRange = 100;
@@ -156,24 +176,45 @@ public class AttractorAI : MonoBehaviour
 		[ShowIf("balancesChanges")]
 		public float allConditionsRequiredUpperBoundDangerRange = 100;
 
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
 		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
 		[ShowIf("balancesChanges")]
 		public float statusRestrictionsLowerBoundDangerRange = 100;
 		[ShowIf("balancesChanges")]
 		public float statusRestrictionsUpperBoundDangerRange = 100;
 
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
 		public bool[] possibleAllStatusesRequiredChanges;
 		[ShowIf("balancesChanges")]
 		public float allStatusesRequiredLowerBoundDangerRange = 100;
 		[ShowIf("balancesChanges")]
 		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
 		[ShowIf("balancesChanges")]
 		public float stateRestrictionLowerBoundDangerRange = 100;
 		[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
+		[Space(20)]
+		[Header("UtilityFunctions")]
+		[Range(0f, 1f)]
+		public float[] possibleMinRequiredUtilityChanges;
+		[ShowIf("balancesChanges")]
+		public float minRequiredUtilityLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
+		public float minRequiredUtilityUpperBoundDangerRange = 100;
+
+		[SerializeField] public UtilityBehaviorListWrapper[] possibleUtilityBehaviorsChanges;
+		[ShowIf("balancesChanges")]
+		public float utilityBehaviorsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
+		public float utilityBehaviorsUpperBoundDangerRange = 100;
+
+		[Header("FiniteStates")]
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
 		[ShowIf("balancesChanges")]
 		public float functionExecutionsLowerBoundDangerRange = 100;
@@ -224,6 +265,13 @@ public class AttractorAI : MonoBehaviour
 			"range")]
 		public bool balancesChanges = false;
 
+		public DecisionType[] possibleThoughtTypeChanges;
+		[ShowIf("balancesChanges")]
+		public float thoughtTypeLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
+		public float thoughtTypeUpperBoundDangerRange = 100;
+
+		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType[] possibleAttractorTypeChanges;
 		[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
@@ -280,6 +328,22 @@ public class AttractorAI : MonoBehaviour
 		[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
+		[Space(20)]
+		[Header("UtilityFunctions")]
+		[Range(0f, 1f)]
+		public float[] possibleMinRequiredUtilityChanges;
+		[ShowIf("balancesChanges")]
+		public float minRequiredUtilityLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
+		public float minRequiredUtilityUpperBoundDangerRange = 100;
+
+		[SerializeField] public UtilityThoughtListWrapper[] possibleUtilityThoughtsChanges;
+		[ShowIf("balancesChanges")]
+		public float utilityThoughtsLowerBoundDangerRange = 100;
+		[ShowIf("balancesChanges")]
+		public float utilityThoughtsUpperBoundDangerRange = 100;
+
+		[Header("FiniteStates")]
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
 		[ShowIf("balancesChanges")]
 		public float functionExecutionsLowerBoundDangerRange = 100;
@@ -873,7 +937,7 @@ public class AttractorAI : MonoBehaviour
 	[System.Serializable]
 	public class EnemyReactions
 	{
-		DecisionType behaviorType;
+		public DecisionType behaviorType;
 
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType attractorType;
@@ -1084,7 +1148,7 @@ public class AttractorAI : MonoBehaviour
 	[System.Serializable]
 	public class ThoughtProcess
 	{
-		DecisionType thoughtType;
+		public DecisionType thoughtType;
 
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType attractorType;
@@ -1214,6 +1278,17 @@ public class AttractorAI : MonoBehaviour
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
+				if (reactionEdit.possibleBehaviorTypeChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.behaviorTypeLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.behaviorTypeUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.behaviorType = reactionEdit.possibleBehaviorTypeChanges[Random.Range((int)(reactionEdit.possibleBehaviorTypeChanges.Length *
+						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleBehaviorTypeChanges.Length * tempUpperBound))];
+				}
 				if (reactionEdit.possibleAttractorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
@@ -1294,6 +1369,30 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.stateRestriction = reactionEdit.possibleStateRestrictionChanges[Random.Range((int)(
 						reactionEdit.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateRestrictionChanges.Length *
 						tempUpperBound))].stateRestriction;
+				}
+				if (reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.minRequiredUtilityLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.minRequiredUtilityUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.minRequiredUtility = reactionEdit.possibleMinRequiredUtilityChanges[Random.Range((int)(
+						reactionEdit.possibleMinRequiredUtilityChanges.Length * tempLowerBound), Mathf.CeilToInt(
+							reactionEdit.possibleMinRequiredUtilityChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleUtilityBehaviorsChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.utilityBehaviorsLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.utilityBehaviorsUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.utilityBehaviors = reactionEdit.possibleUtilityBehaviorsChanges[Random.Range((int)(
+						reactionEdit.possibleUtilityBehaviorsChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleUtilityBehaviorsChanges.Length
+						* tempUpperBound))].utilityBehaviors;
 				}
 				if (reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
 				{
@@ -1393,6 +1492,17 @@ public class AttractorAI : MonoBehaviour
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
+				if (reactionEdit.possibleThoughtTypeChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.thoughtTypeLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.thoughtTypeUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.thoughtType = reactionEdit.possibleThoughtTypeChanges[Random.Range((int)(reactionEdit.possibleThoughtTypeChanges.Length *
+						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleThoughtTypeChanges.Length * tempUpperBound))];
+				}
 				if (reactionEdit.possibleAttractorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
@@ -1473,6 +1583,30 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.stateRestriction = reactionEdit.possibleStateRestrictionChanges[Random.Range((int)(
 						reactionEdit.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateRestrictionChanges.Length *
 						tempUpperBound))].stateRestriction;
+				}
+				if (reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.minRequiredUtilityLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.minRequiredUtilityUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.minRequiredUtility = reactionEdit.possibleMinRequiredUtilityChanges[Random.Range((int)(
+						reactionEdit.possibleMinRequiredUtilityChanges.Length * tempLowerBound), Mathf.CeilToInt(
+							reactionEdit.possibleMinRequiredUtilityChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleUtilityThoughtsChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.utilityThoughtsLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.utilityThoughtsUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.utilityThoughts = reactionEdit.possibleUtilityThoughtsChanges[Random.Range((int)(
+						reactionEdit.possibleUtilityThoughtsChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleUtilityThoughtsChanges.Length
+						* tempUpperBound))].utilityThoughts;
 				}
 				if (reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
 				{
