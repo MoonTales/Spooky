@@ -1215,7 +1215,7 @@ public class AttractorAI : MonoBehaviour
 		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
 		[ShowIf("useStrictConditions")]
-		public CheckConditions reactionConditions;
+		public CheckConditions thoughtConditions;
 		[ShowIf("useStrictConditions")]
 		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
@@ -2177,18 +2177,193 @@ public class AttractorAI : MonoBehaviour
 
 					if (conditionsMet)
 					{
-						thought.timer -= Time.deltaTime;
-
-						if (thought.timer <= 0)
+						if (thought.thoughtType == DecisionType.finiteState)
 						{
-							thought.timer = thought.repeatBuffer;
-							foreach (FunctionPicker function in thought.functionExecutions)
+							thought.timer -= Time.deltaTime;
+
+							if (thought.timer <= 0)
 							{
-								HandleFunctionCalling(function);
+								thought.timer = thought.repeatBuffer;
+								foreach (FunctionPicker function in thought.functionExecutions)
+								{
+									HandleFunctionCalling(function);
+								}
+								foreach (UnityEvent unityEvent in thought.eventExecutions)
+								{
+									unityEvent.Invoke();
+								}
 							}
-							foreach (UnityEvent unityEvent in thought.eventExecutions)
+						}
+						else if (thought.thoughtType == DecisionType.utilityFunction)
+						{
+							int bestThoughtIndex = -1;
+							float highestUtility = float.MinValue;
+
+							foreach (UtilityThought utility in thought.utilityThoughts)
 							{
-								unityEvent.Invoke();
+								if (!utility.useStrictConditions || ((utility.stateRestriction.Count < 1 || utility.stateRestriction.Contains(currentState)) &&
+									(utility.statusRestrictions.Count < 1 || (utility.allStatusesRequired ?
+									currentStatuses.Intersect(utility.statusRestrictions).Count() == utility.statusRestrictions.Count() :
+									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
+								{
+									tempAttractors.Clear();
+									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+										tempDetectedAttractors.ContainsKey(utility.attractorType)))
+									{
+										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
+										{
+											if (utility.minIntensity <= attractor.intensity && attractor.intensity < utility.maxIntensity &&
+												(utility.attractorType
+												!= AttractorType.custom || utility.customAttractorID == attractor.customAttractorID))
+											{
+												tempAttractors.Add(attractor);
+											}
+										}
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType == AttractorType.NONE || tempAttractors.Count > 0))
+									{
+										bool utilityStrictConditionsMet = true;
+										if (utility.useStrictConditions && utility.allConditionsRequired)
+										{
+											if (utility.thoughtConditions.boolConditions.Count > 0 &&
+												!(currentConditions.boolConditions.Intersect(utility.thoughtConditions.boolConditions).Count() ==
+												utility.thoughtConditions.boolConditions.Count()))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.equals &&
+												(utility.thoughtConditions.floatConditions.Count > 0 &&
+												!(currentConditions.floatConditions.Intersect(utility.thoughtConditions.floatConditions).Count() ==
+												utility.thoughtConditions.floatConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.greaterThan)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.lesserThan)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.lesserOrEqualTo)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.equals && (utility.thoughtConditions.intConditions.Count >
+												0 && !(currentConditions.intConditions.Intersect(utility.thoughtConditions.intConditions).Count() ==
+												utility.thoughtConditions.intConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.greaterThan)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.greaterOrEqualTo)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.lesserThan)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.lesserOrEqualTo)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+										}
+
+										if (utilityStrictConditionsMet)
+										{
+											// code to asses the utility of this utility thought
+										}
+									}
+									else if (!utility.allConditionsRequired)
+									{
+										Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+										x.floatValue);
+										Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+										if ((utility.thoughtConditions.boolConditions.Count > 0 &&
+											utility.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((utility.thoughtConditions.floatCompare
+											== Comparison.equals || utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											(utility.thoughtConditions.floatConditions.Count > 0 &&
+											utility.thoughtConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) || ((utility.thoughtConditions.floatCompare
+											== Comparison.greaterThan || utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											utility.thoughtConditions.floatConditions.Where(item1 => tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] >
+											item1.floatValue).ToList().Count > 0) || ((utility.thoughtConditions.intCompare == Comparison.equals ||
+											utility.thoughtConditions.intCompare == Comparison.lesserOrEqualTo) && (utility.thoughtConditions.intConditions.Count > 0 &&
+											utility.thoughtConditions.intConditions.Intersect(currentConditions.intConditions).Any())) || ((utility.thoughtConditions.intCompare ==
+											Comparison.greaterThan || utility.thoughtConditions.intCompare == Comparison.greaterOrEqualTo) &&
+											utility.thoughtConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
+											item1.intValue).ToList().Count > 0))
+										{
+											// code to asses the utility of this utility thought
+										}
+									}
+								}
 							}
 						}
 					}
@@ -2218,18 +2393,191 @@ public class AttractorAI : MonoBehaviour
 						thought.thoughtConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
 						item1.intValue).ToList().Count > 0))
 					{
-						thought.timer -= Time.deltaTime;
-
-						if (thought.timer <= 0)
+						if (thought.thoughtType == DecisionType.finiteState)
 						{
-							thought.timer = thought.repeatBuffer;
-							foreach (FunctionPicker function in thought.functionExecutions)
+							thought.timer -= Time.deltaTime;
+
+							if (thought.timer <= 0)
 							{
-								HandleFunctionCalling(function);
+								thought.timer = thought.repeatBuffer;
+								foreach (FunctionPicker function in thought.functionExecutions)
+								{
+									HandleFunctionCalling(function);
+								}
+								foreach (UnityEvent unityEvent in thought.eventExecutions)
+								{
+									unityEvent.Invoke();
+								}
 							}
-							foreach (UnityEvent unityEvent in thought.eventExecutions)
+						}
+						else if (thought.thoughtType == DecisionType.utilityFunction)
+						{
+							int bestThoughtIndex = -1;
+							float highestUtility = float.MinValue;
+
+							foreach (UtilityThought utility in thought.utilityThoughts)
 							{
-								unityEvent.Invoke();
+								if (!utility.useStrictConditions || ((utility.stateRestriction.Count < 1 || utility.stateRestriction.Contains(currentState)) &&
+									(utility.statusRestrictions.Count < 1 || (utility.allStatusesRequired ?
+									currentStatuses.Intersect(utility.statusRestrictions).Count() == utility.statusRestrictions.Count() :
+									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
+								{
+									tempAttractors.Clear();
+									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+										tempDetectedAttractors.ContainsKey(utility.attractorType)))
+									{
+										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
+										{
+											if (utility.minIntensity <= attractor.intensity && attractor.intensity < utility.maxIntensity &&
+												(utility.attractorType
+												!= AttractorType.custom || utility.customAttractorID == attractor.customAttractorID))
+											{
+												tempAttractors.Add(attractor);
+											}
+										}
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType == AttractorType.NONE || tempAttractors.Count > 0))
+									{
+										bool utilityStrictConditionsMet = true;
+										if (utility.useStrictConditions && utility.allConditionsRequired)
+										{
+											if (utility.thoughtConditions.boolConditions.Count > 0 &&
+												!(currentConditions.boolConditions.Intersect(utility.thoughtConditions.boolConditions).Count() ==
+												utility.thoughtConditions.boolConditions.Count()))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.equals &&
+												(utility.thoughtConditions.floatConditions.Count > 0 &&
+												!(currentConditions.floatConditions.Intersect(utility.thoughtConditions.floatConditions).Count() ==
+												utility.thoughtConditions.floatConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.greaterThan)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.lesserThan)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.lesserOrEqualTo)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.equals && (utility.thoughtConditions.intConditions.Count >
+												0 && !(currentConditions.intConditions.Intersect(utility.thoughtConditions.intConditions).Count() ==
+												utility.thoughtConditions.intConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.greaterThan)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.greaterOrEqualTo)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.lesserThan)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.lesserOrEqualTo)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+										}
+
+										if (utilityStrictConditionsMet)
+										{
+											// code to asses the utility of this utility thought
+										}
+									}
+									else if (!utility.allConditionsRequired)
+									{
+										tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+										x.floatValue);
+										tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+										if ((utility.thoughtConditions.boolConditions.Count > 0 &&
+											utility.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((utility.thoughtConditions.floatCompare
+											== Comparison.equals || utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											(utility.thoughtConditions.floatConditions.Count > 0 &&
+											utility.thoughtConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) || ((utility.thoughtConditions.floatCompare
+											== Comparison.greaterThan || utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											utility.thoughtConditions.floatConditions.Where(item1 => tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] >
+											item1.floatValue).ToList().Count > 0) || ((utility.thoughtConditions.intCompare == Comparison.equals ||
+											utility.thoughtConditions.intCompare == Comparison.lesserOrEqualTo) && (utility.thoughtConditions.intConditions.Count > 0 &&
+											utility.thoughtConditions.intConditions.Intersect(currentConditions.intConditions).Any())) || ((utility.thoughtConditions.intCompare ==
+											Comparison.greaterThan || utility.thoughtConditions.intCompare == Comparison.greaterOrEqualTo) &&
+											utility.thoughtConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
+											item1.intValue).ToList().Count > 0))
+										{
+											// code to asses the utility of this utility thought
+										}
+									}
+								}
 							}
 						}
 					}
