@@ -12,7 +12,7 @@ using UnityEditor;
 namespace HierarchyHelper
 {
 #if UNITY_EDITOR
-	[InitializeOnLoad]
+	//[InitializeOnLoad]
 #endif
 	public static class HierarchyChangedDetecter
 	{

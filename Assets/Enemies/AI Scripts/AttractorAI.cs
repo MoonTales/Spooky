@@ -11,9 +11,9 @@ public class AttractorAI : MonoBehaviour
 {
 	#region InitialSetup
 	public bool tracksDrawingCount = false;
-	[ShowIf("tracksDrawingCount")]
+	//[ShowIf("tracksDrawingCount")]
 	public bool drawingsIncreaseDanger = false;
-	[ShowIf("drawingsIncreaseDanger")]
+	//[ShowIf("drawingsIncreaseDanger")]
 	public float dangerPerDrawing = 0;
 	public List<Vector3> teleportLocations = new List<Vector3>();
 	private NavMeshAgent agent;
@@ -131,130 +131,130 @@ public class AttractorAI : MonoBehaviour
 		public bool balancesChanges = false;
 
 		public DecisionType[] possibleBehaviorTypeChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float behaviorTypeLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float behaviorTypeUpperBoundDangerRange = 100;
 
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType[] possibleAttractorTypeChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float attractorTypeUpperBoundDangerRange = 100;
 
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
 		public string[] possibleCustomAttractorIDChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float customAttractorIDLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float minIntensityLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float minIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float maxIntensityLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float maxIntensityUpperBoundDangerRange = 100;
 
 		public CheckConditions[] possibleThoughtConditionsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float thoughtConditionsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float thoughtConditionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllConditionsRequiredChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float allConditionsRequiredLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float allConditionsRequiredUpperBoundDangerRange = 100;
 
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
 		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float statusRestrictionsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float statusRestrictionsUpperBoundDangerRange = 100;
 
 		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
 		public bool[] possibleAllStatusesRequiredChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float allStatusesRequiredLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
 		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
 			"be activated regardless of the enemy's current state.")]
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float stateRestrictionLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
 		[Space(20)]
 		[Header("UtilityFunctions")]
 		[Range(0f, 1f)]
 		public float[] possibleMinRequiredUtilityChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float minRequiredUtilityLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float minRequiredUtilityUpperBoundDangerRange = 100;
 
 		[SerializeField] public UtilityBehaviorListWrapper[] possibleUtilityBehaviorsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float utilityBehaviorsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float utilityBehaviorsUpperBoundDangerRange = 100;
 
 		[Header("FiniteStates")]
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float functionExecutionsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float functionExecutionsUpperBoundDangerRange = 100;
 
 		[SerializeField] public UnityEventListWrapper[] possibleEventExecutionsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float eventExecutionsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float eventExecutionsUpperBoundDangerRange = 100;
 
 		public EnemyState[] possibleStateChangeChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float stateChangeLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float stateChangeUpperBoundDangerRange = 100;
 
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
 		public bool[] possibleTargetDetectedObjectChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float targetDetectedObjectLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float targetDetectedObjectUpperBoundDangerRange = 100;
 
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
 		public bool[] possiblePrioritizeDistanceInsteadOfIntensityChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
 		public bool[] possibleInvertPriorityChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float invertPriorityLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float invertPriorityUpperBoundDangerRange = 100;
 	}
 
@@ -266,112 +266,112 @@ public class AttractorAI : MonoBehaviour
 		public bool balancesChanges = false;
 
 		public DecisionType[] possibleThoughtTypeChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float thoughtTypeLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float thoughtTypeUpperBoundDangerRange = 100;
 
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType[] possibleAttractorTypeChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float attractorTypeUpperBoundDangerRange = 100;
 
 		public string[] possibleCustomAttractorIDChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float customAttractorIDLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float minIntensityLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float minIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float maxIntensityLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float maxIntensityUpperBoundDangerRange = 100;
 
 		public CheckConditions[] possibleReactionConditionsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float reactionConditionsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float reactionConditionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllConditionsRequiredChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float allConditionsRequiredLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float allConditionsRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float statusRestrictionsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float statusRestrictionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllStatusesRequiredChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float allStatusesRequiredLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float stateRestrictionLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
 		[Space(20)]
 		[Header("UtilityFunctions")]
 		[Range(0f, 1f)]
 		public float[] possibleMinRequiredUtilityChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float minRequiredUtilityLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float minRequiredUtilityUpperBoundDangerRange = 100;
 
 		[SerializeField] public UtilityThoughtListWrapper[] possibleUtilityThoughtsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float utilityThoughtsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float utilityThoughtsUpperBoundDangerRange = 100;
 
 		[Header("FiniteStates")]
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float functionExecutionsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float functionExecutionsUpperBoundDangerRange = 100;
 
 		[SerializeField] public UnityEventListWrapper[] possibleEventExecutionsChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float eventExecutionsLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float eventExecutionsUpperBoundDangerRange = 100;
 
 		public float[] possibleRepeatBufferChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float repeatBufferLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float repeatBufferUpperBoundDangerRange = 100;
 
 		public bool[] possibleForceBufferChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float forceBufferLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float forceBufferUpperBoundDangerRange = 100;
 
 		public float[] possibleTimerChanges;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float timerLowerBoundDangerRange = 100;
-		[ShowIf("balancesChanges")]
+		//[ShowIf("balancesChanges")]
 		public float timerUpperBoundDangerRange = 100;
 	}
 
@@ -380,48 +380,48 @@ public class AttractorAI : MonoBehaviour
 	{
 		public FunctionType function;
 		[Header("Note: use spaces to seperate items in LISTs")]
-		[ShowIfEnum(true, "function", FunctionType.ChangeStats_STATS, FunctionType.DeleteFocus, FunctionType.ReprogramReaction_REPROGRAM,
-			FunctionType.ReprogramThoughts_THOUGHTREPROGRAM, FunctionType.TeleportCycle)]
+		//[ShowIfEnum(true, "function", FunctionType.ChangeStats_STATS, FunctionType.DeleteFocus, FunctionType.ReprogramReaction_REPROGRAM,
+			//FunctionType.ReprogramThoughts_THOUGHTREPROGRAM, FunctionType.TeleportCycle)]
 		public List<string> arguments;
-		[ShowIfEnum("function", FunctionType.ReprogramReaction_REPROGRAM, FunctionType.ReprogramThoughts_THOUGHTREPROGRAM)]
+		//[ShowIfEnum("function", FunctionType.ReprogramReaction_REPROGRAM, FunctionType.ReprogramThoughts_THOUGHTREPROGRAM)]
 		[Tooltip("This is only for functions that reprogram reactions or thoughts in the behaviour hierarchy or thought processes. The array contains possible" +
 			"reactions or thoughts to reprogram  based on their index in the list")]
 		public int[] possiblePriorityReprograms;
-		[ShowIfEnum("function", FunctionType.ReprogramReaction_REPROGRAM)]
+		//[ShowIfEnum("function", FunctionType.ReprogramReaction_REPROGRAM)]
 		[Tooltip("Only useful for functions that reprogram a reaction. All elements in this list will be run. (If this list is reprogrammed during the" +
 			"execution of running all reprogram parameters, the list initially run will continue without changes)")]
 		[SerializeField]public List<EnemyReactionReprogram> reprogramParameters = new List<EnemyReactionReprogram>();
-		[ShowIfEnum("function", FunctionType.ReprogramThoughts_THOUGHTREPROGRAM)]
+		//[ShowIfEnum("function", FunctionType.ReprogramThoughts_THOUGHTREPROGRAM)]
 		[Tooltip("Only useful for functions that reprogram a thought. All elements in this list will be run. (If this list is reprogrammed during the" +
 			"execution of running all reprogram parameters, the list initially run will continue without changes)")]
 		[SerializeField]public List<EnemyThoughtReprogram> thoughtReprogramParameters = new List<EnemyThoughtReprogram>();
 		[Header("StatChanges")]
-		[ShowIfEnum("function", FunctionType.ChangeStats_STATS)]
+		//[ShowIfEnum("function", FunctionType.ChangeStats_STATS)]
 		public Stats[] statsToChange;
-		[ShowIfEnum("function", FunctionType.ChangeStats_STATS,
-			FunctionType.ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount)]
+		//[ShowIfEnum("function", FunctionType.ChangeStats_STATS,
+			//FunctionType.ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount)]
 		public Alteration changeStatsBy;
-		[ShowIfEnum("function", FunctionType.ChangeStats_STATS,
-			FunctionType.ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount)]
+		//[ShowIfEnum("function", FunctionType.ChangeStats_STATS,
+			//FunctionType.ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount)]
 		public float statsChangeAmount;
 		[Header("AddReactionsAndThoughts")]
-		[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
+		//[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		[Tooltip("One of these will be chosen randomly within the danger range")]
 		[SerializeField] public List<EnemyReactions> addReactions;
-		[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
+		//[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		public float addReactionLowerBoundDangerRange = 100;
-		[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
+		//[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		public float addReactionUpperBoundDangerRange = 100;
-		[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
+		//[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		[SerializeField] public List<ThoughtProcess> addThoughts;
-		[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
+		//[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		public float addThoughtsLowerBoundDangerRange = 100;
-		[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
+		//[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		public float addThoughtsUpperBoundDangerRange = 100;
 
 		[Header("Other Stuff")]
 		public bool changeDefaultState = false;
-		[ShowIf("changeDefaultState")]
+		//[ShowIf("changeDefaultState")]
 		public EnemyState newDefaultState;
 		public Transform alsoChangeDefaultFocus;
 	}
@@ -940,17 +940,17 @@ public class AttractorAI : MonoBehaviour
 		public DecisionType behaviorType = DecisionType.finiteState;
 
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
-		[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		//[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
 		public bool considerAttractorsForUtilityFocus = true;
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
-		[ShowIfEnum("attractorType", AttractorType.custom)]
+		//[ShowIfEnum("attractorType", AttractorType.custom)]
 		public string customAttractorID;
 		[Tooltip("Inclusve")]
-		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
-		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
 		public CheckConditions reactionConditions;
 		public bool allConditionsRequired = false;
@@ -965,32 +965,32 @@ public class AttractorAI : MonoBehaviour
 
 		[Space(20)]
 		[Header("UtilityFunctions")]
-		[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		//[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
 		[Range(0f, 1f)]
 		public float minRequiredUtility;
-		[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		//[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
 		public List<UtilityBehavior> utilityBehaviors = new List<UtilityBehavior>();
 
 		[Header("FiniteStates")]
-		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
-		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
-		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public EnemyState stateChange;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
-		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public bool targetDetectedObject = false;
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
-		[ShowIf("targetDetectedObject")]
-		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		//[ShowIf("targetDetectedObject")]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public bool prioritizeDistanceInsteadOfIntensity = false;
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
-		[ShowIf("targetDetectedObject")]
-		[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		//[ShowIf("targetDetectedObject")]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public bool invertPriority = false;
 	}
 
@@ -1014,80 +1014,99 @@ public class AttractorAI : MonoBehaviour
 	{
 		public ConsiderationType considerationType;
 
+		[Space(20)]
 		// Attractor Considerations
-		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		[Header("Attractor Considerations")]
 		public bool considerAttractorsForFocus = true;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public AttractorType attractorTypeConsidered;
-		[ShowIfEnum("attractorTypeConsidered", AttractorType.custom)]
+		//[ShowIfEnum("attractorTypeConsidered", AttractorType.custom)]
 		public string customAttractorIDConsidered;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public float minIntensityConsidered;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public float maxIntensityConsidered;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public bool considerClosestInsteadOfMostIntense = false;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public bool invertConsideredAttractorPriority = false;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity)]
+		[Header("Attractor Intensity Consideration")]
 		public float minIntensityClamp;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity)]
 		public float maxIntensityClamp;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
+		[Header("Attractor Distance Consideration")]
 		public float minDistanceClamp;
-		[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
 		public float maxDistanceClamp;
 
+		[Space(20)]
 		// Bool Condition Consideration
-		[ShowIfEnum("considerationType", ConsiderationType.boolCondition)]
+		//[ShowIfEnum("considerationType", ConsiderationType.boolCondition)]
+		[Header("Bool Condition Consideration")]
 		[Tooltip("false = 0; true = 1")]
 		public string boolID;
 
+		[Space(20)]
 		// Float Condition Consideration
-		[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		[Header("Float Condition Consideration")]
 		public string floatID;
-		[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
 		public float minFloatClamp;
-		[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
 		public float maxFloatClamp;
 
+		[Space(20)]
 		// Int Condition Consideration
-		[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		[Header("Int Condition Consideration")]
 		public string intID;
-		[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
 		public float minIntClamp;
-		[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
 		public float maxIntClamp;
 
+		[Space(20)]
 		// Status Consideration
-		[ShowIfEnum("considerationType", ConsiderationType.status)]
+		//[ShowIfEnum("considerationType", ConsiderationType.status)]
+		[Header("Status Consideration")]
 		[Tooltip("does not have status = 0; has status = 1")]
 		public string statusName;
 
+		[Space(20)]
 		// State Consideration
-		[ShowIfEnum("considerationType", ConsiderationType.state)]
+		//[ShowIfEnum("considerationType", ConsiderationType.state)]
+		[Header("State Consideration")]
 		[Tooltip("is not currently in this state = 0; is currently in this state = 1")]
 		public EnemyState state;
 
+		[Space(20)]
 		// Composite Condiderations
-		[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		[Header("Composite Considerations")]
 		public OperationType operationToPerform;
-		[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
 		[Tooltip("Utility values of 0 within the composite will not be included in the operation")]
 		public bool ignoreZeroValues = true;
-		[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
 		[Tooltip("If there are any values of 0 within the composite, then the composite will always return 0")]
 		public bool allMustBeNonZero = false;
-		[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
 		public Consideration[] compositeConsiderations;
 
+		[Space(20)]
 		// Constant Consideration
 		[Range(0f, 1f)]
-		[ShowIfEnum("considerationType", ConsiderationType.constant)]
+		//[ShowIfEnum("considerationType", ConsiderationType.constant)]
+		[Header("Constant Consideration")]
 		public float constantUtility;
 
 		[Space(20)]
-		[ShowIfEnum(true, "considerationType", ConsiderationType.compositeConsideration, ConsiderationType.constant)]
+		//[ShowIfEnum(true, "considerationType", ConsiderationType.compositeConsideration, ConsiderationType.constant)]
+		[Header("For considerations with curves (AKA everything but composite and constant considerations)")]
 		public AnimationCurve utilityCurve;
 	}
 
@@ -1100,35 +1119,36 @@ public class AttractorAI : MonoBehaviour
 		[Header("These values are not necessary and should only be used if you want to force the enemy to not consider this behavior at all if certain" +
 			"strict conditions are met")]
 		public bool useStrictConditions = false;
+		[Header("The strict conditions in question:")]
 		[HideInInspector] public bool considerAttractorsForFocus = false;
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
-		[ShowIf("useStrictConditions")]
-		[ShowIfEnum("attractorType", AttractorType.custom)]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum("attractorType", AttractorType.custom)]
 		public string customAttractorID;
 		[Tooltip("Inclusve")]
-		[ShowIf("useStrictConditions")]
-		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
-		[ShowIf("useStrictConditions")]
-		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public CheckConditions reactionConditions;
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public List<string> statusRestrictions = new List<string>();
 		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public bool allStatusesRequired = false;
 		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
 			"be activated regardless of the enemy's current state.")]
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
 		[Space(20)]
@@ -1146,10 +1166,10 @@ public class AttractorAI : MonoBehaviour
 		public bool targetDetectedObject = false;
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
-		[ShowIf("targetDetectedObject")]
+		//[ShowIf("targetDetectedObject")]
 		public bool prioritizeDistanceInsteadOfIntensity = false;
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
-		[ShowIf("targetDetectedObject")]
+		//[ShowIf("targetDetectedObject")]
 		public bool invertPriority = false;
 	}
 
@@ -1161,13 +1181,13 @@ public class AttractorAI : MonoBehaviour
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
-		[ShowIfEnum("attractorType", AttractorType.custom)]
+		//[ShowIfEnum("attractorType", AttractorType.custom)]
 		public string customAttractorID;
 		[Tooltip("Inclusve")]
-		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
-		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
 		public CheckConditions thoughtConditions;
 		public bool allConditionsRequired = false;
@@ -1182,23 +1202,23 @@ public class AttractorAI : MonoBehaviour
 
 		[Space(20)]
 		[Header("UtilityFunctions")]
-		[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
+		//[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
 		[Range(0f, 1f)]
 		public float minRequiredUtility;
-		[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
+		//[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
 		public List<UtilityThought> utilityThoughts = new List<UtilityThought>();
 
 		[Header("FiniteStates")]
-		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
-		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
 
-		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
 		public float repeatBuffer = 1;
-		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
 		public bool forceBuffer = false;
-		[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
 		public float timer = 0;
 	}
 
@@ -1208,34 +1228,35 @@ public class AttractorAI : MonoBehaviour
 		[Header("These values are not necessary and should only be used if you want to force the enemy to not consider this behavior at all if certain" +
 			"strict conditions are met")]
 		public bool useStrictConditions = false;
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
+		[Header("The strict conditions in question:")]
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
-		[ShowIf("useStrictConditions")]
-		[ShowIfEnum("attractorType", AttractorType.custom)]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum("attractorType", AttractorType.custom)]
 		public string customAttractorID;
 		[Tooltip("Inclusve")]
-		[ShowIf("useStrictConditions")]
-		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
-		[ShowIf("useStrictConditions")]
-		[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public CheckConditions thoughtConditions;
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public bool allConditionsRequired = false;
 		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
 			"behavior can be activated regardless of the enemy's current statuses.")]
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public List<string> statusRestrictions = new List<string>();
 		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public bool allStatusesRequired = false;
 		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
 			"be activated regardless of the enemy's current state.")]
-		[ShowIf("useStrictConditions")]
+		//[ShowIf("useStrictConditions")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
 		[Space(20)]

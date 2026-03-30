@@ -137,7 +137,7 @@ public class DataGraphWindow : EditorWindow
             {
                 var field = new PropertyField(p.Copy());
                 field.Bind(p.serializedObject);
-                field.style.minWidth = 400;
+                field.style.minWidth = 150;
                 container.Add(field);
             }
         }
