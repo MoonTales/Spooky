@@ -1013,6 +1013,7 @@ public class AttractorAI : MonoBehaviour
 		public ConsiderationType considerationType;
 
 		// Attractor Considerations
+		public bool considerAttractorsForFocus;
 		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public AttractorType attractorTypeConsidered;
 		[ShowIfEnum("attractorTypeConsidered", AttractorType.custom)]
