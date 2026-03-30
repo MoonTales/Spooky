@@ -88,7 +88,8 @@ namespace Managers
             if (newmentalstate == Types.PlayerMentalState.MildlySleepDeprived ||
                 newmentalstate == Types.PlayerMentalState.ModeratelySleepDeprived ||
                 newmentalstate == Types.PlayerMentalState.SeverelySleepDeprived ||
-                newmentalstate == Types.PlayerMentalState.Exhausted)
+                newmentalstate == Types.PlayerMentalState.Exhausted ||
+                newmentalstate == Types.PlayerMentalState.Breakdown)
             {
                 if (newmentalstate == Types.PlayerMentalState.MildlySleepDeprived)
                 {
