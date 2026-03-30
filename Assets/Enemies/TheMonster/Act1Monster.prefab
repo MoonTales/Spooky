@@ -13763,14 +13763,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terrorAudioSourceTransform: {fileID: 0}
-  veryClose: 5
-  close: 10
-  midRange: 25
-  far: 50
-  veryCloseDmg: 50
-  closeDmg: 15
-  midRangeDmg: 5
-  farDmg: 2
+  veryClose: 8
+  close: 15
+  midRange: 38
+  far: 75
+  veryCloseDmg: 75
+  closeDmg: 23
+  midRangeDmg: 8
+  farDmg: 3
 --- !u!1 &3716651708963572587
 GameObject:
   m_ObjectHideFlags: 0
@@ -24918,7 +24918,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6781157561308867419}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.22263353, y: -0.69071037, z: 0.6432203, w: 0.2441745}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.00068, y: 0.00024, z: -0.00157}
   m_LocalScale: {x: 0.00025000024, y: 0.00016917166, z: 0.00025000007}
   m_ConstrainProportionsScale: 1
@@ -25122,7 +25122,9 @@ MonoBehaviour:
     - intName: DRAWINGS
       intValue: 0
   behaviourHierarchy:
-  - attractorType: 2
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 2
     customAttractorID: Avoid
     minIntensity: 1
     maxIntensity: 2
@@ -25138,6 +25140,8 @@ MonoBehaviour:
     - Waiting
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions:
     - function: 3
       arguments:
@@ -25181,7 +25185,9 @@ MonoBehaviour:
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 3
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 3
     customAttractorID: 
     minIntensity: 2
     maxIntensity: 3
@@ -25199,6 +25205,8 @@ MonoBehaviour:
     - Done
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions:
     - function: 5
       arguments:
@@ -25224,7 +25232,9 @@ MonoBehaviour:
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 4
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -25242,6 +25252,8 @@ MonoBehaviour:
     - Done
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions:
     - function: 3
       arguments:
@@ -25304,7 +25316,9 @@ MonoBehaviour:
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 3
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 3
     customAttractorID: 
     minIntensity: 2
     maxIntensity: 3
@@ -25322,13 +25336,17 @@ MonoBehaviour:
     - Done
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions: []
     eventExecutions: []
     stateChange: 3
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 4
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -25346,6 +25364,8 @@ MonoBehaviour:
     - Done
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions: []
     eventExecutions:
     - m_PersistentCalls:
@@ -25367,7 +25387,8 @@ MonoBehaviour:
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
   thoughts:
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -25383,6 +25404,8 @@ MonoBehaviour:
     - StartingEvent
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 3
       arguments:
@@ -25442,7 +25465,8 @@ MonoBehaviour:
     repeatBuffer: 0.1
     forceBuffer: 0
     timer: 0
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -25459,6 +25483,8 @@ MonoBehaviour:
     - Event1
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 5
       arguments:
@@ -25551,7 +25577,8 @@ MonoBehaviour:
     repeatBuffer: 0.1
     forceBuffer: 0
     timer: 0
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -25566,12 +25593,17 @@ MonoBehaviour:
     - ReadyToRumble
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 9
       arguments: []
       possiblePriorityReprograms: 00000000
       reprogramParameters:
       - balancesChanges: 1
+        possibleBehaviorTypeChanges: 
+        behaviorTypeLowerBoundDangerRange: 100
+        behaviorTypeUpperBoundDangerRange: 100
         possibleAttractorTypeChanges: 
         attractorTypeLowerBoundDangerRange: 0
         attractorTypeUpperBoundDangerRange: 0
@@ -25599,6 +25631,12 @@ MonoBehaviour:
         possibleStateRestrictionChanges: []
         stateRestrictionLowerBoundDangerRange: 0
         stateRestrictionUpperBoundDangerRange: 0
+        possibleMinRequiredUtilityChanges: []
+        minRequiredUtilityLowerBoundDangerRange: 100
+        minRequiredUtilityUpperBoundDangerRange: 100
+        possibleUtilityBehaviorsChanges: []
+        utilityBehaviorsLowerBoundDangerRange: 100
+        utilityBehaviorsUpperBoundDangerRange: 100
         possibleFunctionExecutionsChanges:
         - functionExecutions:
           - function: 3
@@ -25690,6 +25728,9 @@ MonoBehaviour:
       possiblePriorityReprograms: 01000000
       reprogramParameters:
       - balancesChanges: 1
+        possibleBehaviorTypeChanges: 
+        behaviorTypeLowerBoundDangerRange: 100
+        behaviorTypeUpperBoundDangerRange: 100
         possibleAttractorTypeChanges: 
         attractorTypeLowerBoundDangerRange: 0
         attractorTypeUpperBoundDangerRange: 0
@@ -25717,6 +25758,12 @@ MonoBehaviour:
         possibleStateRestrictionChanges: []
         stateRestrictionLowerBoundDangerRange: 0
         stateRestrictionUpperBoundDangerRange: 0
+        possibleMinRequiredUtilityChanges: []
+        minRequiredUtilityLowerBoundDangerRange: 100
+        minRequiredUtilityUpperBoundDangerRange: 100
+        possibleUtilityBehaviorsChanges: []
+        utilityBehaviorsLowerBoundDangerRange: 100
+        utilityBehaviorsUpperBoundDangerRange: 100
         possibleFunctionExecutionsChanges:
         - functionExecutions:
           - function: 5
@@ -26249,7 +26296,8 @@ MonoBehaviour:
     repeatBuffer: 15
     forceBuffer: 1
     timer: 12
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -26265,6 +26313,8 @@ MonoBehaviour:
     statusRestrictions: []
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 5
       arguments:
@@ -26325,7 +26375,8 @@ MonoBehaviour:
     repeatBuffer: 5
     forceBuffer: 0
     timer: 0
-  - attractorType: 3
+  - thoughtType: 0
+    attractorType: 3
     customAttractorID: 
     minIntensity: 2
     maxIntensity: 3
@@ -26342,6 +26393,8 @@ MonoBehaviour:
     - ReadyToRumble
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 5
       arguments:
@@ -26380,7 +26433,8 @@ MonoBehaviour:
     repeatBuffer: 8
     forceBuffer: 0
     timer: 0
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -26398,6 +26452,8 @@ MonoBehaviour:
     - BeenSeen
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 3
       arguments:
@@ -26473,7 +26529,8 @@ MonoBehaviour:
     repeatBuffer: 3
     forceBuffer: 1
     timer: 3
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -26487,6 +26544,8 @@ MonoBehaviour:
     statusRestrictions: []
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 5
       arguments:
@@ -26576,6 +26635,7 @@ MonoBehaviour:
     invertDetection: 0
     lightSensitive: 0
   animator: {fileID: 0}
+  additionalAnimators: []
   walkSpdAnimMult: 1
   screamTime: 1
   attackBox: {fileID: 0}
