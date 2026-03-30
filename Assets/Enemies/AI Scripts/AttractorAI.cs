@@ -2571,6 +2571,12 @@ public class AttractorAI : MonoBehaviour
 									currentUtilityIndex++;
 								}
 							}
+							else
+							{
+								foreach (UtilityThought utility in thought.utilityThoughts)
+									if (!utility.forceBuffer)
+										utility.timer = 0;
+							}
 						}
 					}
 					else if (!thought.forceBuffer)
@@ -2829,6 +2835,12 @@ public class AttractorAI : MonoBehaviour
 
 									currentUtilityIndex++;
 								}
+							}
+							else
+							{
+								foreach (UtilityThought utility in thought.utilityThoughts)
+									if (!utility.forceBuffer)
+										utility.timer = 0;
 							}
 						}
 					}
