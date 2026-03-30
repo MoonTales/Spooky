@@ -2078,7 +2078,63 @@ public class AttractorAI : MonoBehaviour
 				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
 		}
 
+		// Status
+		else if (consideration.considerationType == ConsiderationType.status)
+		{
+			return Mathf.Clamp01(currentStatuses.Contains(consideration.statusName) ? 1 : 0);
+		}
 
+		// State
+		else if (consideration.considerationType == ConsiderationType.state)
+		{
+			return Mathf.Clamp01(currentState == consideration.state ? 1 : 0);
+		}
+
+		else if (consideration.considerationType == ConsiderationType.compositeConsideration)
+		{
+			if (consideration.compositeConsiderations == null || consideration.compositeConsiderations.Count() == 0) return 0f;
+
+			float result = EvaluateConsideration(consideration.compositeConsiderations[0], detectedAttractors);
+			if (result == 0f && consideration.allMustBeNonZero) return 0f;
+
+			for (int i = 1; i < consideration.compositeConsiderations.Count(); i++)
+			{
+				float value = EvaluateConsideration(consideration.compositeConsiderations[i], detectedAttractors);
+
+				if (value == 0f && consideration.allMustBeNonZero) return 0f;
+
+				switch (consideration.operationToPerform)
+				{
+					case OperationType.Average:
+						result = (result + value) / 2;
+						break;
+					case OperationType.Multiply:
+						result *= value;
+						break;
+					case OperationType.Add:
+						result += value;
+						break;
+					case OperationType.Subtract:
+						result -= value;
+						break;
+					case OperationType.Divide:
+						result = value != 0 ? result / value : result; // Prevent division by zero
+						break;
+					case OperationType.Max:
+						result = Mathf.Max(result, value);
+						break;
+					case OperationType.Min:
+						result = Mathf.Min(result, value);
+						break;
+				}
+			}
+		}
+
+		// Comstant
+		else if (consideration.considerationType == ConsiderationType.constant)
+		{
+			return Mathf.Clamp01(consideration.constantUtility);
+		}
 
 		return 0f;
 	}
@@ -2301,8 +2357,9 @@ public class AttractorAI : MonoBehaviour
 						}
 						else if (thought.thoughtType == DecisionType.utilityFunction)
 						{
-							int bestThoughtIndex = -1;
-							float highestUtility = float.MinValue;
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
+							float highestUtility = -1;
 
 							foreach (UtilityThought utility in thought.utilityThoughts)
 							{
@@ -2442,7 +2499,13 @@ public class AttractorAI : MonoBehaviour
 
 										if (utilityStrictConditionsMet)
 										{
-											// code to asses the utility of this utility thought
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
 										}
 									}
 									else if (!utility.allConditionsRequired)
@@ -2465,9 +2528,47 @@ public class AttractorAI : MonoBehaviour
 											utility.thoughtConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
 											item1.intValue).ToList().Count > 0))
 										{
-											// code to asses the utility of this utility thought
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
 										}
 									}
+								}
+								currentUtilityIndex++;
+							}
+
+							if (highestUtility >= thought.minRequiredUtility)
+							{
+								currentUtilityIndex = 0;
+								foreach (UtilityThought utility in thought.utilityThoughts)
+								{
+									if (currentUtilityIndex == bestUtilityIndex)
+									{
+										utility.timer -= Time.deltaTime;
+
+										if (utility.timer <= 0)
+										{
+											utility.timer = utility.repeatBuffer;
+											foreach (FunctionPicker function in utility.functionExecutions)
+											{
+												HandleFunctionCalling(function);
+											}
+											foreach (UnityEvent unityEvent in utility.eventExecutions)
+											{
+												unityEvent.Invoke();
+											}
+										}
+									}
+									else if (!utility.forceBuffer)
+									{
+										utility.timer = 0;
+									}
+
+									currentUtilityIndex++;
 								}
 							}
 						}
@@ -2517,7 +2618,8 @@ public class AttractorAI : MonoBehaviour
 						}
 						else if (thought.thoughtType == DecisionType.utilityFunction)
 						{
-							int bestThoughtIndex = -1;
+							float bestUtilityIndex = -1;
+							float currentUtilityIndex = 0;
 							float highestUtility = float.MinValue;
 
 							foreach (UtilityThought utility in thought.utilityThoughts)
@@ -2656,7 +2758,13 @@ public class AttractorAI : MonoBehaviour
 
 										if (utilityStrictConditionsMet)
 										{
-											
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
 										}
 									}
 									else if (!utility.allConditionsRequired)
@@ -2679,9 +2787,47 @@ public class AttractorAI : MonoBehaviour
 											utility.thoughtConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
 											item1.intValue).ToList().Count > 0))
 										{
-											// code to asses the utility of this utility thought
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
 										}
 									}
+								}
+								currentUtilityIndex++;
+							}
+
+							if (highestUtility >= thought.minRequiredUtility)
+							{
+								currentUtilityIndex = 0;
+								foreach (UtilityThought utility in thought.utilityThoughts)
+								{
+									if (currentUtilityIndex == bestUtilityIndex)
+									{
+										utility.timer -= Time.deltaTime;
+
+										if (utility.timer <= 0)
+										{
+											utility.timer = utility.repeatBuffer;
+											foreach (FunctionPicker function in utility.functionExecutions)
+											{
+												HandleFunctionCalling(function);
+											}
+											foreach (UnityEvent unityEvent in utility.eventExecutions)
+											{
+												unityEvent.Invoke();
+											}
+										}
+									}
+									else if (!utility.forceBuffer)
+									{
+										utility.timer = 0;
+									}
+
+									currentUtilityIndex++;
 								}
 							}
 						}
