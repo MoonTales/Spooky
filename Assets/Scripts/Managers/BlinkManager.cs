@@ -34,6 +34,11 @@ namespace Managers
             panTilt = cinemaCamera.GetComponent<CinemachinePanTilt>();
         }
 
+        public void RequestBlink(float duration = 1f)
+        {
+            
+        }
+
         // Update is called once per frame
         void FixedUpdate()
         {
