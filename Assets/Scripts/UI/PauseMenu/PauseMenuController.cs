@@ -147,6 +147,7 @@ namespace UI.PauseMenu
             paused = false;
             ShowMenu(false);
             SettingsController.Instance.CloseSettings();
+            SettingsController.Instance.CloseControlSettings();
             NotificationController.Instance.ShowNotificationText();
         }
 
