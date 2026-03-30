@@ -937,7 +937,7 @@ public class AttractorAI : MonoBehaviour
 	[System.Serializable]
 	public class EnemyReactions
 	{
-		public DecisionType behaviorType;
+		public DecisionType behaviorType = DecisionType.finiteState;
 
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType attractorType;
@@ -1016,7 +1016,7 @@ public class AttractorAI : MonoBehaviour
 		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public AttractorType attractorTypeConsidered;
 		[ShowIfEnum("attractorTypeConsidered", AttractorType.custom)]
-		public AttractorType customAttractorIDConsidered;
+		public string customAttractorIDConsidered;
 		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public float minIntensityConsidered;
 		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
@@ -1148,7 +1148,7 @@ public class AttractorAI : MonoBehaviour
 	[System.Serializable]
 	public class ThoughtProcess
 	{
-		public DecisionType thoughtType;
+		public DecisionType thoughtType = DecisionType.finiteState;
 
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType attractorType;
@@ -1978,6 +1978,111 @@ public class AttractorAI : MonoBehaviour
 		}
 	}
 
+	float EvaluateConsideration(Consideration consideration, Dictionary<AttractorType, List<Attractor>> detectedAttractors)
+	{
+		// Attractors
+		if (consideration.considerationType == ConsiderationType.attractorIntensity || consideration.considerationType == ConsiderationType.attractorDistance)
+		{
+			Transform consideredTarget = defaultFocus;
+			float tempValue = -1;
+			if (consideration.attractorTypeConsidered != AttractorType.NONE && detectedAttractors.ContainsKey(consideration.attractorTypeConsidered))
+			{
+				foreach (Attractor attractor in detectedAttractors[consideration.attractorTypeConsidered])
+				{
+					if (consideration.minIntensityConsidered <= attractor.intensity && attractor.intensity < consideration.maxIntensityConsidered &&
+						(consideration.attractorTypeConsidered != AttractorType.custom || consideration.customAttractorIDConsidered ==
+						attractor.customAttractorID))
+					{
+						if (tempValue < 0 || (consideration.considerClosestInsteadOfMostIntense && ((consideration.invertConsideredAttractorPriority &&
+							Vector3.Distance(transform.position, attractor.transform.position) > tempValue) || (!consideration.invertConsideredAttractorPriority &&
+							Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) ||
+							(!consideration.considerClosestInsteadOfMostIntense && ((consideration.invertConsideredAttractorPriority && attractor.intensity <
+							tempValue) || (!consideration.invertConsideredAttractorPriority && attractor.intensity > tempValue))))
+						{
+							consideredTarget = attractor.transform;
+						}
+					}
+				}
+
+				if (consideredTarget.gameObject.TryGetComponent(out Attractor consideredAttractor))
+				{
+					if (consideration.considerationType == ConsiderationType.attractorIntensity)
+					{
+						float utilityInput = Mathf.Clamp01((Mathf.Clamp(consideredAttractor.intensity, consideration.minIntensityClamp,
+							consideration.maxIntensityClamp) - consideration.minIntensityClamp) / (consideration.maxIntensityClamp -
+							consideration.minIntensityClamp));
+
+						return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
+					}
+
+					else if (consideration.considerationType == ConsiderationType.attractorDistance)
+					{
+						float utilityInput = Mathf.Clamp01((Mathf.Clamp(Vector3.Distance(consideredTarget.position, transform.position),
+							consideration.minDistanceClamp, consideration.maxDistanceClamp) - consideration.minDistanceClamp) / (consideration.maxDistanceClamp -
+							consideration.minDistanceClamp));
+
+						return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
+					}
+				}
+				else
+				{
+					return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+				}
+			}
+			else
+			{
+				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+			}
+		}
+
+		// Bool Condition
+		else if (consideration.considerationType == ConsiderationType.boolCondition)
+		{
+			Dictionary<string, bool> tempBoolDict = currentConditions.boolConditions.ToDictionary(x => x.boolName, x => x.boolValue);
+
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(tempBoolDict.ContainsKey(consideration.boolID) && tempBoolDict[consideration.boolID] ? 1 :
+				0));
+		}
+
+		// Float Condition
+		else if (consideration.considerationType == ConsiderationType.floatCondition)
+		{
+			Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+			if (tempFloatDict.ContainsKey(consideration.floatID))
+			{
+				float foundFloat = tempFloatDict[consideration.floatID];
+				float utilityInput = Mathf.Clamp01((Mathf.Clamp(foundFloat, consideration.minFloatClamp, consideration.maxFloatClamp) -
+					consideration.minFloatClamp) / (consideration.maxFloatClamp - consideration.minFloatClamp));
+
+				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
+			}
+			else
+				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+		}
+
+		// Int Condition
+		else if (consideration.considerationType == ConsiderationType.intCondition)
+		{
+			Dictionary<string, int> tempIntDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+			if (tempIntDict.ContainsKey(consideration.intID))
+			{
+				int foundInt = tempIntDict[consideration.intID];
+				float utilityInput = Mathf.Clamp01((Mathf.Clamp(foundInt, consideration.minIntClamp, consideration.maxIntClamp) -
+					consideration.minIntClamp) / (consideration.maxIntClamp - consideration.minIntClamp));
+
+				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
+			}
+			else
+				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+		}
+
+
+
+		return 0f;
+	}
+
 	void Update()
 	{
 		if (tracksDrawingCount)
@@ -2551,7 +2656,7 @@ public class AttractorAI : MonoBehaviour
 
 										if (utilityStrictConditionsMet)
 										{
-											// code to asses the utility of this utility thought
+											
 										}
 									}
 									else if (!utility.allConditionsRequired)

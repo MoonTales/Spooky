@@ -9,13 +9,17 @@ public class ShowIfEnumDrawer : PropertyDrawer
     {
         if (ShouldShow(property))
         {
+            EditorGUI.BeginProperty(position, label, property);
+
             // Apply your Label Width fix here
             float oldWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(label).x + 20f;
+            EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(label).x + 5f;
 
             EditorGUI.PropertyField(position, property, label, true);
 
             EditorGUIUtility.labelWidth = oldWidth;
+
+            EditorGUI.EndProperty();
         }
     }
 
