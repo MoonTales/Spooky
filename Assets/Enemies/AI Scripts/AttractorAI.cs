@@ -940,6 +940,8 @@ public class AttractorAI : MonoBehaviour
 		public DecisionType behaviorType = DecisionType.finiteState;
 
 		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
+		[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		public bool considerAttractorsForUtilityFocus = true;
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
 		[ShowIfEnum("attractorType", AttractorType.custom)]
@@ -1013,7 +1015,8 @@ public class AttractorAI : MonoBehaviour
 		public ConsiderationType considerationType;
 
 		// Attractor Considerations
-		public bool considerAttractorsForFocus;
+		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public bool considerAttractorsForFocus = true;
 		[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		public AttractorType attractorTypeConsidered;
 		[ShowIfEnum("attractorTypeConsidered", AttractorType.custom)]
@@ -1091,9 +1094,13 @@ public class AttractorAI : MonoBehaviour
 	[System.Serializable]
 	public class UtilityBehavior
 	{
+		[HideInInspector] public Transform myTempFocus;
+		[HideInInspector] public float myTempValue;
+
 		[Header("These values are not necessary and should only be used if you want to force the enemy to not consider this behavior at all if certain" +
 			"strict conditions are met")]
 		public bool useStrictConditions = false;
+		[HideInInspector] public bool considerAttractorsForFocus = false;
 		[ShowIf("useStrictConditions")]
 		public AttractorType attractorType;
 		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
@@ -1979,7 +1986,7 @@ public class AttractorAI : MonoBehaviour
 		}
 	}
 
-	float EvaluateConsideration(Consideration consideration, Dictionary<AttractorType, List<Attractor>> detectedAttractors)
+	float EvaluateConsideration(Consideration consideration, Dictionary<AttractorType, List<Attractor>> detectedAttractors, UtilityBehavior behavior = null)
 	{
 		// Attractors
 		if (consideration.considerationType == ConsiderationType.attractorIntensity || consideration.considerationType == ConsiderationType.attractorDistance)
@@ -1994,6 +2001,23 @@ public class AttractorAI : MonoBehaviour
 						(consideration.attractorTypeConsidered != AttractorType.custom || consideration.customAttractorIDConsidered ==
 						attractor.customAttractorID))
 					{
+						if (behavior != null)
+						{
+							if (behavior.considerAttractorsForFocus && (behavior.targetDetectedObject && (behavior.myTempValue < 0 ||
+								(behavior.prioritizeDistanceInsteadOfIntensity && ((behavior.invertPriority && Vector3.Distance(transform.position,
+								attractor.transform.position) > behavior.myTempValue) || (!behavior.invertPriority && Vector3.Distance(transform.position,
+								attractor.transform.position) < behavior.myTempValue))) || (!behavior.prioritizeDistanceInsteadOfIntensity &&
+								((behavior.invertPriority && attractor.intensity < behavior.myTempValue) || (!behavior.invertPriority && attractor.intensity >
+								behavior.myTempValue))))))
+							{
+								behavior.myTempFocus = attractor.transform;
+								if (!behavior.prioritizeDistanceInsteadOfIntensity)
+									behavior.myTempValue = attractor.intensity;
+								else
+									behavior.myTempValue = Vector3.Distance(behavior.myTempFocus.position, transform.position);
+							}
+						}
+
 						if (tempValue < 0 || (consideration.considerClosestInsteadOfMostIntense && ((consideration.invertConsideredAttractorPriority &&
 							Vector3.Distance(transform.position, attractor.transform.position) > tempValue) || (!consideration.invertConsideredAttractorPriority &&
 							Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) ||
@@ -2001,6 +2025,10 @@ public class AttractorAI : MonoBehaviour
 							tempValue) || (!consideration.invertConsideredAttractorPriority && attractor.intensity > tempValue))))
 						{
 							consideredTarget = attractor.transform;
+							if (!consideration.considerClosestInsteadOfMostIntense)
+								tempValue = attractor.intensity;
+							else
+								tempValue = Vector3.Distance(consideredTarget.position, transform.position);
 						}
 					}
 				}
@@ -2871,13 +2899,18 @@ public class AttractorAI : MonoBehaviour
 						if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity && (reaction.attractorType !=
 							AttractorType.custom || reaction.customAttractorID == attractor.customAttractorID))
 						{
-							if (reaction.targetDetectedObject && (tempValue < 0 || (reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority &&
+							if (!(reaction.behaviorType == DecisionType.utilityFunction && !reaction.considerAttractorsForUtilityFocus) &&
+								(reaction.targetDetectedObject && (tempValue < 0 || (reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority &&
 								Vector3.Distance(transform.position, attractor.transform.position) > tempValue) || (!reaction.invertPriority &&
 								Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) ||
 								(!reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority && attractor.intensity < tempValue) ||
-								(!reaction.invertPriority && attractor.intensity > tempValue)))))
+								(!reaction.invertPriority && attractor.intensity > tempValue))))))
 							{
 								tempFocus = attractor.transform;
+								if (!reaction.prioritizeDistanceInsteadOfIntensity)
+									tempValue = attractor.intensity;
+								else
+									tempValue = Vector3.Distance(tempFocus.position, transform.position);
 							}
 
 							tempAttractors.Add(attractor);
@@ -2993,40 +3026,290 @@ public class AttractorAI : MonoBehaviour
 
 					if (conditionsMet)
 					{
-						nextStatePriority = tempPriority;
-						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
-						nextEvents = new List<UnityEvent>(reaction.eventExecutions);
-						if (nextStatePriority < currentStatePriority)
+						if (reaction.behaviorType == DecisionType.finiteState)
 						{
-							foreach (FunctionPicker function in nextFunctions)
+							nextStatePriority = tempPriority;
+							nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
+							nextEvents = new List<UnityEvent>(reaction.eventExecutions);
+							if (nextStatePriority < currentStatePriority)
 							{
-								HandleFunctionCalling(function);
+								foreach (FunctionPicker function in nextFunctions)
+								{
+									HandleFunctionCalling(function);
+								}
+								foreach (UnityEvent unityEvent in nextEvents)
+								{
+									unityEvent.Invoke();
+								}
 							}
-							foreach (UnityEvent unityEvent in nextEvents)
+
+							if (!reaction.targetDetectedObject)
 							{
-								unityEvent.Invoke();
+								nextFocus = defaultFocus;
+							}
+							else
+							{
+								nextFocus = tempFocus;
+							}
+
+							nextState = reaction.stateChange;
+							if (nextStatePriority < currentStatePriority)
+							{
+								currentFocus = nextFocus;
+								currentState = nextState;
+								currentStatePriority = nextStatePriority;
+							}
+
+							tempCheck = true;
+							break;
+						}
+						else if (reaction.behaviorType == DecisionType.utilityFunction)
+						{
+							float bestUtilityIndex = -1;
+							float currentUtilityIndex = 0;
+							float highestUtility = float.MinValue;
+
+							foreach (UtilityBehavior utility in reaction.utilityBehaviors)
+							{
+								if (!utility.useStrictConditions || ((utility.stateRestriction.Count < 1 || utility.stateRestriction.Contains(currentState)) &&
+									(utility.statusRestrictions.Count < 1 || (utility.allStatusesRequired ?
+									currentStatuses.Intersect(utility.statusRestrictions).Count() == utility.statusRestrictions.Count() :
+									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
+								{
+									tempAttractors.Clear();
+									utility.myTempFocus = defaultFocus;
+									utility.myTempValue = -1;
+
+									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+										tempDetectedAttractors.ContainsKey(utility.attractorType)))
+									{
+										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
+										{
+											if (utility.minIntensity <= attractor.intensity && attractor.intensity < utility.maxIntensity &&
+												(utility.attractorType != AttractorType.custom || utility.customAttractorID == attractor.customAttractorID))
+											{
+												if (utility.considerAttractorsForFocus && (utility.targetDetectedObject && (utility.myTempValue < 0 ||
+													(utility.prioritizeDistanceInsteadOfIntensity && ((utility.invertPriority &&
+													Vector3.Distance(transform.position, attractor.transform.position) > utility.myTempValue) ||
+													(!utility.invertPriority && Vector3.Distance(transform.position, attractor.transform.position) <
+													utility.myTempValue))) || (!utility.prioritizeDistanceInsteadOfIntensity && ((utility.invertPriority &&
+													attractor.intensity < utility.myTempValue) || (!utility.invertPriority && attractor.intensity >
+													utility.myTempValue))))))
+												{
+													utility.myTempFocus = attractor.transform;
+													if (!utility.prioritizeDistanceInsteadOfIntensity)
+														utility.myTempValue = attractor.intensity;
+													else
+														utility.myTempValue = Vector3.Distance(tempFocus.position, transform.position);
+												}
+
+												tempAttractors.Add(attractor);
+											}
+										}
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType == AttractorType.NONE || tempAttractors.Count > 0))
+									{
+										bool utilityStrictConditionsMet = true;
+										if (utility.useStrictConditions && utility.allConditionsRequired)
+										{
+											if (utility.reactionConditions.boolConditions.Count > 0 &&
+												!(currentConditions.boolConditions.Intersect(utility.reactionConditions.boolConditions).Count() ==
+												utility.reactionConditions.boolConditions.Count()))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.equals &&
+												(utility.reactionConditions.floatConditions.Count > 0 &&
+												!(currentConditions.floatConditions.Intersect(utility.reactionConditions.floatConditions).Count() ==
+												utility.reactionConditions.floatConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.greaterThan)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.lesserThan)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.lesserOrEqualTo)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.equals && (utility.reactionConditions.intConditions.Count >
+												0 && !(currentConditions.intConditions.Intersect(utility.reactionConditions.intConditions).Count() ==
+												utility.reactionConditions.intConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.greaterThan)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.greaterOrEqualTo)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.lesserThan)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.lesserOrEqualTo)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+										}
+
+										if (utilityStrictConditionsMet)
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+									else if (!utility.allConditionsRequired)
+									{
+										Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+										x.floatValue);
+										Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+										if ((utility.reactionConditions.boolConditions.Count > 0 &&
+											utility.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((utility.reactionConditions.floatCompare
+											== Comparison.equals || utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											(utility.reactionConditions.floatConditions.Count > 0 &&
+											utility.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) || ((utility.reactionConditions.floatCompare
+											== Comparison.greaterThan || utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											utility.reactionConditions.floatConditions.Where(item1 => tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] >
+											item1.floatValue).ToList().Count > 0) || ((utility.reactionConditions.intCompare == Comparison.equals ||
+											utility.reactionConditions.intCompare == Comparison.lesserOrEqualTo) && (utility.reactionConditions.intConditions.Count > 0 &&
+											utility.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any())) || ((utility.reactionConditions.intCompare ==
+											Comparison.greaterThan || utility.reactionConditions.intCompare == Comparison.greaterOrEqualTo) &&
+											utility.reactionConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
+											item1.intValue).ToList().Count > 0))
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+								}
+								currentUtilityIndex++;
+							}
+
+							if (highestUtility >= reaction.minRequiredUtility)
+							{
+								currentUtilityIndex = 0;
+								foreach (UtilityBehavior utility in reaction.utilityBehaviors)
+								{
+									// FIGURE OUT THE NEXT STATE PRIORITY THING FUCK MY LIFE I GUESS
+
+									nextStatePriority = tempPriority;
+									nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
+									nextEvents = new List<UnityEvent>(reaction.eventExecutions);
+									if (nextStatePriority < currentStatePriority)
+									{
+										foreach (FunctionPicker function in nextFunctions)
+										{
+											HandleFunctionCalling(function);
+										}
+										foreach (UnityEvent unityEvent in nextEvents)
+										{
+											unityEvent.Invoke();
+										}
+									}
+
+									if (!reaction.targetDetectedObject)
+									{
+										nextFocus = defaultFocus;
+									}
+									else
+									{
+										nextFocus = tempFocus;
+									}
+
+									nextState = reaction.stateChange;
+									if (nextStatePriority < currentStatePriority)
+									{
+										currentFocus = nextFocus;
+										currentState = nextState;
+										currentStatePriority = nextStatePriority;
+									}
+
+									tempCheck = true;
+									break;
+								}
 							}
 						}
-
-						if (!reaction.targetDetectedObject)
-						{
-							nextFocus = defaultFocus;
-						}
-						else
-						{
-							nextFocus = tempFocus;
-						}
-
-						nextState = reaction.stateChange;
-						if (nextStatePriority < currentStatePriority)
-						{
-							currentFocus = nextFocus;
-							currentState = nextState;
-							currentStatePriority = nextStatePriority;
-						}
-
-						tempCheck = true;
-						break;
 					}
 				}
 				else if (!reaction.allConditionsRequired)
