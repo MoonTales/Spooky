@@ -7,7 +7,7 @@ using UnityEngine;
 using Types = System.Types;
 using Interaction;
 
-public class Clock : MonoBehaviour
+public class Clock : EventSubscriberBase
 {
     
     [SerializeField] private SceneField sceneName;
@@ -30,6 +30,8 @@ public class Clock : MonoBehaviour
     [SerializeField] private float ClockSpeed;
     [SerializeField] private float damagePerTick;
     [SerializeField] private float alottedInspectTime = 100; // 50 == 1 hr
+
+    private bool _cachedKillPlayer = false;
 
     void Start()
     {
@@ -135,7 +137,18 @@ public class Clock : MonoBehaviour
                 if (isInspecting && inspectTimeElapsed <= alottedInspectTime)
                 {
                     elapsedTime = elapsedTime + FastForwardSpeed;
-                    EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick*FastForwardSpeed);
+                    float health = PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth();
+                    float damageToPlayer = damagePerTick*FastForwardSpeed;
+                    if (health - damageToPlayer <= 0)
+                    {
+                        // we need to "pause the clock" here, and then wait for the player to finish inpsecting
+                        _cachedKillPlayer = true;
+                    }
+                    else
+                    {
+                        EventBroadcaster.Broadcast_OnPlayerDamaged(damagePerTick*FastForwardSpeed);
+                    }
+                    
                 }
                 /*
                 else
@@ -200,5 +213,19 @@ public class Clock : MonoBehaviour
         }
         // we are good to sleep!
         //SceneSwapper.Instance.SwapScene(sceneName);
+    }
+    
+    
+    // Stuff that was needed to fix this clock ---
+    protected override void OnGameStateChanged(Types.GameState newState)
+    {
+        if (newState == Types.GameState.Gameplay && _cachedKillPlayer)
+        {
+            _cachedKillPlayer = false;
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom)
+            {
+                EventBroadcaster.Broadcast_OnPlayerDamaged(PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth());
+            }
+        }
     }
 }
