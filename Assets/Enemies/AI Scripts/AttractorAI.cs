@@ -3086,8 +3086,8 @@ public class AttractorAI : MonoBehaviour
 						}
 						else if (reaction.behaviorType == DecisionType.utilityFunction)
 						{
-							float bestUtilityIndex = -1;
-							float currentUtilityIndex = 0;
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
 							float highestUtility = float.MinValue;
 
 							foreach (UtilityBehavior utility in reaction.utilityBehaviors)
@@ -3289,46 +3289,43 @@ public class AttractorAI : MonoBehaviour
 
 							if (highestUtility >= reaction.minRequiredUtility)
 							{
+								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
+
 								currentUtilityIndex = 0;
-								foreach (UtilityBehavior utility in reaction.utilityBehaviors)
+								nextStatePriority = tempPriority;
+								nextFunctions = new List<FunctionPicker>(chosenUtility.functionExecutions);
+								nextEvents = new List<UnityEvent>(chosenUtility.eventExecutions);
+								if (nextStatePriority < currentStatePriority)
 								{
-									// FIGURE OUT THE NEXT STATE PRIORITY THING FUCK MY LIFE I GUESS
-
-									nextStatePriority = tempPriority;
-									nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
-									nextEvents = new List<UnityEvent>(reaction.eventExecutions);
-									if (nextStatePriority < currentStatePriority)
+									foreach (FunctionPicker function in nextFunctions)
 									{
-										foreach (FunctionPicker function in nextFunctions)
-										{
-											HandleFunctionCalling(function);
-										}
-										foreach (UnityEvent unityEvent in nextEvents)
-										{
-											unityEvent.Invoke();
-										}
+										HandleFunctionCalling(function);
 									}
-
-									if (!reaction.targetDetectedObject)
+									foreach (UnityEvent unityEvent in nextEvents)
 									{
-										nextFocus = defaultFocus;
+										unityEvent.Invoke();
 									}
-									else
-									{
-										nextFocus = tempFocus;
-									}
-
-									nextState = reaction.stateChange;
-									if (nextStatePriority < currentStatePriority)
-									{
-										currentFocus = nextFocus;
-										currentState = nextState;
-										currentStatePriority = nextStatePriority;
-									}
-
-									tempCheck = true;
-									break;
 								}
+
+								if (!reaction.targetDetectedObject)
+								{
+									nextFocus = defaultFocus;
+								}
+								else
+								{
+									nextFocus = tempFocus;
+								}
+
+								nextState = reaction.stateChange;
+								if (nextStatePriority < currentStatePriority)
+								{
+									currentFocus = nextFocus;
+									currentState = nextState;
+									currentStatePriority = nextStatePriority;
+								}
+
+								tempCheck = true;
+								break;
 							}
 						}
 					}
