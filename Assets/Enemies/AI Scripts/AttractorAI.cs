@@ -2674,8 +2674,8 @@ public class AttractorAI : MonoBehaviour
 						}
 						else if (thought.thoughtType == DecisionType.utilityFunction)
 						{
-							float bestUtilityIndex = -1;
-							float currentUtilityIndex = 0;
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
 							float highestUtility = float.MinValue;
 
 							foreach (UtilityThought utility in thought.utilityThoughts)
@@ -3098,8 +3098,16 @@ public class AttractorAI : MonoBehaviour
 									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
 								{
 									tempAttractors.Clear();
-									utility.myTempFocus = defaultFocus;
-									utility.myTempValue = -1;
+									if (reaction.considerAttractorsForUtilityFocus)
+									{
+										utility.myTempFocus = tempFocus;
+										utility.myTempValue = tempValue;
+									}
+									else
+									{
+										utility.myTempFocus = defaultFocus;
+										utility.myTempValue = -1;
+									}
 
 									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
 										tempDetectedAttractors.ContainsKey(utility.attractorType)))
