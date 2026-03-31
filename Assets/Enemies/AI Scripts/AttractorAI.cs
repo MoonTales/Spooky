@@ -3886,7 +3886,8 @@ public class AttractorAI : MonoBehaviour
 			{
 				fleeTime -= Time.deltaTime;
 
-				if (fleeTime <= 0 || hasAgent ? agent.remainingDistance < 0.5f : Vector3.Distance(transform.position, nonAgentDestination) < 0.5f)
+				if (fleeTime <= 0 || hasAgent ? agent.remainingDistance < agent.stoppingDistance + 0.5f : Vector3.Distance(transform.position, nonAgentDestination)
+					< agent.stoppingDistance + 0.5f)
 				{
 					fleeTime = 0;
 					fleeing = false;
