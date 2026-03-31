@@ -40,6 +40,7 @@ namespace System
         private KeyCode _developerModeToggleKey = KeyCode.Backslash;
         private KeyCode _holdDeveloperModeKey = KeyCode.LeftControl;
         private const float BrightnessStep = 0.1f;
+        private const KeyCode ToggleMentalInvincibilityKey = KeyCode.Quote;
 
         private GameObject _developerCanvas;
         private List<DeveloperCommand> _developerCommands = new List<DeveloperCommand>();
@@ -195,6 +196,7 @@ namespace System
             RegisterCommand(KeyCode.Alpha8, () => AdjustBrightness(BrightnessStep), "Increase Brightness", "Raises debug brightness by 0.1");
             RegisterCommand(KeyCode.Alpha9, () => AdjustBrightness(-BrightnessStep), "Decrease Brightness", "Lowers debug brightness by 0.1");
             RegisterCommand(KeyCode.Slash, ResetBrightness, "Reset Brightness", "Resets debug brightness to the default exposure");
+            RegisterCommand(ToggleMentalInvincibilityKey, ToggleMentalHealthInvincibility, "Toggle Mental Invincibility", "Toggles debug invincibility so mental health is always clamped to max.");
             // Delete save gme
             RegisterCommand(KeyCode.Backslash, () => SaveSystem.Instance.DeleteSaveData(), "Delete Save Game", "Deletes the current save game data from the persistent data path");
         }
@@ -230,6 +232,18 @@ namespace System
             }
 
             effects.gameBrightness = 0f;
+        }
+
+        private void ToggleMentalHealthInvincibility()
+        {
+            if (PlayerStats.Instance == null)
+            {
+                return;
+            }
+
+            bool nextEnabled = !PlayerStats.Instance.GetDebugMentalHealthInvincible();
+            PlayerStats.Instance.SetDebugMentalHealthInvincible(nextEnabled);
+            Debug.Log($"DeveloperCommands: Mental health invincibility {(nextEnabled ? "enabled" : "disabled")}.");
         }
 
         /// <summary>
