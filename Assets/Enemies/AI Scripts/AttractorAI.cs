@@ -1282,7 +1282,9 @@ public class AttractorAI : MonoBehaviour
 	private int currentStatePriority;
 	private int nextStatePriority;
 	private int lowestPriority;
-	
+	private int currentUtilityPriority;
+	private int nextUtilityPriority;
+
 	public void ReprogramReaction(int[] priority, List<EnemyReactionReprogram> tempReactionEdits)
 	{
 		List<EnemyReactionReprogram> reactionEdits = new List<EnemyReactionReprogram>(tempReactionEdits);
@@ -3269,18 +3271,19 @@ public class AttractorAI : MonoBehaviour
 										Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
 
 										if ((utility.reactionConditions.boolConditions.Count > 0 &&
-											utility.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((utility.reactionConditions.floatCompare
-											== Comparison.equals || utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo) &&
-											(utility.reactionConditions.floatConditions.Count > 0 &&
-											utility.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) || ((utility.reactionConditions.floatCompare
-											== Comparison.greaterThan || utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo) &&
-											utility.reactionConditions.floatConditions.Where(item1 => tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] >
-											item1.floatValue).ToList().Count > 0) || ((utility.reactionConditions.intCompare == Comparison.equals ||
-											utility.reactionConditions.intCompare == Comparison.lesserOrEqualTo) && (utility.reactionConditions.intConditions.Count > 0 &&
-											utility.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any())) || ((utility.reactionConditions.intCompare ==
-											Comparison.greaterThan || utility.reactionConditions.intCompare == Comparison.greaterOrEqualTo) &&
-											utility.reactionConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
-											item1.intValue).ToList().Count > 0))
+											utility.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
+											((utility.reactionConditions.floatCompare == Comparison.equals || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && (utility.reactionConditions.floatConditions.Count > 0 &&
+											utility.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) ||
+											((utility.reactionConditions.floatCompare == Comparison.greaterThan || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.floatConditions.Where(item1 =>
+											tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0) ||
+											((utility.reactionConditions.intCompare == Comparison.equals || utility.reactionConditions.intCompare ==
+											Comparison.lesserOrEqualTo) && (utility.reactionConditions.intConditions.Count > 0 &&
+											utility.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any())) ||
+											((utility.reactionConditions.intCompare == Comparison.greaterThan || utility.reactionConditions.intCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.intConditions.Where(item1 =>
+											tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] > item1.intValue).ToList().Count > 0))
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
@@ -3299,11 +3302,12 @@ public class AttractorAI : MonoBehaviour
 							{
 								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
 
-								currentUtilityIndex = 0;
 								nextStatePriority = tempPriority;
+								nextUtilityPriority = bestUtilityIndex;
 								nextFunctions = new List<FunctionPicker>(chosenUtility.functionExecutions);
 								nextEvents = new List<UnityEvent>(chosenUtility.eventExecutions);
-								if (nextStatePriority < currentStatePriority)
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
 								{
 									foreach (FunctionPicker function in nextFunctions)
 									{
@@ -3315,17 +3319,18 @@ public class AttractorAI : MonoBehaviour
 									}
 								}
 
-								if (!reaction.targetDetectedObject)
+								if (!chosenUtility.targetDetectedObject)
 								{
 									nextFocus = defaultFocus;
 								}
 								else
 								{
-									nextFocus = tempFocus;
+									nextFocus = chosenUtility.myTempFocus;
 								}
 
-								nextState = reaction.stateChange;
-								if (nextStatePriority < currentStatePriority)
+								nextState = chosenUtility.stateChange;
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
 								{
 									currentFocus = nextFocus;
 									currentState = nextState;
@@ -3343,7 +3348,7 @@ public class AttractorAI : MonoBehaviour
 					Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
 					Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
 					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!      fixed???
 
 					if ((reaction.reactionConditions.boolConditions.Count > 0 &&
 						reaction.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((reaction.reactionConditions.floatCompare
