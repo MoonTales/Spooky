@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using FMODUnity;
 using FMOD.Studio;
 using Player;
+using Placeables;
 using Types = System.Types;
 
 namespace Managers
@@ -40,20 +41,6 @@ namespace Managers
         {
             public SfxId id;
             public EventReference eventRef;
-        }
-
-        [Serializable]
-        public class DoorwayBlendConfig
-        {
-            public string sceneName = "Nightmare1";
-            public string rootObjectName;
-            public string objectName;
-            public bool forwardPointsOutside = true;
-            public float halfWidthOverride;
-            public float blendDepthOverride;
-            public float maxInfluenceDistanceOverride;
-
-            [NonSerialized] public Transform cachedTransform;
         }
 
         // Per-call parameter payload for FMOD events.
@@ -208,10 +195,6 @@ namespace Managers
         [SerializeField] private EventReference nightmareAmbLoopEvent;
         [SerializeField] private EventReference nightmareInteriorExteriorAmbLoopEvent;
         [SerializeField] private string nightmareInteriorAmountParameter = "InteriorAmount";
-        [SerializeField] private DoorwayBlendConfig[] nightmareInteriorDoorways;
-        [SerializeField] private float nightmareInteriorDoorHalfWidth = 1.5f;
-        [SerializeField] private float nightmareInteriorBlendDepth = 4f;
-        [SerializeField] private float nightmareInteriorDoorMaxInfluenceDistance = 20f;
         #endregion
 
         #region Menu and Mix
@@ -289,6 +272,7 @@ namespace Managers
         private bool _tutorialHallwayPlayerSpeedFloorActive;
         private PARAMETER_ID _bedroomWallClockActiveParameterId;
         private bool _hasBedroomWallClockActiveParameterId;
+        private NightmareWindPlane[] _cachedNightmareWindPlanes = Array.Empty<NightmareWindPlane>();
 
         // Runtime audio state - snapshot control.
         private bool _pauseSnapshotActive;
@@ -356,7 +340,7 @@ namespace Managers
             BuildSfxMap();
             CachePlayerMovementBus();
             CacheSettingsBuses();
-            CacheNightmareInteriorDoorTransforms(SceneManager.GetActiveScene());
+            CacheNightmareWindPlanes(SceneManager.GetActiveScene());
             AutoAttachLampAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachTutorialOrbAudioEmittersInScene(SceneManager.GetActiveScene());
             AutoAttachSpiderAudioEmittersInScene(SceneManager.GetActiveScene());
@@ -462,7 +446,7 @@ namespace Managers
                 StopAndReleaseBedroomWallClock(true);
             }
 
-            CacheNightmareInteriorDoorTransforms(scene);
+            CacheNightmareWindPlanes(scene);
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
             AutoAttachSpiderAudioEmittersInScene(scene);
@@ -1578,41 +1562,33 @@ namespace Managers
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom;
         }
 
-        private void CacheNightmareInteriorDoorTransforms(Scene scene)
+        private void CacheNightmareWindPlanes(Scene scene)
         {
-            if (nightmareInteriorDoorways == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
-            {
-                if (nightmareInteriorDoorways[i] != null)
-                {
-                    nightmareInteriorDoorways[i].cachedTransform = null;
-                }
-            }
+            _cachedNightmareWindPlanes = Array.Empty<NightmareWindPlane>();
 
             if (!scene.IsValid() || !scene.isLoaded)
             {
                 return;
             }
 
-            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
-            {
-                DoorwayBlendConfig doorway = nightmareInteriorDoorways[i];
-                if (doorway == null
-                    || string.IsNullOrWhiteSpace(doorway.sceneName)
-                    || !string.Equals(scene.name, doorway.sceneName, StringComparison.Ordinal)
-                    || string.IsNullOrWhiteSpace(doorway.objectName))
-                {
-                    continue;
-                }
+            GameObject[] roots = scene.GetRootGameObjects();
+            List<NightmareWindPlane> planes = new List<NightmareWindPlane>();
+            HashSet<NightmareWindPlane> uniquePlanes = new HashSet<NightmareWindPlane>();
 
-                doorway.cachedTransform = string.IsNullOrWhiteSpace(doorway.rootObjectName)
-                    ? FindTransformInSceneByName(scene, doorway.objectName)
-                    : FindTransformInRootHierarchy(scene, doorway.rootObjectName, doorway.objectName);
+            for (int i = 0; i < roots.Length; i++)
+            {
+                NightmareWindPlane[] rootPlanes = roots[i].GetComponentsInChildren<NightmareWindPlane>(true);
+                for (int j = 0; j < rootPlanes.Length; j++)
+                {
+                    NightmareWindPlane rootPlane = rootPlanes[j];
+                    if (rootPlane != null && uniquePlanes.Add(rootPlane))
+                    {
+                        planes.Add(rootPlane);
+                    }
+                }
             }
+
+            _cachedNightmareWindPlanes = planes.ToArray();
         }
 
         private bool ShouldPlayBedroomAmbience()
@@ -1659,65 +1635,110 @@ namespace Managers
         {
             if (!_nightmareInteriorExteriorAmbienceInstance.isValid()
                 || string.IsNullOrWhiteSpace(nightmareInteriorAmountParameter)
-                || PlayerController.Instance == null
-                || nightmareInteriorDoorways == null)
+                || PlayerController.Instance == null)
             {
                 return;
             }
 
             Vector3 playerPosition = PlayerController.Instance.transform.position;
-            float clampedBlendDepth = Mathf.Max(0.01f, nightmareInteriorBlendDepth);
-            float clampedMaxInfluenceDistance = Mathf.Max(0.01f, nightmareInteriorDoorMaxInfluenceDistance);
-            float lowestInteriorAmount = 1f;
-            string winningDoorwayName = null;
-            bool foundRelevantDoorway = false;
+            float defaultHalfWidth = 1.5f;
+            float defaultBlendDepth = 4f;
+            float defaultMaxInfluenceDistance = 20f;
 
-            for (int i = 0; i < nightmareInteriorDoorways.Length; i++)
+            float clampedBlendDepth = Mathf.Max(0.01f, defaultBlendDepth);
+            float clampedDoorHalfWidth = Mathf.Max(0.01f, defaultHalfWidth);
+            float clampedMaxInfluenceDistance = Mathf.Max(0.01f, defaultMaxInfluenceDistance);
+            float activeInteriorAmount = 1f;
+            bool foundRelevantDoorway = false;
+            NightmareWindPlane activeWindPlane = null;
+            float closestObjectDistance = float.MaxValue;
+
+            List<NightmareWindPlane> relevantDebugPlanes = null;
+            List<float> debugSignedDepths = null;
+            List<float> debugLateralOffsets = null;
+            List<float> debugPlanarDistances = null;
+            List<float> debugInteriorAmounts = null;
+            List<float> debugHalfWidths = null;
+            List<float> debugBlendDepths = null;
+            List<float> debugMaxInfluenceDistances = null;
+
+            if (_cachedNightmareWindPlanes == null || _cachedNightmareWindPlanes.Length == 0)
             {
-                DoorwayBlendConfig doorway = nightmareInteriorDoorways[i];
-                if (doorway == null || doorway.cachedTransform == null)
+                return;
+            }
+
+            for (int i = 0; i < _cachedNightmareWindPlanes.Length; i++)
+            {
+                NightmareWindPlane windPlane = _cachedNightmareWindPlanes[i];
+                if (windPlane == null || !windPlane.isActiveAndEnabled)
                 {
                     continue;
                 }
 
-                float doorwayBlendDepth = doorway.blendDepthOverride > 0f
-                    ? doorway.blendDepthOverride
+                float doorwayBlendDepth = windPlane.BlendDepthOverride > 0f
+                    ? windPlane.BlendDepthOverride
                     : clampedBlendDepth;
-                float doorwayHalfWidth = doorway.halfWidthOverride > 0f
-                    ? doorway.halfWidthOverride
-                    : nightmareInteriorDoorHalfWidth;
-                float doorwayMaxInfluenceDistance = doorway.maxInfluenceDistanceOverride > 0f
-                    ? doorway.maxInfluenceDistanceOverride
+                float doorwayHalfWidth = windPlane.HalfWidthOverride > 0f
+                    ? windPlane.HalfWidthOverride
+                    : clampedDoorHalfWidth;
+                float doorwayMaxInfluenceDistance = windPlane.MaxInfluenceDistanceOverride > 0f
+                    ? windPlane.MaxInfluenceDistanceOverride
                     : clampedMaxInfluenceDistance;
 
-                Vector3 toPlayer = playerPosition - doorway.cachedTransform.position;
+                Vector3 toPlayer = playerPosition - windPlane.transform.position;
+                float objectDistance = toPlayer.magnitude;
                 float planarDistance = Vector3.ProjectOnPlane(toPlayer, Vector3.up).magnitude;
                 if (planarDistance > doorwayMaxInfluenceDistance)
                 {
                     continue;
                 }
 
-                foundRelevantDoorway = true;
-
-                float signedDepth = Vector3.Dot(doorway.cachedTransform.forward, toPlayer);
-                if (!doorway.forwardPointsOutside)
+                Vector3 outsideNormal = windPlane.GetOutsideNormalWorld().normalized;
+                Vector3 lateralDirection = windPlane.GetLateralDirectionWorld().normalized;
+                if (outsideNormal.sqrMagnitude <= 0.0001f || lateralDirection.sqrMagnitude <= 0.0001f)
                 {
-                    signedDepth = -signedDepth;
+                    continue;
                 }
 
+                foundRelevantDoorway = true;
+
+                float signedDepth = Vector3.Dot(outsideNormal, toPlayer);
                 float interiorAmount = 1f - Mathf.InverseLerp(-doorwayBlendDepth, doorwayBlendDepth, signedDepth);
 
-                // Restrict the blend to the doorway opening so nearby walls do not behave like exterior space.
-                float lateralOffset = Mathf.Abs(Vector3.Dot(doorway.cachedTransform.right, toPlayer));
+                float lateralOffset = Mathf.Abs(Vector3.Dot(lateralDirection, toPlayer));
                 if (lateralOffset > doorwayHalfWidth)
                 {
                     interiorAmount = signedDepth <= 0f ? 1f : 0f;
                 }
 
-                if (interiorAmount < lowestInteriorAmount)
+                interiorAmount = Mathf.Min(interiorAmount, windPlane.InteriorAmountCeiling);
+
+                if (objectDistance < closestObjectDistance)
                 {
-                    lowestInteriorAmount = interiorAmount;
-                    winningDoorwayName = doorway.cachedTransform.name;
+                    closestObjectDistance = objectDistance;
+                    activeInteriorAmount = interiorAmount;
+                    activeWindPlane = windPlane;
+                }
+
+                if (windPlane.DebugOutputEnabled)
+                {
+                    relevantDebugPlanes ??= new List<NightmareWindPlane>();
+                    debugSignedDepths ??= new List<float>();
+                    debugLateralOffsets ??= new List<float>();
+                    debugPlanarDistances ??= new List<float>();
+                    debugInteriorAmounts ??= new List<float>();
+                    debugHalfWidths ??= new List<float>();
+                    debugBlendDepths ??= new List<float>();
+                    debugMaxInfluenceDistances ??= new List<float>();
+
+                    relevantDebugPlanes.Add(windPlane);
+                    debugSignedDepths.Add(signedDepth);
+                    debugLateralOffsets.Add(lateralOffset);
+                    debugPlanarDistances.Add(planarDistance);
+                    debugInteriorAmounts.Add(interiorAmount);
+                    debugHalfWidths.Add(doorwayHalfWidth);
+                    debugBlendDepths.Add(doorwayBlendDepth);
+                    debugMaxInfluenceDistances.Add(doorwayMaxInfluenceDistance);
                 }
             }
 
@@ -1726,7 +1747,24 @@ namespace Managers
                 return;
             }
 
-            _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareInteriorAmountParameter, lowestInteriorAmount);
+            if (relevantDebugPlanes != null)
+            {
+                for (int i = 0; i < relevantDebugPlanes.Count; i++)
+                {
+                    NightmareWindPlane debugPlane = relevantDebugPlanes[i];
+                    debugPlane.LogDebugBlendState(
+                        debugPlane == activeWindPlane,
+                        debugSignedDepths[i],
+                        debugLateralOffsets[i],
+                        debugPlanarDistances[i],
+                        debugInteriorAmounts[i],
+                        debugHalfWidths[i],
+                        debugBlendDepths[i],
+                        debugMaxInfluenceDistances[i]);
+                }
+            }
+
+            _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareInteriorAmountParameter, activeInteriorAmount);
         }
 
         private void SetTutorialHallwayStretchStateLabel(string stateLabel)
