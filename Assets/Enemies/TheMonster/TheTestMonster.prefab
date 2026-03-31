@@ -11882,13 +11882,17 @@ MonoBehaviour:
   defaultState: 2
   defaultFocus: {fileID: 0}
   currentConditions:
-    boolConditions: []
+    boolConditions:
+    - boolName: CanSeePlayer
+      boolValue: 0
     floatConditions: []
     intConditions:
     - intName: DRAWINGS
       intValue: 0
   behaviourHierarchy:
-  - attractorType: 3
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 3
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 4
@@ -11903,6 +11907,8 @@ MonoBehaviour:
     - Waiting
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions:
     - function: 3
       arguments:
@@ -11927,7 +11933,9 @@ MonoBehaviour:
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 4
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -11942,6 +11950,8 @@ MonoBehaviour:
     - Waiting
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions:
     - function: 5
       arguments:
@@ -12042,7 +12052,9 @@ MonoBehaviour:
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 0
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 0
     customAttractorID: 
     minIntensity: 15
     maxIntensity: 26
@@ -12058,13 +12070,17 @@ MonoBehaviour:
     statusRestrictions: []
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions: []
     eventExecutions: []
     stateChange: 3
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 3
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 3
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 3
@@ -12080,6 +12096,8 @@ MonoBehaviour:
     statusRestrictions: []
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions:
     - function: 3
       arguments:
@@ -12104,7 +12122,9 @@ MonoBehaviour:
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 1
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 1
     customAttractorID: 
     minIntensity: 4
     maxIntensity: 8
@@ -12120,6 +12140,8 @@ MonoBehaviour:
     statusRestrictions: []
     allStatusesRequired: 0
     stateRestriction: 02000000
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions:
     - function: 3
       arguments:
@@ -12144,7 +12166,9 @@ MonoBehaviour:
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
-  - attractorType: 0
+  - behaviorType: 0
+    considerAttractorsForUtilityFocus: 1
+    attractorType: 0
     customAttractorID: 
     minIntensity: 19
     maxIntensity: 26
@@ -12160,6 +12184,8 @@ MonoBehaviour:
     statusRestrictions: []
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityBehaviors: []
     functionExecutions: []
     eventExecutions: []
     stateChange: 2
@@ -12167,7 +12193,8 @@ MonoBehaviour:
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
   thoughts:
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -12182,6 +12209,8 @@ MonoBehaviour:
     - Invisible
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 3
       arguments:
@@ -12205,7 +12234,8 @@ MonoBehaviour:
     repeatBuffer: 30
     forceBuffer: 0
     timer: 0
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -12223,6 +12253,8 @@ MonoBehaviour:
     - NotTeleported
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 4
       arguments: []
@@ -12338,7 +12370,8 @@ MonoBehaviour:
     repeatBuffer: 30
     forceBuffer: 1
     timer: 15
-  - attractorType: 2
+  - thoughtType: 0
+    attractorType: 2
     customAttractorID: Avoid
     minIntensity: 0
     maxIntensity: 3
@@ -12353,6 +12386,8 @@ MonoBehaviour:
     - Teleporting
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 4
       arguments: []
@@ -12470,7 +12505,8 @@ MonoBehaviour:
     repeatBuffer: 30
     forceBuffer: 0
     timer: 0
-  - attractorType: 2
+  - thoughtType: 0
+    attractorType: 2
     customAttractorID: Avoid
     minIntensity: 0
     maxIntensity: 3
@@ -12487,6 +12523,8 @@ MonoBehaviour:
     - Invisible
     allStatusesRequired: 0
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 5
       arguments:
@@ -12529,7 +12567,8 @@ MonoBehaviour:
     repeatBuffer: 30
     forceBuffer: 0
     timer: 0
-  - attractorType: 4
+  - thoughtType: 0
+    attractorType: 4
     customAttractorID: 
     minIntensity: 0
     maxIntensity: 0
@@ -12545,6 +12584,8 @@ MonoBehaviour:
     - NotTeleported
     allStatusesRequired: 1
     stateRestriction: 
+    minRequiredUtility: 0
+    utilityThoughts: []
     functionExecutions:
     - function: 7
       arguments: []
@@ -12635,6 +12676,7 @@ MonoBehaviour:
     invertDetection: 0
     lightSensitive: 0
   animator: {fileID: 5422795287182189326}
+  additionalAnimators: []
   walkSpdAnimMult: 10
   screamTime: 1
   attackBox: {fileID: 0}

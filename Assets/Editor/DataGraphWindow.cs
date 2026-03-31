@@ -23,17 +23,11 @@ public class DataGraphWindow : EditorWindow
 
         var refreshBtn = new Button(RefreshNodes) { text = "Refresh Graph" };
 
-        var widthSlider = new Slider("Node Width", 200, 1000) { value = _defaultWidth, style = { width = 200 } };
-        widthSlider.RegisterValueChangedCallback(evt => { _defaultWidth = evt.newValue; RefreshNodes(); });
-
-        var zoomSlider = new Slider("Zoom", 0.1f, 2.0f) { value = 1.0f, style = { width = 150 } };
-        zoomSlider.RegisterValueChangedCallback(evt => _graphView.UpdateZoom(evt.newValue));
+        
 
         toolbar.Add(picker);
         toolbar.Add(refreshBtn);
         toolbar.Add(new ToolbarSpacer());
-        toolbar.Add(widthSlider);
-        toolbar.Add(zoomSlider);
         rootVisualElement.Add(toolbar);
 
         _graphView = new SimpleGraphView { style = { flexGrow = 1 } };
@@ -93,16 +87,6 @@ public class DataGraphWindow : EditorWindow
                 // Create a Header PropertyField to show the size/buttons
                 var listHeaderField = new PropertyField(p.Copy());
                 listHeaderField.Bind(p.serializedObject);
-
-                // Use a schedule to find and hide ONLY the scrollable list part
-                listHeaderField.schedule.Execute(() => {
-                    // This never ended up working. Oh well
-                    var internalListView = listHeaderField.Q<ListView>();
-                    if (internalListView != null)
-                    {
-                        //internalListView.style.display = DisplayStyle.None;
-                    }
-                }).ExecuteLater(50); // Small delay to let Unity build the internal list
 
                 container.Add(listHeaderField);
 
