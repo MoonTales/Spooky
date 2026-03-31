@@ -77,6 +77,9 @@ namespace Managers
 
         private void OnPlayerHealthStateChanged(Types.PlayerMentalState newhealthstate)
         {
+            
+            // EDGE CASE - Clock buffer
+            
             // check for a player death
             if (newhealthstate == Types.PlayerMentalState.Breakdown)
             {
