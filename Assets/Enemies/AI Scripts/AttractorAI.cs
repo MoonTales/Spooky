@@ -1309,7 +1309,7 @@ public class AttractorAI : MonoBehaviour
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
-				if (reactionEdit.possibleBehaviorTypeChanges.Length > 0)
+				if (reactionEdit.possibleBehaviorTypeChanges != null && reactionEdit.possibleBehaviorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1320,7 +1320,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.behaviorType = reactionEdit.possibleBehaviorTypeChanges[Random.Range((int)(reactionEdit.possibleBehaviorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleBehaviorTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleAttractorTypeChanges.Length > 0)
+				if (reactionEdit.possibleAttractorTypeChanges != null && reactionEdit.possibleAttractorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1331,7 +1331,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				if (reactionEdit.possibleCustomAttractorIDChanges != null && reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1343,7 +1343,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
 						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMinIntensityChanges != null && reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1354,7 +1354,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.minIntensity = reactionEdit.possibleMinIntensityChanges[Random.Range((int)(reactionEdit.possibleMinIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMinIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMaxIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMaxIntensityChanges != null && reactionEdit.possibleMaxIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1365,7 +1365,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.maxIntensity = reactionEdit.possibleMaxIntensityChanges[Random.Range((int)(reactionEdit.possibleMaxIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMaxIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
+				if (reactionEdit.possibleStatusRestrictionsChanges != null && reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1377,7 +1377,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStatusRestrictionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleStatusRestrictionsChanges.Length * tempUpperBound))].statusRestrictions;
 				}
-				if (reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
+				if (reactionEdit.possibleAllStatusesRequiredChanges != null && reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1389,7 +1389,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleAllStatusesRequiredChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleAllStatusesRequiredChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStateRestrictionChanges.Length > 0)
+				if (reactionEdit.possibleStateRestrictionChanges != null && reactionEdit.possibleStateRestrictionChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1401,7 +1401,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateRestrictionChanges.Length *
 						tempUpperBound))].stateRestriction;
 				}
-				if (reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
+				if (reactionEdit.possibleMinRequiredUtilityChanges != null && reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1413,7 +1413,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleMinRequiredUtilityChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleMinRequiredUtilityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleUtilityBehaviorsChanges.Length > 0)
+				if (reactionEdit.possibleUtilityBehaviorsChanges != null && reactionEdit.possibleUtilityBehaviorsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1425,7 +1425,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleUtilityBehaviorsChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleUtilityBehaviorsChanges.Length
 						* tempUpperBound))].utilityBehaviors;
 				}
-				if (reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleFunctionExecutionsChanges != null && reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1437,7 +1437,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
 				}
-				if (reactionEdit.possibleEventExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleEventExecutionsChanges != null && reactionEdit.possibleEventExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1449,7 +1449,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleEventExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleEventExecutionsChanges.Length * tempUpperBound))].eventExecutions;
 				}
-				if (reactionEdit.possibleStateChangeChanges.Length > 0)
+				if (reactionEdit.possibleStateChangeChanges != null && reactionEdit.possibleStateChangeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1460,7 +1460,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.stateChange = reactionEdit.possibleStateChangeChanges[Random.Range((int)(reactionEdit.possibleStateChangeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateChangeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleTargetDetectedObjectChanges.Length > 0)
+				if (reactionEdit.possibleTargetDetectedObjectChanges != null && reactionEdit.possibleTargetDetectedObjectChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1472,7 +1472,8 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleTargetDetectedObjectChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleTargetDetectedObjectChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
+				if (reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges != null &&
+					reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1484,7 +1485,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleInvertPriorityChanges.Length > 0)
+				if (reactionEdit.possibleInvertPriorityChanges != null && reactionEdit.possibleInvertPriorityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1523,7 +1524,7 @@ public class AttractorAI : MonoBehaviour
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
-				if (reactionEdit.possibleThoughtTypeChanges.Length > 0)
+				if (reactionEdit.possibleThoughtTypeChanges != null && reactionEdit.possibleThoughtTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1534,7 +1535,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.thoughtType = reactionEdit.possibleThoughtTypeChanges[Random.Range((int)(reactionEdit.possibleThoughtTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleThoughtTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleAttractorTypeChanges.Length > 0)
+				if (reactionEdit.possibleAttractorTypeChanges != null && reactionEdit.possibleAttractorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1545,7 +1546,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				if (reactionEdit.possibleCustomAttractorIDChanges != null && reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1557,7 +1558,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
 						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMinIntensityChanges != null && reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1568,7 +1569,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.minIntensity = reactionEdit.possibleMinIntensityChanges[Random.Range((int)(reactionEdit.possibleMinIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMinIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMaxIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMaxIntensityChanges != null && reactionEdit.possibleMaxIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1579,7 +1580,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.maxIntensity = reactionEdit.possibleMaxIntensityChanges[Random.Range((int)(reactionEdit.possibleMaxIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMaxIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
+				if (reactionEdit.possibleStatusRestrictionsChanges != null && reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1591,7 +1592,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStatusRestrictionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleStatusRestrictionsChanges.Length * tempUpperBound))].statusRestrictions;
 				}
-				if (reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
+				if (reactionEdit.possibleAllStatusesRequiredChanges != null && reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1603,7 +1604,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleAllStatusesRequiredChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleAllStatusesRequiredChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStateRestrictionChanges.Length > 0)
+				if (reactionEdit.possibleStateRestrictionChanges != null && reactionEdit.possibleStateRestrictionChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1615,7 +1616,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateRestrictionChanges.Length *
 						tempUpperBound))].stateRestriction;
 				}
-				if (reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
+				if (reactionEdit.possibleMinRequiredUtilityChanges != null && reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1627,7 +1628,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleMinRequiredUtilityChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleMinRequiredUtilityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleUtilityThoughtsChanges.Length > 0)
+				if (reactionEdit.possibleUtilityThoughtsChanges != null && reactionEdit.possibleUtilityThoughtsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1639,7 +1640,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleUtilityThoughtsChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleUtilityThoughtsChanges.Length
 						* tempUpperBound))].utilityThoughts;
 				}
-				if (reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleFunctionExecutionsChanges != null && reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1651,7 +1652,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
 				}
-				if (reactionEdit.possibleEventExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleEventExecutionsChanges != null && reactionEdit.possibleEventExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1663,7 +1664,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleEventExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleEventExecutionsChanges.Length * tempUpperBound))].eventExecutions;
 				}
-				if (reactionEdit.possibleRepeatBufferChanges.Length > 0)
+				if (reactionEdit.possibleRepeatBufferChanges != null && reactionEdit.possibleRepeatBufferChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1674,7 +1675,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.repeatBuffer = reactionEdit.possibleRepeatBufferChanges[Random.Range((int)(reactionEdit.possibleRepeatBufferChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleRepeatBufferChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleForceBufferChanges.Length > 0)
+				if (reactionEdit.possibleForceBufferChanges != null && reactionEdit.possibleForceBufferChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1685,7 +1686,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.forceBuffer = reactionEdit.possibleForceBufferChanges[Random.Range((int)(reactionEdit.possibleForceBufferChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleForceBufferChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleTimerChanges.Length > 0)
+				if (reactionEdit.possibleTimerChanges != null && reactionEdit.possibleTimerChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
