@@ -22,6 +22,8 @@ namespace System
         
         // Internal variables
         private string _spawnAnchorID = "";
+        private bool _sceneInitialized = false;
+        public void NotifySceneInitialized() => _sceneInitialized = true;
 
         protected override void OnEnable()
         {
@@ -86,6 +88,7 @@ namespace System
             }
             
 
+            NotifySceneInitialized();
         }
 
         private void DelayedSave()
@@ -96,6 +99,7 @@ namespace System
         // Async for a smoother scene transition
         public IEnumerator LoadSceneAsync(string sceneName)
         {
+            _sceneInitialized = false;
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
             // Prevent the scene from activating the moment it finishes loading
@@ -109,12 +113,10 @@ namespace System
 
             // Scene is ready — activate it now for a clean, snap-free transition
             asyncLoad.allowSceneActivation = true;
-
-           // pause for half a second as a buffer to ensure the new scene is fully active before we do anything else (like teleporting the player)
-           yield return new WaitForSeconds(0.5f);
             
-
-            yield return null;
+            yield return new WaitUntil(() => _sceneInitialized);
+            
+            yield return new WaitForEndOfFrame();
         }
 
         public string SaveId => "SceneSwapper";
