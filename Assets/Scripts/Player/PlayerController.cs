@@ -77,7 +77,7 @@ namespace Player
         private bool _isInspecting = false;
         private bool _crouchInputActive = false;
         
-        private bool _toggleCrouchMode = false; public void SetToggleCrouchMode(bool toggle) { _toggleCrouchMode = toggle; }
+        private bool _toggleCrouchMode = true; public void SetToggleCrouchMode(bool toggle) { _toggleCrouchMode = toggle; } public bool GetToggleCrouchMode() { return _toggleCrouchMode; }
         private float _crouchHeldTime = 0f;
         private const float MinCrouchTime = 0.10f;
         
@@ -99,14 +99,6 @@ namespace Player
         private Types.PlayerMovementState _playerMovementState;
         private void FixedUpdate()
         {
-            
-            // set U to toggle between toggle crouch and hold crouch modes for testing
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                SetToggleCrouchMode(!_toggleCrouchMode);
-                Debug.Log("Toggled crouch mode. Now toggle crouch mode is: " + _toggleCrouchMode);
-            }
-            
             // debug print if input is locked
             if(_lockedInput){
 
