@@ -2180,6 +2180,8 @@ public class AttractorAI : MonoBehaviour
 						break;
 				}
 			}
+
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(result));
 		}
 
 		// Comstant
@@ -3111,7 +3113,7 @@ public class AttractorAI : MonoBehaviour
 										utility.myTempValue = -1;
 									}
 
-									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+									if (utility.useStrictConditions && (utility.attractorType != AttractorType.NONE &&
 										tempDetectedAttractors.ContainsKey(utility.attractorType)))
 									{
 										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
@@ -3335,6 +3337,7 @@ public class AttractorAI : MonoBehaviour
 									currentFocus = nextFocus;
 									currentState = nextState;
 									currentStatePriority = nextStatePriority;
+									currentUtilityPriority = nextUtilityPriority;
 								}
 
 								tempCheck = true;
@@ -3642,6 +3645,7 @@ public class AttractorAI : MonoBehaviour
 									currentFocus = nextFocus;
 									currentState = nextState;
 									currentStatePriority = nextStatePriority;
+									currentUtilityPriority = nextUtilityPriority;
 								}
 
 								tempCheck = true;
