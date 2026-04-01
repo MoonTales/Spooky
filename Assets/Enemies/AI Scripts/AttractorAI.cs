@@ -1282,7 +1282,9 @@ public class AttractorAI : MonoBehaviour
 	private int currentStatePriority;
 	private int nextStatePriority;
 	private int lowestPriority;
-	
+	private int currentUtilityPriority;
+	private int nextUtilityPriority;
+
 	public void ReprogramReaction(int[] priority, List<EnemyReactionReprogram> tempReactionEdits)
 	{
 		List<EnemyReactionReprogram> reactionEdits = new List<EnemyReactionReprogram>(tempReactionEdits);
@@ -1307,7 +1309,7 @@ public class AttractorAI : MonoBehaviour
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
-				if (reactionEdit.possibleBehaviorTypeChanges.Length > 0)
+				if (reactionEdit.possibleBehaviorTypeChanges != null && reactionEdit.possibleBehaviorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1318,7 +1320,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.behaviorType = reactionEdit.possibleBehaviorTypeChanges[Random.Range((int)(reactionEdit.possibleBehaviorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleBehaviorTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleAttractorTypeChanges.Length > 0)
+				if (reactionEdit.possibleAttractorTypeChanges != null && reactionEdit.possibleAttractorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1329,7 +1331,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				if (reactionEdit.possibleCustomAttractorIDChanges != null && reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1341,7 +1343,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
 						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMinIntensityChanges != null && reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1352,7 +1354,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.minIntensity = reactionEdit.possibleMinIntensityChanges[Random.Range((int)(reactionEdit.possibleMinIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMinIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMaxIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMaxIntensityChanges != null && reactionEdit.possibleMaxIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1363,7 +1365,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.maxIntensity = reactionEdit.possibleMaxIntensityChanges[Random.Range((int)(reactionEdit.possibleMaxIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMaxIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
+				if (reactionEdit.possibleStatusRestrictionsChanges != null && reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1375,7 +1377,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStatusRestrictionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleStatusRestrictionsChanges.Length * tempUpperBound))].statusRestrictions;
 				}
-				if (reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
+				if (reactionEdit.possibleAllStatusesRequiredChanges != null && reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1387,7 +1389,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleAllStatusesRequiredChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleAllStatusesRequiredChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStateRestrictionChanges.Length > 0)
+				if (reactionEdit.possibleStateRestrictionChanges != null && reactionEdit.possibleStateRestrictionChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1399,7 +1401,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateRestrictionChanges.Length *
 						tempUpperBound))].stateRestriction;
 				}
-				if (reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
+				if (reactionEdit.possibleMinRequiredUtilityChanges != null && reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1411,7 +1413,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleMinRequiredUtilityChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleMinRequiredUtilityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleUtilityBehaviorsChanges.Length > 0)
+				if (reactionEdit.possibleUtilityBehaviorsChanges != null && reactionEdit.possibleUtilityBehaviorsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1423,7 +1425,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleUtilityBehaviorsChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleUtilityBehaviorsChanges.Length
 						* tempUpperBound))].utilityBehaviors;
 				}
-				if (reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleFunctionExecutionsChanges != null && reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1435,7 +1437,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
 				}
-				if (reactionEdit.possibleEventExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleEventExecutionsChanges != null && reactionEdit.possibleEventExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1447,7 +1449,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleEventExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleEventExecutionsChanges.Length * tempUpperBound))].eventExecutions;
 				}
-				if (reactionEdit.possibleStateChangeChanges.Length > 0)
+				if (reactionEdit.possibleStateChangeChanges != null && reactionEdit.possibleStateChangeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1458,7 +1460,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.stateChange = reactionEdit.possibleStateChangeChanges[Random.Range((int)(reactionEdit.possibleStateChangeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateChangeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleTargetDetectedObjectChanges.Length > 0)
+				if (reactionEdit.possibleTargetDetectedObjectChanges != null && reactionEdit.possibleTargetDetectedObjectChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1470,7 +1472,8 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleTargetDetectedObjectChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleTargetDetectedObjectChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
+				if (reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges != null &&
+					reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1482,7 +1485,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleInvertPriorityChanges.Length > 0)
+				if (reactionEdit.possibleInvertPriorityChanges != null && reactionEdit.possibleInvertPriorityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1521,7 +1524,7 @@ public class AttractorAI : MonoBehaviour
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
-				if (reactionEdit.possibleThoughtTypeChanges.Length > 0)
+				if (reactionEdit.possibleThoughtTypeChanges != null && reactionEdit.possibleThoughtTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1532,7 +1535,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.thoughtType = reactionEdit.possibleThoughtTypeChanges[Random.Range((int)(reactionEdit.possibleThoughtTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleThoughtTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleAttractorTypeChanges.Length > 0)
+				if (reactionEdit.possibleAttractorTypeChanges != null && reactionEdit.possibleAttractorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1543,7 +1546,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				if (reactionEdit.possibleCustomAttractorIDChanges != null && reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1555,7 +1558,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
 						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMinIntensityChanges != null && reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1566,7 +1569,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.minIntensity = reactionEdit.possibleMinIntensityChanges[Random.Range((int)(reactionEdit.possibleMinIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMinIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMaxIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMaxIntensityChanges != null && reactionEdit.possibleMaxIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1577,7 +1580,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.maxIntensity = reactionEdit.possibleMaxIntensityChanges[Random.Range((int)(reactionEdit.possibleMaxIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMaxIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
+				if (reactionEdit.possibleStatusRestrictionsChanges != null && reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1589,7 +1592,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStatusRestrictionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleStatusRestrictionsChanges.Length * tempUpperBound))].statusRestrictions;
 				}
-				if (reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
+				if (reactionEdit.possibleAllStatusesRequiredChanges != null && reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1601,7 +1604,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleAllStatusesRequiredChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleAllStatusesRequiredChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStateRestrictionChanges.Length > 0)
+				if (reactionEdit.possibleStateRestrictionChanges != null && reactionEdit.possibleStateRestrictionChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1613,7 +1616,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateRestrictionChanges.Length *
 						tempUpperBound))].stateRestriction;
 				}
-				if (reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
+				if (reactionEdit.possibleMinRequiredUtilityChanges != null && reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1625,7 +1628,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleMinRequiredUtilityChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleMinRequiredUtilityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleUtilityThoughtsChanges.Length > 0)
+				if (reactionEdit.possibleUtilityThoughtsChanges != null && reactionEdit.possibleUtilityThoughtsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1637,7 +1640,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleUtilityThoughtsChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleUtilityThoughtsChanges.Length
 						* tempUpperBound))].utilityThoughts;
 				}
-				if (reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleFunctionExecutionsChanges != null && reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1649,7 +1652,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
 				}
-				if (reactionEdit.possibleEventExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleEventExecutionsChanges != null && reactionEdit.possibleEventExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1661,7 +1664,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleEventExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleEventExecutionsChanges.Length * tempUpperBound))].eventExecutions;
 				}
-				if (reactionEdit.possibleRepeatBufferChanges.Length > 0)
+				if (reactionEdit.possibleRepeatBufferChanges != null && reactionEdit.possibleRepeatBufferChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1672,7 +1675,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.repeatBuffer = reactionEdit.possibleRepeatBufferChanges[Random.Range((int)(reactionEdit.possibleRepeatBufferChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleRepeatBufferChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleForceBufferChanges.Length > 0)
+				if (reactionEdit.possibleForceBufferChanges != null && reactionEdit.possibleForceBufferChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1683,7 +1686,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.forceBuffer = reactionEdit.possibleForceBufferChanges[Random.Range((int)(reactionEdit.possibleForceBufferChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleForceBufferChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleTimerChanges.Length > 0)
+				if (reactionEdit.possibleTimerChanges != null && reactionEdit.possibleTimerChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -2178,6 +2181,8 @@ public class AttractorAI : MonoBehaviour
 						break;
 				}
 			}
+
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(result));
 		}
 
 		// Comstant
@@ -2674,8 +2679,8 @@ public class AttractorAI : MonoBehaviour
 						}
 						else if (thought.thoughtType == DecisionType.utilityFunction)
 						{
-							float bestUtilityIndex = -1;
-							float currentUtilityIndex = 0;
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
 							float highestUtility = float.MinValue;
 
 							foreach (UtilityThought utility in thought.utilityThoughts)
@@ -3086,8 +3091,8 @@ public class AttractorAI : MonoBehaviour
 						}
 						else if (reaction.behaviorType == DecisionType.utilityFunction)
 						{
-							float bestUtilityIndex = -1;
-							float currentUtilityIndex = 0;
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
 							float highestUtility = float.MinValue;
 
 							foreach (UtilityBehavior utility in reaction.utilityBehaviors)
@@ -3098,10 +3103,18 @@ public class AttractorAI : MonoBehaviour
 									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
 								{
 									tempAttractors.Clear();
-									utility.myTempFocus = defaultFocus;
-									utility.myTempValue = -1;
+									if (reaction.considerAttractorsForUtilityFocus)
+									{
+										utility.myTempFocus = tempFocus;
+										utility.myTempValue = tempValue;
+									}
+									else
+									{
+										utility.myTempFocus = defaultFocus;
+										utility.myTempValue = -1;
+									}
 
-									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+									if (utility.useStrictConditions && (utility.attractorType != AttractorType.NONE &&
 										tempDetectedAttractors.ContainsKey(utility.attractorType)))
 									{
 										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
@@ -3261,18 +3274,19 @@ public class AttractorAI : MonoBehaviour
 										Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
 
 										if ((utility.reactionConditions.boolConditions.Count > 0 &&
-											utility.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((utility.reactionConditions.floatCompare
-											== Comparison.equals || utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo) &&
-											(utility.reactionConditions.floatConditions.Count > 0 &&
-											utility.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) || ((utility.reactionConditions.floatCompare
-											== Comparison.greaterThan || utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo) &&
-											utility.reactionConditions.floatConditions.Where(item1 => tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] >
-											item1.floatValue).ToList().Count > 0) || ((utility.reactionConditions.intCompare == Comparison.equals ||
-											utility.reactionConditions.intCompare == Comparison.lesserOrEqualTo) && (utility.reactionConditions.intConditions.Count > 0 &&
-											utility.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any())) || ((utility.reactionConditions.intCompare ==
-											Comparison.greaterThan || utility.reactionConditions.intCompare == Comparison.greaterOrEqualTo) &&
-											utility.reactionConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
-											item1.intValue).ToList().Count > 0))
+											utility.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
+											((utility.reactionConditions.floatCompare == Comparison.equals || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && (utility.reactionConditions.floatConditions.Count > 0 &&
+											utility.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) ||
+											((utility.reactionConditions.floatCompare == Comparison.greaterThan || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.floatConditions.Where(item1 =>
+											tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0) ||
+											((utility.reactionConditions.intCompare == Comparison.equals || utility.reactionConditions.intCompare ==
+											Comparison.lesserOrEqualTo) && (utility.reactionConditions.intConditions.Count > 0 &&
+											utility.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any())) ||
+											((utility.reactionConditions.intCompare == Comparison.greaterThan || utility.reactionConditions.intCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.intConditions.Where(item1 =>
+											tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] > item1.intValue).ToList().Count > 0))
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
@@ -3289,46 +3303,46 @@ public class AttractorAI : MonoBehaviour
 
 							if (highestUtility >= reaction.minRequiredUtility)
 							{
-								currentUtilityIndex = 0;
-								foreach (UtilityBehavior utility in reaction.utilityBehaviors)
+								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
+
+								nextStatePriority = tempPriority;
+								nextUtilityPriority = bestUtilityIndex;
+								nextFunctions = new List<FunctionPicker>(chosenUtility.functionExecutions);
+								nextEvents = new List<UnityEvent>(chosenUtility.eventExecutions);
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
 								{
-									// FIGURE OUT THE NEXT STATE PRIORITY THING FUCK MY LIFE I GUESS
-
-									nextStatePriority = tempPriority;
-									nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
-									nextEvents = new List<UnityEvent>(reaction.eventExecutions);
-									if (nextStatePriority < currentStatePriority)
+									foreach (FunctionPicker function in nextFunctions)
 									{
-										foreach (FunctionPicker function in nextFunctions)
-										{
-											HandleFunctionCalling(function);
-										}
-										foreach (UnityEvent unityEvent in nextEvents)
-										{
-											unityEvent.Invoke();
-										}
+										HandleFunctionCalling(function);
 									}
-
-									if (!reaction.targetDetectedObject)
+									foreach (UnityEvent unityEvent in nextEvents)
 									{
-										nextFocus = defaultFocus;
+										unityEvent.Invoke();
 									}
-									else
-									{
-										nextFocus = tempFocus;
-									}
-
-									nextState = reaction.stateChange;
-									if (nextStatePriority < currentStatePriority)
-									{
-										currentFocus = nextFocus;
-										currentState = nextState;
-										currentStatePriority = nextStatePriority;
-									}
-
-									tempCheck = true;
-									break;
 								}
+
+								if (!chosenUtility.targetDetectedObject)
+								{
+									nextFocus = defaultFocus;
+								}
+								else
+								{
+									nextFocus = chosenUtility.myTempFocus;
+								}
+
+								nextState = chosenUtility.stateChange;
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
+								{
+									currentFocus = nextFocus;
+									currentState = nextState;
+									currentStatePriority = nextStatePriority;
+									currentUtilityPriority = nextUtilityPriority;
+								}
+
+								tempCheck = true;
+								break;
 							}
 						}
 					}
@@ -3338,7 +3352,7 @@ public class AttractorAI : MonoBehaviour
 					Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
 					Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
 					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!      fixed???
 
 					if ((reaction.reactionConditions.boolConditions.Count > 0 &&
 						reaction.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((reaction.reactionConditions.floatCompare
@@ -3354,33 +3368,291 @@ public class AttractorAI : MonoBehaviour
 						reaction.reactionConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
 						item1.intValue).ToList().Count > 0))
 					{
-						nextStatePriority = tempPriority;
-						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
-						nextEvents = new List<UnityEvent>(reaction.eventExecutions);
-						if (nextStatePriority < currentStatePriority)
+						if (reaction.behaviorType == DecisionType.finiteState)
 						{
-							foreach (FunctionPicker function in nextFunctions)
+							nextStatePriority = tempPriority;
+							nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
+							nextEvents = new List<UnityEvent>(reaction.eventExecutions);
+							if (nextStatePriority < currentStatePriority)
 							{
-								HandleFunctionCalling(function);
+								foreach (FunctionPicker function in nextFunctions)
+								{
+									HandleFunctionCalling(function);
+								}
+								foreach (UnityEvent unityEvent in nextEvents)
+								{
+									unityEvent.Invoke();
+								}
 							}
-							foreach (UnityEvent unityEvent in nextEvents)
+
+							nextFocus = defaultFocus;
+							nextState = reaction.stateChange;
+							if (nextStatePriority < currentStatePriority)
 							{
-								unityEvent.Invoke();
+								currentFocus = nextFocus;
+								currentState = nextState;
+								currentStatePriority = nextStatePriority;
+							}
+
+							tempCheck = true;
+							break;
+						}
+						else if (reaction.behaviorType == DecisionType.utilityFunction)
+						{
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
+							float highestUtility = float.MinValue;
+
+							foreach (UtilityBehavior utility in reaction.utilityBehaviors)
+							{
+								if (!utility.useStrictConditions || ((utility.stateRestriction.Count < 1 || utility.stateRestriction.Contains(currentState)) &&
+									(utility.statusRestrictions.Count < 1 || (utility.allStatusesRequired ?
+									currentStatuses.Intersect(utility.statusRestrictions).Count() == utility.statusRestrictions.Count() :
+									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
+								{
+									tempAttractors.Clear();
+									if (reaction.considerAttractorsForUtilityFocus)
+									{
+										utility.myTempFocus = tempFocus;
+										utility.myTempValue = tempValue;
+									}
+									else
+									{
+										utility.myTempFocus = defaultFocus;
+										utility.myTempValue = -1;
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+										tempDetectedAttractors.ContainsKey(utility.attractorType)))
+									{
+										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
+										{
+											if (utility.minIntensity <= attractor.intensity && attractor.intensity < utility.maxIntensity &&
+												(utility.attractorType != AttractorType.custom || utility.customAttractorID == attractor.customAttractorID))
+											{
+												if (utility.considerAttractorsForFocus && (utility.targetDetectedObject && (utility.myTempValue < 0 ||
+													(utility.prioritizeDistanceInsteadOfIntensity && ((utility.invertPriority &&
+													Vector3.Distance(transform.position, attractor.transform.position) > utility.myTempValue) ||
+													(!utility.invertPriority && Vector3.Distance(transform.position, attractor.transform.position) <
+													utility.myTempValue))) || (!utility.prioritizeDistanceInsteadOfIntensity && ((utility.invertPriority &&
+													attractor.intensity < utility.myTempValue) || (!utility.invertPriority && attractor.intensity >
+													utility.myTempValue))))))
+												{
+													utility.myTempFocus = attractor.transform;
+													if (!utility.prioritizeDistanceInsteadOfIntensity)
+														utility.myTempValue = attractor.intensity;
+													else
+														utility.myTempValue = Vector3.Distance(tempFocus.position, transform.position);
+												}
+
+												tempAttractors.Add(attractor);
+											}
+										}
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType == AttractorType.NONE || tempAttractors.Count > 0))
+									{
+										bool utilityStrictConditionsMet = true;
+										if (utility.useStrictConditions && utility.allConditionsRequired)
+										{
+											if (utility.reactionConditions.boolConditions.Count > 0 &&
+												!(currentConditions.boolConditions.Intersect(utility.reactionConditions.boolConditions).Count() ==
+												utility.reactionConditions.boolConditions.Count()))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.equals &&
+												(utility.reactionConditions.floatConditions.Count > 0 &&
+												!(currentConditions.floatConditions.Intersect(utility.reactionConditions.floatConditions).Count() ==
+												utility.reactionConditions.floatConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.greaterThan)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.lesserThan)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.lesserOrEqualTo)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.equals && (utility.reactionConditions.intConditions.Count >
+												0 && !(currentConditions.intConditions.Intersect(utility.reactionConditions.intConditions).Count() ==
+												utility.reactionConditions.intConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.greaterThan)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.greaterOrEqualTo)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.lesserThan)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.lesserOrEqualTo)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+										}
+
+										if (utilityStrictConditionsMet)
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+									else if (!utility.allConditionsRequired)
+									{
+										tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+										x.floatValue);
+										tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+										if ((utility.reactionConditions.boolConditions.Count > 0 &&
+											utility.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
+											((utility.reactionConditions.floatCompare == Comparison.equals || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && (utility.reactionConditions.floatConditions.Count > 0 &&
+											utility.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) ||
+											((utility.reactionConditions.floatCompare == Comparison.greaterThan || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.floatConditions.Where(item1 =>
+											tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0) ||
+											((utility.reactionConditions.intCompare == Comparison.equals || utility.reactionConditions.intCompare ==
+											Comparison.lesserOrEqualTo) && (utility.reactionConditions.intConditions.Count > 0 &&
+											utility.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any())) ||
+											((utility.reactionConditions.intCompare == Comparison.greaterThan || utility.reactionConditions.intCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.intConditions.Where(item1 =>
+											tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] > item1.intValue).ToList().Count > 0))
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+								}
+								currentUtilityIndex++;
+							}
+
+							if (highestUtility >= reaction.minRequiredUtility)
+							{
+								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
+
+								nextStatePriority = tempPriority;
+								nextUtilityPriority = bestUtilityIndex;
+								nextFunctions = new List<FunctionPicker>(chosenUtility.functionExecutions);
+								nextEvents = new List<UnityEvent>(chosenUtility.eventExecutions);
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
+								{
+									foreach (FunctionPicker function in nextFunctions)
+									{
+										HandleFunctionCalling(function);
+									}
+									foreach (UnityEvent unityEvent in nextEvents)
+									{
+										unityEvent.Invoke();
+									}
+								}
+
+								if (!chosenUtility.targetDetectedObject)
+								{
+									nextFocus = defaultFocus;
+								}
+								else
+								{
+									nextFocus = chosenUtility.myTempFocus;
+								}
+
+								nextState = chosenUtility.stateChange;
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
+								{
+									currentFocus = nextFocus;
+									currentState = nextState;
+									currentStatePriority = nextStatePriority;
+									currentUtilityPriority = nextUtilityPriority;
+								}
+
+								tempCheck = true;
+								break;
 							}
 						}
-
-						nextFocus = defaultFocus;
-						nextState = reaction.stateChange;
-
-						if (nextStatePriority < currentStatePriority)
-						{
-							currentFocus = nextFocus;
-							currentState = nextState;
-							currentStatePriority = nextStatePriority;
-						}
-
-						tempCheck = true;
-						break;
 					}
 				}
 			}
