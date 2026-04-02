@@ -91,10 +91,14 @@ namespace UI.PauseMenu
             SettingsController.Instance.CloseSettings();
             // we also need to "reset" the cached paused state, and set it to cutscene, cause we know the game will always
             _previousGameState = Types.GameState.Cutscene;
+            new Types.ScreenFadeSceneTransitionData(1f, 1f, "MainMenu", null , null, ReturnToMainMenu).Send();
+
+        }
+
+        private void ReturnToMainMenu()
+        {
             // resume into a cutscene from the main menu
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
-            SceneSwapper.Instance.SwapScene("MainMenu");
-
         }
 
         // Update is called once per frame

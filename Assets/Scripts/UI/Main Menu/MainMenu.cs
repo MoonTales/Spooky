@@ -240,7 +240,9 @@ namespace UI.Main_Menu
 
         private void CloseGame()
         {
-            Application.Quit();
+            // small fade to make the quit feel a bit smoother
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1f, 1f, fadeOutDuration:0.75f, null, Application.Quit);
+            fadeData.Send();
         }
 
     }
