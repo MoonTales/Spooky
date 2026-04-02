@@ -16880,8 +16880,16 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: currentStatuses.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'currentStatuses.Array.data[0]'
+      value: Lurking
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: senses.Array.data[0].detectionAngle
@@ -17540,6 +17548,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.operationToPerform
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.utilityCurve.m_PreInfinity
       value: 2
       objectReference: {fileID: 0}
@@ -17577,6 +17589,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17628,6 +17644,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].maxDistanceClamp
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].considerationType
       value: 7
       objectReference: {fileID: 0}
@@ -17640,6 +17660,10 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].considerationType
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].operationToPerform
       value: 1
       objectReference: {fileID: 0}
@@ -17648,11 +17672,23 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].operationToPerform
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].maxIntensityConsidered
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].minIntensityConsidered
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].maxIntensityConsidered
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].minIntensityConsidered
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17668,11 +17704,19 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_PreInfinity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_PostInfinity
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].utilityCurve.m_PostInfinity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_PostInfinity
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17684,6 +17728,14 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[1].utilityCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -17692,11 +17744,19 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17712,6 +17772,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].value
       value: 0
       objectReference: {fileID: 0}
@@ -17721,6 +17785,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].value
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17741,6 +17809,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].inSlope
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].inSlope
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].inSlope
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17780,6 +17856,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].outSlope
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].outSlope
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].outWeight
       value: 0
       objectReference: {fileID: 0}
@@ -17794,6 +17878,10 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].floatID
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].floatID
+      value: Energy
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].tangentMode
@@ -17812,8 +17900,20 @@ PrefabInstance:
       value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].maxFloatClamp
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].maxFloatClamp
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].maxDistanceClamp
@@ -17832,6 +17932,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].maxDistanceClamp
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].minDistanceClamp
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].considerationType
       value: 1
       objectReference: {fileID: 0}
@@ -17846,6 +17954,14 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[1].considerationType
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].considerationType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].considerationType
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[1].operationToPerform
@@ -17868,6 +17984,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].maxIntensityConsidered
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].minIntensityConsidered
+      value: 19
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_PreInfinity
       value: 2
       objectReference: {fileID: 0}
@@ -17888,6 +18012,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_PreInfinity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_PreInfinity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_PostInfinity
       value: 2
       objectReference: {fileID: 0}
@@ -17901,6 +18033,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[1].utilityCurve.m_PostInfinity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_PostInfinity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_PostInfinity
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17920,6 +18060,14 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -17934,6 +18082,14 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.size
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].compositeConsiderations.Array.size
@@ -17976,6 +18132,34 @@ PrefabInstance:
       value: 0.98976105
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].time
+      value: 0.0630523
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[2].time
+      value: 0.28668946
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[3].time
+      value: 0.5310634
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[4].time
+      value: 0.6398215
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[5].time
+      value: 0.74459714
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[6].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].value
       value: 1
       objectReference: {fileID: 0}
@@ -18010,6 +18194,34 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].value
       value: 0.7714825
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].value
+      value: 0.324337
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[2].value
+      value: 0.9548925
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[3].value
+      value: 0.16169581
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[4].value
+      value: 0.4030869
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[5].value
+      value: -0.009041667
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].inSlope
@@ -18054,6 +18266,30 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].inSlope
       value: -0.7717814
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].inSlope
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].inSlope
+      value: 1.3320177
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[2].inSlope
+      value: 0.0050044577
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[3].inSlope
+      value: -1.475444
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[4].inSlope
+      value: -0.395453
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[5].inSlope
+      value: -0.122069746
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].outSlope
@@ -18128,6 +18364,50 @@ PrefabInstance:
       value: -0.7717814
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[1].outSlope
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].inWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].outSlope
+      value: 1.3320177
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[2].inWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[2].outSlope
+      value: 0.0050044577
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[3].inWeight
+      value: 0.20426339
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[3].outSlope
+      value: -1.475444
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[4].inWeight
+      value: 0.6764603
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[4].outSlope
+      value: -0.395453
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[5].inWeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[5].outSlope
+      value: -0.122069746
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_Curve.Array.data[0].outWeight
       value: 0.38406125
       objectReference: {fileID: 0}
@@ -18154,6 +18434,26 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[0].outWeight
       value: 0.24232084
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[1].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[2].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[3].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[4].outWeight
+      value: 0.09797572
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].utilityCurve.m_Curve.Array.data[5].outWeight
+      value: 0.33333334
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[0].floatID

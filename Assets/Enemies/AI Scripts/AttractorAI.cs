@@ -1996,7 +1996,7 @@ public class AttractorAI : MonoBehaviour
 		}
 	}
 
-	float EvaluateConsideration(Consideration consideration, Dictionary<AttractorType, List<Attractor>> detectedAttractors, UtilityBehavior behavior = null)
+	public float EvaluateConsideration(Consideration consideration, Dictionary<AttractorType, List<Attractor>> detectedAttractors, UtilityBehavior behavior = null)
 	{
 		// Attractors
 		if (consideration.considerationType == ConsiderationType.attractorIntensity || consideration.considerationType == ConsiderationType.attractorDistance)
