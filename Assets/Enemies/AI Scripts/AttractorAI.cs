@@ -199,7 +199,6 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
-		[Space(20)]
 		[Header("UtilityFunctions")]
 		[Range(0f, 1f)]
 		public float[] possibleMinRequiredUtilityChanges;
@@ -328,7 +327,6 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
-		[Space(20)]
 		[Header("UtilityFunctions")]
 		[Range(0f, 1f)]
 		public float[] possibleMinRequiredUtilityChanges;
@@ -963,7 +961,6 @@ public class AttractorAI : MonoBehaviour
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
-		[Space(20)]
 		[Header("UtilityFunctions")]
 		//[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
 		[Range(0f, 1f)]
@@ -1014,7 +1011,6 @@ public class AttractorAI : MonoBehaviour
 	{
 		public ConsiderationType considerationType;
 
-		[Space(20)]
 		// Attractor Considerations
 		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		[Header("Attractor Considerations")]
@@ -1042,14 +1038,12 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
 		public float maxDistanceClamp;
 
-		[Space(20)]
 		// Bool Condition Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.boolCondition)]
 		[Header("Bool Condition Consideration")]
 		[Tooltip("false = 0; true = 1")]
 		public string boolID;
 
-		[Space(20)]
 		// Float Condition Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
 		[Header("Float Condition Consideration")]
@@ -1059,7 +1053,6 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
 		public float maxFloatClamp;
 
-		[Space(20)]
 		// Int Condition Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
 		[Header("Int Condition Consideration")]
@@ -1069,21 +1062,18 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
 		public float maxIntClamp;
 
-		[Space(20)]
 		// Status Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.status)]
 		[Header("Status Consideration")]
 		[Tooltip("does not have status = 0; has status = 1")]
 		public string statusName;
 
-		[Space(20)]
 		// State Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.state)]
 		[Header("State Consideration")]
 		[Tooltip("is not currently in this state = 0; is currently in this state = 1")]
 		public EnemyState state;
 
-		[Space(20)]
 		// Composite Condiderations
 		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
 		[Header("Composite Considerations")]
@@ -1097,14 +1087,12 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
 		public Consideration[] compositeConsiderations;
 
-		[Space(20)]
 		// Constant Consideration
 		[Range(0f, 1f)]
 		//[ShowIfEnum("considerationType", ConsiderationType.constant)]
 		[Header("Constant Consideration")]
 		public float constantUtility;
 
-		[Space(20)]
 		//[ShowIfEnum(true, "considerationType", ConsiderationType.compositeConsideration, ConsiderationType.constant)]
 		[Header("For considerations with curves (AKA everything but composite and constant considerations)")]
 		public AnimationCurve utilityCurve;
@@ -1151,11 +1139,12 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIf("useStrictConditions")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
-		[Space(20)]
 		[Header("Define your utility considerations here!")]
+
+		//[Range(0f, 1f)]
+		//public float utilityStickiness;
 		public Consideration considerations;
 
-		[Space(20)]
 		[Header("Construct the behavior here!")]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
@@ -1200,7 +1189,6 @@ public class AttractorAI : MonoBehaviour
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
-		[Space(20)]
 		[Header("UtilityFunctions")]
 		//[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
 		[Range(0f, 1f)]
@@ -1259,11 +1247,9 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIf("useStrictConditions")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
-		[Space(20)]
 		[Header("Define your utility considerations here!")]
 		public Consideration considerations;
 
-		[Space(20)]
 		[Header("Construct the thought here!")]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
