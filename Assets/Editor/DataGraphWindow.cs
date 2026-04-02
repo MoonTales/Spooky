@@ -9,7 +9,7 @@ public class DataGraphWindow : EditorWindow
 {
     private SimpleGraphView _graphView;
     private MonoBehaviour _currentTarget;
-    private float _defaultWidth = 400f;
+    private float _defaultWidth = 0f;
 
     [MenuItem("Window/Custom/Data Dashboard Graph")]
     public static void Open() => GetWindow<DataGraphWindow>("Data Dashboard");
