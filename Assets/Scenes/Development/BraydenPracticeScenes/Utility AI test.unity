@@ -16897,7 +16897,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].repeatBuffer
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[2].repeatBuffer
@@ -16968,6 +16968,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].minRequiredUtility
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].allStatusesRequired
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.boolConditions.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -16977,7 +16985,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.floatConditions.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[0].allConditionsRequired
@@ -17012,6 +17020,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: behaviourHierarchy.Array.data[0].attractorType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'senses.Array.data[0].senseOrgans.Array.data[0]'
       value: 
       objectReference: {fileID: 1322710444}
@@ -17025,7 +17037,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].stateRestriction.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[2].stateRestriction.Array.size
@@ -17049,11 +17061,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[0].functionExecutions.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].functionExecutions.Array.size
-      value: 1
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[2].functionExecutions.Array.size
@@ -17081,15 +17093,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[1].stateRestriction.Array.data[0]'
-      value: 1
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].thoughtConditions.floatCompare
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[2].stateRestriction.Array.data[0]'
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[2].thoughtConditions.floatCompare
@@ -17097,7 +17109,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[3].stateRestriction.Array.data[0]'
-      value: 7
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[3].thoughtConditions.floatCompare
@@ -17105,7 +17117,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[4].stateRestriction.Array.data[0]'
-      value: 3
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[4].thoughtConditions.floatCompare
@@ -17113,7 +17125,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[5].stateRestriction.Array.data[0]'
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[5].thoughtConditions.floatCompare
@@ -17141,11 +17153,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.floatConditions.Array.data[1].floatName
-      value: MaxEnergy
+      value: RecoveryTime
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.floatConditions.Array.data[2].floatName
-      value: RecoveryTime
+      value: MaxEnergy
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.floatConditions.Array.data[3].floatName
@@ -17157,11 +17169,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.floatConditions.Array.data[1].floatValue
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.floatConditions.Array.data[2].floatValue
-      value: 0
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.floatConditions.Array.data[3].floatValue
@@ -17172,7 +17184,23 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[0].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[3].function
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17201,7 +17229,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].thoughtConditions.boolConditions.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[0].thoughtConditions.floatConditions.Array.size
@@ -17236,8 +17264,24 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[0].functionExecutions.Array.data[1].changeStatsBy
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[0].changeStatsBy
-      value: 1
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[1].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[2].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[2].functionExecutions.Array.data[0].changeStatsBy
@@ -17264,8 +17308,16 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[0].functionExecutions.Array.data[1].statsChangeAmount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[0].statsChangeAmount
-      value: 1
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[1].statsChangeAmount
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[2].functionExecutions.Array.data[0].statsChangeAmount
@@ -17273,15 +17325,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[3].functionExecutions.Array.data[0].statsChangeAmount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[4].functionExecutions.Array.data[0].statsChangeAmount
-      value: 8
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[5].functionExecutions.Array.data[0].statsChangeAmount
-      value: 5
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[6].functionExecutions.Array.data[0].statsChangeAmount
@@ -17292,7 +17344,23 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[0].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].functionExecutions.Array.data[3].arguments.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17321,11 +17389,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].thoughtConditions.boolConditions.Array.data[0].boolName
-      value: Recovery
+      value: Recovering
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[0].functionExecutions.Array.data[0].arguments.Array.data[0]'
       value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[0].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: false
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[0].thoughtConditions.boolConditions.Array.data[0].boolValue
@@ -17334,6 +17406,26 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[1].functionExecutions.Array.data[0].arguments.Array.data[0]'
       value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[1].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[1].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[1].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[1].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].thoughtConditions.boolConditions.Array.data[0].boolValue
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[2].functionExecutions.Array.data[0].arguments.Array.data[0]'
@@ -17365,7 +17457,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].thoughtConditions.floatConditions.Array.data[0].floatName
-      value: Energy
+      value: RecoverTime
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[2].thoughtConditions.floatConditions.Array.data[0].floatName
@@ -17390,6 +17482,10 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[0].thoughtConditions.floatConditions.Array.data[0].floatValue
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[1].thoughtConditions.floatConditions.Array.data[0].floatValue
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3654124647647044610, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
