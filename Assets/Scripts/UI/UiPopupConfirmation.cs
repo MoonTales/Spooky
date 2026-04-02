@@ -14,11 +14,7 @@ namespace UI
     /// </summary>
     public class UiPopupConfirmation : Singleton<UiPopupConfirmation>
     {
-
-        
-
-
-        public void RequestPopupConfirmation(string displayMessage, Action onConfirm)
+        public GameObject RequestPopupConfirmation(string displayMessage, Action onConfirm)
         {
             // we will load from the resources folder, a prefab of the confirmation popup
             GameObject popupPrefab = Resources.Load<GameObject>("Prefabs/UI/PopupConfirmation");
@@ -32,7 +28,8 @@ namespace UI
             if(popupPrefab == null)
             {
                 DebugUtils.LogError("Could not find PopupConfirmation prefab in Resources/Prefabs/UI/PopupConfirmation! Make sure it exists and is in the correct folder.");
-                return;
+                return popupPrefab;
+                // i think this is wrong but oop
             }
             
             // otherwise, we know we have it, lets populate it
@@ -48,16 +45,24 @@ namespace UI
             {
                 DebugUtils.LogError("PopupConfirmation prefab is missing one of the required components! Make sure it has a TMP_Text called DisplayText, and two Buttons called ConfirmButton and CancelButton.");
                 Destroy(popupInstance);
-                return;
+                return popupPrefab;
+                // i think this is wrong but oop
             }
             
             // hook up to our buttons
             displayText.text = displayMessage;
             confirmButton.onClick.AddListener(() => OnConfirmButtonClicked(popupInstance, onConfirm));
             cancelButton.onClick.AddListener(() => OnCancelButtonClicked(popupInstance));
+            return popupInstance;
         }
         
         private void OnCancelButtonClicked(GameObject popupInstance)
+        {
+            // we will just destroy the pop up, and do nothing else
+            Destroy(popupInstance);
+        }
+
+        public void DestroyActivePopup(GameObject popupInstance)
         {
             // we will just destroy the pop up, and do nothing else
             Destroy(popupInstance);
