@@ -16933,7 +16933,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.size
-      value: 12
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: onlyScreamOnFirstChase
@@ -17053,6 +17053,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].attractorType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].attractorType
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17256,6 +17260,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].statusRestrictions.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[1].stateRestriction.Array.data[0]'
       value: 4
       objectReference: {fileID: 0}
@@ -17378,6 +17390,10 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[10].statusRestrictions.Array.data[1]'
       value: Hunting
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].statusRestrictions.Array.data[0]'
+      value: Lurking
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: currentConditions.floatConditions.Array.data[0].floatName
@@ -17553,7 +17569,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[1].function
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[2].function
@@ -17589,6 +17605,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].function
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].function
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].function
       value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -17840,6 +17864,14 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[8].functionExecutions.Array.data[10].changeStatsBy
       value: 4
       objectReference: {fileID: 0}
@@ -17997,7 +18029,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[1].statsChangeAmount
-      value: 150
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[2].statsChangeAmount
@@ -18033,6 +18065,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].statsChangeAmount
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].statsChangeAmount
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].statsChangeAmount
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -18136,6 +18176,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[0].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[8].functionExecutions.Array.data[11].arguments.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -18230,6 +18274,14 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[0].thoughtConditions.floatConditions.Array.data[0].floatName
       value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[10].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Lurking SwitchingStats
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[10].functionExecutions.Array.data[0].arguments.Array.data[1]'
+      value: false
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].thoughtConditions.floatConditions.Array.data[0].floatName
@@ -18365,7 +18417,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[0].statsToChange.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[10].functionExecutions.Array.data[11].arguments.Array.data[0]'
@@ -18377,7 +18429,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[1].statsToChange.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[2].statsToChange.Array.size
@@ -18414,6 +18466,10 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].statsToChange.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].statsToChange.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[1].thoughtConditions.floatConditions.Array.data[0].floatValue
@@ -18568,6 +18624,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].statsToChange.Array.data[0]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[8].functionExecutions.Array.data[10].statsToChange.Array.data[0]'
       value: 23
       objectReference: {fileID: 0}
@@ -18589,11 +18649,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[0].possiblePriorityReprograms.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].possiblePriorityReprograms.Array.size
@@ -18601,6 +18661,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].possiblePriorityReprograms.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].possiblePriorityReprograms.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -18630,6 +18706,14 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[11].functionExecutions.Array.data[0].possiblePriorityReprograms.Array.data[0]'
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].possiblePriorityReprograms.Array.data[0]'
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[1].possiblePriorityReprograms.Array.data[0]'
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.utilityCurve.m_PreInfinity
@@ -18693,6 +18777,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].balancesChanges
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].balancesChanges
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].balancesChanges
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -18848,6 +18940,22 @@ PrefabInstance:
       value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].functionExecutionsLowerBoundDangerRange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].functionExecutionsUpperBoundDangerRange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].reactionConditionsLowerBoundDangerRange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].reactionConditionsUpperBoundDangerRange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].maxIntensityConsidered
       value: 0
       objectReference: {fileID: 0}
@@ -18882,6 +18990,26 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.size
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.size
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].utilityCurve.m_PreInfinity
@@ -19252,6 +19380,26 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[0].boolConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[1].boolConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[2].boolConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[3].boolConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].boolConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].considerationType
       value: 1
       objectReference: {fileID: 0}
@@ -19329,6 +19477,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].floatConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[0].floatConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[1].floatConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[2].floatConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[3].floatConditions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].floatConditions.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -19416,6 +19584,70 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.data[0].statusRestrictions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.data[1].statusRestrictions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.data[0].statusRestrictions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.data[1].statusRestrictions.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].maxIntensityConsidered
       value: 30
       objectReference: {fileID: 0}
@@ -19446,6 +19678,22 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[1].considerations.compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[0].minIntensityConsidered
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.data[0].statusRestrictions.Array.data[0]'
+      value: Hunting
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.data[1].statusRestrictions.Array.data[0]'
+      value: Lurking
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.data[0].statusRestrictions.Array.data[0]'
+      value: Hunting
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleStatusRestrictionsChanges.Array.data[1].statusRestrictions.Array.data[0]'
+      value: Lurking
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[0].utilityCurve.m_PreInfinity
@@ -19612,6 +19860,26 @@ PrefabInstance:
       value: Recovering
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[0].boolConditions.Array.data[0].boolName
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[1].boolConditions.Array.data[0].boolName
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[2].boolConditions.Array.data[0].boolName
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[3].boolConditions.Array.data[0].boolName
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].boolConditions.Array.data[0].boolName
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[0].boolConditions.Array.data[0].boolValue
       value: 1
       objectReference: {fileID: 0}
@@ -19652,6 +19920,26 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[0].boolConditions.Array.data[0].boolValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[1].boolConditions.Array.data[0].boolValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[2].boolConditions.Array.data[0].boolValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[3].boolConditions.Array.data[0].boolValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].boolConditions.Array.data[0].boolValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[10].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[0].floatConditions.Array.data[0].floatName
       value: RecoverTime
       objectReference: {fileID: 0}
@@ -19689,6 +19977,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].floatConditions.Array.data[0].floatName
+      value: RecoverTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[0].floatConditions.Array.data[0].floatName
+      value: RecoverTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[1].floatConditions.Array.data[0].floatName
+      value: RecoverTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[2].floatConditions.Array.data[0].floatName
+      value: RecoverTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[3].floatConditions.Array.data[0].floatName
+      value: RecoverTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].floatConditions.Array.data[0].floatName
       value: RecoverTime
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -19769,6 +20077,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].floatConditions.Array.data[0].floatValue
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[0].floatConditions.Array.data[0].floatValue
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[1].floatConditions.Array.data[0].floatValue
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[2].floatConditions.Array.data[0].floatValue
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[3].floatConditions.Array.data[0].floatValue
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleReactionConditionsChanges.Array.data[4].floatConditions.Array.data[0].floatValue
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -20092,6 +20420,174 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].function
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].function
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[0].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[1].function
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[2].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[3].function
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].function
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].function
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].compositeConsiderations.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -20257,6 +20753,94 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[3].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].changeStatsBy
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].changeStatsBy
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -20577,6 +21161,46 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[0].statsChangeAmount
+      value: 105
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].statsChangeAmount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].statsChangeAmount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[0].statsChangeAmount
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[0].statsChangeAmount
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[0].statsChangeAmount
+      value: 55
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[0].statsChangeAmount
+      value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[0].statsChangeAmount
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[0].statsChangeAmount
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[0].statsChangeAmount
+      value: 95
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[0].statsChangeAmount
       value: 105
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -21348,6 +21972,174 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[0].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[1].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[2].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[3].arguments.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].arguments.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[0].floatID
       value: Energy
       objectReference: {fileID: 0}
@@ -21782,6 +22574,230 @@ PrefabInstance:
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: 'thoughts.Array.data[11].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[3].arguments.Array.data[0]'
       value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Lurking
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Hunting SwitchingStats
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[2].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[3].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[4].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[5].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[6].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[7].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[8].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Energy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[1].arguments.Array.data[0]'
+      value: true
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[2].arguments.Array.data[0]'
+      value: Recovering
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[2].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[0].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[9].functionExecutions.Array.data[3].arguments.Array.data[0]'
+      value: RecoveryTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Lurking
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[0].functionExecutions.Array.data[0].arguments.Array.data[1]'
+      value: false
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].arguments.Array.data[0]'
+      value: Hunting SwitchingStats
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: 'thoughts.Array.data[12].functionExecutions.Array.data[1].thoughtReprogramParameters.Array.data[0].possibleFunctionExecutionsChanges.Array.data[1].functionExecutions.Array.data[0].arguments.Array.data[1]'
+      value: false
       objectReference: {fileID: 0}
     - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: behaviourHierarchy.Array.data[0].utilityBehaviors.Array.data[0].considerations.compositeConsiderations.Array.data[0].compositeConsiderations.Array.data[1].compositeConsiderations.Array.data[0].maxFloatClamp
