@@ -22,8 +22,7 @@ public class Headphones : MonoBehaviour
     private void Start()
     {
         headphonesCanvas.SetActive(true);
-
-        SceneCache.Instance.RequestSceneCache("Tutorial");
+        
         // reveal scene from black
         new Types.ScreenFadeData(
             fadeInDuration: revealDuration,
@@ -32,7 +31,7 @@ public class Headphones : MonoBehaviour
             null,
             SendToNextScene
         ).Send();
-        
+        SceneCache.Instance.RequestSceneCache("Tutorial");
     }
 
     // ill set this up later

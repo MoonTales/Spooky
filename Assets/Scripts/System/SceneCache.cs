@@ -11,6 +11,10 @@ namespace System
     public class SceneCache : Singleton<SceneCache>
     {
         private HashSet<string> _cachedScenes = new HashSet<string>();
+        private int _activeCacheCount = 0;
+        
+
+        public bool IsCacheInProgress() { return _activeCacheCount > 0; }
 
         public void RequestSceneCache(string sceneName)
         {
@@ -19,7 +23,7 @@ namespace System
                 Debug.Log($"[SceneCache] '{sceneName}' is already cached or in progress, skipping.");
                 return;
             }
-
+            
             _cachedScenes.Add(sceneName);
             StartCoroutine(CacheScene(sceneName));
         }
@@ -27,7 +31,7 @@ namespace System
         private IEnumerator CacheScene(string sceneName)
         {
             Debug.Log($"[SceneCache] Starting cache for '{sceneName}'...");
-
+            _activeCacheCount++;
             AsyncOperation op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
             op.allowSceneActivation = false;
 
@@ -42,6 +46,7 @@ namespace System
             SceneManager.UnloadSceneAsync(sceneName);
 
             Debug.Log($"[SceneCache] '{sceneName}' cache complete.");
+            _activeCacheCount--;
         }
     }
     

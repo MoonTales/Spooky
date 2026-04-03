@@ -38,6 +38,7 @@ namespace UI.Main_Menu
         private void Start()
         {
             mainMenuCanvas.SetActive(true);
+            SceneCache.Instance.RequestSceneCache("Nightmare1");
             //set all scribbles to false initially 
             Scribble1.enabled = false;
             Scribble2.enabled = false;

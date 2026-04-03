@@ -53,6 +53,10 @@ namespace System
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            // if the cache is active, we dont wanna do any of this stuff
+            // also if its an additive scene, we wont do any of this stuff either
+            if (SceneCache.Instance.IsCacheInProgress()) { return; }
+            if (mode == LoadSceneMode.Additive) { return; }
             // after the scene has been loaded, we need to ensure the player is teleported to the correct location
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
             // This is when we want to broadcast the world clock
