@@ -4,6 +4,7 @@ using UnityEngine.UIElements;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using System.Collections.Generic;
+using System;
 
 public class DataGraphWindow : EditorWindow
 {
@@ -23,7 +24,7 @@ public class DataGraphWindow : EditorWindow
 
         var refreshBtn = new Button(RefreshNodes) { text = "Refresh Graph" };
 
-        
+
 
         toolbar.Add(picker);
         toolbar.Add(refreshBtn);
@@ -62,12 +63,17 @@ public class DataGraphWindow : EditorWindow
     private void CreateDataNode(SerializedProperty prop, ref int index)
     {
         string saveKey = $"{_currentTarget.GetType().Name}_{prop.propertyPath}_pos";
-        Vector2 pos = new Vector2(EditorPrefs.GetFloat(saveKey + "X", index * (_defaultWidth + 50)), EditorPrefs.GetFloat(saveKey + "Y", 50));
+
+        // 1. Load Position
+        Vector2 savedPos = new Vector2(
+            EditorPrefs.GetFloat(saveKey + "X", index * (_defaultWidth + 50)),
+            EditorPrefs.GetFloat(saveKey + "Y", 50)
+        );
 
         var node = new Node { title = prop.displayName };
-        node.SetPosition(new Rect(pos, new Vector2(_defaultWidth, 200)));
+        node.SetPosition(new Rect(savedPos, new Vector2(_defaultWidth, 200)));
 
-        // Node Styling
+        // 2. Layout Settings
         node.style.width = StyleKeyword.Auto;
         node.style.minWidth = _defaultWidth;
         node.extensionContainer.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.9f);
@@ -76,52 +82,49 @@ public class DataGraphWindow : EditorWindow
         node.extensionContainer.style.paddingLeft = 5;
         node.extensionContainer.style.paddingRight = 5;
 
+        // Helper: Cell Styling
         VisualElement CreateCellWrapper()
         {
             var wrapper = new VisualElement();
+            wrapper.style.flexShrink = 0;
             wrapper.style.paddingTop = 5; wrapper.style.paddingBottom = 5;
             wrapper.style.paddingLeft = 5; wrapper.style.paddingRight = 5;
-
             wrapper.style.borderTopWidth = 1; wrapper.style.borderBottomWidth = 1;
             wrapper.style.borderLeftWidth = 1; wrapper.style.borderRightWidth = 1;
+
             var borderColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
             wrapper.style.borderTopColor = borderColor;
             wrapper.style.borderBottomColor = borderColor;
             wrapper.style.borderLeftColor = borderColor;
             wrapper.style.borderRightColor = borderColor;
-
             wrapper.style.backgroundColor = new Color(1, 1, 1, 0.03f);
             return wrapper;
         }
 
         void BuildDataUI(SerializedProperty p, VisualElement container, bool isVertical)
         {
-            // === 1. ARRAY HANDLING (Manual Control + Fast Diff) ===
+            // === 1. ARRAY HANDLING (Manual Control) ===
             if (p.isArray && p.propertyType == SerializedPropertyType.Generic)
             {
-                // A. The Header Container
                 var headerContainer = new VisualElement();
                 headerContainer.style.flexDirection = FlexDirection.Row;
                 headerContainer.style.marginBottom = 5;
-                headerContainer.style.alignItems = Align.Center; // Centers items vertically
+                headerContainer.style.alignItems = Align.Center;
 
-                // B. Manual Foldout
                 var foldout = new Foldout { text = p.displayName, value = true };
                 foldout.style.flexGrow = 1;
 
-                // C. FIX 1: Explicit IntegerField for Size Input
-                // We use a real IntegerField instead of PropertyField to guarantee an input box appears.
                 var sizeProp = p.FindPropertyRelative("Array.size");
-                var sizeField = new IntegerField("Size");
-                sizeField.style.minWidth = 120; // Ensure enough space for label + input
-                sizeField.bindingPath = sizeProp.propertyPath; // Bind manually
+                // Use Delayed Integer Field for Size too
+                var sizeField = new IntegerField("Size") { isDelayed = true };
+                sizeField.style.minWidth = 120;
+                sizeField.bindingPath = sizeProp.propertyPath;
                 sizeField.Bind(p.serializedObject);
 
                 headerContainer.Add(foldout);
                 headerContainer.Add(sizeField);
                 container.Add(headerContainer);
 
-                // D. Content Container
                 var listContent = new VisualElement();
                 listContent.style.flexDirection = isVertical ? FlexDirection.Column : FlexDirection.Row;
                 listContent.style.flexWrap = Wrap.NoWrap;
@@ -130,13 +133,9 @@ public class DataGraphWindow : EditorWindow
                 foldout.RegisterValueChangedCallback(evt => listContent.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
                 container.Add(listContent);
 
-                // Capture References
                 string arrayPath = p.propertyPath;
                 SerializedObject so = p.serializedObject;
 
-                // E. FIX 2: The Fast Sync Logic
-                // Instead of destroying the list (Rebuild), we simply Add or Remove items.
-                // This restores the speed of the graph creation and updates.
                 void SyncContent()
                 {
                     so.Update();
@@ -146,10 +145,8 @@ public class DataGraphWindow : EditorWindow
                     int targetCount = freshArray.arraySize;
                     int currentCount = listContent.childCount;
 
-                    // Optimization: If counts match, do nothing (Fastest possible path)
                     if (targetCount == currentCount) return;
 
-                    // Grow: Add new items
                     if (targetCount > currentCount)
                     {
                         for (int i = currentCount; i < targetCount; i++)
@@ -160,7 +157,6 @@ public class DataGraphWindow : EditorWindow
                             listContent.Add(wrapper);
                         }
                     }
-                    // Shrink: Remove from end
                     else
                     {
                         while (listContent.childCount > targetCount)
@@ -170,15 +166,8 @@ public class DataGraphWindow : EditorWindow
                     }
                 }
 
-                // Initial Build
                 SyncContent();
-
-                // F. The Anti-Lag Listener
-                // We keep the exact logic that fixed the lag: listening to the IntegerField.
-                sizeField.RegisterCallback<ChangeEvent<int>>(evt =>
-                {
-                    listContent.schedule.Execute(SyncContent);
-                });
+                sizeField.RegisterCallback<ChangeEvent<int>>(evt => listContent.schedule.Execute(SyncContent));
             }
             // === 2. CLASS HANDLING ===
             else if (p.hasVisibleChildren)
@@ -195,12 +184,40 @@ public class DataGraphWindow : EditorWindow
                 }
                 container.Add(classFoldout);
             }
-            // === 3. SIMPLE PROPERTY HANDLING ===
+            // === 3. PRIMITIVE HANDLING (THE LAG FIX) ===
             else
             {
-                var field = new PropertyField(p.Copy());
+                VisualElement field = null;
+
+                // We switch to Native Fields with 'isDelayed = true'.
+                // This prevents the layout engine from recalculating on every keystroke.
+                // It only recalculates when you press Enter or focus away.
+                if (p.propertyType == SerializedPropertyType.String)
+                {
+                    field = new TextField(p.displayName) { isDelayed = true, bindingPath = p.propertyPath };
+                }
+                else if (p.propertyType == SerializedPropertyType.Integer)
+                {
+                    field = new IntegerField(p.displayName) { isDelayed = true, bindingPath = p.propertyPath };
+                }
+                else if (p.propertyType == SerializedPropertyType.Float)
+                {
+                    field = new FloatField(p.displayName) { isDelayed = true, bindingPath = p.propertyPath };
+                }
+                else if (p.propertyType == SerializedPropertyType.Boolean)
+                {
+                    field = new Toggle(p.displayName) { bindingPath = p.propertyPath };
+                }
+                else
+                {
+                    // Fallback for complex types (Vectors, Enums, ObjectRefs)
+                    var propField = new PropertyField(p.Copy());
+                    field = propField;
+                }
+
                 field.Bind(p.serializedObject);
                 field.style.minWidth = 150;
+                field.style.flexShrink = 0;
                 container.Add(field);
             }
         }
@@ -209,13 +226,13 @@ public class DataGraphWindow : EditorWindow
         node.RefreshExpandedState();
         _graphView.AddElement(node);
 
-        node.RegisterCallback<GeometryChangedEvent>(evt => {
+        // === 4. SAVE ON DRAG RELEASE ONLY ===
+        node.RegisterCallback<MouseUpEvent>(evt => {
             var currentPos = node.GetPosition().position;
             EditorPrefs.SetFloat(saveKey + "X", currentPos.x);
             EditorPrefs.SetFloat(saveKey + "Y", currentPos.y);
         });
     }
-
 }
 
 public class SimpleGraphView : GraphView
