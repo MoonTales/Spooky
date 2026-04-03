@@ -1793,6 +1793,8 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float hideRadius;
 	[SerializeField] private bool avoidHideTarget = false;
 	[SerializeField] private float hideTargetAvoidanceRange;
+	[SerializeField] private bool lookAround = false;
+	[SerializeField] private bool waitAtSpots = false;
 
 	private float searchTimer;
 	private int searchAmount;
@@ -4007,7 +4009,7 @@ public class AttractorAI : MonoBehaviour
 					}
 					else
 					{
-						if (hasAnimator)
+						if (hasAnimator && lookAround)
 						{
 							animator.SetBool("LookingAround", false);
 							foreach (Animator anim in additionalAnimators)
@@ -4071,37 +4073,50 @@ public class AttractorAI : MonoBehaviour
 						}
 					}
 					else
-						searchingSpot = false;
+					{
+						if (waitAtSpots)
+							searchTimer -= Time.deltaTime;
+						else
+							searchingSpot = false;
+					}
 				}
 				
 				if (searchTimer <= 0)
 				{
-					if (hasAnimator)
+					if (hasAnimator && lookAround)
 					{
 						animator.SetBool("LookingAround", false);
 						foreach (Animator anim in additionalAnimators)
 							anim.SetBool("LookingAround", false);
 					}
-					searchTimer = 0;
-					searching = false;
-					hiddenStationary = false;
-					hiding = false;
-					if (currentAvoidedTarget != null)
-						currentAvoidedTarget.enabled = false;
-					currentFocus = nextFocus;
-					currentState = nextState;
-					if (nextStatePriority != currentStatePriority)
+					if (waitAtSpots)
 					{
-						foreach (FunctionPicker function in nextFunctions)
-						{
-							HandleFunctionCalling(function);
-						}
-						foreach (UnityEvent unityEvent in nextEvents)
-						{
-							unityEvent.Invoke();
-						}
+						searchingSpot = false;
+						searchTimer = Random.Range(minSearchTimer, maxSearchTimer);
 					}
-					currentStatePriority = nextStatePriority;
+					else
+					{
+						searchTimer = 0;
+						searching = false;
+						hiddenStationary = false;
+						hiding = false;
+						if (currentAvoidedTarget != null)
+							currentAvoidedTarget.enabled = false;
+						currentFocus = nextFocus;
+						currentState = nextState;
+						if (nextStatePriority != currentStatePriority)
+						{
+							foreach (FunctionPicker function in nextFunctions)
+							{
+								HandleFunctionCalling(function);
+							}
+							foreach (UnityEvent unityEvent in nextEvents)
+							{
+								unityEvent.Invoke();
+							}
+						}
+						currentStatePriority = nextStatePriority;
+					}
 				}
 			}
 		}
