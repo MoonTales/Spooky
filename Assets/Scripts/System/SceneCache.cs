@@ -23,6 +23,7 @@ namespace System
                 Debug.Log($"[SceneCache] '{sceneName}' is already cached or in progress, skipping.");
                 return;
             }
+            DebugUtils.LogSuccess("Requesting cache for scene: " + sceneName);
             
             _cachedScenes.Add(sceneName);
             StartCoroutine(CacheScene(sceneName));

@@ -31,7 +31,6 @@ public class Headphones : MonoBehaviour
             null,
             SendToNextScene
         ).Send();
-        SceneCache.Instance.RequestSceneCache("Tutorial");
     }
 
     // ill set this up later

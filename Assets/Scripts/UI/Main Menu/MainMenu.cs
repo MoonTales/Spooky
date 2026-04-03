@@ -38,7 +38,7 @@ namespace UI.Main_Menu
         private void Start()
         {
             mainMenuCanvas.SetActive(true);
-            SceneCache.Instance.RequestSceneCache("Nightmare1");
+            //SceneCache.Instance.RequestSceneCache("Nightmare1");
             //set all scribbles to false initially 
             Scribble1.enabled = false;
             Scribble2.enabled = false;
@@ -146,7 +146,6 @@ namespace UI.Main_Menu
                 Scribble4.enabled = false;
                 Scribble5.enabled = false;
             }
-   
             
         }
         // Button connections
