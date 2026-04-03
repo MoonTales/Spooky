@@ -67,57 +67,120 @@ public class DataGraphWindow : EditorWindow
         var node = new Node { title = prop.displayName };
         node.SetPosition(new Rect(pos, new Vector2(_defaultWidth, 200)));
 
-        // Base Node Styling
+        // Node Styling
         node.style.width = StyleKeyword.Auto;
         node.style.minWidth = _defaultWidth;
-        node.style.height = StyleKeyword.Auto;
-
         node.extensionContainer.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.9f);
         node.extensionContainer.style.paddingTop = 5;
         node.extensionContainer.style.paddingBottom = 5;
         node.extensionContainer.style.paddingLeft = 5;
         node.extensionContainer.style.paddingRight = 5;
 
-        // if isVertical is true then Top-to-Bottom, if it is false then Left-to-Right
+        VisualElement CreateCellWrapper()
+        {
+            var wrapper = new VisualElement();
+            wrapper.style.paddingTop = 5; wrapper.style.paddingBottom = 5;
+            wrapper.style.paddingLeft = 5; wrapper.style.paddingRight = 5;
+
+            wrapper.style.borderTopWidth = 1; wrapper.style.borderBottomWidth = 1;
+            wrapper.style.borderLeftWidth = 1; wrapper.style.borderRightWidth = 1;
+            var borderColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+            wrapper.style.borderTopColor = borderColor;
+            wrapper.style.borderBottomColor = borderColor;
+            wrapper.style.borderLeftColor = borderColor;
+            wrapper.style.borderRightColor = borderColor;
+
+            wrapper.style.backgroundColor = new Color(1, 1, 1, 0.03f);
+            return wrapper;
+        }
+
         void BuildDataUI(SerializedProperty p, VisualElement container, bool isVertical)
         {
-            // If it is an array (or list technically)
+            // === 1. ARRAY HANDLING (Manual Control + Fast Diff) ===
             if (p.isArray && p.propertyType == SerializedPropertyType.Generic)
             {
-                // Create a Header PropertyField to show the size/buttons
-                var listHeaderField = new PropertyField(p.Copy());
-                listHeaderField.Bind(p.serializedObject);
+                // A. The Header Container
+                var headerContainer = new VisualElement();
+                headerContainer.style.flexDirection = FlexDirection.Row;
+                headerContainer.style.marginBottom = 5;
+                headerContainer.style.alignItems = Align.Center; // Centers items vertically
 
-                container.Add(listHeaderField);
+                // B. Manual Foldout
+                var foldout = new Foldout { text = p.displayName, value = true };
+                foldout.style.flexGrow = 1;
 
-                // Create the custom non-scrolling grid view below the header
+                // C. FIX 1: Explicit IntegerField for Size Input
+                // We use a real IntegerField instead of PropertyField to guarantee an input box appears.
+                var sizeProp = p.FindPropertyRelative("Array.size");
+                var sizeField = new IntegerField("Size");
+                sizeField.style.minWidth = 120; // Ensure enough space for label + input
+                sizeField.bindingPath = sizeProp.propertyPath; // Bind manually
+                sizeField.Bind(p.serializedObject);
+
+                headerContainer.Add(foldout);
+                headerContainer.Add(sizeField);
+                container.Add(headerContainer);
+
+                // D. Content Container
                 var listContent = new VisualElement();
                 listContent.style.flexDirection = isVertical ? FlexDirection.Column : FlexDirection.Row;
                 listContent.style.flexWrap = Wrap.NoWrap;
-                listContent.style.marginLeft = 15; // Indent slightly below the buttons
+                listContent.style.marginLeft = 15;
 
-                for (int i = 0; i < p.arraySize; i++)
-                {
-                    var element = p.GetArrayElementAtIndex(i);
-                    var elementWrapper = new VisualElement();
-
-                    // Cell Styling (corrected for IStyle)
-                    elementWrapper.style.paddingTop = 5; elementWrapper.style.paddingBottom = 5;
-                    elementWrapper.style.paddingLeft = 5; elementWrapper.style.paddingRight = 5;
-                    elementWrapper.style.borderTopWidth = 1; elementWrapper.style.borderBottomWidth = 1;
-                    elementWrapper.style.borderLeftWidth = 1; elementWrapper.style.borderRightWidth = 1;
-                    elementWrapper.style.borderTopColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-                    elementWrapper.style.borderBottomColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-                    elementWrapper.style.borderLeftColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-                    elementWrapper.style.borderRightColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-                    elementWrapper.style.backgroundColor = new Color(1, 1, 1, 0.03f);
-
-                    BuildDataUI(element, elementWrapper, !isVertical);
-                    listContent.Add(elementWrapper);
-                }
+                foldout.RegisterValueChangedCallback(evt => listContent.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
                 container.Add(listContent);
+
+                // Capture References
+                string arrayPath = p.propertyPath;
+                SerializedObject so = p.serializedObject;
+
+                // E. FIX 2: The Fast Sync Logic
+                // Instead of destroying the list (Rebuild), we simply Add or Remove items.
+                // This restores the speed of the graph creation and updates.
+                void SyncContent()
+                {
+                    so.Update();
+                    var freshArray = so.FindProperty(arrayPath);
+                    if (freshArray == null) return;
+
+                    int targetCount = freshArray.arraySize;
+                    int currentCount = listContent.childCount;
+
+                    // Optimization: If counts match, do nothing (Fastest possible path)
+                    if (targetCount == currentCount) return;
+
+                    // Grow: Add new items
+                    if (targetCount > currentCount)
+                    {
+                        for (int i = currentCount; i < targetCount; i++)
+                        {
+                            var elementProp = freshArray.GetArrayElementAtIndex(i);
+                            var wrapper = CreateCellWrapper();
+                            BuildDataUI(elementProp, wrapper, !isVertical);
+                            listContent.Add(wrapper);
+                        }
+                    }
+                    // Shrink: Remove from end
+                    else
+                    {
+                        while (listContent.childCount > targetCount)
+                        {
+                            listContent.RemoveAt(listContent.childCount - 1);
+                        }
+                    }
+                }
+
+                // Initial Build
+                SyncContent();
+
+                // F. The Anti-Lag Listener
+                // We keep the exact logic that fixed the lag: listening to the IntegerField.
+                sizeField.RegisterCallback<ChangeEvent<int>>(evt =>
+                {
+                    listContent.schedule.Execute(SyncContent);
+                });
             }
-            // If it is a class
+            // === 2. CLASS HANDLING ===
             else if (p.hasVisibleChildren)
             {
                 var classFoldout = new Foldout { text = p.displayName, value = true };
@@ -132,7 +195,7 @@ public class DataGraphWindow : EditorWindow
                 }
                 container.Add(classFoldout);
             }
-            // for simple variables
+            // === 3. SIMPLE PROPERTY HANDLING ===
             else
             {
                 var field = new PropertyField(p.Copy());
@@ -142,13 +205,10 @@ public class DataGraphWindow : EditorWindow
             }
         }
 
-        // Start with Vertical for the main list
         BuildDataUI(prop.Copy(), node.extensionContainer, true);
-
         node.RefreshExpandedState();
         _graphView.AddElement(node);
 
-        // Save Position
         node.RegisterCallback<GeometryChangedEvent>(evt => {
             var currentPos = node.GetPosition().position;
             EditorPrefs.SetFloat(saveKey + "X", currentPos.x);
