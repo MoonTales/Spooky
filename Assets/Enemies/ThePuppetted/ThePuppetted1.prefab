@@ -15144,6 +15144,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4054806513202188415}
   - component: {fileID: 431777586572866820}
+  - component: {fileID: 6513903050189443428}
   m_Layer: 7
   m_Name: Creep_mesh
   m_TagString: Untagged
@@ -15190,6 +15191,27 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6513903050189443428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5945155882845629859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a160fcc9797d634cb469011d677e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terrorAudioSourceTransform: {fileID: 0}
+  veryClose: 5
+  close: 10
+  midRange: 20
+  far: 30
+  veryCloseDmg: 20
+  closeDmg: 10
+  midRangeDmg: 4
+  farDmg: 1
 --- !u!1 &5966823017408181535
 GameObject:
   m_ObjectHideFlags: 0
@@ -22086,8 +22108,8 @@ MonoBehaviour:
                 inWeight: 0
                 outWeight: 0
               - serializedVersion: 3
-                time: 0.82935154
-                value: 0.9981114
+                time: 0.76791966
+                value: 1.0001562
                 inSlope: 3.2493274
                 outSlope: 3.2493274
                 tangentMode: 0
@@ -22220,8 +22242,8 @@ MonoBehaviour:
                   inWeight: 0
                   outWeight: 0.33105803
                 - serializedVersion: 3
-                  time: 0.11700318
-                  value: 0.9835068
+                  time: 0.23304312
+                  value: 0.9702678
                   inSlope: -0.5866282
                   outSlope: -0.5866282
                   tangentMode: 0
@@ -23955,9 +23977,9 @@ MonoBehaviour:
       - boolName: Recovering
         boolValue: 1
       floatConditions:
-      - floatName: RecoverTime
+      - floatName: RecoveryTime
         floatValue: 10
-      floatCompare: 3
+      floatCompare: 1
       intConditions: []
       intCompare: 0
     allConditionsRequired: 1
@@ -27257,6 +27279,7 @@ GameObject:
   - component: {fileID: 2156486008130238645}
   - component: {fileID: 4749969487970696824}
   - component: {fileID: 5196718417304209807}
+  - component: {fileID: 5249537566126355846}
   m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
@@ -27411,6 +27434,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.053408083, y: 0.051014863, z: 0.06868574}
   m_Center: {x: 0, y: -0.0056988015, z: -0.0072177397}
+--- !u!114 &5249537566126355846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8178454992359902083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ecd5fc681cf3fd4db28d5a7a28d4b31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageAmount: 20
 --- !u!1 &8186183564314044105
 GameObject:
   m_ObjectHideFlags: 0
