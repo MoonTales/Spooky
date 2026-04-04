@@ -3250,7 +3250,6 @@ public class AttractorAI : MonoBehaviour
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
-											Debug.Log("Impossible6");
 											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
 
 											if (utilityScore > highestUtility)
@@ -3283,7 +3282,6 @@ public class AttractorAI : MonoBehaviour
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
-											Debug.Log("Impossible2");
 											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
 
 											if (utilityScore > highestUtility)
@@ -3299,7 +3297,6 @@ public class AttractorAI : MonoBehaviour
 
 							if (highestUtility >= reaction.minRequiredUtility)
 							{
-								Debug.Log("Impossible3");
 								Debug.Log(tellMe);
 
 								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
@@ -3569,7 +3566,6 @@ public class AttractorAI : MonoBehaviour
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
-											Debug.Log("Impossible4");
 											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
 
 											if (utilityScore > highestUtility)
@@ -3602,7 +3598,6 @@ public class AttractorAI : MonoBehaviour
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
-											Debug.Log("Impossible5");
 
 											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
 
@@ -3619,7 +3614,6 @@ public class AttractorAI : MonoBehaviour
 
 							if (highestUtility >= reaction.minRequiredUtility)
 							{
-								Debug.Log("Impossible6");
 
 								Debug.Log(tellMe);
 
