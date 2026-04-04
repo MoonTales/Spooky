@@ -2067,12 +2067,12 @@ public class AttractorAI : MonoBehaviour
 				}
 				else
 				{
-					return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+					return 0f;
 				}
 			}
 			else
 			{
-				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+				return 0f;
 			}
 		}
 
@@ -2099,7 +2099,7 @@ public class AttractorAI : MonoBehaviour
 				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
 			}
 			else
-				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+				return 0f;
 		}
 
 		// Int Condition
@@ -2116,7 +2116,7 @@ public class AttractorAI : MonoBehaviour
 				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
 			}
 			else
-				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+				return 0f;
 		}
 
 		// Status
