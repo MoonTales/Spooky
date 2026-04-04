@@ -131,6 +131,16 @@ public class Clock : EventSubscriberBase
                 continue;
             }
 
+            // Is this a drawing, if so pass
+            if (InspectionSystem.Instance.GetInspectedObject() != null)
+            {
+                //Debug.Log(InspectionSystem.Instance.GetInspectedObject().GetComponent<Interaction.drawings.Drawing>());
+                if (InspectionSystem.Instance.GetInspectedObject().GetComponent<Interaction.drawings.Drawing>() == true)
+                {
+                    continue;
+                }
+            }
+
             // Increment timer. If inspecting, increment * fast forward speed
             if (_currentGameState != Types.GameState.Paused)
             {
@@ -189,6 +199,16 @@ public class Clock : EventSubscriberBase
                 !LetterManager.Instance.GetHasReadAct3FriendLetter()) )
             {
                 continue;
+            }
+
+            // Is this a drawing, if so pass
+            if (InspectionSystem.Instance.GetInspectedObject() != null)
+            {
+                //Debug.Log(InspectionSystem.Instance.GetInspectedObject().GetComponent<Interaction.drawings.Drawing>());
+                if (InspectionSystem.Instance.GetInspectedObject().GetComponent<Interaction.drawings.Drawing>() == true)
+                {
+                    continue;
+                }
             }
 
             //_isInspecting = PlayerController.Instance.IsPlayerInspecting();

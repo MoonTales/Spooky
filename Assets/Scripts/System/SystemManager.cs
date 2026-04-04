@@ -39,6 +39,7 @@ namespace System
             gameObject.AddComponent<SleepTrackerManager>();
             gameObject.AddComponent<SaveSystem>();
             gameObject.AddComponent<UiPopupConfirmation>();
+            gameObject.AddComponent<SceneCache>();
 
 
         }

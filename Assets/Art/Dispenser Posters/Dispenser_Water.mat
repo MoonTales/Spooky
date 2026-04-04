@@ -20,16 +20,17 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Drawing9
+  m_Name: Dispenser_Water
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _METALLICSPECGLOSSMAP
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2000
   stringTagMap:
     RenderType: Opaque
   disabledShaderPasses:
@@ -39,9 +40,9 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: d866b0d3635d2e041ad0f7ef62b29cb2, type: 3}
-        m_Scale: {x: 1.75, y: 3.15}
-        m_Offset: {x: 0.008, y: -0.2}
+        m_Texture: {fileID: 2800000, guid: 6c4207bf4fd3104429ef408d41738984, type: 3}
+        m_Scale: {x: -1.49, y: -2.82}
+        m_Offset: {x: -0.08, y: -1.11}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -63,11 +64,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d866b0d3635d2e041ad0f7ef62b29cb2, type: 3}
-        m_Scale: {x: 1.75, y: 3.15}
-        m_Offset: {x: 0.008, y: -0.2}
+        m_Texture: {fileID: 2800000, guid: 6c4207bf4fd3104429ef408d41738984, type: 3}
+        m_Scale: {x: -1.49, y: -2.82}
+        m_Offset: {x: -0.08, y: -1.11}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 6c4207bf4fd3104429ef408d41738984, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
