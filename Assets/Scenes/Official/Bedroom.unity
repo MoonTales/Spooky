@@ -110261,7 +110261,7 @@ MonoBehaviour:
     place: prompt
     id: drawing_examine
   requiredHour: -1
-  pickupSfx: {fileID: 8300000, guid: c8de8387af01fe847b7775e868eb2724, type: 3}
+  pickupSfx: {fileID: 8300000, guid: 02fe0ebc36630f2419edb818229b7e10, type: 3}
   putDownSfx: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
   sfxVolume: 1
   sfxPitchVariation: 0.05
@@ -253645,7 +253645,7 @@ MonoBehaviour:
     place: prompt
     id: drawing_examine
   requiredHour: -1
-  pickupSfx: {fileID: 8300000, guid: c8de8387af01fe847b7775e868eb2724, type: 3}
+  pickupSfx: {fileID: 8300000, guid: 02fe0ebc36630f2419edb818229b7e10, type: 3}
   putDownSfx: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
   sfxVolume: 1
   sfxPitchVariation: 0.05
@@ -332021,9 +332021,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 885765374}
     - target: {fileID: 3282597010837077446, guid: 6c493ca1758fe7e41a72be472d0ef464, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 7978e231609454a44a7ab52bee35b1f2, type: 3}
+    - target: {fileID: 3282597010837077446, guid: 6c493ca1758fe7e41a72be472d0ef464, type: 3}
       propertyPath: rowKey.id
       value: drawing_2
       objectReference: {fileID: 0}
+    - target: {fileID: 3282597010837077446, guid: 6c493ca1758fe7e41a72be472d0ef464, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
     - target: {fileID: 3282597010837077446, guid: 6c493ca1758fe7e41a72be472d0ef464, type: 3}
       propertyPath: rowKey.place
       value: bedroom
@@ -332234,9 +332242,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1951547046}
     - target: {fileID: 3877816298236101081, guid: 603f155b9b08ce74b91d1ad339e6a3e6, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 02fe0ebc36630f2419edb818229b7e10, type: 3}
+    - target: {fileID: 3877816298236101081, guid: 603f155b9b08ce74b91d1ad339e6a3e6, type: 3}
       propertyPath: rowKey.id
       value: drawing_5
       objectReference: {fileID: 0}
+    - target: {fileID: 3877816298236101081, guid: 603f155b9b08ce74b91d1ad339e6a3e6, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 2e66b8dd429b05e4eb2330247d41f281, type: 3}
     - target: {fileID: 3877816298236101081, guid: 603f155b9b08ce74b91d1ad339e6a3e6, type: 3}
       propertyPath: rowKey.place
       value: bedroom
@@ -333428,9 +333444,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2103209756}
     - target: {fileID: 4082318488599989202, guid: 71539821ccdca6646831517ff3a27ea0, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: c8de8387af01fe847b7775e868eb2724, type: 3}
+    - target: {fileID: 4082318488599989202, guid: 71539821ccdca6646831517ff3a27ea0, type: 3}
       propertyPath: rowKey.id
       value: drawing_1
       objectReference: {fileID: 0}
+    - target: {fileID: 4082318488599989202, guid: 71539821ccdca6646831517ff3a27ea0, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
     - target: {fileID: 4082318488599989202, guid: 71539821ccdca6646831517ff3a27ea0, type: 3}
       propertyPath: rowKey.place
       value: bedroom
@@ -334909,9 +334933,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1834558763}
     - target: {fileID: 2081634560181109928, guid: a8f3ca75c1bc54245a3c1b3322b6a941, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 5a473a65fd204da49991f9166f63071c, type: 3}
+    - target: {fileID: 2081634560181109928, guid: a8f3ca75c1bc54245a3c1b3322b6a941, type: 3}
       propertyPath: rowKey.id
       value: drawing_7
       objectReference: {fileID: 0}
+    - target: {fileID: 2081634560181109928, guid: a8f3ca75c1bc54245a3c1b3322b6a941, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 2e66b8dd429b05e4eb2330247d41f281, type: 3}
     - target: {fileID: 2081634560181109928, guid: a8f3ca75c1bc54245a3c1b3322b6a941, type: 3}
       propertyPath: rowKey.place
       value: bedroom
@@ -335883,9 +335915,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1622184905}
     - target: {fileID: 7825952758472009047, guid: 4ec94228051a8044b966e92d8f503140, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 2d27d464c0203174ba2ec8af62c53f45, type: 3}
+    - target: {fileID: 7825952758472009047, guid: 4ec94228051a8044b966e92d8f503140, type: 3}
       propertyPath: rowKey.id
       value: drawing_3
       objectReference: {fileID: 0}
+    - target: {fileID: 7825952758472009047, guid: 4ec94228051a8044b966e92d8f503140, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 2e66b8dd429b05e4eb2330247d41f281, type: 3}
     - target: {fileID: 7825952758472009047, guid: 4ec94228051a8044b966e92d8f503140, type: 3}
       propertyPath: rowKey.place
       value: bedroom
@@ -336465,9 +336505,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 577448366}
     - target: {fileID: 9001934443518348857, guid: 52ab45c707fb4864fb36395d5d9fa427, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 02fe0ebc36630f2419edb818229b7e10, type: 3}
+    - target: {fileID: 9001934443518348857, guid: 52ab45c707fb4864fb36395d5d9fa427, type: 3}
       propertyPath: rowKey.id
       value: drawing_8
       objectReference: {fileID: 0}
+    - target: {fileID: 9001934443518348857, guid: 52ab45c707fb4864fb36395d5d9fa427, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
     - target: {fileID: 9001934443518348857, guid: 52ab45c707fb4864fb36395d5d9fa427, type: 3}
       propertyPath: rowKey.place
       value: bedroom
@@ -338121,9 +338169,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 841482850}
     - target: {fileID: 695794372210173850, guid: ebeabc3a248357043bbc9a9e6bd68ffe, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 5a473a65fd204da49991f9166f63071c, type: 3}
+    - target: {fileID: 695794372210173850, guid: ebeabc3a248357043bbc9a9e6bd68ffe, type: 3}
       propertyPath: rowKey.id
       value: drawing_9
       objectReference: {fileID: 0}
+    - target: {fileID: 695794372210173850, guid: ebeabc3a248357043bbc9a9e6bd68ffe, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
     - target: {fileID: 695794372210173850, guid: ebeabc3a248357043bbc9a9e6bd68ffe, type: 3}
       propertyPath: rowKey.place
       value: bedroom
@@ -339975,9 +340031,17 @@ PrefabInstance:
       value: 3580
       objectReference: {fileID: 0}
     - target: {fileID: 1492972966088792541, guid: fba685105a2017b449ca1c30ab6d24a2, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 7978e231609454a44a7ab52bee35b1f2, type: 3}
+    - target: {fileID: 1492972966088792541, guid: fba685105a2017b449ca1c30ab6d24a2, type: 3}
       propertyPath: rowKey.id
       value: drawing_6
       objectReference: {fileID: 0}
+    - target: {fileID: 1492972966088792541, guid: fba685105a2017b449ca1c30ab6d24a2, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 2e66b8dd429b05e4eb2330247d41f281, type: 3}
     - target: {fileID: 1492972966088792541, guid: fba685105a2017b449ca1c30ab6d24a2, type: 3}
       propertyPath: rowKey.place
       value: bedroom
@@ -343484,9 +343548,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1005800245}
     - target: {fileID: 6723873558589647985, guid: 74cc995060d6d5b42b484e6b4cd72fe3, type: 3}
+      propertyPath: pickupSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 7978e231609454a44a7ab52bee35b1f2, type: 3}
+    - target: {fileID: 6723873558589647985, guid: 74cc995060d6d5b42b484e6b4cd72fe3, type: 3}
       propertyPath: rowKey.id
       value: drawing_4
       objectReference: {fileID: 0}
+    - target: {fileID: 6723873558589647985, guid: 74cc995060d6d5b42b484e6b4cd72fe3, type: 3}
+      propertyPath: putDownSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 1ac3f90ca23557943876a7ce3b2abe96, type: 3}
     - target: {fileID: 6723873558589647985, guid: 74cc995060d6d5b42b484e6b4cd72fe3, type: 3}
       propertyPath: rowKey.place
       value: bedroom
