@@ -89,8 +89,8 @@ namespace Inspection
                 
                 // Play notification if player has not read letters by 6pm
                 Types.NotificationData data = new(
-                    duration: 1.0f, 
-                    messageKey: new TextKey { place = "prompt", id = "letters_not_read" },
+                    duration: 2.0f, 
+                    messageKey: new TextKey { place = "prompt", id = "letters_not_read_inspect" },
                     messageOverride: "",
                     shouldOnlyShowOnce: false
                 );
