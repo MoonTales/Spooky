@@ -89,9 +89,9 @@ namespace Inspection
                 
                 // Play notification if player has not read letters by 6pm
                 Types.NotificationData data = new(
-                    duration: 1.0f, 
-                    messageKey: new TextKey(),
-                    messageOverride: "Can’t. Too tired...\n\nShould check for letters...",
+                    duration: 2.0f, 
+                    messageKey: new TextKey { place = "prompt", id = "letters_not_read_inspect" },
+                    messageOverride: "",
                     shouldOnlyShowOnce: false
                 );
                 data.Send();
@@ -99,7 +99,7 @@ namespace Inspection
                 /*
                 Types.NotificationData data = new(
                     duration: 1, 
-                    messageKey: new TextKey { place = "prompt", id = "letters_not_read" },
+                    messageKey: new TextKey { place = "prompt", id = "letters_not_read_inspect" },
                     messageOverride: "",
                     shouldOnlyShowOnce:false
                 );
