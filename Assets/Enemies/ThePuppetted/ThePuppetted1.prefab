@@ -20456,7 +20456,7 @@ MonoBehaviour:
   currentStatuses:
   - Lurking
   - SwitchingStats
-  defaultState: 7
+  defaultState: 0
   defaultFocus: {fileID: 0}
   currentConditions:
     boolConditions:
@@ -20464,7 +20464,7 @@ MonoBehaviour:
       boolValue: 0
     floatConditions:
     - floatName: Energy
-      floatValue: 10
+      floatValue: 12
     - floatName: RecoveryTime
       floatValue: 0
     - floatName: RushTime
@@ -21540,30 +21540,30 @@ MonoBehaviour:
               m_Curve:
               - serializedVersion: 3
                 time: 0
-                value: 0
-                inSlope: 2
-                outSlope: 2
+                value: 1
+                inSlope: -0.03311312
+                outSlope: -0.03311312
                 tangentMode: 0
                 weightedMode: 0
                 inWeight: 0
-                outWeight: 0
+                outWeight: 0.8370395
               - serializedVersion: 3
-                time: 0.693891
-                value: 0.9974467
-                inSlope: -0.094175026
-                outSlope: -0.094175026
+                time: 0.24119729
+                value: 0.9973186
+                inSlope: -0.06381118
+                outSlope: -0.06381118
                 tangentMode: 0
                 weightedMode: 0
-                inWeight: 0.33333334
-                outWeight: 0.6320658
+                inWeight: 0.7877482
+                outWeight: 0.4389675
               - serializedVersion: 3
                 time: 1
-                value: 1
-                inSlope: 0
-                outSlope: 0
+                value: 0.0018920898
+                inSlope: -3.8180623
+                outSlope: -3.8180623
                 tangentMode: 0
                 weightedMode: 0
-                inWeight: 0
+                inWeight: 0.06746753
                 outWeight: 0
               m_PreInfinity: 2
               m_PostInfinity: 2
@@ -21794,30 +21794,30 @@ MonoBehaviour:
               m_Curve:
               - serializedVersion: 3
                 time: 0
-                value: 0
-                inSlope: 2
-                outSlope: 2
+                value: 1
+                inSlope: -0.03311312
+                outSlope: -0.03311312
                 tangentMode: 0
                 weightedMode: 0
                 inWeight: 0
-                outWeight: 0
+                outWeight: 0.8370395
               - serializedVersion: 3
-                time: 0.693891
-                value: 0.9974467
-                inSlope: -0.094175026
-                outSlope: -0.094175026
+                time: 0.24119729
+                value: 0.9973186
+                inSlope: -0.06381118
+                outSlope: -0.06381118
                 tangentMode: 0
                 weightedMode: 0
-                inWeight: 0.33333334
-                outWeight: 0.6320658
+                inWeight: 0.7877482
+                outWeight: 0.4389675
               - serializedVersion: 3
                 time: 1
-                value: 1
-                inSlope: 0
-                outSlope: 0
+                value: 0.0018920898
+                inSlope: -3.8180623
+                outSlope: -3.8180623
                 tangentMode: 0
                 weightedMode: 0
-                inWeight: 0
+                inWeight: 0.06746753
                 outWeight: 0
               m_PreInfinity: 2
               m_PostInfinity: 2
@@ -24331,7 +24331,7 @@ MonoBehaviour:
       thoughtReprogramParameters: []
       statsToChange: 
       changeStatsBy: 1
-      statsChangeAmount: 8
+      statsChangeAmount: 4
       addReactions: []
       addReactionLowerBoundDangerRange: 0
       addReactionUpperBoundDangerRange: 0
