@@ -2122,13 +2122,13 @@ public class AttractorAI : MonoBehaviour
 		// Status
 		else if (consideration.considerationType == ConsiderationType.status)
 		{
-			return Mathf.Clamp01(currentStatuses.Contains(consideration.statusName) ? 1 : 0);
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(currentStatuses.Contains(consideration.statusName) ? 1 : 0));
 		}
 
 		// State
 		else if (consideration.considerationType == ConsiderationType.state)
 		{
-			return Mathf.Clamp01(currentState == consideration.state ? 1 : 0);
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(currentState == consideration.state ? 1 : 0));
 		}
 
 		else if (consideration.considerationType == ConsiderationType.compositeConsideration)
