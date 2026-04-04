@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Inspection;
 using Managers;
 using Player;
 using UnityEngine;
@@ -9,7 +10,7 @@ using Types = System.Types;
 
 namespace Interaction.drawings
 {
-    public class Drawing : EventSubscriberBase, IInteractable
+    public class Drawing : InspectableObject, IInteractable
     {
         [Header("Drawing Settings")]
         [SerializeField, Tooltip("What area does this item exist within?")] 
@@ -163,7 +164,7 @@ namespace Interaction.drawings
             }
         }
     
-        public bool CanInteract(Interactor interactor)
+        public new bool CanInteract(Interactor interactor)
         {
             // Can't interact with yourself if you're being held or returning
             if (_isPickedUp || _isReturningToPosition){ return false;}
@@ -183,7 +184,7 @@ namespace Interaction.drawings
         }
 
 
-        public void OnInspectionFinished()
+        public new void OnInspectionFinished()
         {
             if (IsInBedroom())
             {
@@ -220,11 +221,17 @@ namespace Interaction.drawings
             }
         }
 
-        public virtual void Interact(Interactor interactor)
+        public new virtual void Interact(Interactor interactor)
         {
             
             if(GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom)
             {
+                
+                // Due to this being a different "type" of drawing, ima set up this stupid thing
+                
+                
+                
+                
                 InspectionSystem.Instance.StartInspection(gameObject, _returnLocation);
                 return;
             }

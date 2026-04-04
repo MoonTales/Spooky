@@ -53,6 +53,11 @@ namespace System
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            // if the cache is active, we dont wanna do any of this stuff
+            // also if its an additive scene, we wont do any of this stuff either
+            if (SceneCache.Instance.IsCacheInProgress()) { return; }
+
+            if (mode == LoadSceneMode.Additive) { return; }
             // after the scene has been loaded, we need to ensure the player is teleported to the correct location
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
             // This is when we want to broadcast the world clock
@@ -86,6 +91,36 @@ namespace System
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
             }
+            
+            // --- SECTION FOR ASYNC LOADING --- //
+            if (scene.name.ToLower() == "headphone")
+            {
+                SceneCache.Instance.RequestSceneCache("Tutorial");
+            }
+            if (scene.name.ToLower() == "mainmenu")
+            {
+                
+            }
+            if (scene.name.ToLower() == "credits")
+            {
+                
+            }
+            if (scene.name.ToLower() == "tutorial")
+            {
+                SceneCache.Instance.RequestSceneCache("Bedroom");
+            }
+            if (scene.name.ToLower() == "bedroom")
+            {
+                SceneCache.Instance.RequestSceneCache("Nightmare1");
+            }
+            if (scene.name.ToLower() == "nightmare1")
+            {
+                SceneCache.Instance.RequestSceneCache("FinaleNightmare");
+            }
+            
+            
+            
+            // --------------------------------- //
             
 
             NotifySceneInitialized();

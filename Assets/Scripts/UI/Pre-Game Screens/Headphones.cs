@@ -14,13 +14,15 @@ public class Headphones : MonoBehaviour
     [SerializeField] private float exitToBlackDuration = 1f;
     [SerializeField] private float headphonesAnim = 2f;
 
+    
+    private AsyncOperation _tutorialPreload;
     // this is for transparency for the fade
     float alpha = 1;
 
     private void Start()
     {
         headphonesCanvas.SetActive(true);
-
+        
         // reveal scene from black
         new Types.ScreenFadeData(
             fadeInDuration: revealDuration,
@@ -29,7 +31,6 @@ public class Headphones : MonoBehaviour
             null,
             SendToNextScene
         ).Send();
-        
     }
 
     // ill set this up later

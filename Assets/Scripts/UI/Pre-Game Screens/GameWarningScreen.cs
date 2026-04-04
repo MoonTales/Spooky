@@ -23,6 +23,7 @@ public class GameWarningScreen : MonoBehaviour
     private void Start()
     {
         warningsCanvas.SetActive(true);
+        //SceneCache.Instance.RequestSceneCache("Bedroom");
 
         _pressKeyBaseColor = pressKey.color;
 
