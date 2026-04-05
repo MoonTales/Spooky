@@ -27,7 +27,6 @@
 		</relationship>
 		<relationship name="groupTracks">
 			<destination>{5f78a54a-e792-47ed-abd4-883cdbc462c0}</destination>
-			<destination>{aa000b49-a86c-4e84-bf56-69f1571bf282}</destination>
 		</relationship>
 		<relationship name="timeline">
 			<destination>{cd2d8d94-d189-459c-9fd3-02f646ba4e40}</destination>
@@ -68,11 +67,6 @@
 		</relationship>
 		<relationship name="mixerGroup">
 			<destination>{6f572b61-8dec-4700-ade8-cf40a0e42494}</destination>
-		</relationship>
-	</object>
-	<object class="GroupTrack" id="{aa000b49-a86c-4e84-bf56-69f1571bf282}">
-		<relationship name="mixerGroup">
-			<destination>{e3ecc3e0-0720-41f8-a882-dce59b08353f}</destination>
 		</relationship>
 	</object>
 	<object class="Timeline" id="{cd2d8d94-d189-459c-9fd3-02f646ba4e40}">
@@ -127,20 +121,6 @@
 			<destination>{564877ba-a8b2-4581-8e6d-4ebf990371a6}</destination>
 		</relationship>
 	</object>
-	<object class="EventMixerGroup" id="{e3ecc3e0-0720-41f8-a882-dce59b08353f}">
-		<property name="name">
-			<value>Audio 2</value>
-		</property>
-		<relationship name="effectChain">
-			<destination>{233d0b55-418a-4b50-9ef9-488892f9da39}</destination>
-		</relationship>
-		<relationship name="panner">
-			<destination>{2a9f97eb-8824-4802-8d73-6300254fc901}</destination>
-		</relationship>
-		<relationship name="output">
-			<destination>{564877ba-a8b2-4581-8e6d-4ebf990371a6}</destination>
-		</relationship>
-	</object>
 	<object class="LoopRegion" id="{9f4431a1-92c0-4466-b349-cc2fb468223a}">
 		<property name="position">
 			<value>0</value>
@@ -170,12 +150,6 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{2804035c-1b38-48a0-9acc-cc5f1c592585}" />
-	<object class="MixerBusEffectChain" id="{233d0b55-418a-4b50-9ef9-488892f9da39}">
-		<relationship name="effects">
-			<destination>{f1bbf842-9114-448b-9e2f-0ffbbcf36f33}</destination>
-		</relationship>
-	</object>
-	<object class="MixerBusPanner" id="{2a9f97eb-8824-4802-8d73-6300254fc901}" />
 	<object class="MultibandEqEffect" id="{0f0fe25e-6aca-459f-8b7f-111f46660eda}">
 		<property name="filterTypeA">
 			<value>2</value>
@@ -203,7 +177,6 @@
 			<destination>{be19db0a-3c9e-4e09-8e4c-d790527c59f6}</destination>
 		</relationship>
 	</object>
-	<object class="MixerBusFader" id="{f1bbf842-9114-448b-9e2f-0ffbbcf36f33}" />
 	<object class="Automator" id="{be19db0a-3c9e-4e09-8e4c-d790527c59f6}">
 		<property name="nameOfPropertyBeingAutomated">
 			<value>frequencyA</value>
@@ -231,10 +204,10 @@
 	</object>
 	<object class="AutomationPoint" id="{053941ac-7383-46b0-9f05-5c3726b17a65}">
 		<property name="position">
-			<value>0.60593220338983056</value>
+			<value>1</value>
 		</property>
 		<property name="value">
-			<value>129.562164</value>
+			<value>450</value>
 		</property>
 	</object>
 </objects>
