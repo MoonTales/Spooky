@@ -109,7 +109,6 @@ namespace UI.PauseMenu
             float masterVolume = LoadSavedVolume(MasterVolumeKey);
             float musicVolume = LoadSavedVolume(MusicVolumeKey);
             float sfxVolume = LoadSavedVolume(SfxVolumeKey);
-            LogLoadedAudioVolumes("InitializeAudioSliders", masterVolume, musicVolume, sfxVolume);
 
             SetAudioSliderValues(masterVolume, musicVolume, sfxVolume);
             BindAudioSliderCallbacks();
@@ -165,15 +164,6 @@ namespace UI.PauseMenu
             return Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultVolume));
         }
 
-        private static void LogLoadedAudioVolumes(string source, float masterVolume, float musicVolume, float sfxVolume)
-        {
-            Debug.Log(
-                $"SettingsController: Loaded audio PlayerPrefs ({source}) -> " +
-                $"{MasterVolumeKey}={masterVolume:0.###} (hasKey={PlayerPrefs.HasKey(MasterVolumeKey)}), " +
-                $"{MusicVolumeKey}={musicVolume:0.###} (hasKey={PlayerPrefs.HasKey(MusicVolumeKey)}), " +
-                $"{SfxVolumeKey}={sfxVolume:0.###} (hasKey={PlayerPrefs.HasKey(SfxVolumeKey)})");
-        }
-
         private static void ApplyAudioVolumes(float masterVolume, float musicVolume, float sfxVolume)
         {
             if (AudioManager.Instance == null)
@@ -199,7 +189,6 @@ namespace UI.PauseMenu
             float masterVolume = LoadSavedVolume(MasterVolumeKey);
             float musicVolume = LoadSavedVolume(MusicVolumeKey);
             float sfxVolume = LoadSavedVolume(SfxVolumeKey);
-            LogLoadedAudioVolumes("RefreshAudioSlidersFromSavedValues", masterVolume, musicVolume, sfxVolume);
             SetAudioSliderValues(masterVolume, musicVolume, sfxVolume);
         }
 
