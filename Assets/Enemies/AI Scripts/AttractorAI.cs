@@ -199,7 +199,6 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
-		[Space(20)]
 		[Header("UtilityFunctions")]
 		[Range(0f, 1f)]
 		public float[] possibleMinRequiredUtilityChanges;
@@ -328,7 +327,6 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
-		[Space(20)]
 		[Header("UtilityFunctions")]
 		[Range(0f, 1f)]
 		public float[] possibleMinRequiredUtilityChanges;
@@ -963,7 +961,6 @@ public class AttractorAI : MonoBehaviour
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
-		[Space(20)]
 		[Header("UtilityFunctions")]
 		//[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
 		[Range(0f, 1f)]
@@ -1014,7 +1011,6 @@ public class AttractorAI : MonoBehaviour
 	{
 		public ConsiderationType considerationType;
 
-		[Space(20)]
 		// Attractor Considerations
 		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
 		[Header("Attractor Considerations")]
@@ -1042,14 +1038,12 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
 		public float maxDistanceClamp;
 
-		[Space(20)]
 		// Bool Condition Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.boolCondition)]
 		[Header("Bool Condition Consideration")]
 		[Tooltip("false = 0; true = 1")]
 		public string boolID;
 
-		[Space(20)]
 		// Float Condition Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
 		[Header("Float Condition Consideration")]
@@ -1059,7 +1053,6 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
 		public float maxFloatClamp;
 
-		[Space(20)]
 		// Int Condition Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
 		[Header("Int Condition Consideration")]
@@ -1069,21 +1062,18 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
 		public float maxIntClamp;
 
-		[Space(20)]
 		// Status Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.status)]
 		[Header("Status Consideration")]
 		[Tooltip("does not have status = 0; has status = 1")]
 		public string statusName;
 
-		[Space(20)]
 		// State Consideration
 		//[ShowIfEnum("considerationType", ConsiderationType.state)]
 		[Header("State Consideration")]
 		[Tooltip("is not currently in this state = 0; is currently in this state = 1")]
 		public EnemyState state;
 
-		[Space(20)]
 		// Composite Condiderations
 		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
 		[Header("Composite Considerations")]
@@ -1097,14 +1087,12 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
 		public Consideration[] compositeConsiderations;
 
-		[Space(20)]
 		// Constant Consideration
 		[Range(0f, 1f)]
 		//[ShowIfEnum("considerationType", ConsiderationType.constant)]
 		[Header("Constant Consideration")]
 		public float constantUtility;
 
-		[Space(20)]
 		//[ShowIfEnum(true, "considerationType", ConsiderationType.compositeConsideration, ConsiderationType.constant)]
 		[Header("For considerations with curves (AKA everything but composite and constant considerations)")]
 		public AnimationCurve utilityCurve;
@@ -1151,11 +1139,12 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIf("useStrictConditions")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
-		[Space(20)]
 		[Header("Define your utility considerations here!")]
+
+		//[Range(0f, 1f)]
+		//public float utilityStickiness;
 		public Consideration considerations;
 
-		[Space(20)]
 		[Header("Construct the behavior here!")]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
@@ -1200,7 +1189,6 @@ public class AttractorAI : MonoBehaviour
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
-		[Space(20)]
 		[Header("UtilityFunctions")]
 		//[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
 		[Range(0f, 1f)]
@@ -1259,11 +1247,9 @@ public class AttractorAI : MonoBehaviour
 		//[ShowIf("useStrictConditions")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
 
-		[Space(20)]
 		[Header("Define your utility considerations here!")]
 		public Consideration considerations;
 
-		[Space(20)]
 		[Header("Construct the thought here!")]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
 		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
@@ -1807,6 +1793,8 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float hideRadius;
 	[SerializeField] private bool avoidHideTarget = false;
 	[SerializeField] private float hideTargetAvoidanceRange;
+	[SerializeField] private bool lookAround = false;
+	[SerializeField] private bool waitAtSpots = false;
 
 	private float searchTimer;
 	private int searchAmount;
@@ -2010,7 +1998,7 @@ public class AttractorAI : MonoBehaviour
 		}
 	}
 
-	float EvaluateConsideration(Consideration consideration, Dictionary<AttractorType, List<Attractor>> detectedAttractors, UtilityBehavior behavior = null)
+	public float EvaluateConsideration(Consideration consideration, Dictionary<AttractorType, List<Attractor>> detectedAttractors, UtilityBehavior behavior = null)
 	{
 		// Attractors
 		if (consideration.considerationType == ConsiderationType.attractorIntensity || consideration.considerationType == ConsiderationType.attractorDistance)
@@ -2079,12 +2067,12 @@ public class AttractorAI : MonoBehaviour
 				}
 				else
 				{
-					return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+					return 0f;
 				}
 			}
 			else
 			{
-				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+				return 0f;
 			}
 		}
 
@@ -2111,7 +2099,7 @@ public class AttractorAI : MonoBehaviour
 				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
 			}
 			else
-				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+				return 0f;
 		}
 
 		// Int Condition
@@ -2128,19 +2116,19 @@ public class AttractorAI : MonoBehaviour
 				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
 			}
 			else
-				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(0));
+				return 0f;
 		}
 
 		// Status
 		else if (consideration.considerationType == ConsiderationType.status)
 		{
-			return Mathf.Clamp01(currentStatuses.Contains(consideration.statusName) ? 1 : 0);
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(currentStatuses.Contains(consideration.statusName) ? 1 : 0));
 		}
 
 		// State
 		else if (consideration.considerationType == ConsiderationType.state)
 		{
-			return Mathf.Clamp01(currentState == consideration.state ? 1 : 0);
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(currentState == consideration.state ? 1 : 0));
 		}
 
 		else if (consideration.considerationType == ConsiderationType.compositeConsideration)
@@ -3091,6 +3079,8 @@ public class AttractorAI : MonoBehaviour
 						}
 						else if (reaction.behaviorType == DecisionType.utilityFunction)
 						{
+							string tellMe = "";
+
 							int bestUtilityIndex = -1;
 							int currentUtilityIndex = 0;
 							float highestUtility = float.MinValue;
@@ -3260,6 +3250,8 @@ public class AttractorAI : MonoBehaviour
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
+											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
+
 											if (utilityScore > highestUtility)
 											{
 												highestUtility = utilityScore;
@@ -3290,6 +3282,8 @@ public class AttractorAI : MonoBehaviour
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
+											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
+
 											if (utilityScore > highestUtility)
 											{
 												highestUtility = utilityScore;
@@ -3303,6 +3297,8 @@ public class AttractorAI : MonoBehaviour
 
 							if (highestUtility >= reaction.minRequiredUtility)
 							{
+								Debug.Log(tellMe);
+
 								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
 
 								nextStatePriority = tempPriority;
@@ -3399,6 +3395,8 @@ public class AttractorAI : MonoBehaviour
 						}
 						else if (reaction.behaviorType == DecisionType.utilityFunction)
 						{
+							string tellMe = "";
+
 							int bestUtilityIndex = -1;
 							int currentUtilityIndex = 0;
 							float highestUtility = float.MinValue;
@@ -3568,6 +3566,8 @@ public class AttractorAI : MonoBehaviour
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
+											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
+
 											if (utilityScore > highestUtility)
 											{
 												highestUtility = utilityScore;
@@ -3598,6 +3598,9 @@ public class AttractorAI : MonoBehaviour
 										{
 											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
 
+
+											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
+
 											if (utilityScore > highestUtility)
 											{
 												highestUtility = utilityScore;
@@ -3611,6 +3614,9 @@ public class AttractorAI : MonoBehaviour
 
 							if (highestUtility >= reaction.minRequiredUtility)
 							{
+
+								Debug.Log(tellMe);
+
 								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
 
 								nextStatePriority = tempPriority;
@@ -4021,7 +4027,7 @@ public class AttractorAI : MonoBehaviour
 					}
 					else
 					{
-						if (hasAnimator)
+						if (hasAnimator && lookAround)
 						{
 							animator.SetBool("LookingAround", false);
 							foreach (Animator anim in additionalAnimators)
@@ -4085,37 +4091,50 @@ public class AttractorAI : MonoBehaviour
 						}
 					}
 					else
-						searchingSpot = false;
+					{
+						if (waitAtSpots)
+							searchTimer -= Time.deltaTime;
+						else
+							searchingSpot = false;
+					}
 				}
 				
 				if (searchTimer <= 0)
 				{
-					if (hasAnimator)
+					if (hasAnimator && lookAround)
 					{
 						animator.SetBool("LookingAround", false);
 						foreach (Animator anim in additionalAnimators)
 							anim.SetBool("LookingAround", false);
 					}
-					searchTimer = 0;
-					searching = false;
-					hiddenStationary = false;
-					hiding = false;
-					if (currentAvoidedTarget != null)
-						currentAvoidedTarget.enabled = false;
-					currentFocus = nextFocus;
-					currentState = nextState;
-					if (nextStatePriority != currentStatePriority)
+					if (waitAtSpots)
 					{
-						foreach (FunctionPicker function in nextFunctions)
-						{
-							HandleFunctionCalling(function);
-						}
-						foreach (UnityEvent unityEvent in nextEvents)
-						{
-							unityEvent.Invoke();
-						}
+						searchingSpot = false;
+						searchTimer = Random.Range(minSearchTimer, maxSearchTimer);
 					}
-					currentStatePriority = nextStatePriority;
+					else
+					{
+						searchTimer = 0;
+						searching = false;
+						hiddenStationary = false;
+						hiding = false;
+						if (currentAvoidedTarget != null)
+							currentAvoidedTarget.enabled = false;
+						currentFocus = nextFocus;
+						currentState = nextState;
+						if (nextStatePriority != currentStatePriority)
+						{
+							foreach (FunctionPicker function in nextFunctions)
+							{
+								HandleFunctionCalling(function);
+							}
+							foreach (UnityEvent unityEvent in nextEvents)
+							{
+								unityEvent.Invoke();
+							}
+						}
+						currentStatePriority = nextStatePriority;
+					}
 				}
 			}
 		}
