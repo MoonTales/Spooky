@@ -62,7 +62,6 @@ public class Clock : EventSubscriberBase
         damagePerTick = 100/timeToExit;  // Normalized damage per second to player sanity
         minuteHandDegPerSec = ClockSpeed; // 7.2° per second for minute hand
         hourHandDegPerSec = minuteHandDegPerSec / 12; // 0.6° per second for hour hand
-        Debug.Log($"Clock: Requesting bedroom wall clock audio start for '{name}'.");
         AudioManager.Instance?.StartBedroomWallClock(transform);
         StartCoroutine(Timer());
         StartCoroutine(ClockTick());

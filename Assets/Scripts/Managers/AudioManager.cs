@@ -153,7 +153,6 @@ namespace Managers
         [SerializeField] private string tutorialDrawingAudioSceneName = "Tutorial";
         [SerializeField] private EventReference tutorialDrawingStaticLoopEvent;
         [SerializeField] private string bedroomWallClockActiveParameter = "ClockActive";
-        [SerializeField] private string bedroomWallClockInspectingParameter = "IsInspecting";
         #endregion
 
         #region Mental Audio
@@ -273,8 +272,6 @@ namespace Managers
         private bool _tutorialHallwayPlayerSpeedFloorActive;
         private PARAMETER_ID _bedroomWallClockActiveParameterId;
         private bool _hasBedroomWallClockActiveParameterId;
-        private PARAMETER_ID _bedroomWallClockInspectingParameterId;
-        private bool _hasBedroomWallClockInspectingParameterId;
         private NightmareWindPlane[] _cachedNightmareWindPlanes = Array.Empty<NightmareWindPlane>();
 
         // Runtime audio state - snapshot control.
@@ -438,12 +435,13 @@ namespace Managers
             {
                 return;
             }
+
+            SetBedroomWallClockActive(false);
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (mode != LoadSceneMode.Additive
-                && !string.Equals(scene.name, "Bedroom", StringComparison.Ordinal))
+            if (!string.Equals(scene.name, "Bedroom", StringComparison.Ordinal))
             {
                 StopAndReleaseBedroomWallClock(true);
             }
@@ -482,7 +480,6 @@ namespace Managers
                 StopMainMenuMusic(true);
             }
 
-            SetBedroomWallClockInspecting(newState == Types.GameState.Inspecting);
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
             ApplyNightmareWorldAmbience();
@@ -522,18 +519,6 @@ namespace Managers
 
         public void StartBedroomWallClock(Transform sourceTransform)
         {
-            if (GameStateManager.Instance == null
-                || GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Bedroom)
-            {
-                if (_bedroomWallClockInstance.isValid())
-                {
-                    StopAndReleaseBedroomWallClock(true);
-                }
-
-                Debug.Log($"AudioManager: Ignoring bedroom wall clock start outside Bedroom. source={(sourceTransform != null ? sourceTransform.name : "null")}, world={(GameStateManager.Instance != null ? GameStateManager.Instance.GetCurrentWorldLocation().ToString() : "null")}");
-                return;
-            }
-
             EventReference eventReference = GetSfxEvent(SfxId.ClockTick);
             if (eventReference.IsNull)
             {
@@ -548,21 +533,14 @@ namespace Managers
                     _bedroomWallClockInstance.set3DAttributes(RuntimeUtils.To3DAttributes(sourceTransform.position));
                 }
 
-                Debug.Log($"AudioManager: Reusing bedroom wall clock event. source={(sourceTransform != null ? sourceTransform.name : "null")}");
                 SetBedroomWallClockActive(true);
-                SetBedroomWallClockInspecting(GameStateManager.Instance != null
-                    && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Inspecting);
                 return;
             }
 
             _bedroomWallClockInstance = CreateEventInstance(eventReference, sourceTransform);
             CacheBedroomWallClockActiveParameterId();
-            CacheBedroomWallClockInspectingParameterId();
             _bedroomWallClockInstance.start();
-            Debug.Log($"AudioManager: Started bedroom wall clock event. source={(sourceTransform != null ? sourceTransform.name : "null")}");
             SetBedroomWallClockActive(true);
-            SetBedroomWallClockInspecting(GameStateManager.Instance != null
-                && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.Inspecting);
         }
 
         private void OnSleepTrackerAudioStateChanged(bool isActive, bool isGoodWakeup, Transform sourceTransform)
@@ -2120,8 +2098,6 @@ namespace Managers
 
             _hasBedroomWallClockActiveParameterId = false;
             _bedroomWallClockActiveParameterId = default;
-            _hasBedroomWallClockInspectingParameterId = false;
-            _bedroomWallClockInspectingParameterId = default;
         }
 
         private void StopAndReleaseTutorialAmbience()
@@ -2259,29 +2235,6 @@ namespace Managers
             }
         }
 
-        private void SetBedroomWallClockInspecting(bool isInspecting)
-        {
-            if (_bedroomWallClockInstance.isValid() && !string.IsNullOrWhiteSpace(bedroomWallClockInspectingParameter))
-            {
-                float requestedValue = isInspecting ? 1f : 0f;
-                if (!_hasBedroomWallClockInspectingParameterId)
-                {
-                    CacheBedroomWallClockInspectingParameterId();
-                }
-
-                if (_hasBedroomWallClockInspectingParameterId)
-                {
-                    _bedroomWallClockInstance.setParameterByID(_bedroomWallClockInspectingParameterId, requestedValue);
-                }
-                else
-                {
-                    _bedroomWallClockInstance.setParameterByName(bedroomWallClockInspectingParameter, requestedValue);
-                }
-
-                Debug.Log($"AudioManager: Bedroom wall clock '{bedroomWallClockInspectingParameter}' -> {requestedValue:0} (state={(GameStateManager.Instance != null ? GameStateManager.Instance.GetCurrentGameState().ToString() : "null")})");
-            }
-        }
-
         private void CacheBedroomWallClockActiveParameterId()
         {
             _hasBedroomWallClockActiveParameterId = false;
@@ -2309,35 +2262,6 @@ namespace Managers
 
             _bedroomWallClockActiveParameterId = parameterDescription.id;
             _hasBedroomWallClockActiveParameterId = true;
-        }
-
-        private void CacheBedroomWallClockInspectingParameterId()
-        {
-            _hasBedroomWallClockInspectingParameterId = false;
-            _bedroomWallClockInspectingParameterId = default;
-
-            if (!_bedroomWallClockInstance.isValid() || string.IsNullOrWhiteSpace(bedroomWallClockInspectingParameter))
-            {
-                return;
-            }
-
-            FMOD.RESULT descriptionResult = _bedroomWallClockInstance.getDescription(out EventDescription description);
-            if (descriptionResult != FMOD.RESULT.OK)
-            {
-                return;
-            }
-
-            FMOD.RESULT parameterDescriptionResult = description.getParameterDescriptionByName(
-                bedroomWallClockInspectingParameter,
-                out PARAMETER_DESCRIPTION parameterDescription);
-
-            if (parameterDescriptionResult != FMOD.RESULT.OK)
-            {
-                return;
-            }
-
-            _bedroomWallClockInspectingParameterId = parameterDescription.id;
-            _hasBedroomWallClockInspectingParameterId = true;
         }
 
         #endregion
