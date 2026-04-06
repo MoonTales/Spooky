@@ -482,6 +482,14 @@ public class InspectionSystem : Singleton<InspectionSystem>
         }
         return null;
     }
+    public GameObject GetInspectedObject()
+    {
+        if (_currentInspectedObject != null)
+        {
+            return _currentInspectedObject;
+        }
+        return null;
+    }
     
     protected override void OnGameStateChanged(Types.GameState newstate)
     {
