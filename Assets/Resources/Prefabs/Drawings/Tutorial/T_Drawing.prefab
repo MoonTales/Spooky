@@ -30,16 +30,16 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 877781371174010366}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00000007125328, y: 1, z: 0.00000008940697, w: 0.00000019395252}
+  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_LocalScale: {x: 0.6514689, y: 1.3, z: 1.833131}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7729660432536520032}
   - {fileID: 9103781576219990890}
   - {fileID: 2192449207150809833}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
 --- !u!114 &9194497367361724260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,6 +368,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64c29fbebc9588c499edf00092ce8d28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rowKey:
+    place: 
+    id: 
+  promptKey:
+    place: 
+    id: 
+  requiredHour: -1
+  pickupSfx: {fileID: 0}
+  putDownSfx: {fileID: 0}
+  sfxVolume: 1
+  sfxPitchVariation: 0.05
   location: 2
   drawingID: 0
   uniqueDrawingID: -1
