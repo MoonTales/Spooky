@@ -1,5 +1,6 @@
 using System;
 using Managers;
+using Player;
 using UI.Main_Menu;
 using UnityEngine;
 using UnityEngine.UI;
@@ -92,6 +93,17 @@ namespace UI.PauseMenu
                     _pauseMenuBackControls.onClick.AddListener(OnPauseMenuControlsBackButtonClicked);
                 }
             }
+            
+            // we will hook up a listner to the crouchToggle button now
+            if (crouchToggle != null)
+            {
+                crouchToggle.onValueChanged.AddListener(OnCrouchToggleChanged);
+            }
+        }
+        
+        private void OnCrouchToggleChanged(bool isOn)
+        {
+            PlayerController.Instance.SetToggleCrouchMode(isOn);
         }
 
         private void InitializeAudioSliders()
