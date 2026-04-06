@@ -22,7 +22,11 @@ namespace UI.PauseMenu
         [SerializeField] private Slider musicSlider;
         [SerializeField] private Slider sfxSlider;
         // TODO: If ambience gets its own slider later, split ambience control from music.
-    
+
+        // Brightness and crouch 
+        [SerializeField] private Slider brightSlider;
+        [SerializeField] private Toggle crouchToggle;
+
         // both of the Pause Menus are going to have back buttons on them somewhere
         private Button _mainMenuBackButton;
         private Button _pauseMenuBackButton;
@@ -88,7 +92,6 @@ namespace UI.PauseMenu
                     _pauseMenuBackControls.onClick.AddListener(OnPauseMenuControlsBackButtonClicked);
                 }
             }
-        
         }
 
         private void InitializeAudioSliders()

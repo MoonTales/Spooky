@@ -2535,7 +2535,7 @@ GameObject:
   - component: {fileID: 5646151804806802406}
   - component: {fileID: 8098246945833801426}
   m_Layer: 0
-  m_Name: Slider (1)
+  m_Name: sfx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3779,7 +3779,7 @@ GameObject:
   - component: {fileID: 4606337184333810993}
   - component: {fileID: 2524989250984937493}
   m_Layer: 0
-  m_Name: Slider (3)
+  m_Name: brightness
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3851,7 +3851,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 664521555539500144}
   m_HandleRect: {fileID: 69245849023641710}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: -1
   m_MaxValue: 1
   m_WholeNumbers: 0
   m_Value: 0
@@ -5478,6 +5478,8 @@ MonoBehaviour:
   masterSlider: {fileID: 0}
   musicSlider: {fileID: 0}
   sfxSlider: {fileID: 0}
+  brightSlider: {fileID: 2524989250984937493}
+  crouchToggle: {fileID: 7884255072642269665}
   PauseControls: {fileID: 4403851091057987263}
   MainMenuControls: {fileID: 7921511563712659107}
   ControlsCanvas: {fileID: 3924498275265076774}
@@ -5782,7 +5784,7 @@ GameObject:
   - component: {fileID: 7911783797080653540}
   - component: {fileID: 6404755397894679526}
   m_Layer: 0
-  m_Name: Slider
+  m_Name: master
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6183,7 +6185,7 @@ GameObject:
   - component: {fileID: 3557237072406599494}
   - component: {fileID: 8481505103973356244}
   m_Layer: 0
-  m_Name: Slider (2)
+  m_Name: music
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
