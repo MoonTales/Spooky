@@ -194,7 +194,6 @@ namespace Managers
         [SerializeField] private EventReference tutorialAmbLoopEvent;
         [SerializeField] private bool tutorialAmbienceRequiresGameplay = true;
         [SerializeField] private EventReference nightmareAmbLoopEvent;
-        [SerializeField] private string nightmareAmbWorldClockParameter = "WorldClock";
         [SerializeField] private EventReference nightmareInteriorExteriorAmbLoopEvent;
         [SerializeField] private string nightmareInteriorAmountParameter = "InteriorAmount";
         #endregion
@@ -449,10 +448,7 @@ namespace Managers
                 StopAndReleaseBedroomWallClock(true);
             }
 
-            if (mode != LoadSceneMode.Additive)
-            {
-                CacheNightmareWindPlanes(scene);
-            }
+            CacheNightmareWindPlanes(scene);
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
             AutoAttachSpiderAudioEmittersInScene(scene);
@@ -490,12 +486,6 @@ namespace Managers
             ApplyBedroomAmbience();
             ApplyTutorialAmbience();
             ApplyNightmareWorldAmbience();
-        }
-
-        protected override void OnWorldClockTicked(int newHour)
-        {
-            base.OnWorldClockTicked(newHour);
-            SetNightmareAmbienceWorldClock(newHour);
         }
 
           //---------------//
@@ -1445,17 +1435,9 @@ namespace Managers
             if (!_nightmareAmbienceInstance.isValid())
             {
                 _nightmareAmbienceInstance = CreateEventInstance(nightmareAmbLoopEvent);
-                SetNightmareAmbienceWorldClock(GameStateManager.Instance != null
-                    ? GameStateManager.Instance.GetCurrentWorldClockHour()
-                    : 1);
                 _nightmareAmbienceInstance.start();
                 LogAudioState("Nightmare base ambience started.");
-                return;
             }
-
-            SetNightmareAmbienceWorldClock(GameStateManager.Instance != null
-                ? GameStateManager.Instance.GetCurrentWorldClockHour()
-                : 1);
         }
 
         private void ApplyNightmareInteriorExteriorAmbience()
@@ -1474,16 +1456,10 @@ namespace Managers
             if (!_nightmareInteriorExteriorAmbienceInstance.isValid())
             {
                 _nightmareInteriorExteriorAmbienceInstance = CreateEventInstance(nightmareInteriorExteriorAmbLoopEvent);
-                SetNightmareAmbienceWorldClock(GameStateManager.Instance != null
-                    ? GameStateManager.Instance.GetCurrentWorldClockHour()
-                    : 1);
                 _nightmareInteriorExteriorAmbienceInstance.start();
                 LogAudioState("Nightmare interior/exterior ambience started.");
             }
 
-            SetNightmareAmbienceWorldClock(GameStateManager.Instance != null
-                ? GameStateManager.Instance.GetCurrentWorldClockHour()
-                : 1);
             UpdateNightmareInteriorBlend();
         }
 
@@ -2107,24 +2083,6 @@ namespace Managers
                 _nightmareAmbienceInstance.release();
                 _nightmareAmbienceInstance = default;
                 LogAudioState("Nightmare ambience stopped.");
-            }
-        }
-
-        private void SetNightmareAmbienceWorldClock(int worldClockHour)
-        {
-            if (string.IsNullOrWhiteSpace(nightmareAmbWorldClockParameter))
-            {
-                return;
-            }
-
-            if (_nightmareAmbienceInstance.isValid())
-            {
-                _nightmareAmbienceInstance.setParameterByName(nightmareAmbWorldClockParameter, worldClockHour);
-            }
-
-            if (_nightmareInteriorExteriorAmbienceInstance.isValid())
-            {
-                _nightmareInteriorExteriorAmbienceInstance.setParameterByName(nightmareAmbWorldClockParameter, worldClockHour);
             }
         }
 
