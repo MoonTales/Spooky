@@ -15204,10 +15204,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terrorAudioSourceTransform: {fileID: 0}
-  veryClose: 5
-  close: 10
-  midRange: 20
-  far: 30
+  veryClose: 2.5
+  close: 5
+  midRange: 10
+  far: 15
   veryCloseDmg: 20
   closeDmg: 10
   midRangeDmg: 4
@@ -20444,11 +20444,11 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7911825391206212268}
   m_Enabled: 1
-  m_AgentTypeID: -1923039037
+  m_AgentTypeID: 658490984
   m_Radius: 2
   m_Speed: 3.5
   m_Acceleration: 800
-  avoidancePriority: 50
+  avoidancePriority: 4
   m_AngularSpeed: 1200
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
@@ -20457,7 +20457,7 @@ NavMeshAgent:
   m_Height: 7
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 0
+  m_ObstacleAvoidanceType: 4
 --- !u!114 &3623560390383053900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20470,11 +20470,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad5d1f8a5ee5304abeff8b265d36a36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tracksDrawingCount: 0
-  drawingsIncreaseDanger: 0
-  dangerPerDrawing: 0
+  tracksDrawingCount: 1
+  drawingsIncreaseDanger: 1
+  dangerPerDrawing: 11
   teleportLocations: []
-  currentDangerLevel: 10
+  currentDangerLevel: 0
   currentStatuses:
   - Lurking
   - SwitchingStats
@@ -20491,7 +20491,9 @@ MonoBehaviour:
       floatValue: 0
     - floatName: RushTime
       floatValue: 0
-    intConditions: []
+    intConditions:
+    - intName: DRAWINGS
+      intValue: 0
   behaviourHierarchy:
   - behaviorType: 1
     considerAttractorsForUtilityFocus: 0
