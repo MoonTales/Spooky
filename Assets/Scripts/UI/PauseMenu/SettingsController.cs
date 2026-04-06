@@ -1,6 +1,7 @@
 using System;
 using Managers;
 using Player;
+using Player.Camera;
 using UI.Main_Menu;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,6 +45,7 @@ namespace UI.PauseMenu
         public void Start()
         {
             InitializeAudioSliders();
+            LoadSavedBrightness("game.brightness");
 
             // loop through all children of the main menu settings, and find the back button, and add a listener to it
             Button[] mainMenuButtons = MainMenuSettings.GetComponentsInChildren<Button>();
@@ -97,13 +99,20 @@ namespace UI.PauseMenu
             // we will hook up a listner to the crouchToggle button now
             if (crouchToggle != null)
             {
-                crouchToggle.onValueChanged.AddListener(OnCrouchToggleChanged);
+                crouchToggle.onValueChanged.AddListener(PlayerController.Instance.SetToggleCrouchMode);
+            }
+            
+            if (brightSlider != null)
+            {
+                brightSlider.onValueChanged.AddListener(SetBrightness);
             }
         }
-        
-        private void OnCrouchToggleChanged(bool isOn)
+        private void SetBrightness(float brightness)
         {
-            PlayerController.Instance.SetToggleCrouchMode(isOn);
+            CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
+            if (effects == null){ return;}
+            effects.gameBrightness = Mathf.Clamp(brightness, 0f, 1f);
+            SaveBrightness("game.brightness", brightness);
         }
 
         private void InitializeAudioSliders()
@@ -237,6 +246,22 @@ namespace UI.PauseMenu
         {
             PlayerPrefs.SetFloat(key, Mathf.Clamp01(value));
             PlayerPrefs.Save();
+        }
+        private static void SaveBrightness(string key, float value)
+        {
+            PlayerPrefs.SetFloat(key, Mathf.Clamp01(value));
+            PlayerPrefs.Save();
+        }
+        private void LoadSavedBrightness(string key)
+        {
+            float value = Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultVolume));
+            CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
+            if (effects != null)
+            {
+                effects.gameBrightness = value;
+            }
+            
+            brightSlider.value = value;
         }
 
         private void OnMasterVolumeChanged(float value)
