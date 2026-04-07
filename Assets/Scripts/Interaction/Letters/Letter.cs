@@ -18,6 +18,8 @@ namespace Interaction.Letters
 
         [SerializeField] private AudioClip researcherPickupSfx;
         [SerializeField] private AudioClip researcherDropSfx;
+        [SerializeField] private AudioClip frenPickupSfx;
+        [SerializeField] private AudioClip frenDropSfx;
         [SerializeField] private float researcherSfxVolume = 1f;
         [SerializeField] private float researcherSfxDeviation = 0.05f;
 
@@ -52,7 +54,10 @@ namespace Interaction.Letters
             {
                 PlayPickupSfx();
             }
-            InspectionSystem.Instance.StartInspection(gameObject);
+            else {
+                PlayFrenPickupSfx();
+            }
+                InspectionSystem.Instance.StartInspection(gameObject);
             // Tell the letter system that we have been read
             var id = (_letterType == Types.LetterType.Researcher ? "res_letter_" : "fren_letter_") + GameStateManager.Instance.GetCurrentWorldClockHour();            
             LetterManager.Instance.HandleLetterRead(id);
@@ -186,5 +191,14 @@ namespace Interaction.Letters
               UAudio.Instance.PlayClip(researcherDropSfx, gameObject, researcherSfxVolume, researcherSfxVolume);
           }
     }
+
+    private void PlayFrenPickupSfx()
+    {
+            if (frenPickupSfx != null)
+            {
+                UAudio.Instance.PlayClip(frenPickupSfx, gameObject, researcherSfxVolume, researcherSfxDeviation);
+            }
+    }
+
     }
 }
