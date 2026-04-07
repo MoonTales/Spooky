@@ -423,6 +423,7 @@ namespace Interaction.drawings
             if (PlayerInventory.Instance.CanAddDrawing())
             {
                 PlayerInventory.Instance.AddDrawing(drawingID);
+                UAudio.Instance.PlayClip(UAudio.Instance.DrawingCollectSound, fromObject: gameObject, deviation:0.1f);
                 gameObject.SetActive(false);
             }
             

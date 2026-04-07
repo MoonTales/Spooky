@@ -16,6 +16,8 @@ namespace Managers
         
         [Header("Example Sounds")]
         public AudioClip ExampleAudioClip;
+
+        public AudioClip DrawingCollectSound;
         
         [Header("Mutes")]
         public bool muteSFX = false;
