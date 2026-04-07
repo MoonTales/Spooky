@@ -9,6 +9,8 @@ public class SpiderPivot : MonoBehaviour
     [SerializeField, Range(0, 1)] float positionWeight = 0;
     [SerializeField, Range(0, 1)] float rotationWeight = 1;
 
+    public bool lockYRotation = false;
+
     public Transform Pivot { get => pivot; }
 
     void OnDisable()
@@ -46,6 +48,17 @@ public class SpiderPivot : MonoBehaviour
         rotAvg = MathExtension.QuatAvgApprox(rots.ToArray(), weights.ToArray());
 
         pivot.position = Vector3.Lerp(transform.position, posAvg, positionWeight);
-        pivot.rotation = Quaternion.Lerp(transform.rotation, rotAvg, rotationWeight);
+        if (!lockYRotation)
+        {
+            pivot.rotation = Quaternion.Lerp(transform.rotation, rotAvg, rotationWeight);
+        }
+        else
+		{
+            Vector3 currentEuler = transform.eulerAngles;
+
+            Quaternion awaa = Quaternion.Lerp(transform.rotation, rotAvg, rotationWeight);
+
+            pivot.rotation = new Quaternion(awaa.x, pivot.rotation.y, awaa.z, pivot.rotation.w);
+        }
     }
 }
