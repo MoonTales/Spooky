@@ -18,6 +18,8 @@ namespace UI.PauseMenu
         private Button _controlsButton;
         private Button _mainMenuButton;
 
+        private GameObject _popup;
+
     
         // Internal variables
         private Types.GameState _previousGameState;
@@ -73,7 +75,7 @@ namespace UI.PauseMenu
 
         private void OnMainMenuButtonClicked()
         {
-            UiPopupConfirmation.Instance.RequestPopupConfirmation(
+            _popup = UiPopupConfirmation.Instance.RequestPopupConfirmation(
                 TextDB.GetText("popup", "mainmenu"),
                 ConfirmReturnToMainMenu
             );
@@ -152,6 +154,7 @@ namespace UI.PauseMenu
             ShowMenu(false);
             SettingsController.Instance.CloseSettings();
             SettingsController.Instance.CloseControlSettings();
+            UiPopupConfirmation.Instance.DestroyActivePopup(_popup);
             NotificationController.Instance.ShowNotificationText();
         }
 
