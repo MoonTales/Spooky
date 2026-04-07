@@ -15503,6 +15503,10 @@ PrefabInstance:
       propertyPath: m_Sources.Array.data[0].sourceTransform
       value: 
       objectReference: {fileID: 1178287228}
+    - target: {fileID: 1703187160397755462, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: anim
+      value: 
+      objectReference: {fileID: 1266954461}
     - target: {fileID: 1911201218881750603, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.3353615
@@ -15541,6 +15545,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1911201218881750603, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: dangerPerDrawing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: currentDangerLevel
+      value: 99
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: tracksDrawingCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623560390383053900, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+      propertyPath: drawingsIncreaseDanger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7672497915078299903, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
@@ -15684,6 +15704,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!95 &1266954461 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5139546128011310932, guid: 9f55a423216bb914eba1cdad7f5e11e0, type: 3}
+  m_PrefabInstance: {fileID: 1173010712}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1367372197
 GameObject:
   m_ObjectHideFlags: 0
@@ -15836,7 +15861,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SerializedVersion: 0
-  m_AgentTypeID: -1923039037
+  m_AgentTypeID: 658490984
   m_CollectObjects: 1
   m_Size: {x: 530, y: 60, z: 310}
   m_Center: {x: 0, y: 0, z: 0}

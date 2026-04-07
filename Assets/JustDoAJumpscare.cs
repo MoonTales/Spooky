@@ -5,11 +5,12 @@ public class JustDoAJumpscare : MonoBehaviour
 {
 	public Animator anim;
 	public AudioClip[] jumpscareSounds;
+	public string jumpscareActivateBool = "Scary";
 
 	public void Jumpscare()
 	{
 		if (anim != null)
-			anim.SetBool("Scary", true);
+			anim.SetBool(jumpscareActivateBool, true);
 
 		if (jumpscareSounds != null)
 		{ 
