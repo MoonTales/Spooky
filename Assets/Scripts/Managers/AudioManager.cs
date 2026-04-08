@@ -1360,6 +1360,10 @@ namespace Managers
             float bestDistanceToPlayer = float.MaxValue;
             Transform bestSourceTransform = null;
             bool foundActiveRadius = false;
+            int bestRadiusIndex = -1;
+            List<string> debugRadiusEntries = debugAudioLogs && logTerrorParameterValue
+                ? new List<string>()
+                : null;
 
             for (int i = _registeredTerrorRadii.Count - 1; i >= 0; i--)
             {
@@ -1380,6 +1384,7 @@ namespace Managers
 
                 foundActiveRadius = true;
                 float clampedIntensity = Mathf.Clamp01(normalizedIntensity);
+                debugRadiusEntries?.Add($"[{i}] {terrorRadius.name}={clampedIntensity:0.000}");
                 bool isStrongerSource = clampedIntensity > bestTerrorSeverity + 0.0001f;
                 bool isTieButCloserSource = Mathf.Abs(clampedIntensity - bestTerrorSeverity) <= 0.0001f
                     && distanceToPlayer < bestDistanceToPlayer;
@@ -1392,6 +1397,7 @@ namespace Managers
                 bestTerrorSeverity = clampedIntensity;
                 bestDistanceToPlayer = distanceToPlayer;
                 bestSourceTransform = sourceTransform;
+                bestRadiusIndex = i;
             }
 
             _terrorSeverity = bestTerrorSeverity;
@@ -1401,6 +1407,8 @@ namespace Managers
             if (debugAudioLogs && logTerrorParameterValue)
             {
                 Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
+                Debug.Log(
+                    $"AudioManager: Terror radii considered = {debugRadiusEntries?.Count ?? 0}, bestIndex = {bestRadiusIndex}, values = {(debugRadiusEntries != null && debugRadiusEntries.Count > 0 ? string.Join(", ", debugRadiusEntries) : "none")}");
             }
         }
         #endregion
