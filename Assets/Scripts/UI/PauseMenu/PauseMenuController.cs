@@ -121,6 +121,8 @@ namespace UI.PauseMenu
                 {
                     Stop();
                 }
+                // Regardless, we wanna play an sfx when we open or close the menu
+                AudioManager.Instance.PlayUiHoverSfx();
             }
         }
 

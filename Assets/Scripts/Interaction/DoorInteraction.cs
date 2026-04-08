@@ -38,7 +38,7 @@ namespace Interaction
         public void Interact(Interactor interactor)
         {
             // <> SFX HERE <>
-            AudioManager.Instance.PlayUiHoverSfx();
+            AudioManager.Instance.PlayDoorLockedSfx();
             // --------------
             // "shake" the door handle
             StartCoroutine(ShakeHandle());
