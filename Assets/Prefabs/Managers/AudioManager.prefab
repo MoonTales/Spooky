@@ -270,7 +270,6 @@ MonoBehaviour:
       Data4: 2144522301
     Path: event:/amb/env/tutorial/general/drawing-end
   bedroomWallClockActiveParameter: ClockActive
-  bedroomWallClockInspectingParameter: IsInspecting
   terrorDistortionParameter: Terror
   mentalHealthDistortionParameter: MentalHealth
   terrorParameterIsGlobal: 1
@@ -329,15 +328,53 @@ MonoBehaviour:
       Data3: 580708496
       Data4: -533915791
     Path: event:/amb/nightmare/mental-amb-loop
-  nightmareAmbWorldClockParameter: WorldClock
   nightmareInteriorExteriorAmbLoopEvent:
     Guid:
-      Data1: -332973383
-      Data2: 1251811974
-      Data3: -1888238460
-      Data4: 1621704129
-    Path: event:/amb/env/nightmare/nm-exterior
+      Data1: -886720084
+      Data2: 1228769479
+      Data3: -373386594
+      Data4: 1600399410
+    Path: event:/amb/env/nightmare/act1-wind
   nightmareInteriorAmountParameter: InteriorAmount
+  nightmareInteriorDoorways:
+  - sceneName: Nightmare1
+    rootObjectName:
+    objectName: Door_1B
+    forwardPointsOutside: 1
+    halfWidthOverride: 5
+    blendDepthOverride: 10
+    maxInfluenceDistanceOverride: 50
+  - sceneName: Nightmare1
+    rootObjectName: MysteriousNeighbor
+    objectName: Exterior_Door_Frame
+    forwardPointsOutside: 1
+    halfWidthOverride: 0
+    blendDepthOverride: 0
+    maxInfluenceDistanceOverride: 0
+  - sceneName: Nightmare1
+    rootObjectName: 
+    objectName: Tunnel3
+    forwardPointsOutside: 0
+    halfWidthOverride: 5
+    blendDepthOverride: 10
+    maxInfluenceDistanceOverride: 10
+  - sceneName: Nightmare1
+    rootObjectName: TunnelTo2
+    objectName: Tunnel2
+    forwardPointsOutside: 1
+    halfWidthOverride: 5
+    blendDepthOverride: 10
+    maxInfluenceDistanceOverride: 20
+  - sceneName: Nightmare1
+    rootObjectName:
+    objectName: Floor_1x1_1Side
+    forwardPointsOutside: 1
+    halfWidthOverride: 5
+    blendDepthOverride: 10
+    maxInfluenceDistanceOverride: 20
+  nightmareInteriorDoorHalfWidth: 1.5
+  nightmareInteriorBlendDepth: 5
+  nightmareInteriorDoorMaxInfluenceDistance: 50
   mainMenuMusicEvent:
     Guid:
       Data1: -578515550

@@ -7,7 +7,7 @@ using Types = System.Types;
 public class CreditScript : MonoBehaviour
 {
     public float scrollSpeed = 100f;
-    int timer = 11500;
+    int timer = 11750;
     private RectTransform rectTransform;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

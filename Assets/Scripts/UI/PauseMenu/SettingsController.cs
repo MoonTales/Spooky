@@ -1,5 +1,7 @@
 using System;
 using Managers;
+using Player;
+using Player.Camera;
 using UI.Main_Menu;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,7 +24,11 @@ namespace UI.PauseMenu
         [SerializeField] private Slider musicSlider;
         [SerializeField] private Slider sfxSlider;
         // TODO: If ambience gets its own slider later, split ambience control from music.
-    
+
+        // Brightness and crouch 
+        [SerializeField] private Slider brightSlider;
+        [SerializeField] private Toggle crouchToggle;
+
         // both of the Pause Menus are going to have back buttons on them somewhere
         private Button _mainMenuBackButton;
         private Button _pauseMenuBackButton;
@@ -39,6 +45,7 @@ namespace UI.PauseMenu
         public void Start()
         {
             InitializeAudioSliders();
+            LoadSavedBrightness("game.brightness");
 
             // loop through all children of the main menu settings, and find the back button, and add a listener to it
             Button[] mainMenuButtons = MainMenuSettings.GetComponentsInChildren<Button>();
@@ -88,7 +95,24 @@ namespace UI.PauseMenu
                     _pauseMenuBackControls.onClick.AddListener(OnPauseMenuControlsBackButtonClicked);
                 }
             }
-        
+            
+            // we will hook up a listner to the crouchToggle button now
+            if (crouchToggle != null)
+            {
+                crouchToggle.onValueChanged.AddListener(PlayerController.Instance.SetToggleCrouchMode);
+            }
+            
+            if (brightSlider != null)
+            {
+                brightSlider.onValueChanged.AddListener(SetBrightness);
+            }
+        }
+        private void SetBrightness(float brightness)
+        {
+            CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
+            if (effects == null){ return;}
+            effects.gameBrightness = Mathf.Clamp(brightness, 0f, 1f);
+            SaveBrightness("game.brightness", brightness);
         }
 
         private void InitializeAudioSliders()
@@ -109,6 +133,7 @@ namespace UI.PauseMenu
             float masterVolume = LoadSavedVolume(MasterVolumeKey);
             float musicVolume = LoadSavedVolume(MusicVolumeKey);
             float sfxVolume = LoadSavedVolume(SfxVolumeKey);
+            LogLoadedAudioVolumes("InitializeAudioSliders", masterVolume, musicVolume, sfxVolume);
 
             SetAudioSliderValues(masterVolume, musicVolume, sfxVolume);
             BindAudioSliderCallbacks();
@@ -164,6 +189,15 @@ namespace UI.PauseMenu
             return Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultVolume));
         }
 
+        private static void LogLoadedAudioVolumes(string source, float masterVolume, float musicVolume, float sfxVolume)
+        {
+            Debug.Log(
+                $"SettingsController: Loaded audio PlayerPrefs ({source}) -> " +
+                $"{MasterVolumeKey}={masterVolume:0.###} (hasKey={PlayerPrefs.HasKey(MasterVolumeKey)}), " +
+                $"{MusicVolumeKey}={musicVolume:0.###} (hasKey={PlayerPrefs.HasKey(MusicVolumeKey)}), " +
+                $"{SfxVolumeKey}={sfxVolume:0.###} (hasKey={PlayerPrefs.HasKey(SfxVolumeKey)})");
+        }
+
         private static void ApplyAudioVolumes(float masterVolume, float musicVolume, float sfxVolume)
         {
             if (AudioManager.Instance == null)
@@ -189,6 +223,7 @@ namespace UI.PauseMenu
             float masterVolume = LoadSavedVolume(MasterVolumeKey);
             float musicVolume = LoadSavedVolume(MusicVolumeKey);
             float sfxVolume = LoadSavedVolume(SfxVolumeKey);
+            LogLoadedAudioVolumes("RefreshAudioSlidersFromSavedValues", masterVolume, musicVolume, sfxVolume);
             SetAudioSliderValues(masterVolume, musicVolume, sfxVolume);
         }
 
@@ -211,6 +246,22 @@ namespace UI.PauseMenu
         {
             PlayerPrefs.SetFloat(key, Mathf.Clamp01(value));
             PlayerPrefs.Save();
+        }
+        private static void SaveBrightness(string key, float value)
+        {
+            PlayerPrefs.SetFloat(key, Mathf.Clamp01(value));
+            PlayerPrefs.Save();
+        }
+        private void LoadSavedBrightness(string key)
+        {
+            float value = Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultVolume));
+            CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
+            if (effects != null)
+            {
+                effects.gameBrightness = value;
+            }
+            
+            brightSlider.value = value;
         }
 
         private void OnMasterVolumeChanged(float value)
