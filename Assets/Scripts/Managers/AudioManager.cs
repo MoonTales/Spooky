@@ -1361,9 +1361,7 @@ namespace Managers
             Transform bestSourceTransform = null;
             bool foundActiveRadius = false;
             int bestRadiusIndex = -1;
-            List<string> debugRadiusEntries = debugAudioLogs && logTerrorParameterValue
-                ? new List<string>()
-                : null;
+            List<string> debugRadiusEntries = new List<string>();
 
             for (int i = _registeredTerrorRadii.Count - 1; i >= 0; i--)
             {
@@ -1384,7 +1382,7 @@ namespace Managers
 
                 foundActiveRadius = true;
                 float clampedIntensity = Mathf.Clamp01(normalizedIntensity);
-                debugRadiusEntries?.Add($"[{i}] {terrorRadius.name}={clampedIntensity:0.000}");
+                debugRadiusEntries.Add($"[{i}] {terrorRadius.name}={clampedIntensity:0.000}");
                 bool isStrongerSource = clampedIntensity > bestTerrorSeverity + 0.0001f;
                 bool isTieButCloserSource = Mathf.Abs(clampedIntensity - bestTerrorSeverity) <= 0.0001f
                     && distanceToPlayer < bestDistanceToPlayer;
@@ -1404,12 +1402,8 @@ namespace Managers
             _terrorRadiusIsActive = foundActiveRadius;
             _terrorSourceTransform = foundActiveRadius ? bestSourceTransform : null;
 
-            if (debugAudioLogs && logTerrorParameterValue)
-            {
-                Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
-                Debug.Log(
-                    $"AudioManager: Terror radii considered = {debugRadiusEntries?.Count ?? 0}, bestIndex = {bestRadiusIndex}, values = {(debugRadiusEntries != null && debugRadiusEntries.Count > 0 ? string.Join(", ", debugRadiusEntries) : "none")}");
-            }
+            Debug.Log(
+                $"AudioManager: Terror radii considered = {debugRadiusEntries.Count}, bestIndex = {bestRadiusIndex}, bestValue = {_terrorSeverity:0.000}, values = {(debugRadiusEntries.Count > 0 ? string.Join(", ", debugRadiusEntries) : "none")}");
         }
         #endregion
 
