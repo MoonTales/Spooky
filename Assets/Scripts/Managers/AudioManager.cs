@@ -443,16 +443,19 @@ namespace Managers
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (mode != LoadSceneMode.Additive
-                && !string.Equals(scene.name, "Bedroom", StringComparison.Ordinal))
+            // Scene caching activates additive scenes briefly, which still triggers sceneLoaded.
+            // Audio should only react to real single-scene transitions.
+            if (mode == LoadSceneMode.Additive)
+            {
+                return;
+            }
+
+            if (!string.Equals(scene.name, "Bedroom", StringComparison.Ordinal))
             {
                 StopAndReleaseBedroomWallClock(true);
             }
 
-            if (mode != LoadSceneMode.Additive)
-            {
-                CacheNightmareWindPlanes(scene);
-            }
+            CacheNightmareWindPlanes(scene);
             AutoAttachLampAudioEmittersInScene(scene);
             AutoAttachTutorialOrbAudioEmittersInScene(scene);
             AutoAttachSpiderAudioEmittersInScene(scene);
@@ -1430,7 +1433,7 @@ namespace Managers
 
         private void ApplyNightmareAmbience()
         {
-            if (!IsNightmareWorldLocation())
+            if (!IsNightmareWorldLocation() || IsMainMenuGameState())
             {
                 StopAndReleaseNightmareAmbience();
                 StopAndReleaseNightmareInteriorExteriorAmbience();
@@ -1460,7 +1463,7 @@ namespace Managers
 
         private void ApplyNightmareInteriorExteriorAmbience()
         {
-            if (!IsNightmareWorldLocation())
+            if (!IsNightmareWorldLocation() || IsMainMenuGameState())
             {
                 StopAndReleaseNightmareInteriorExteriorAmbience();
                 return;
@@ -1606,6 +1609,12 @@ namespace Managers
         {
             return GameStateManager.Instance != null
                 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom;
+        }
+
+        private static bool IsMainMenuGameState()
+        {
+            return GameStateManager.Instance != null
+                && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu;
         }
 
         private void CacheNightmareWindPlanes(Scene scene)
