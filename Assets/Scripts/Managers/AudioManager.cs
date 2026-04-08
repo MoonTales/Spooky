@@ -1593,12 +1593,21 @@ namespace Managers
                 _terrorLoopInstance.start();
                 _terrorLoopIsPlaying = true;
                 LogAudioState("Terror loop started. Expected: audible 3D terror source in Nightmare.");
-                return;
             }
 
             if (_terrorLoopInstance.isValid())
             {
                 _terrorLoopInstance.set3DAttributes(RuntimeUtils.To3DAttributes(_terrorSourceTransform.position));
+            }
+
+            if (!string.IsNullOrWhiteSpace(terrorDistortionParameter))
+            {
+                SetFmodParameter(_terrorLoopInstance, terrorDistortionParameter, terrorSeverity, terrorParameterIsGlobal);
+            }
+
+            if (!string.IsNullOrWhiteSpace(mentalHealthDistortionParameter))
+            {
+                SetFmodParameter(_terrorLoopInstance, mentalHealthDistortionParameter, _mentalStateSeverity, mentalHealthParameterIsGlobal);
             }
         }
 
