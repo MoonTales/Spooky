@@ -18,6 +18,8 @@ namespace Managers
         public AudioClip ExampleAudioClip;
 
         public AudioClip DrawingCollectSound;
+        public AudioClip PauseMenuOpenedSound;
+        public AudioClip PauseMenuClosedSound;
         
         [Header("Mutes")]
         public bool muteSFX = false;
@@ -104,7 +106,16 @@ namespace Managers
 
         public void PlayClip(AudioClip clip, GameObject fromObject = null, float volume = 1f, float deviation = 0f)
         {
+            
             PlaySFX(clip, volume, deviation, fromObject);
+        }
+        public void PlayPauseMenuOpenedSfx()
+        {
+            PlaySFX(PauseMenuOpenedSound, volume: 1f, deviation: 0.1f);
+        }
+        public void PlayPauseMenuClosedSfx()
+        {
+            PlaySFX(PauseMenuClosedSound, volume: 1f, deviation: 0.1f);
         }
 
         private AudioSource GetFreeSource()
