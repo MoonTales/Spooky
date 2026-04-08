@@ -51,6 +51,8 @@ namespace UI
             
             // hook up to our buttons
             displayText.text = displayMessage;
+            UIButtonSfx.Ensure(confirmButton, enableHover: true, enableClick: true);
+            UIButtonSfx.Ensure(cancelButton, enableHover: true, enableClick: true);
             confirmButton.onClick.AddListener(() => OnConfirmButtonClicked(popupInstance, onConfirm));
             cancelButton.onClick.AddListener(() => OnCancelButtonClicked(popupInstance));
             return popupInstance;
