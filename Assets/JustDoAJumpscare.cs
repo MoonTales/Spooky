@@ -1,5 +1,6 @@
 using UnityEngine;
 using Managers;
+using System;
 
 public class JustDoAJumpscare : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class JustDoAJumpscare : MonoBehaviour
 	public AudioClip[] jumpscareSounds;
 	public string jumpscareActivateBool = "Scary";
 	public bool boolValue = true;
+	public float damageDone = 0;
 
 	public void Jumpscare()
 	{
@@ -19,6 +21,11 @@ public class JustDoAJumpscare : MonoBehaviour
 			{
 				UAudio.Instance.PlayClip(jumpscare);
 			}
+		}
+
+		if (damageDone > 0)
+		{
+			EventBroadcaster.Broadcast_OnPlayerDamaged(damageDone);
 		}
 	}
 }
