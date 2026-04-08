@@ -224,8 +224,7 @@ public class SpiderAudioEmitter : MonoBehaviour
             ? "attractorAI=<none>"
             : $"attractorAI={targetAttractorAI.name}, dangerRaw={targetAttractorAI.currentDangerLevel:0.00}, state={targetAttractorAI.GetCurrentState()}({GetCurrentStateValue()})";
 
-        Debug.Log(
-            $"[SpiderAudioDebug] phase={phase}, spiderRootPos={FormatVector(spiderRoot.position)}, instanceValid={_activeInstance.isValid()}, movementSpeed={_currentMovementSpeed:0.000}, movementThreshold={MovementSpeedThreshold:0.000}, {listenerText}, {attractorText}, {aiText}");
+        //Debug.Log($"[SpiderAudioDebug] phase={phase}, spiderRootPos={FormatVector(spiderRoot.position)}, instanceValid={_activeInstance.isValid()}, movementSpeed={_currentMovementSpeed:0.000}, movementThreshold={MovementSpeedThreshold:0.000}, {listenerText}, {attractorText}, {aiText}");
     }
 
     private bool TryGetDebugSpiderRoot(out Transform spiderRoot)
