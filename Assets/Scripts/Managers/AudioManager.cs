@@ -259,6 +259,7 @@ namespace Managers
         private Transform _terrorSourceTransform;
         private bool _terrorRadiusIsActive;
         private bool _terrorLoopIsPlaying;
+        private readonly List<TerrorRadius> _registeredTerrorRadii = new List<TerrorRadius>();
 
         // Runtime audio state - sleep tracker flow.
         private Coroutine _goodWakeupTransitionCoroutine;
@@ -302,9 +303,6 @@ namespace Managers
             TrackSubscription(
                 () => EventBroadcaster.OnPlayerHealthStateChanged += OnPlayerMentalStateChanged,
                 () => EventBroadcaster.OnPlayerHealthStateChanged -= OnPlayerMentalStateChanged);
-            TrackSubscription(
-                () => EventBroadcaster.OnTerrorIntensityChanged += OnTerrorIntensityChanged,
-                () => EventBroadcaster.OnTerrorIntensityChanged -= OnTerrorIntensityChanged);
 
             // Sleep tracker alarm state changes (active + good/bad variant).
             TrackSubscription(
@@ -675,27 +673,6 @@ namespace Managers
             RefreshMentalAudio();
         }
 
-        private void OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform, bool isTerrorRadiusActive)
-        {
-            if (!IsNightmareWorldLocation())
-            {
-                _terrorSeverity = 0f;
-                _terrorSourceTransform = null;
-                _terrorRadiusIsActive = false;
-                RefreshMentalAudio();
-                return;
-            }
-
-            _terrorSeverity = Mathf.Clamp01(normalizedIntensity);
-            _terrorRadiusIsActive = isTerrorRadiusActive;
-            _terrorSourceTransform = isTerrorRadiusActive ? terrorSourceTransform : null;
-            if (debugAudioLogs && logTerrorParameterValue)
-            {
-                Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
-            }
-            LogAudioState($"Terror changed -> {_terrorSeverity:0.00} (active={_terrorRadiusIsActive}, source={(terrorSourceTransform != null ? terrorSourceTransform.name : "null")}). Expected: terror loop follows source in Nightmare.");
-            RefreshMentalAudio();
-        }
         #endregion
 
 
@@ -705,6 +682,26 @@ namespace Managers
 
 
         #region Gameplay SFX
+
+        public void RegisterTerrorRadius(TerrorRadius terrorRadius)
+        {
+            if (terrorRadius == null || _registeredTerrorRadii.Contains(terrorRadius))
+            {
+                return;
+            }
+
+            _registeredTerrorRadii.Add(terrorRadius);
+        }
+
+        public void UnregisterTerrorRadius(TerrorRadius terrorRadius)
+        {
+            if (terrorRadius == null)
+            {
+                return;
+            }
+
+            _registeredTerrorRadii.Remove(terrorRadius);
+        }
 
         public void BeginGoodWakeupAlarmTransition()
         {
@@ -1341,10 +1338,69 @@ namespace Managers
         private void UpdateMentalAudioFrameParameters()
         {
             _mentalStateSeverity = GetNormalizedMentalHealth();
+            UpdateTerrorStateFromRegisteredRadii();
 
             if (IsNightmareWorldLocation() || _heartbeatInstance.isValid() || _terrorLoopInstance.isValid())
             {
                 RefreshMentalAudio();
+            }
+        }
+
+        private void UpdateTerrorStateFromRegisteredRadii()
+        {
+            if (!IsNightmareWorldLocation())
+            {
+                _terrorSeverity = 0f;
+                _terrorSourceTransform = null;
+                _terrorRadiusIsActive = false;
+                return;
+            }
+
+            float bestTerrorSeverity = 0f;
+            float bestDistanceToPlayer = float.MaxValue;
+            Transform bestSourceTransform = null;
+            bool foundActiveRadius = false;
+
+            for (int i = _registeredTerrorRadii.Count - 1; i >= 0; i--)
+            {
+                TerrorRadius terrorRadius = _registeredTerrorRadii[i];
+                if (terrorRadius == null)
+                {
+                    _registeredTerrorRadii.RemoveAt(i);
+                    continue;
+                }
+
+                if (!terrorRadius.TryGetAudioTerrorState(
+                        out float normalizedIntensity,
+                        out Transform sourceTransform,
+                        out float distanceToPlayer))
+                {
+                    continue;
+                }
+
+                foundActiveRadius = true;
+                float clampedIntensity = Mathf.Clamp01(normalizedIntensity);
+                bool isStrongerSource = clampedIntensity > bestTerrorSeverity + 0.0001f;
+                bool isTieButCloserSource = Mathf.Abs(clampedIntensity - bestTerrorSeverity) <= 0.0001f
+                    && distanceToPlayer < bestDistanceToPlayer;
+
+                if (!isStrongerSource && !isTieButCloserSource)
+                {
+                    continue;
+                }
+
+                bestTerrorSeverity = clampedIntensity;
+                bestDistanceToPlayer = distanceToPlayer;
+                bestSourceTransform = sourceTransform;
+            }
+
+            _terrorSeverity = bestTerrorSeverity;
+            _terrorRadiusIsActive = foundActiveRadius;
+            _terrorSourceTransform = foundActiveRadius ? bestSourceTransform : null;
+
+            if (debugAudioLogs && logTerrorParameterValue)
+            {
+                Debug.Log($"AudioManager: Terror param value = {_terrorSeverity:0.000}");
             }
         }
         #endregion

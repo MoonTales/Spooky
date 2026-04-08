@@ -35,6 +35,8 @@ public class TerrorRadius : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private Transform terrorAudioSourceTransform;
 
+    private bool _registeredWithAudioManager;
+
     // Internal variables such as timer intervals to check distance, and distance float
     private float timer;
     private float interval = 0.8f;
@@ -56,19 +58,29 @@ public class TerrorRadius : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        EnsureAudioRegistration();
+    }
 
+    private void OnEnable()
+    {
+        EnsureAudioRegistration();
     }
 
     private void OnDisable()
     {
-        EventBroadcaster.Broadcast_OnTerrorIntensityChanged(0f, null, false);
+        ReleaseAudioRegistration();
+    }
+
+    private void OnDestroy()
+    {
+        ReleaseAudioRegistration();
     }
 
     // Update is called once per frame
     void Update()
     {
+        EnsureAudioRegistration();
         distance = PlayerManager.Instance.GetDistance(transform.position);
-        BroadcastCurrentTerrorState();
 
         // Timer keeps damage cadence separate from audio updates.
         timer += Time.deltaTime;
@@ -110,20 +122,20 @@ public class TerrorRadius : MonoBehaviour
 
     }
 
-    private float CalculateNormalizedTerrorIntensity()
-    {   
+    private float CalculateNormalizedTerrorIntensity(float currentDistance)
+    {
         // Returns terror as a percentage in [0, 1]
-        if (distance <= veryClose)
+        if (currentDistance <= veryClose)
         {
             return 1f;
         }
 
-        if (distance >= far)
+        if (currentDistance >= far)
         {
             return 0f;
         }
 
-        return Mathf.InverseLerp(far, veryClose, distance);
+        return Mathf.InverseLerp(far, veryClose, currentDistance);
     }
 
     private Transform GetTerrorAudioSourceTransform()
@@ -132,15 +144,50 @@ public class TerrorRadius : MonoBehaviour
         return terrorAudioSourceTransform != null ? terrorAudioSourceTransform : transform;
     }
 
-    private void BroadcastCurrentTerrorState()
+    public bool TryGetAudioTerrorState(out float normalizedIntensity, out Transform sourceTransform, out float distanceToPlayer)
     {
+        normalizedIntensity = 0f;
+        sourceTransform = null;
+        distanceToPlayer = 0f;
+
         bool isNightmare = GameStateManager.Instance != null
             && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare;
 
-        bool isTerrorRadiusActive = isActiveAndEnabled && isNightmare;
-        float terrorIntensity = isTerrorRadiusActive ? CalculateNormalizedTerrorIntensity() : 0f;
-        Transform sourceTransform = isTerrorRadiusActive ? GetTerrorAudioSourceTransform() : null;
-        EventBroadcaster.Broadcast_OnTerrorIntensityChanged(terrorIntensity, sourceTransform, isTerrorRadiusActive);
+        if (!isActiveAndEnabled || !isNightmare || PlayerManager.Instance == null)
+        {
+            return false;
+        }
+
+        distanceToPlayer = PlayerManager.Instance.GetDistance(transform.position);
+        normalizedIntensity = CalculateNormalizedTerrorIntensity(distanceToPlayer);
+        sourceTransform = GetTerrorAudioSourceTransform();
+        return true;
+    }
+
+    private void EnsureAudioRegistration()
+    {
+        if (_registeredWithAudioManager || AudioManager.Instance == null)
+        {
+            return;
+        }
+
+        AudioManager.Instance.RegisterTerrorRadius(this);
+        _registeredWithAudioManager = true;
+    }
+
+    private void ReleaseAudioRegistration()
+    {
+        if (!_registeredWithAudioManager)
+        {
+            return;
+        }
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.UnregisterTerrorRadius(this);
+        }
+
+        _registeredWithAudioManager = false;
     }
 
     /*
