@@ -23,6 +23,9 @@ namespace Interaction.Letters
         [SerializeField] private float researcherSfxVolume = 1f;
         [SerializeField] private float researcherSfxDeviation = 0.05f;
 
+        // Referenc
+        [SerializeField] private GameObject Elias_Photo;
+        
         // Expose the material to be set for the fade script
         public Material[] materialArray;
 
@@ -39,6 +42,11 @@ namespace Interaction.Letters
             {
                 promptKey = new TextKey { place = "prompt", id = "fren_letter" };
                 rowKey = new TextKey { place = "bedroom", id = "fren_letter" };
+
+                if (GameStateManager.Instance.GetCurrentWorldClockHour() == 1)
+                {
+                    Elias_Photo.SetActive(true);
+                }
             }
         }
         
@@ -105,6 +113,7 @@ namespace Interaction.Letters
         GetComponent<Collider>().enabled = false;
         StartCoroutine(FadeOut());
         // there is an edge case we need to account for (if its act 4), since we will treat that one differently
+        GameStateManager.Instance.SetIsPhotoInRoom(true);
     }
 
 

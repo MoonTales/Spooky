@@ -139,6 +139,11 @@ public class Clock : EventSubscriberBase
                 {
                     continue;
                 }
+                // Also dont pass if its a "showOnCondition" (which currently is ONLY the Elias photo, and im to lazy to do an official check
+                if (InspectionSystem.Instance.GetInspectedObject().GetComponent<ShowOnCondition>() == true)
+                {
+                    continue;
+                }
             }
 
             // Increment timer. If inspecting, increment * fast forward speed

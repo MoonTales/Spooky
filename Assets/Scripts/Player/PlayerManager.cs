@@ -55,6 +55,9 @@ namespace Player
         
         public void SearchForSpawnAnchor(string spawnPointID = "")
         {
+            
+            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            DebugUtils.LogWarning("Searching from spawn anchor, and teleporting player within the scene: " + sceneName);
             // reset flashlight to default intensity upon respawn
             Flashlight.Instance.GetComponent<Animator>().SetBool("Increase", false);
 

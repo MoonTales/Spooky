@@ -15,7 +15,7 @@ namespace Managers
             // save the world clock hour
             public int worldClockHour;
             public int currentZoneId;
-            
+            public bool isPhotoInRoom;
         }
         
         
@@ -30,6 +30,19 @@ namespace Managers
         private int _currentZoneId = 0; public int GetCurrentZoneId() { return _currentZoneId; } public void SetCurrentZoneId(int zoneId) { _currentZoneId = zoneId; }
         
         private int _currentWorldClockHour = 1; public int GetCurrentWorldClockHour() { return _currentWorldClockHour; }
+
+        private bool _IsPhotoInRoom = false; public bool GetIsPhotoInRoom() { return _IsPhotoInRoom; }
+
+        public void SetIsPhotoInRoom(bool value)
+        {
+            _IsPhotoInRoom = value;
+            // find the only gameobject in the scene with the class "ShowOnCondition"
+            ShowOnCondition[] showOnConditions = FindObjectsOfType<ShowOnCondition>(true);
+            foreach (ShowOnCondition showOnCondition in showOnConditions)
+            {
+                showOnCondition.gameObject.SetActive(_IsPhotoInRoom);
+            }
+        }
         public void Start()
         {
             // Initialize the game state
@@ -182,7 +195,8 @@ namespace Managers
             return new GameStateSaveData
             {
                 worldClockHour = _currentWorldClockHour,
-                currentZoneId = _currentZoneId
+                currentZoneId = _currentZoneId,
+                isPhotoInRoom = _IsPhotoInRoom
             };
         }
 
@@ -192,6 +206,7 @@ namespace Managers
             // we will alwaysw start in gameplay
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
             _currentZoneId = data.currentZoneId;
+            _IsPhotoInRoom = data.isPhotoInRoom;
         }
         
         
