@@ -3297,7 +3297,7 @@ public class AttractorAI : MonoBehaviour
 
 							if (highestUtility >= reaction.minRequiredUtility)
 							{
-								Debug.Log(tellMe);
+								//Debug.Log(tellMe);
 
 								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
 

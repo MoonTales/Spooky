@@ -126,6 +126,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _poolSize: 10
   ExampleAudioClip: {fileID: 8300000, guid: 0b68b0887e36363449710d0591457b29, type: 3}
+  DrawingCollectSound: {fileID: 8300000, guid: 2d27d464c0203174ba2ec8af62c53f45, type: 3}
+  PauseMenuOpenedSound: {fileID: 8300000, guid: 2d27d464c0203174ba2ec8af62c53f45, type: 3}
+  PauseMenuClosedSound: {fileID: 8300000, guid: 2e66b8dd429b05e4eb2330247d41f281, type: 3}
   muteSFX: 0
   sfxValue: 1
 --- !u!81 &2692148044793071574
@@ -135,7 +138,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2294186576336603821}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!1 &3273276169319173279
 GameObject:
   m_ObjectHideFlags: 0

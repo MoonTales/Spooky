@@ -237,6 +237,7 @@ namespace Managers
         private EventInstance _mainMenuMusicInstance;
         private EventInstance _pauseSnapshotInstance;
         private EventInstance _uiHoverInstance;
+        private EventInstance _DoorLockedInstance;
 
         // Persistent FMOD instances - world ambience and mental stack.
         private EventInstance _bedroomAmbienceInstance;
@@ -1188,6 +1189,26 @@ namespace Managers
             }
 
             _uiHoverInstance.start();
+        }
+
+        public void PlayDoorLockedSfx()
+        {
+            if (muteSFX)
+            {
+                return;
+            }
+            
+            EventReference eventReference = GetSfxEvent(SfxId.DoorLocked);
+            if (!_DoorLockedInstance.isValid())
+            {
+                _DoorLockedInstance = CreateEventInstance(eventReference);
+            }
+            else
+            {
+                _DoorLockedInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            }
+
+            _DoorLockedInstance.start();
         }
 
         public void PlayPlayerLanding(float downwardSpeed, float airborneTime, Transform fromTransform = null)

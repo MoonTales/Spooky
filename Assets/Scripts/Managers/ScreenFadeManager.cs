@@ -32,7 +32,7 @@ namespace Managers
         
         public void DisplaySaveIconForDuration(float duration)
         {
-            Debug.Log($"Displaying save icon for duration: {duration}");
+            //Debug.Log($"Displaying save icon for duration: {duration}");
             // enable the save icon, and then disable it after the duration
             if (_ICON_Save_Image == null)
             {

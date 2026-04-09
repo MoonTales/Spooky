@@ -113,14 +113,19 @@ namespace UI.PauseMenu
             // Added TAB as an option, cause sometimes ESC has weird behaviors
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
             {
+                // these audio SFX are on the UAudio Singleton in persistant Objects
                 if (paused)
                 {
+                    UAudio.Instance.PlayPauseMenuClosedSfx();
                     Play();
                 }
                 else
                 {
+                    UAudio.Instance.PlayPauseMenuOpenedSfx();
                     Stop();
                 }
+                // Regardless, we wanna play an sfx when we open or close the menu
+                
             }
         }
 

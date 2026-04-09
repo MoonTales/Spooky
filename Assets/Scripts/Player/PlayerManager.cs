@@ -19,7 +19,8 @@ namespace Player
         
         void Start()
         {
-            
+            // we can skip if we are caching, as we most likely already spawned during the scene loading
+            if (SceneCache.Instance.IsCacheInProgress()) { return; }
             SearchForSpawnAnchor(defaultSpawnPointID);
         }
         
@@ -55,6 +56,9 @@ namespace Player
         
         public void SearchForSpawnAnchor(string spawnPointID = "")
         {
+            
+            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            DebugUtils.LogWarning("Searching from spawn anchor, and teleporting player within the scene: " + sceneName);
             // reset flashlight to default intensity upon respawn
             Flashlight.Instance.GetComponent<Animator>().SetBool("Increase", false);
 
@@ -126,7 +130,9 @@ namespace Player
         /// </summary>
         public void TeleportPlayer(Vector3 newPosition, Quaternion? rotation = null)
         {
-            if (_player == null) return;
+            if (_player == null){ return;}
+            
+            DebugUtils.Log("Teleporting player to position: " + newPosition + " with rotation: " + (rotation.HasValue ? rotation.Value.eulerAngles.ToString() : "null"));
 
             CharacterController controller = _player.GetComponent<CharacterController>();
 

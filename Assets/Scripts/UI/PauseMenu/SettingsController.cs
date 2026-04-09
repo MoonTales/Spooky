@@ -133,7 +133,7 @@ namespace UI.PauseMenu
             float masterVolume = LoadSavedVolume(MasterVolumeKey);
             float musicVolume = LoadSavedVolume(MusicVolumeKey);
             float sfxVolume = LoadSavedVolume(SfxVolumeKey);
-            LogLoadedAudioVolumes("InitializeAudioSliders", masterVolume, musicVolume, sfxVolume);
+            //LogLoadedAudioVolumes("InitializeAudioSliders", masterVolume, musicVolume, sfxVolume);
 
             SetAudioSliderValues(masterVolume, musicVolume, sfxVolume);
             BindAudioSliderCallbacks();

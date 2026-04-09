@@ -10,7 +10,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 4
     m_ConditionEvent: Speed
-    m_EventTreshold: 0.2
+    m_EventTreshold: 0.09
   - m_ConditionMode: 2
     m_ConditionEvent: Screaming
     m_EventTreshold: 0
@@ -464,10 +464,10 @@ AnimatorStateMachine:
     m_Position: {x: 465, y: 195, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2157025451502823956}
-    m_Position: {x: -290, y: 10, z: 0}
+    m_Position: {x: -220, y: 70, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -4706467522300177263}
-    m_Position: {x: -255, y: 75, z: 0}
+    m_Position: {x: -510, y: 180, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: 7386053798367906288}
@@ -494,7 +494,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
-    m_EventTreshold: 0.2
+    m_EventTreshold: 0.11
   - m_ConditionMode: 4
     m_ConditionEvent: Speed
     m_EventTreshold: 2
