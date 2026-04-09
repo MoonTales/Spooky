@@ -41,6 +41,6 @@ jobs:
 
       # Deploy to itch.io (Mac channel)
       - name: Deploy to itch.io
-        run: butler push Game-Mac.zip moontalesstudio/spooky-game:mac
+        run: butler push Game-Mac.zip moontalesstudio/ephialtine:mac
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
