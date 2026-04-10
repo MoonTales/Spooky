@@ -35,6 +35,7 @@ namespace System
             Bedroom,
             Nightmare,
             Tutorial,
+            Finale
         }
         
         /* ------------------------ System Types ------------------------ */
