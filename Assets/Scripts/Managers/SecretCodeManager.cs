@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
+using Types = System.Types;
 
 public class SecretCodeManager : Singleton<SecretCodeManager>
 {
-    private const int RequiredPresses = 5;
+    private const int RequiredPresses = 10;
     private const float TimeWindow = 2f;
 
     private int _pressCount = 0;
@@ -30,7 +31,13 @@ public class SecretCodeManager : Singleton<SecretCodeManager>
 
     private void SecretUnlocked()
     {
-        Debug.Log("Secret Unlocked!");
+        Types.NotificationData data = new(
+            duration: 1, 
+            messageKey: new TextKey { place = "prompt", id = "cant_sleep" },
+            messageOverride: "Beep beep boop boop beeeeeeeeeeeeeeeeeeeeeeeeeep! :3",
+            shouldOnlyShowOnce:true
+        );
+        data.Send();
     }
     
 }
