@@ -702,7 +702,7 @@ namespace Player
                 if (_hasGameplayAirborneToken && hadMeaningfulAirborneTime && hadMeaningfulDropDistance)
                 {
                     float impactDownwardSpeed = Mathf.Max(0f, -_verticalVelocity);
-                    AudioManager.Instance.PlayPlayerLanding(impactDownwardSpeed, _gameplayAirborneTime, transform);
+                    AudioManager.Instance.PlayPlayerLanding(impactDownwardSpeed, _gameplayAirborneTime, _surfaceType, transform);
                 }
 
                 // Landing edge consumed; reset airborne tracking for the next jump/fall cycle.
