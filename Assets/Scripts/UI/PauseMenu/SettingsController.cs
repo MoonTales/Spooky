@@ -12,6 +12,7 @@ namespace UI.PauseMenu
     public class SettingsController : Singleton<SettingsController> 
     {
         private const float DefaultVolume = 1f;
+        private const float DefaultBrightness = 0f;
         private const string MasterVolumeKey = "audio.master";
         private const string MusicVolumeKey = "audio.music";
         private const string SfxVolumeKey = "audio.sfx";
@@ -44,8 +45,10 @@ namespace UI.PauseMenu
 
         public void Start()
         {
+            
+            
             InitializeAudioSliders();
-            LoadSavedBrightness("game.brightness");
+            LoadSavedBrightness("SaveData.brightness");
 
             // loop through all children of the main menu settings, and find the back button, and add a listener to it
             Button[] mainMenuButtons = MainMenuSettings.GetComponentsInChildren<Button>();
@@ -112,7 +115,7 @@ namespace UI.PauseMenu
             CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
             if (effects == null){ return;}
             effects.gameBrightness = Mathf.Clamp(brightness, 0f, 1f);
-            SaveBrightness("game.brightness", brightness);
+            SaveBrightness("SaveData.brightness", brightness);
         }
 
         private void InitializeAudioSliders()
@@ -254,7 +257,7 @@ namespace UI.PauseMenu
         }
         private void LoadSavedBrightness(string key)
         {
-            float value = Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultVolume));
+            float value = Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultBrightness));
             CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
             if (effects != null)
             {
