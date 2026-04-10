@@ -40,6 +40,7 @@ namespace System
             gameObject.AddComponent<SaveSystem>();
             gameObject.AddComponent<UiPopupConfirmation>();
             gameObject.AddComponent<SceneCache>();
+            gameObject.AddComponent<SecretCodeManager>();
 
 
         }
