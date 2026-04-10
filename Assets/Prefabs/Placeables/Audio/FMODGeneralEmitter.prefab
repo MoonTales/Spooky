@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1395477830197832906
+--- !u!1 &2475181864428355687
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,53 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6622401298650970523}
-  - component: {fileID: 1752910554021597344}
+  - component: {fileID: 2540865626505200047}
+  - component: {fileID: 3388600911892969964}
   m_Layer: 0
-  m_Name: NightmareWindPlane
+  m_Name: FMODGeneralEmitter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6622401298650970523
+--- !u!4 &2540865626505200047
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1395477830197832906}
+  m_GameObject: {fileID: 2475181864428355687}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 453.29208, y: -1.6177298, z: 413.16}
+  m_LocalPosition: {x: 445.41504, y: 2.1050484, z: 423.25775}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1752910554021597344
+--- !u!114 &3388600911892969964
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1395477830197832906}
+  m_GameObject: {fileID: 2475181864428355687}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 258831be146e1c3c18cdc2b71b3161fa, type: 3}
+  m_Script: {fileID: 11500000, guid: 28d400d89c1ec0a618b3345280ea4d25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outsideNormalAxis: 4
-  lateralAxis: 0
-  useSimpleControls: 0
-  halfWidthOverride: 0
-  blendDepthOverride: 0
-  maxInfluenceDistanceOverride: 0
-  interiorAmountCeiling: 1
-  debugOutput: 0
-  editorGizmoColor: {r: 0.15, g: 0.7, b: 1, a: 0.2}
+  eventRef:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  audioAnchor: {fileID: 0}
+  playOnEnable: 1
+  stopOnDisable: 1
+  followAnchor: 1
+  restartIfAlreadyPlaying: 0
+  randomizeTimelinePositionOnStart: 0
+  initialParameters: []
