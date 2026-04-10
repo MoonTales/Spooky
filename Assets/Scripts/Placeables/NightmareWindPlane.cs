@@ -25,6 +25,7 @@ namespace Placeables
         [SerializeField] private float halfWidthOverride;
         [SerializeField] private float blendDepthOverride;
         [SerializeField] private float maxInfluenceDistanceOverride;
+        [SerializeField, Range(0f, 1f)] private float interiorAmountFloor = 0f;
         [SerializeField, Range(0f, 1f)] private float interiorAmountCeiling = 1f;
 
         [Header("Debug")]
@@ -43,6 +44,7 @@ namespace Placeables
             ? MaxInfluenceDistanceOverride * 0.5f
             : Mathf.Max(0f, blendDepthOverride);
         public float MaxInfluenceDistanceOverride => Mathf.Max(0f, maxInfluenceDistanceOverride);
+        public float InteriorAmountFloor => Mathf.Clamp01(interiorAmountFloor);
         public float InteriorAmountCeiling => Mathf.Clamp01(interiorAmountCeiling);
         public bool DebugOutputEnabled => debugOutput;
 
@@ -78,7 +80,7 @@ namespace Placeables
 
             _nextDebugLogTime = Time.unscaledTime + DebugLogIntervalSeconds;
             Debug.Log(
-                $"NightmareWindPlane '{name}': active={isActivePlane}, interior={interiorAmount:F3}, signedDepth={signedDepth:F3}, lateral={lateralOffset:F3}/{halfWidth:F3}, planar={planarDistance:F3}/{maxInfluenceDistance:F3}, blendDepth={blendDepth:F3}, ceiling={InteriorAmountCeiling:F3}",
+                $"NightmareWindPlane '{name}': active={isActivePlane}, interior={interiorAmount:F3}, signedDepth={signedDepth:F3}, lateral={lateralOffset:F3}/{halfWidth:F3}, planar={planarDistance:F3}/{maxInfluenceDistance:F3}, blendDepth={blendDepth:F3}, floor={InteriorAmountFloor:F3}, ceiling={InteriorAmountCeiling:F3}",
                 this);
         }
 
@@ -106,7 +108,12 @@ namespace Placeables
             halfWidthOverride = Mathf.Max(0f, halfWidthOverride);
             blendDepthOverride = Mathf.Max(0f, blendDepthOverride);
             maxInfluenceDistanceOverride = Mathf.Max(0f, maxInfluenceDistanceOverride);
+            interiorAmountFloor = Mathf.Clamp01(interiorAmountFloor);
             interiorAmountCeiling = Mathf.Clamp01(interiorAmountCeiling);
+            if (interiorAmountCeiling < interiorAmountFloor)
+            {
+                interiorAmountCeiling = interiorAmountFloor;
+            }
         }
 
         private static bool UsesSameAxis(LocalAxisDirection a, LocalAxisDirection b)

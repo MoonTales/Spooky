@@ -1208,7 +1208,7 @@ namespace Managers
             _DoorLockedInstance.start();
         }
 
-        public void PlayPlayerLanding(float downwardSpeed, float airborneTime, Transform fromTransform = null)
+        public void PlayPlayerLanding(float downwardSpeed, float airborneTime, string surfaceLabel, Transform fromTransform = null)
         {
             if (muteSFX) return;
 
@@ -1235,6 +1235,10 @@ namespace Managers
             }
 
             EventInstance instance = CreateEventInstance(eventReference, fromTransform);
+            if (!string.IsNullOrWhiteSpace(surfaceLabel) && !string.Equals(surfaceLabel, "Unknown", StringComparison.OrdinalIgnoreCase))
+            {
+                instance.setParameterByNameWithLabel("Surface", surfaceLabel);
+            }
             if (!string.IsNullOrWhiteSpace(landingIntensityParameter))
             {
                 instance.setParameterByName(landingIntensityParameter, landingIntensity);
@@ -1402,8 +1406,8 @@ namespace Managers
             _terrorRadiusIsActive = foundActiveRadius;
             _terrorSourceTransform = foundActiveRadius ? bestSourceTransform : null;
 
-            Debug.Log(
-                $"AudioManager: Terror radii considered = {debugRadiusEntries.Count}, bestIndex = {bestRadiusIndex}, bestValue = {_terrorSeverity:0.000}, values = {(debugRadiusEntries.Count > 0 ? string.Join(", ", debugRadiusEntries) : "none")}");
+            // Debug.Log(
+            //     $"AudioManager: Terror radii considered = {debugRadiusEntries.Count}, bestIndex = {bestRadiusIndex}, bestValue = {_terrorSeverity:0.000}, values = {(debugRadiusEntries.Count > 0 ? string.Join(", ", debugRadiusEntries) : "none")}");
         }
         #endregion
 
@@ -1854,7 +1858,7 @@ namespace Managers
                     interiorAmount = signedDepth <= 0f ? 1f : 0f;
                 }
 
-                interiorAmount = Mathf.Min(interiorAmount, windPlane.InteriorAmountCeiling);
+                interiorAmount = Mathf.Clamp(interiorAmount, windPlane.InteriorAmountFloor, windPlane.InteriorAmountCeiling);
 
                 if (objectDistance < closestObjectDistance)
                 {
