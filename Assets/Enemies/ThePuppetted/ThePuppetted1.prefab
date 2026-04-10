@@ -6582,7 +6582,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2453076376757185836}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.010047112, y: 0.022486357, z: -0.017272042, w: 0.9995475}
+  m_LocalRotation: {x: 0.010046128, y: 0.02248831, z: -0.017272605, w: 0.9995474}
   m_LocalPosition: {x: -0.00482, y: -0.00472, z: 0.0073}
   m_LocalScale: {x: 0.004472836, y: 0.0039351955, z: 0.0028725753}
   m_ConstrainProportionsScale: 0
@@ -8295,7 +8295,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2931033688779976828}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4478661, y: 0.49875817, z: 0.708196, w: -0.22161847}
+  m_LocalRotation: {x: 0.44786608, y: 0.4987581, z: 0.70819616, w: -0.22161794}
   m_LocalPosition: {x: -56.5, y: 19, z: 6.6}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
@@ -11786,7 +11786,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3992613794897159343}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5712464, y: -0.3201572, z: 0.2819822, w: 0.7011869}
+  m_LocalRotation: {x: 0.5712472, y: -0.3201575, z: 0.28198186, w: 0.70118624}
   m_LocalPosition: {x: -23.4, y: 1.8, z: 7.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -19259,7 +19259,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7063020017249136209}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.011114543, y: -0.031470522, z: -0.003040555, w: 0.9994383}
+  m_LocalRotation: {x: 0.011114372, y: -0.031468075, z: -0.0030413368, w: 0.99943835}
   m_LocalPosition: {x: 0.00468, y: -0.00468, z: 0.0073}
   m_LocalScale: {x: 0.004394136, y: 0.00397201, z: 0.0028994493}
   m_ConstrainProportionsScale: 0
@@ -21719,8 +21719,8 @@ MonoBehaviour:
                 inWeight: 0
                 outWeight: 0.4999928
               - serializedVersion: 3
-                time: 0.36603838
-                value: 0.010237113
+                time: 0.21620488
+                value: 0.00042907894
                 inSlope: 0.35276455
                 outSlope: 0.35276455
                 tangentMode: 0
@@ -21728,8 +21728,8 @@ MonoBehaviour:
                 inWeight: 0.33333334
                 outWeight: 0.33333334
               - serializedVersion: 3
-                time: 0.50172675
-                value: 0.1442989
+                time: 0.35189325
+                value: 0.13449086
                 inSlope: 0.529635
                 outSlope: 0.529635
                 tangentMode: 0
@@ -21737,8 +21737,8 @@ MonoBehaviour:
                 inWeight: 0.26389945
                 outWeight: 0.33333334
               - serializedVersion: 3
-                time: 0.70769167
-                value: 0.9923809
+                time: 0.55785817
+                value: 0.9825729
                 inSlope: 0.152266
                 outSlope: 0.152266
                 tangentMode: 0
@@ -21878,20 +21878,20 @@ MonoBehaviour:
             maxIntClamp: 0
             statusName: 
             state: 0
-            operationToPerform: 1
+            operationToPerform: 0
             ignoreZeroValues: 0
             allMustBeNonZero: 0
             compositeConsiderations:
             - considerationType: 0
               considerAttractorsForFocus: 0
-              attractorTypeConsidered: 0
+              attractorTypeConsidered: 1
               customAttractorIDConsidered: 
-              minIntensityConsidered: 10
-              maxIntensityConsidered: 30
+              minIntensityConsidered: 0
+              maxIntensityConsidered: 10
               considerClosestInsteadOfMostIntense: 0
               invertConsideredAttractorPriority: 0
               minIntensityClamp: 0
-              maxIntensityClamp: 20
+              maxIntensityClamp: 7
               minDistanceClamp: 0
               maxDistanceClamp: 0
               boolID: 
@@ -21913,37 +21913,37 @@ MonoBehaviour:
                 m_Curve:
                 - serializedVersion: 3
                   time: 0
-                  value: 1
-                  inSlope: -1
-                  outSlope: -1
-                  tangentMode: 34
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
                   weightedMode: 0
                   inWeight: 0
-                  outWeight: 0.33333334
+                  outWeight: 0
                 - serializedVersion: 3
                   time: 1
-                  value: 0
-                  inSlope: -1
-                  outSlope: -1
-                  tangentMode: 34
+                  value: 1
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
                   weightedMode: 0
-                  inWeight: 0.33333334
+                  inWeight: 0
                   outWeight: 0
                 m_PreInfinity: 2
                 m_PostInfinity: 2
                 m_RotationOrder: 4
-            - considerationType: 7
+            - considerationType: 1
               considerAttractorsForFocus: 0
-              attractorTypeConsidered: 0
+              attractorTypeConsidered: 1
               customAttractorIDConsidered: 
               minIntensityConsidered: 0
-              maxIntensityConsidered: 0
+              maxIntensityConsidered: 10
               considerClosestInsteadOfMostIntense: 0
               invertConsideredAttractorPriority: 0
               minIntensityClamp: 0
               maxIntensityClamp: 0
-              minDistanceClamp: 0
-              maxDistanceClamp: 0
+              minDistanceClamp: 5
+              maxDistanceClamp: 80
               boolID: 
               floatID: 
               minFloatClamp: 0
@@ -21956,202 +21956,75 @@ MonoBehaviour:
               operationToPerform: 0
               ignoreZeroValues: 0
               allMustBeNonZero: 0
-              compositeConsiderations:
-              - considerationType: 0
-                considerAttractorsForFocus: 0
-                attractorTypeConsidered: 1
-                customAttractorIDConsidered: 
-                minIntensityConsidered: 0
-                maxIntensityConsidered: 10
-                considerClosestInsteadOfMostIntense: 0
-                invertConsideredAttractorPriority: 0
-                minIntensityClamp: 0
-                maxIntensityClamp: 7
-                minDistanceClamp: 0
-                maxDistanceClamp: 0
-                boolID: 
-                floatID: 
-                minFloatClamp: 0
-                maxFloatClamp: 0
-                intID: 
-                minIntClamp: 0
-                maxIntClamp: 0
-                statusName: 
-                state: 0
-                operationToPerform: 0
-                ignoreZeroValues: 0
-                allMustBeNonZero: 0
-                compositeConsiderations: []
-                constantUtility: 0
-                utilityCurve:
-                  serializedVersion: 2
-                  m_Curve:
-                  - serializedVersion: 3
-                    time: 0
-                    value: 0
-                    inSlope: 0
-                    outSlope: 0
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0
-                    outWeight: 0
-                  - serializedVersion: 3
-                    time: 1
-                    value: 1
-                    inSlope: 0
-                    outSlope: 0
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0
-                    outWeight: 0
-                  m_PreInfinity: 2
-                  m_PostInfinity: 2
-                  m_RotationOrder: 4
-              - considerationType: 1
-                considerAttractorsForFocus: 0
-                attractorTypeConsidered: 1
-                customAttractorIDConsidered: 
-                minIntensityConsidered: 0
-                maxIntensityConsidered: 10
-                considerClosestInsteadOfMostIntense: 0
-                invertConsideredAttractorPriority: 0
-                minIntensityClamp: 0
-                maxIntensityClamp: 0
-                minDistanceClamp: 5
-                maxDistanceClamp: 80
-                boolID: 
-                floatID: 
-                minFloatClamp: 0
-                maxFloatClamp: 0
-                intID: 
-                minIntClamp: 0
-                maxIntClamp: 0
-                statusName: 
-                state: 0
-                operationToPerform: 0
-                ignoreZeroValues: 0
-                allMustBeNonZero: 0
-                compositeConsiderations: []
-                constantUtility: 0
-                utilityCurve:
-                  serializedVersion: 2
-                  m_Curve:
-                  - serializedVersion: 3
-                    time: 0
-                    value: 1
-                    inSlope: 0.080325566
-                    outSlope: 0.080325566
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0
-                    outWeight: 0.21160409
-                  - serializedVersion: 3
-                    time: 0.2960411
-                    value: 0.8445878
-                    inSlope: -2.1651568
-                    outSlope: -2.1651568
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0.33333334
-                    outWeight: 0.07775388
-                  - serializedVersion: 3
-                    time: 0.6926364
-                    value: 0.005423039
-                    inSlope: -0.9392147
-                    outSlope: -0.9392147
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0.33333334
-                    outWeight: 0.33333334
-                  - serializedVersion: 3
-                    time: 1
-                    value: 0
-                    inSlope: 0
-                    outSlope: 0
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0
-                    outWeight: 0
-                  m_PreInfinity: 2
-                  m_PostInfinity: 2
-                  m_RotationOrder: 4
-              - considerationType: 3
-                considerAttractorsForFocus: 0
-                attractorTypeConsidered: 1
-                customAttractorIDConsidered: 
-                minIntensityConsidered: 0
-                maxIntensityConsidered: 0
-                considerClosestInsteadOfMostIntense: 0
-                invertConsideredAttractorPriority: 0
-                minIntensityClamp: 0
-                maxIntensityClamp: 0
-                minDistanceClamp: 0
-                maxDistanceClamp: 0
-                boolID: 
-                floatID: Energy
-                minFloatClamp: 0
-                maxFloatClamp: 100
-                intID: 
-                minIntClamp: 0
-                maxIntClamp: 0
-                statusName: 
-                state: 0
-                operationToPerform: 0
-                ignoreZeroValues: 0
-                allMustBeNonZero: 0
-                compositeConsiderations: []
-                constantUtility: 0
-                utilityCurve:
-                  serializedVersion: 2
-                  m_Curve:
-                  - serializedVersion: 3
-                    time: 0
-                    value: 0
-                    inSlope: 0.049955815
-                    outSlope: 0.049955815
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0
-                    outWeight: 0.4999928
-                  - serializedVersion: 3
-                    time: 0.36603838
-                    value: 0.010237113
-                    inSlope: 0.35276455
-                    outSlope: 0.35276455
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0.33333334
-                    outWeight: 0.33333334
-                  - serializedVersion: 3
-                    time: 0.50172675
-                    value: 0.1442989
-                    inSlope: 0.529635
-                    outSlope: 0.529635
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0.26389945
-                    outWeight: 0.33333334
-                  - serializedVersion: 3
-                    time: 0.70769167
-                    value: 0.9923809
-                    inSlope: 0.152266
-                    outSlope: 0.152266
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0.33333334
-                    outWeight: 0.48334828
-                  - serializedVersion: 3
-                    time: 1
-                    value: 1
-                    inSlope: 0
-                    outSlope: 0
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0
-                    outWeight: 0
-                  m_PreInfinity: 2
-                  m_PostInfinity: 2
-                  m_RotationOrder: 4
+              compositeConsiderations: []
+              constantUtility: 0
+              utilityCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 1
+                  inSlope: 0.080325566
+                  outSlope: 0.080325566
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0.21160409
+                - serializedVersion: 3
+                  time: 0.2960411
+                  value: 0.8445878
+                  inSlope: -2.1651568
+                  outSlope: -2.1651568
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0.33333334
+                  outWeight: 0.07775388
+                - serializedVersion: 3
+                  time: 0.6926364
+                  value: 0.005423039
+                  inSlope: -0.9392147
+                  outSlope: -0.9392147
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0.33333334
+                  outWeight: 0.33333334
+                - serializedVersion: 3
+                  time: 1
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+            - considerationType: 3
+              considerAttractorsForFocus: 0
+              attractorTypeConsidered: 1
+              customAttractorIDConsidered: 
+              minIntensityConsidered: 0
+              maxIntensityConsidered: 0
+              considerClosestInsteadOfMostIntense: 0
+              invertConsideredAttractorPriority: 0
+              minIntensityClamp: 0
+              maxIntensityClamp: 0
+              minDistanceClamp: 0
+              maxDistanceClamp: 0
+              boolID: 
+              floatID: Energy
+              minFloatClamp: 0
+              maxFloatClamp: 100
+              intID: 
+              minIntClamp: 0
+              maxIntClamp: 0
+              statusName: 
+              state: 0
+              operationToPerform: 0
+              ignoreZeroValues: 0
+              allMustBeNonZero: 0
+              compositeConsiderations: []
               constantUtility: 0
               utilityCurve:
                 serializedVersion: 2
@@ -22159,18 +22032,45 @@ MonoBehaviour:
                 - serializedVersion: 3
                   time: 0
                   value: 0
-                  inSlope: 1
-                  outSlope: 1
-                  tangentMode: 34
+                  inSlope: 0.049955815
+                  outSlope: 0.049955815
+                  tangentMode: 0
                   weightedMode: 0
                   inWeight: 0
-                  outWeight: 0
+                  outWeight: 0.4999928
+                - serializedVersion: 3
+                  time: 0.36603838
+                  value: 0.010237113
+                  inSlope: 0.35276455
+                  outSlope: 0.35276455
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0.33333334
+                  outWeight: 0.33333334
+                - serializedVersion: 3
+                  time: 0.50172675
+                  value: 0.1442989
+                  inSlope: 0.529635
+                  outSlope: 0.529635
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0.26389945
+                  outWeight: 0.33333334
+                - serializedVersion: 3
+                  time: 0.70769167
+                  value: 0.9923809
+                  inSlope: 0.152266
+                  outSlope: 0.152266
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0.33333334
+                  outWeight: 0.48334828
                 - serializedVersion: 3
                   time: 1
                   value: 1
-                  inSlope: 1
-                  outSlope: 1
-                  tangentMode: 34
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
                   weightedMode: 0
                   inWeight: 0
                   outWeight: 0
@@ -22184,20 +22084,20 @@ MonoBehaviour:
               - serializedVersion: 3
                 time: 0
                 value: 0
-                inSlope: -0.1130083
-                outSlope: -0.1130083
-                tangentMode: 0
+                inSlope: 1
+                outSlope: 1
+                tangentMode: 34
                 weightedMode: 0
                 inWeight: 0
-                outWeight: 0.24232084
+                outWeight: 0
               - serializedVersion: 3
-                time: 0.98976105
-                value: 0.7714825
-                inSlope: -0.7717814
-                outSlope: -0.7717814
-                tangentMode: 0
+                time: 1
+                value: 1
+                inSlope: 1
+                outSlope: 1
+                tangentMode: 34
                 weightedMode: 0
-                inWeight: 0.13103439
+                inWeight: 0
                 outWeight: 0
               m_PreInfinity: 2
               m_PostInfinity: 2
