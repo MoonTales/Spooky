@@ -81,6 +81,7 @@ namespace System
 
             if (scene.name.ToLower() == "finalenightmare")
             {
+                //TODO: need to change this to Nightmare, but I dont wanna mess up audio this close to gold release
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.ModeratelyAnxious);
                 if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
