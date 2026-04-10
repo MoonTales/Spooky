@@ -122,7 +122,7 @@ namespace System
         public void DeleteSaveData()
         {
             // delete the save data from disk and clear our current save data struct
-            PlayerPrefs.DeleteAll();
+            PlayerPrefs.DeleteKey("SaveData");
             _currentSaveData = new SaveData { saveData = new List<SavableObject>() };
         }
 
