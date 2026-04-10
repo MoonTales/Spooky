@@ -34,7 +34,7 @@ public class SecretCodeManager : Singleton<SecretCodeManager>
         Types.NotificationData data = new(
             duration: 1, 
             messageKey: new TextKey { place = "prompt", id = "cant_sleep" },
-            messageOverride: "Beep beep boop boop beeeeeeeeeeeeeeeeeeeeeeeeeep! :3",
+            messageOverride: "Beep beep boop boop beeeeeeeeeeeeeeeeeeeeeeeep! :3",
             shouldOnlyShowOnce:true
         );
         data.Send();
