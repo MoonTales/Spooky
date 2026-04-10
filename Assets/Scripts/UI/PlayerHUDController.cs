@@ -72,7 +72,7 @@ namespace UI
             Types.NotificationData data = new(
                 duration: 2.0f, 
                 messageKey: new TextKey { place = "Notifications", id = "AllDrawingsCollected" },
-                messageOverride: "I should probably bring these back to the room now...",
+                messageOverride: "Need to go back. Can't lose these.",
                 shouldOnlyShowOnce: false
             );
             data.Send();
