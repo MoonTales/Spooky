@@ -257,14 +257,20 @@ namespace UI.PauseMenu
         }
         private void LoadSavedBrightness(string key)
         {
-            float value = Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultBrightness));
+            float value = PlayerPrefs.HasKey(key)
+                ? Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultBrightness))
+                : DefaultBrightness;
+
             CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
             if (effects != null)
             {
                 effects.gameBrightness = value;
             }
-            
-            brightSlider.value = value;
+
+            if (brightSlider != null)
+            {
+                brightSlider.SetValueWithoutNotify(value);
+            }
         }
 
         private void OnMasterVolumeChanged(float value)
