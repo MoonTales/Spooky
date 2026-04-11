@@ -157,7 +157,7 @@ namespace Player
         private void OnPlayerDamaged(float damageAmount)
         {
             // if the player is in Zone 0, they cannot be damaged
-            if (GameStateManager.Instance.GetCurrentZoneId() == 0) { return; }
+            if (GameStateManager.Instance.GetCurrentZoneId() == 0 && GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Nightmare) { return; }
             UpdateCurrentMentalHealth(-damageAmount);
         }
         
