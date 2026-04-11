@@ -6,6 +6,7 @@ using UI.Main_Menu;
 using UnityEngine;
 using UnityEngine.UI;
 using Types = System.Types;
+using UnityEngine.Audio;
 
 namespace UI.PauseMenu
 {
@@ -24,6 +25,8 @@ namespace UI.PauseMenu
         [SerializeField] private Slider masterSlider;
         [SerializeField] private Slider musicSlider;
         [SerializeField] private Slider sfxSlider;
+        public AudioMixer musicMixer;
+        public AudioMixer sfxMixer;
         // TODO: If ambience gets its own slider later, split ambience control from music.
 
         // Brightness and crouch 
@@ -230,6 +233,9 @@ namespace UI.PauseMenu
             AudioManager.Instance.SetMusicVolume(musicVolume);
             AudioManager.Instance.SetSfxVolume(sfxVolume);
             AudioManager.Instance.SetAmbienceVolume(musicVolume);
+
+            Instance.musicMixer.SetFloat("MusicVolume", Mathf.Log10(Mathf.Clamp(musicVolume * masterVolume, 0.0001f, 1)) * 20);
+            Instance.sfxMixer.SetFloat("SoundVolume", Mathf.Log10(Mathf.Clamp(sfxVolume * masterVolume, 0.0001f, 1)) * 20);
             // TODO: Split ambience from music when a dedicated ambience slider is added.
         }
 
@@ -299,6 +305,12 @@ namespace UI.PauseMenu
                 AudioManager.Instance.SetMasterVolume(clamped);
             }
 
+            float musicVolume = LoadSavedVolume(MusicVolumeKey);
+            float sfxVolume = LoadSavedVolume(SfxVolumeKey);
+
+            Instance.musicMixer.SetFloat("MusicVolume", Mathf.Log10(Mathf.Clamp(musicVolume * clamped, 0.0001f, 1)) * 20);
+            Instance.sfxMixer.SetFloat("SoundVolume", Mathf.Log10(Mathf.Clamp(sfxVolume * clamped, 0.0001f, 1)) * 20);
+
             SaveVolume(MasterVolumeKey, clamped);
         }
 
@@ -312,6 +324,9 @@ namespace UI.PauseMenu
                 // TODO: Split ambience from music when a dedicated ambience slider is added.
             }
 
+            float masterVolume = LoadSavedVolume(MasterVolumeKey);
+            Instance.musicMixer.SetFloat("MusicVolume", Mathf.Log10(Mathf.Clamp(clamped * masterVolume, 0.0001f, 1)) * 20);
+
             SaveVolume(MusicVolumeKey, clamped);
         }
 
@@ -322,6 +337,9 @@ namespace UI.PauseMenu
             {
                 AudioManager.Instance.SetSfxVolume(clamped);
             }
+
+            float masterVolume = LoadSavedVolume(MasterVolumeKey);
+            Instance.sfxMixer.SetFloat("SoundVolume", Mathf.Log10(Mathf.Clamp(clamped * masterVolume, 0.0001f, 1)) * 20);
 
             SaveVolume(SfxVolumeKey, clamped);
         }
