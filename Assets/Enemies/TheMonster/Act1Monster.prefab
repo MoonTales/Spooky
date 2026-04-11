@@ -25082,9 +25082,9 @@ NavMeshAgent:
   m_AgentTypeID: -1923039037
   m_Radius: 5
   m_Speed: 0
-  m_Acceleration: 50
+  m_Acceleration: 500
   avoidancePriority: 50
-  m_AngularSpeed: 250
+  m_AngularSpeed: 2500
   m_StoppingDistance: 0.1
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
@@ -25312,7 +25312,7 @@ MonoBehaviour:
       newDefaultState: 0
       alsoChangeDefaultFocus: {fileID: 0}
     eventExecutions: []
-    stateChange: 2
+    stateChange: 8
     targetDetectedObject: 0
     prioritizeDistanceInsteadOfIntensity: 0
     invertPriority: 0
@@ -26529,83 +26529,6 @@ MonoBehaviour:
     repeatBuffer: 3
     forceBuffer: 1
     timer: 3
-  - thoughtType: 0
-    attractorType: 4
-    customAttractorID: 
-    minIntensity: 0
-    maxIntensity: 0
-    thoughtConditions:
-      boolConditions: []
-      floatConditions: []
-      floatCompare: 0
-      intConditions: []
-      intCompare: 3
-    allConditionsRequired: 1
-    statusRestrictions: []
-    allStatusesRequired: 1
-    stateRestriction: 
-    minRequiredUtility: 0
-    utilityThoughts: []
-    functionExecutions:
-    - function: 5
-      arguments:
-      - ReadyToRumble
-      - false
-      possiblePriorityReprograms: 
-      reprogramParameters: []
-      thoughtReprogramParameters: []
-      statsToChange: 
-      changeStatsBy: 0
-      statsChangeAmount: 0
-      addReactions: []
-      addReactionLowerBoundDangerRange: 0
-      addReactionUpperBoundDangerRange: 0
-      addThoughts: []
-      addThoughtsLowerBoundDangerRange: 0
-      addThoughtsUpperBoundDangerRange: 0
-      changeDefaultState: 0
-      newDefaultState: 0
-      alsoChangeDefaultFocus: {fileID: 0}
-    - function: 11
-      arguments:
-      - 3
-      possiblePriorityReprograms: 
-      reprogramParameters: []
-      thoughtReprogramParameters: []
-      statsToChange: 
-      changeStatsBy: 0
-      statsChangeAmount: 0
-      addReactions: []
-      addReactionLowerBoundDangerRange: 0
-      addReactionUpperBoundDangerRange: 0
-      addThoughts: []
-      addThoughtsLowerBoundDangerRange: 0
-      addThoughtsUpperBoundDangerRange: 0
-      changeDefaultState: 0
-      newDefaultState: 0
-      alsoChangeDefaultFocus: {fileID: 0}
-    - function: 11
-      arguments:
-      - 6
-      possiblePriorityReprograms: 
-      reprogramParameters: []
-      thoughtReprogramParameters: []
-      statsToChange: 
-      changeStatsBy: 0
-      statsChangeAmount: 0
-      addReactions: []
-      addReactionLowerBoundDangerRange: 0
-      addReactionUpperBoundDangerRange: 0
-      addThoughts: []
-      addThoughtsLowerBoundDangerRange: 0
-      addThoughtsUpperBoundDangerRange: 0
-      changeDefaultState: 0
-      newDefaultState: 0
-      alsoChangeDefaultFocus: {fileID: 0}
-    eventExecutions: []
-    repeatBuffer: 30
-    forceBuffer: 1
-    timer: 30
   senses:
   - detectionRadius: 5
     detectionAngle: 180
@@ -26677,7 +26600,9 @@ MonoBehaviour:
   hideRadius: 0
   avoidHideTarget: 0
   hideTargetAvoidanceRange: 0
-  fleeSpeed: 50
+  lookAround: 0
+  waitAtSpots: 0
+  fleeSpeed: 100
   minFleeDistance: 30
   maxFleeDistance: 50
   minFleeTime: 10
