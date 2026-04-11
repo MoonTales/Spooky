@@ -12,6 +12,7 @@ namespace UI.PauseMenu
     public class SettingsController : Singleton<SettingsController> 
     {
         private const float DefaultVolume = 1f;
+        private const float DefaultBrightness = 0f;
         private const string MasterVolumeKey = "audio.master";
         private const string MusicVolumeKey = "audio.music";
         private const string SfxVolumeKey = "audio.sfx";
@@ -44,8 +45,10 @@ namespace UI.PauseMenu
 
         public void Start()
         {
+            
+            
             InitializeAudioSliders();
-            LoadSavedBrightness("game.brightness");
+            
 
             // loop through all children of the main menu settings, and find the back button, and add a listener to it
             Button[] mainMenuButtons = MainMenuSettings.GetComponentsInChildren<Button>();
@@ -99,20 +102,38 @@ namespace UI.PauseMenu
             // we will hook up a listner to the crouchToggle button now
             if (crouchToggle != null)
             {
-                crouchToggle.onValueChanged.AddListener(PlayerController.Instance.SetToggleCrouchMode);
+                crouchToggle.onValueChanged.AddListener(SetToggleCrouchMode);
             }
             
             if (brightSlider != null)
             {
                 brightSlider.onValueChanged.AddListener(SetBrightness);
             }
+            LoadSavedBrightness("brightness");
+            LoadToggleCrouchMode();
         }
         private void SetBrightness(float brightness)
         {
             CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
             if (effects == null){ return;}
             effects.gameBrightness = Mathf.Clamp(brightness, 0f, 1f);
-            SaveBrightness("game.brightness", brightness);
+            SaveBrightness("brightness", brightness);
+        }
+
+        private void SetToggleCrouchMode(bool isToggle)
+        {
+            PlayerController.Instance.SetToggleCrouchMode(isToggle);
+            PlayerPrefs.SetInt("crouch.toggle", isToggle ? 1 : 0);
+        }
+        
+        private void LoadToggleCrouchMode()
+        {
+            bool isToggle = PlayerPrefs.GetInt("crouch.toggle", 0) == 1;
+            PlayerController.Instance.SetToggleCrouchMode(isToggle);
+            if (crouchToggle != null)
+            {
+                crouchToggle.SetIsOnWithoutNotify(isToggle);
+            }
         }
 
         private void InitializeAudioSliders()
@@ -254,14 +275,20 @@ namespace UI.PauseMenu
         }
         private void LoadSavedBrightness(string key)
         {
-            float value = Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultVolume));
+            float value = PlayerPrefs.HasKey(key)
+                ? Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultBrightness))
+                : DefaultBrightness;
+
             CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
             if (effects != null)
             {
                 effects.gameBrightness = value;
             }
-            
-            brightSlider.value = value;
+
+            if (brightSlider != null)
+            {
+                brightSlider.SetValueWithoutNotify(value);
+            }
         }
 
         private void OnMasterVolumeChanged(float value)

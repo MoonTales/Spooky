@@ -156,6 +156,8 @@ namespace Player
         
         private void OnPlayerDamaged(float damageAmount)
         {
+            // if the player is in Zone 0, they cannot be damaged
+            if (GameStateManager.Instance.GetCurrentZoneId() == 0) { return; }
             UpdateCurrentMentalHealth(-damageAmount);
         }
         

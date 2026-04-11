@@ -91,6 +91,7 @@ namespace System
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+                if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
             }
             
             // --- SECTION FOR ASYNC LOADING --- //
