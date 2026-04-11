@@ -12,6 +12,7 @@ namespace System
     
     public class SceneSwapper : Singleton<SceneSwapper>, ISaveSystemInterface<SceneSwapper.SceneSwapSaveData>
     {
+        private string _oldSceneName = "";
         
         public struct SceneSwapSaveData
         {
@@ -21,6 +22,8 @@ namespace System
         
         // Internal variables
         private string _spawnAnchorID = "";
+        private bool _sceneInitialized = false;
+        public void NotifySceneInitialized() => _sceneInitialized = true;
 
         protected override void OnEnable()
         {
@@ -36,6 +39,7 @@ namespace System
 
         public void SwapScene(SceneField newScene, string InSpawnAnchorID = "")
         {
+            _oldSceneName = SceneManager.GetActiveScene().name;
             _spawnAnchorID = InSpawnAnchorID;
             StartCoroutine(LoadSceneAsync(newScene.SceneName));
         }
@@ -49,37 +53,90 @@ namespace System
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            // if the cache is active, we dont wanna do any of this stuff
+            // also if its an additive scene, we wont do any of this stuff either
+            if (SceneCache.Instance.IsCacheInProgress()) { return; }
+
+            if (mode == LoadSceneMode.Additive) { return; }
             // after the scene has been loaded, we need to ensure the player is teleported to the correct location
             Player.PlayerManager.Instance.SearchForSpawnAnchor(_spawnAnchorID);
             // This is when we want to broadcast the world clock
             EventBroadcaster.Broadcast_OnWorldClockHourChanged(GameStateManager.Instance.GetCurrentWorldClockHour());
-            
+            float saveDelay = 2.5f;
             // for now we will hardcode this
             if (scene.name.ToLower() == "bedroom")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Bedroom);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
-                SaveSystem.Instance.SaveGame();
+                // only save if we did not come from the mainmenu
+                if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
+                
             }
             if (scene.name.ToLower() == "nightmare1")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
-                SaveSystem.Instance.SaveGame();
+                if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
+            }
+
+            if (scene.name.ToLower() == "finalenightmare")
+            {
+                //TODO: need to change this to Nightmare, but I dont wanna mess up audio this close to gold release
+                EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Nightmare);
+                EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.ModeratelyAnxious);
+                if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
             }
 
             if (scene.name.ToLower() == "tutorial")
             {
                 EventBroadcaster.Broadcast_OnWorldLocationChanged(Types.WorldLocation.Tutorial);
                 EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
+                if (_oldSceneName.ToLower() != "mainmenu"){Invoke(nameof(DelayedSave), saveDelay);}
             }
             
+            // --- SECTION FOR ASYNC LOADING --- //
+            if (scene.name.ToLower() == "headphone")
+            {
+                SceneCache.Instance.RequestSceneCache("Tutorial");
+            }
+            if (scene.name.ToLower() == "mainmenu")
+            {
+                
+            }
+            if (scene.name.ToLower() == "credits")
+            {
+                
+            }
+            if (scene.name.ToLower() == "tutorial")
+            {
+                SceneCache.Instance.RequestSceneCache("Bedroom");
+            }
+            if (scene.name.ToLower() == "bedroom")
+            {
+                SceneCache.Instance.RequestSceneCache("Nightmare1");
+            }
+            if (scene.name.ToLower() == "nightmare1")
+            {
+                SceneCache.Instance.RequestSceneCache("FinaleNightmare");
+            }
+            
+            
+            
+            // --------------------------------- //
+            
 
+            NotifySceneInitialized();
         }
-        
-        // Async for a smoother scene transition
-        private IEnumerator LoadSceneAsync(string sceneName)
+
+        private void DelayedSave()
         {
+            // we want to delay to ensure that stuff is fully loaded and saved
+            SaveSystem.Instance.SaveGame();
+        }
+        // Async for a smoother scene transition
+        public IEnumerator LoadSceneAsync(string sceneName)
+        {
+            _sceneInitialized = false;
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
             // Prevent the scene from activating the moment it finishes loading
@@ -93,11 +150,10 @@ namespace System
 
             // Scene is ready — activate it now for a clean, snap-free transition
             asyncLoad.allowSceneActivation = true;
-
-            // Wait one frame for OnSceneLoaded to fire before continuing
             
-
-            yield return null;
+            yield return new WaitUntil(() => _sceneInitialized);
+            
+            yield return new WaitForEndOfFrame();
         }
 
         public string SaveId => "SceneSwapper";
@@ -114,7 +170,8 @@ namespace System
         public void OnLoad(SceneSwapSaveData data)
         {
             // when we load, we want to immediately swap to the scene that we were in when we saved
-            SwapScene(data.CurrentSceneName);
+            // we no longer need to worry about this
+            //SwapScene(data.CurrentSceneName);
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using System.Reflection;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
@@ -10,12 +11,22 @@ public class AttractorAI : MonoBehaviour
 {
 	#region InitialSetup
 	public bool tracksDrawingCount = false;
+	//[ShowIf("tracksDrawingCount")]
+	public bool drawingsIncreaseDanger = false;
+	//[ShowIf("drawingsIncreaseDanger")]
+	public float dangerPerDrawing = 0;
 	public List<Vector3> teleportLocations = new List<Vector3>();
 	private NavMeshAgent agent;
 
 	[Tooltip("Between 0-100")]
 	public float currentDangerLevel = 0;
 	[SerializeField] private List<string> currentStatuses = new List<string>();
+
+	private bool hasAgent = false;
+	private float nonAgentSpeed = 0;
+	private Vector3 nonAgentDestination;
+	private bool hasNonAgentDestination = false;
+	private bool hasAnimator = false;
 	#endregion
 
 	#region States
@@ -31,6 +42,11 @@ public class AttractorAI : MonoBehaviour
 		Search,
 		Flee
 	}
+
+	public EnemyState GetCurrentState()
+	{
+		return currentState;
+	}
 	#endregion
 
 	#region InspectorVariables
@@ -39,6 +55,7 @@ public class AttractorAI : MonoBehaviour
 	private EnemyState currentState = EnemyState.Stand;
 	private EnemyState nextState = EnemyState.Stand;
 	private List<FunctionPicker> nextFunctions = new List<FunctionPicker>();
+	private List<UnityEvent> nextEvents = new List<UnityEvent>();
 	[Tooltip("Leave blank to default focus on player")]
 	public Transform defaultFocus;
 
@@ -46,7 +63,7 @@ public class AttractorAI : MonoBehaviour
 	{
 		visual,
 		audio,
-		attackRange,
+		custom,
 		self,
 		NONE
 	}
@@ -59,14 +76,15 @@ public class AttractorAI : MonoBehaviour
 		EnemyVisible_boolVisible,
 		ChangeStats_STATS,
 		AddStatuses_LISTstringStatuses_boolRemove,
-		Teleport_floatX_floatY_floatZ,
+		Teleport_OPTIONAL_floatX_floatY_floatZ,
 		TeleportCycle,
 		ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount,
 		ReprogramThoughts_THOUGHTREPROGRAM,
 		RemoveReaction_LISTintPossiblePriorities,
 		RemoveThought_LISTintPossiblePriorities,
 		AddReaction_LISTintPossiblePriorities_ADDREACTIONS,
-		AddThought_LISTintPossiblePriorities_ADDTHOUGHTS
+		AddThought_LISTintPossiblePriorities_ADDTHOUGHTS,
+		// MakePlayerLook_floatVisualEffect_floatForceLook    not sure how to do this
 	}
 
 	[System.Serializable]
@@ -88,70 +106,154 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	[System.Serializable]
+	public class UnityEventListWrapper
+	{
+		public List<UnityEvent> eventExecutions;
+	}
+
+	[System.Serializable]
+	public class UtilityBehaviorListWrapper
+	{
+		public List<UtilityBehavior> utilityBehaviors;
+	}
+
+	[System.Serializable]
+	public class UtilityThoughtListWrapper
+	{
+		public List<UtilityThought> utilityThoughts;
+	}
+
+	[System.Serializable]
 	public class EnemyReactionReprogram
 	{
 		[Tooltip("If set to true, each change's randomness will only include elements determined by the enemy's danger level and the respective change's danger" +
 			"range")]
 		public bool balancesChanges = false;
 
+		public DecisionType[] possibleBehaviorTypeChanges;
+		//[ShowIf("balancesChanges")]
+		public float behaviorTypeLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float behaviorTypeUpperBoundDangerRange = 100;
+
+		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType[] possibleAttractorTypeChanges;
+		//[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float attractorTypeUpperBoundDangerRange = 100;
+
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		public string[] possibleCustomAttractorIDChanges;
+		//[ShowIf("balancesChanges")]
+		public float customAttractorIDLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
+		//[ShowIf("balancesChanges")]
 		public float minIntensityLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float minIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
+		//[ShowIf("balancesChanges")]
 		public float maxIntensityLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float maxIntensityUpperBoundDangerRange = 100;
 
 		public CheckConditions[] possibleThoughtConditionsChanges;
+		//[ShowIf("balancesChanges")]
 		public float thoughtConditionsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float thoughtConditionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllConditionsRequiredChanges;
+		//[ShowIf("balancesChanges")]
 		public float allConditionsRequiredLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float allConditionsRequiredUpperBoundDangerRange = 100;
 
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
 		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
+		//[ShowIf("balancesChanges")]
 		public float statusRestrictionsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float statusRestrictionsUpperBoundDangerRange = 100;
 
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
 		public bool[] possibleAllStatusesRequiredChanges;
+		//[ShowIf("balancesChanges")]
 		public float allStatusesRequiredLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
+		//[ShowIf("balancesChanges")]
 		public float stateRestrictionLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
+		[Header("UtilityFunctions")]
+		[Range(0f, 1f)]
+		public float[] possibleMinRequiredUtilityChanges;
+		//[ShowIf("balancesChanges")]
+		public float minRequiredUtilityLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float minRequiredUtilityUpperBoundDangerRange = 100;
+
+		[SerializeField] public UtilityBehaviorListWrapper[] possibleUtilityBehaviorsChanges;
+		//[ShowIf("balancesChanges")]
+		public float utilityBehaviorsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float utilityBehaviorsUpperBoundDangerRange = 100;
+
+		[Header("FiniteStates")]
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
+		//[ShowIf("balancesChanges")]
 		public float functionExecutionsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float functionExecutionsUpperBoundDangerRange = 100;
 
+		[SerializeField] public UnityEventListWrapper[] possibleEventExecutionsChanges;
+		//[ShowIf("balancesChanges")]
+		public float eventExecutionsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float eventExecutionsUpperBoundDangerRange = 100;
+
 		public EnemyState[] possibleStateChangeChanges;
+		//[ShowIf("balancesChanges")]
 		public float stateChangeLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float stateChangeUpperBoundDangerRange = 100;
 
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
 		public bool[] possibleTargetDetectedObjectChanges;
+		//[ShowIf("balancesChanges")]
 		public float targetDetectedObjectLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float targetDetectedObjectUpperBoundDangerRange = 100;
 
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
 		public bool[] possiblePrioritizeDistanceInsteadOfIntensityChanges;
+		//[ShowIf("balancesChanges")]
 		public float prioritizeDistanceInsteadOfIntensityLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float prioritizeDistanceInsteadOfIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
 		public bool[] possibleInvertPriorityChanges;
+		//[ShowIf("balancesChanges")]
 		public float invertPriorityLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float invertPriorityUpperBoundDangerRange = 100;
 	}
 
@@ -162,54 +264,112 @@ public class AttractorAI : MonoBehaviour
 			"range")]
 		public bool balancesChanges = false;
 
+		public DecisionType[] possibleThoughtTypeChanges;
+		//[ShowIf("balancesChanges")]
+		public float thoughtTypeLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float thoughtTypeUpperBoundDangerRange = 100;
+
+		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType[] possibleAttractorTypeChanges;
+		//[ShowIf("balancesChanges")]
 		public float attractorTypeLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float attractorTypeUpperBoundDangerRange = 100;
+
+		public string[] possibleCustomAttractorIDChanges;
+		//[ShowIf("balancesChanges")]
+		public float customAttractorIDLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float customAttractorIDUpperBoundDangerRange = 100;
 
 		[Tooltip("Inclusve")]
 		public float[] possibleMinIntensityChanges;
+		//[ShowIf("balancesChanges")]
 		public float minIntensityLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float minIntensityUpperBoundDangerRange = 100;
 
 		[Tooltip("Non-inclusve")]
 		public float[] possibleMaxIntensityChanges;
+		//[ShowIf("balancesChanges")]
 		public float maxIntensityLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float maxIntensityUpperBoundDangerRange = 100;
 
 		public CheckConditions[] possibleReactionConditionsChanges;
+		//[ShowIf("balancesChanges")]
 		public float reactionConditionsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float reactionConditionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllConditionsRequiredChanges;
+		//[ShowIf("balancesChanges")]
 		public float allConditionsRequiredLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float allConditionsRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStatusListWrapper[] possibleStatusRestrictionsChanges;
+		//[ShowIf("balancesChanges")]
 		public float statusRestrictionsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float statusRestrictionsUpperBoundDangerRange = 100;
 
 		public bool[] possibleAllStatusesRequiredChanges;
+		//[ShowIf("balancesChanges")]
 		public float allStatusesRequiredLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float allStatusesRequiredUpperBoundDangerRange = 100;
 
 		[SerializeField] public EnemyStateListWrapper[] possibleStateRestrictionChanges;
+		//[ShowIf("balancesChanges")]
 		public float stateRestrictionLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float stateRestrictionUpperBoundDangerRange = 100;
 
+		[Header("UtilityFunctions")]
+		[Range(0f, 1f)]
+		public float[] possibleMinRequiredUtilityChanges;
+		//[ShowIf("balancesChanges")]
+		public float minRequiredUtilityLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float minRequiredUtilityUpperBoundDangerRange = 100;
+
+		[SerializeField] public UtilityThoughtListWrapper[] possibleUtilityThoughtsChanges;
+		//[ShowIf("balancesChanges")]
+		public float utilityThoughtsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float utilityThoughtsUpperBoundDangerRange = 100;
+
+		[Header("FiniteStates")]
 		[SerializeField] public FunctionPickerListWrapper[] possibleFunctionExecutionsChanges;
+		//[ShowIf("balancesChanges")]
 		public float functionExecutionsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float functionExecutionsUpperBoundDangerRange = 100;
 
+		[SerializeField] public UnityEventListWrapper[] possibleEventExecutionsChanges;
+		//[ShowIf("balancesChanges")]
+		public float eventExecutionsLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
+		public float eventExecutionsUpperBoundDangerRange = 100;
+
 		public float[] possibleRepeatBufferChanges;
+		//[ShowIf("balancesChanges")]
 		public float repeatBufferLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float repeatBufferUpperBoundDangerRange = 100;
 
 		public bool[] possibleForceBufferChanges;
+		//[ShowIf("balancesChanges")]
 		public float forceBufferLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float forceBufferUpperBoundDangerRange = 100;
 
 		public float[] possibleTimerChanges;
+		//[ShowIf("balancesChanges")]
 		public float timerLowerBoundDangerRange = 100;
+		//[ShowIf("balancesChanges")]
 		public float timerUpperBoundDangerRange = 100;
 	}
 
@@ -218,28 +378,50 @@ public class AttractorAI : MonoBehaviour
 	{
 		public FunctionType function;
 		[Header("Note: use spaces to seperate items in LISTs")]
+		//[ShowIfEnum(true, "function", FunctionType.ChangeStats_STATS, FunctionType.DeleteFocus, FunctionType.ReprogramReaction_REPROGRAM,
+			//FunctionType.ReprogramThoughts_THOUGHTREPROGRAM, FunctionType.TeleportCycle)]
 		public List<string> arguments;
+		//[ShowIfEnum("function", FunctionType.ReprogramReaction_REPROGRAM, FunctionType.ReprogramThoughts_THOUGHTREPROGRAM)]
 		[Tooltip("This is only for functions that reprogram reactions or thoughts in the behaviour hierarchy or thought processes. The array contains possible" +
 			"reactions or thoughts to reprogram  based on their index in the list")]
 		public int[] possiblePriorityReprograms;
+		//[ShowIfEnum("function", FunctionType.ReprogramReaction_REPROGRAM)]
 		[Tooltip("Only useful for functions that reprogram a reaction. All elements in this list will be run. (If this list is reprogrammed during the" +
 			"execution of running all reprogram parameters, the list initially run will continue without changes)")]
 		[SerializeField]public List<EnemyReactionReprogram> reprogramParameters = new List<EnemyReactionReprogram>();
+		//[ShowIfEnum("function", FunctionType.ReprogramThoughts_THOUGHTREPROGRAM)]
 		[Tooltip("Only useful for functions that reprogram a thought. All elements in this list will be run. (If this list is reprogrammed during the" +
 			"execution of running all reprogram parameters, the list initially run will continue without changes)")]
 		[SerializeField]public List<EnemyThoughtReprogram> thoughtReprogramParameters = new List<EnemyThoughtReprogram>();
 		[Header("StatChanges")]
+		//[ShowIfEnum("function", FunctionType.ChangeStats_STATS)]
 		public Stats[] statsToChange;
+		//[ShowIfEnum("function", FunctionType.ChangeStats_STATS,
+			//FunctionType.ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount)]
 		public Alteration changeStatsBy;
+		//[ShowIfEnum("function", FunctionType.ChangeStats_STATS,
+			//FunctionType.ChangeConditions_LISTstringConditions_OPTIONAL_boolBoolChange_STATSchangeBy_STATSchangeAmount)]
 		public float statsChangeAmount;
 		[Header("AddReactionsAndThoughts")]
+		//[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		[Tooltip("One of these will be chosen randomly within the danger range")]
 		[SerializeField] public List<EnemyReactions> addReactions;
+		//[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		public float addReactionLowerBoundDangerRange = 100;
+		//[ShowIfEnum("function", FunctionType.AddReaction_LISTintPossiblePriorities_ADDREACTIONS)]
 		public float addReactionUpperBoundDangerRange = 100;
+		//[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		[SerializeField] public List<ThoughtProcess> addThoughts;
+		//[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		public float addThoughtsLowerBoundDangerRange = 100;
+		//[ShowIfEnum("function", FunctionType.AddThought_LISTintPossiblePriorities_ADDTHOUGHTS)]
 		public float addThoughtsUpperBoundDangerRange = 100;
+
+		[Header("Other Stuff")]
+		public bool changeDefaultState = false;
+		//[ShowIf("changeDefaultState")]
+		public EnemyState newDefaultState;
+		public Transform alsoChangeDefaultFocus;
 	}
 
 	public void TestFunction(List<string> arguments)
@@ -263,7 +445,10 @@ public class AttractorAI : MonoBehaviour
 	{
 		bool visible = bool.Parse(arguments[0]);
 
-		animator.gameObject.SetActive(visible);
+		if (hasAnimator)
+			animator.gameObject.SetActive(visible);
+		else if (transform.childCount > 0)
+			transform.GetChild(0).gameObject.SetActive(visible);
 	}
 	public void ChangeConditions(List<string> arguments, Alteration changeBy, float changeAmount)
 	{
@@ -404,21 +589,43 @@ public class AttractorAI : MonoBehaviour
 	}
 	public void Teleport(List<string> arguments)
 	{
-		float x = float.Parse(arguments[0]);
-		float y = float.Parse(arguments[1]);
-		float z = float.Parse(arguments[2]);
-		Vector3 location = new Vector3(x, y, z);
+		Vector3 location;
+		if (arguments.Count < 3)
+		{
+			location = currentFocus.position;
+		}
+		else
+		{
+			float x = float.Parse(arguments[0]);
+			float y = float.Parse(arguments[1]);
+			float z = float.Parse(arguments[2]);
+			location = new Vector3(x, y, z);
+		}
 
-		agent.Warp(location);
+		if (hasAgent)
+			agent.Warp(location);
+		else
+			transform.position = location;
 	}
 	private int nextTeleportIndex = 0;
 	public void TeleportCycle()
 	{
-		agent.Warp(teleportLocations[nextTeleportIndex]);
+		if (hasAgent)
+			agent.Warp(teleportLocations[nextTeleportIndex]);
+		else
+			transform.position = teleportLocations[nextTeleportIndex];
 
 		nextTeleportIndex++;
 		if (nextTeleportIndex >= teleportLocations.Count())
 			nextTeleportIndex = 0;
+	}
+
+	public void MakePlayerLook(List<string> arguments)
+	{
+		float VisualEffects = float.Parse(arguments[0]);
+		float ForceLook = float.Parse(arguments[1]);
+
+		//do something idk
 	}
 
 	public enum Stats
@@ -639,7 +846,18 @@ public class AttractorAI : MonoBehaviour
 		public bool Equals(BoolCondition other)
 		{
 			if (other == null) return false;
+
+			if (ReferenceEquals(this, other)) return true;
+
 			return (boolName == other.boolName && boolValue == other.boolValue);
+		}
+
+		public override bool Equals(object obj) => Equals(obj as BoolCondition);
+
+		public override int GetHashCode()
+		{
+			// Combine hash codes of the properties used for equality
+			return (boolName, boolValue).GetHashCode();
 		}
 	}
 	[System.Serializable]
@@ -652,7 +870,18 @@ public class AttractorAI : MonoBehaviour
 		public bool Equals(FloatCondition other)
 		{
 			if (other == null) return false;
+
+			if (ReferenceEquals(this, other)) return true;
+
 			return (floatName == other.floatName && floatValue == other.floatValue);
+		}
+
+		public override bool Equals(object obj) => Equals(obj as FloatCondition);
+
+		public override int GetHashCode()
+		{
+			// Combine hash codes of the properties used for equality
+			return (floatName, floatValue).GetHashCode();
 		}
 	}
 	[System.Serializable]
@@ -665,7 +894,18 @@ public class AttractorAI : MonoBehaviour
 		public bool Equals(IntCondition other)
 		{
 			if (other == null) return false;
+
+			if (ReferenceEquals(this, other)) return true;
+
 			return (intName == other.intName && intValue == other.intValue);
+		}
+
+		public override bool Equals(object obj) => Equals(obj as IntCondition);
+
+		public override int GetHashCode()
+		{
+			// Combine hash codes of the properties used for equality
+			return (intName, intValue).GetHashCode();
 		}
 	}
 	[System.Serializable]
@@ -686,14 +926,29 @@ public class AttractorAI : MonoBehaviour
 	}
 
 	public ReactConditions currentConditions;
+	public enum DecisionType
+	{
+		finiteState,
+		utilityFunction
+	}
 
 	[System.Serializable]
 	public class EnemyReactions
 	{
+		public DecisionType behaviorType = DecisionType.finiteState;
+
+		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
+		//[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		public bool considerAttractorsForUtilityFocus = true;
 		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		//[ShowIfEnum("attractorType", AttractorType.custom)]
+		public string customAttractorID;
 		[Tooltip("Inclusve")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
 		public CheckConditions reactionConditions;
 		public bool allConditionsRequired = false;
@@ -705,33 +960,223 @@ public class AttractorAI : MonoBehaviour
 		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
+
+		[Header("UtilityFunctions")]
+		//[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		[Range(0f, 1f)]
+		public float minRequiredUtility;
+		//[ShowIfEnum("behaviorType", DecisionType.utilityFunction)]
+		public List<UtilityBehavior> utilityBehaviors = new List<UtilityBehavior>();
+
+		[Header("FiniteStates")]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
 		public EnemyState stateChange;
-		//[Tooltip("Some states have 'buffers' that must complete before transitioning to another state. This is set to true so that those buffers are ignored" +
-			//"when this behaviour is activated. Set to false if you want previous states to finish before transitioning to the new state")]
-		//public bool immediateStateTransition = true;
-		//[Tooltip("Forces the new state to finish its buffer before changing to any other states")]
-		//public bool forceStateBuffer = false;
-		//[Tooltip("Forces the new state to skip its buffer when changing to any other states")]
-		//public bool forceSkipStateBuffer = false;
+		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
+			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
+			"it will automatically target the defaultFocus/Player")]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		public bool targetDetectedObject = false;
+		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
+			"instead of the Attractor with the highest intensity")]
+		//[ShowIf("targetDetectedObject")]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		public bool prioritizeDistanceInsteadOfIntensity = false;
+		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
+		//[ShowIf("targetDetectedObject")]
+		//[ShowIfEnum("behaviorType", DecisionType.finiteState)]
+		public bool invertPriority = false;
+	}
+
+	public enum ConsiderationType
+	{
+		attractorIntensity,
+		attractorDistance,
+		boolCondition,
+		floatCondition,
+		intCondition,
+		status,
+		state,
+		compositeConsideration,
+		constant
+	}
+
+	public enum OperationType { Average, Multiply, Add, Subtract, Divide, Max, Min }
+
+	[System.Serializable]
+	public class Consideration
+	{
+		public ConsiderationType considerationType;
+
+		// Attractor Considerations
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		[Header("Attractor Considerations")]
+		public bool considerAttractorsForFocus = true;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public AttractorType attractorTypeConsidered;
+		//[ShowIfEnum("attractorTypeConsidered", AttractorType.custom)]
+		public string customAttractorIDConsidered;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public float minIntensityConsidered;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public float maxIntensityConsidered;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public bool considerClosestInsteadOfMostIntense = false;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity, ConsiderationType.attractorDistance)]
+		public bool invertConsideredAttractorPriority = false;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity)]
+		[Header("Attractor Intensity Consideration")]
+		public float minIntensityClamp;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorIntensity)]
+		public float maxIntensityClamp;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
+		[Header("Attractor Distance Consideration")]
+		public float minDistanceClamp;
+		//[ShowIfEnum("considerationType", ConsiderationType.attractorDistance)]
+		public float maxDistanceClamp;
+
+		// Bool Condition Consideration
+		//[ShowIfEnum("considerationType", ConsiderationType.boolCondition)]
+		[Header("Bool Condition Consideration")]
+		[Tooltip("false = 0; true = 1")]
+		public string boolID;
+
+		// Float Condition Consideration
+		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		[Header("Float Condition Consideration")]
+		public string floatID;
+		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		public float minFloatClamp;
+		//[ShowIfEnum("considerationType", ConsiderationType.floatCondition)]
+		public float maxFloatClamp;
+
+		// Int Condition Consideration
+		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		[Header("Int Condition Consideration")]
+		public string intID;
+		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		public float minIntClamp;
+		//[ShowIfEnum("considerationType", ConsiderationType.intCondition)]
+		public float maxIntClamp;
+
+		// Status Consideration
+		//[ShowIfEnum("considerationType", ConsiderationType.status)]
+		[Header("Status Consideration")]
+		[Tooltip("does not have status = 0; has status = 1")]
+		public string statusName;
+
+		// State Consideration
+		//[ShowIfEnum("considerationType", ConsiderationType.state)]
+		[Header("State Consideration")]
+		[Tooltip("is not currently in this state = 0; is currently in this state = 1")]
+		public EnemyState state;
+
+		// Composite Condiderations
+		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		[Header("Composite Considerations")]
+		public OperationType operationToPerform;
+		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		[Tooltip("Utility values of 0 within the composite will not be included in the operation")]
+		public bool ignoreZeroValues = true;
+		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		[Tooltip("If there are any values of 0 within the composite, then the composite will always return 0")]
+		public bool allMustBeNonZero = false;
+		//[ShowIfEnum("considerationType", ConsiderationType.compositeConsideration)]
+		public Consideration[] compositeConsiderations;
+
+		// Constant Consideration
+		[Range(0f, 1f)]
+		//[ShowIfEnum("considerationType", ConsiderationType.constant)]
+		[Header("Constant Consideration")]
+		public float constantUtility;
+
+		//[ShowIfEnum(true, "considerationType", ConsiderationType.compositeConsideration, ConsiderationType.constant)]
+		[Header("For considerations with curves (AKA everything but composite and constant considerations)")]
+		public AnimationCurve utilityCurve;
+	}
+
+	[System.Serializable]
+	public class UtilityBehavior
+	{
+		[HideInInspector] public Transform myTempFocus;
+		[HideInInspector] public float myTempValue;
+
+		[Header("These values are not necessary and should only be used if you want to force the enemy to not consider this behavior at all if certain" +
+			"strict conditions are met")]
+		public bool useStrictConditions = false;
+		[Header("The strict conditions in question:")]
+		[HideInInspector] public bool considerAttractorsForFocus = false;
+		//[ShowIf("useStrictConditions")]
+		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum("attractorType", AttractorType.custom)]
+		public string customAttractorID;
+		[Tooltip("Inclusve")]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		public float minIntensity;
+		[Tooltip("Non-inclusve")]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		public float maxIntensity;
+		//[ShowIf("useStrictConditions")]
+		public CheckConditions reactionConditions;
+		//[ShowIf("useStrictConditions")]
+		public bool allConditionsRequired = false;
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
+		//[ShowIf("useStrictConditions")]
+		public List<string> statusRestrictions = new List<string>();
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
+		//[ShowIf("useStrictConditions")]
+		public bool allStatusesRequired = false;
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
+		//[ShowIf("useStrictConditions")]
+		public List<EnemyState> stateRestriction = new List<EnemyState>();
+
+		[Header("Define your utility considerations here!")]
+
+		//[Range(0f, 1f)]
+		//public float utilityStickiness;
+		public Consideration considerations;
+
+		[Header("Construct the behavior here!")]
+		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
+		public EnemyState stateChange;
 		[Tooltip("Set to true whenever the stateChange is a state that requires a target to focus on" +
 			"and you want the enemy to focus on the relevant detected target. If this is false and the state requires a target," +
 			"it will automatically target the defaultFocus/Player")]
 		public bool targetDetectedObject = false;
 		[Tooltip("When choosing an Attractor to focus on, the enemy will choose the Attractor nearest to it," +
 			"instead of the Attractor with the highest intensity")]
+		//[ShowIf("targetDetectedObject")]
 		public bool prioritizeDistanceInsteadOfIntensity = false;
 		[Tooltip("Enemy will focus on farthest Attractor or the Attractor with the lowest intensity")]
+		//[ShowIf("targetDetectedObject")]
 		public bool invertPriority = false;
 	}
 
 	[System.Serializable]
 	public class ThoughtProcess
 	{
+		public DecisionType thoughtType = DecisionType.finiteState;
+
+		[Header("These conditions determines the execution of this behavior regardless of its behavior type")]
 		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		//[ShowIfEnum("attractorType", AttractorType.custom)]
+		public string customAttractorID;
 		[Tooltip("Inclusve")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float minIntensity;
 		[Tooltip("Non-inclusve")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
 		public float maxIntensity;
 		public CheckConditions thoughtConditions;
 		public bool allConditionsRequired = false;
@@ -743,7 +1188,71 @@ public class AttractorAI : MonoBehaviour
 		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
 			"be activated regardless of the enemy's current state.")]
 		public List<EnemyState> stateRestriction = new List<EnemyState>();
+
+		[Header("UtilityFunctions")]
+		//[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
+		[Range(0f, 1f)]
+		public float minRequiredUtility;
+		//[ShowIfEnum("thoughtType", DecisionType.utilityFunction)]
+		public List<UtilityThought> utilityThoughts = new List<UtilityThought>();
+
+		[Header("FiniteStates")]
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
 		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
+
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		public float repeatBuffer = 1;
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		public bool forceBuffer = false;
+		//[ShowIfEnum("thoughtType", DecisionType.finiteState)]
+		public float timer = 0;
+	}
+
+	[System.Serializable]
+	public class UtilityThought
+	{
+		[Header("These values are not necessary and should only be used if you want to force the enemy to not consider this behavior at all if certain" +
+			"strict conditions are met")]
+		public bool useStrictConditions = false;
+		//[ShowIf("useStrictConditions")]
+		[Header("The strict conditions in question:")]
+		public AttractorType attractorType;
+		[Tooltip("If the Attractor Type is the custom type, you must define the target Attractor with a string ID")]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum("attractorType", AttractorType.custom)]
+		public string customAttractorID;
+		[Tooltip("Inclusve")]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		public float minIntensity;
+		[Tooltip("Non-inclusve")]
+		//[ShowIf("useStrictConditions")]
+		//[ShowIfEnum(true, "attractorType", AttractorType.NONE)]
+		public float maxIntensity;
+		//[ShowIf("useStrictConditions")]
+		public CheckConditions thoughtConditions;
+		//[ShowIf("useStrictConditions")]
+		public bool allConditionsRequired = false;
+		[Tooltip("This behavior will only be activated if any of the enemy's current statuses match up with any in this list. If this list is empty, then this" +
+			"behavior can be activated regardless of the enemy's current statuses.")]
+		//[ShowIf("useStrictConditions")]
+		public List<string> statusRestrictions = new List<string>();
+		[Tooltip("If this is set to true, the above rule changes from any of the listed status to all of the listed statuses being required.")]
+		//[ShowIf("useStrictConditions")]
+		public bool allStatusesRequired = false;
+		[Tooltip("This behavior will only be activated if the current state of the enemy is one of these states. If this list is empty, then this behavior can" +
+			"be activated regardless of the enemy's current state.")]
+		//[ShowIf("useStrictConditions")]
+		public List<EnemyState> stateRestriction = new List<EnemyState>();
+
+		[Header("Define your utility considerations here!")]
+		public Consideration considerations;
+
+		[Header("Construct the thought here!")]
+		[SerializeField] public List<FunctionPicker> functionExecutions = new List<FunctionPicker>();
+		[SerializeField] public List<UnityEvent> eventExecutions = new List<UnityEvent>();
 
 		public float repeatBuffer = 1;
 		public bool forceBuffer = false;
@@ -759,7 +1268,9 @@ public class AttractorAI : MonoBehaviour
 	private int currentStatePriority;
 	private int nextStatePriority;
 	private int lowestPriority;
-	
+	private int currentUtilityPriority;
+	private int nextUtilityPriority;
+
 	public void ReprogramReaction(int[] priority, List<EnemyReactionReprogram> tempReactionEdits)
 	{
 		List<EnemyReactionReprogram> reactionEdits = new List<EnemyReactionReprogram>(tempReactionEdits);
@@ -779,12 +1290,23 @@ public class AttractorAI : MonoBehaviour
 			{
 				EnemyReactions chosenReaction = behaviourHierarchy[chosenPriority];
 
-				float tempLowerBound = 100;
-				float tempUpperBound = 100;
+				float tempLowerBound = 0;
+				float tempUpperBound = 1;
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
-				if (reactionEdit.possibleAttractorTypeChanges.Length > 0)
+				if (reactionEdit.possibleBehaviorTypeChanges != null && reactionEdit.possibleBehaviorTypeChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.behaviorTypeLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.behaviorTypeUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.behaviorType = reactionEdit.possibleBehaviorTypeChanges[Random.Range((int)(reactionEdit.possibleBehaviorTypeChanges.Length *
+						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleBehaviorTypeChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleAttractorTypeChanges != null && reactionEdit.possibleAttractorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -795,7 +1317,19 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
+				if (reactionEdit.possibleCustomAttractorIDChanges != null && reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.customAttractorIDLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.customAttractorIDUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.customAttractorID =
+						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
+						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleMinIntensityChanges != null && reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -806,7 +1340,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.minIntensity = reactionEdit.possibleMinIntensityChanges[Random.Range((int)(reactionEdit.possibleMinIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMinIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMaxIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMaxIntensityChanges != null && reactionEdit.possibleMaxIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -817,7 +1351,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.maxIntensity = reactionEdit.possibleMaxIntensityChanges[Random.Range((int)(reactionEdit.possibleMaxIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMaxIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
+				if (reactionEdit.possibleStatusRestrictionsChanges != null && reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -829,7 +1363,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStatusRestrictionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleStatusRestrictionsChanges.Length * tempUpperBound))].statusRestrictions;
 				}
-				if (reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
+				if (reactionEdit.possibleAllStatusesRequiredChanges != null && reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -841,7 +1375,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleAllStatusesRequiredChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleAllStatusesRequiredChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStateRestrictionChanges.Length > 0)
+				if (reactionEdit.possibleStateRestrictionChanges != null && reactionEdit.possibleStateRestrictionChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -853,7 +1387,31 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateRestrictionChanges.Length *
 						tempUpperBound))].stateRestriction;
 				}
-				if (reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleMinRequiredUtilityChanges != null && reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.minRequiredUtilityLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.minRequiredUtilityUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.minRequiredUtility = reactionEdit.possibleMinRequiredUtilityChanges[Random.Range((int)(
+						reactionEdit.possibleMinRequiredUtilityChanges.Length * tempLowerBound), Mathf.CeilToInt(
+							reactionEdit.possibleMinRequiredUtilityChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleUtilityBehaviorsChanges != null && reactionEdit.possibleUtilityBehaviorsChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.utilityBehaviorsLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.utilityBehaviorsUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.utilityBehaviors = reactionEdit.possibleUtilityBehaviorsChanges[Random.Range((int)(
+						reactionEdit.possibleUtilityBehaviorsChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleUtilityBehaviorsChanges.Length
+						* tempUpperBound))].utilityBehaviors;
+				}
+				if (reactionEdit.possibleFunctionExecutionsChanges != null && reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -865,7 +1423,19 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
 				}
-				if (reactionEdit.possibleStateChangeChanges.Length > 0)
+				if (reactionEdit.possibleEventExecutionsChanges != null && reactionEdit.possibleEventExecutionsChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.eventExecutionsLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.eventExecutionsUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenReaction.eventExecutions = reactionEdit.possibleEventExecutionsChanges[Random.Range((int)(
+						reactionEdit.possibleEventExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
+							reactionEdit.possibleEventExecutionsChanges.Length * tempUpperBound))].eventExecutions;
+				}
+				if (reactionEdit.possibleStateChangeChanges != null && reactionEdit.possibleStateChangeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -876,7 +1446,7 @@ public class AttractorAI : MonoBehaviour
 					chosenReaction.stateChange = reactionEdit.possibleStateChangeChanges[Random.Range((int)(reactionEdit.possibleStateChangeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateChangeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleTargetDetectedObjectChanges.Length > 0)
+				if (reactionEdit.possibleTargetDetectedObjectChanges != null && reactionEdit.possibleTargetDetectedObjectChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -888,7 +1458,8 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleTargetDetectedObjectChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleTargetDetectedObjectChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
+				if (reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges != null &&
+					reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -900,7 +1471,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possiblePrioritizeDistanceInsteadOfIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleInvertPriorityChanges.Length > 0)
+				if (reactionEdit.possibleInvertPriorityChanges != null && reactionEdit.possibleInvertPriorityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -934,12 +1505,23 @@ public class AttractorAI : MonoBehaviour
 			{
 				ThoughtProcess chosenThought = thoughts[chosenPriority];
 
-				float tempLowerBound = 100;
-				float tempUpperBound = 100;
+				float tempLowerBound = 0;
+				float tempUpperBound = 1;
 
 				currentDangerLevel = Mathf.Clamp(currentDangerLevel, 0, 100);
 
-				if (reactionEdit.possibleAttractorTypeChanges.Length > 0)
+				if (reactionEdit.possibleThoughtTypeChanges != null && reactionEdit.possibleThoughtTypeChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.thoughtTypeLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.thoughtTypeUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.thoughtType = reactionEdit.possibleThoughtTypeChanges[Random.Range((int)(reactionEdit.possibleThoughtTypeChanges.Length *
+						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleThoughtTypeChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleAttractorTypeChanges != null && reactionEdit.possibleAttractorTypeChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -950,7 +1532,19 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.attractorType = reactionEdit.possibleAttractorTypeChanges[Random.Range((int)(reactionEdit.possibleAttractorTypeChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleAttractorTypeChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMinIntensityChanges.Length > 0)
+				if (reactionEdit.possibleCustomAttractorIDChanges != null && reactionEdit.possibleCustomAttractorIDChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.customAttractorIDLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.customAttractorIDUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.customAttractorID =
+						reactionEdit.possibleCustomAttractorIDChanges[Random.Range((int)(reactionEdit.possibleCustomAttractorIDChanges.Length * tempLowerBound),
+						Mathf.CeilToInt(reactionEdit.possibleCustomAttractorIDChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleMinIntensityChanges != null && reactionEdit.possibleMinIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -961,7 +1555,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.minIntensity = reactionEdit.possibleMinIntensityChanges[Random.Range((int)(reactionEdit.possibleMinIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMinIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleMaxIntensityChanges.Length > 0)
+				if (reactionEdit.possibleMaxIntensityChanges != null && reactionEdit.possibleMaxIntensityChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -972,7 +1566,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.maxIntensity = reactionEdit.possibleMaxIntensityChanges[Random.Range((int)(reactionEdit.possibleMaxIntensityChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleMaxIntensityChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
+				if (reactionEdit.possibleStatusRestrictionsChanges != null && reactionEdit.possibleStatusRestrictionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -984,7 +1578,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStatusRestrictionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleStatusRestrictionsChanges.Length * tempUpperBound))].statusRestrictions;
 				}
-				if (reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
+				if (reactionEdit.possibleAllStatusesRequiredChanges != null && reactionEdit.possibleAllStatusesRequiredChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -996,7 +1590,7 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleAllStatusesRequiredChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleAllStatusesRequiredChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleStateRestrictionChanges.Length > 0)
+				if (reactionEdit.possibleStateRestrictionChanges != null && reactionEdit.possibleStateRestrictionChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1008,7 +1602,31 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleStateRestrictionChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleStateRestrictionChanges.Length *
 						tempUpperBound))].stateRestriction;
 				}
-				if (reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
+				if (reactionEdit.possibleMinRequiredUtilityChanges != null && reactionEdit.possibleMinRequiredUtilityChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.minRequiredUtilityLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.minRequiredUtilityUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.minRequiredUtility = reactionEdit.possibleMinRequiredUtilityChanges[Random.Range((int)(
+						reactionEdit.possibleMinRequiredUtilityChanges.Length * tempLowerBound), Mathf.CeilToInt(
+							reactionEdit.possibleMinRequiredUtilityChanges.Length * tempUpperBound))];
+				}
+				if (reactionEdit.possibleUtilityThoughtsChanges != null && reactionEdit.possibleUtilityThoughtsChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.utilityThoughtsLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.utilityThoughtsUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.utilityThoughts = reactionEdit.possibleUtilityThoughtsChanges[Random.Range((int)(
+						reactionEdit.possibleUtilityThoughtsChanges.Length * tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleUtilityThoughtsChanges.Length
+						* tempUpperBound))].utilityThoughts;
+				}
+				if (reactionEdit.possibleFunctionExecutionsChanges != null && reactionEdit.possibleFunctionExecutionsChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1020,7 +1638,19 @@ public class AttractorAI : MonoBehaviour
 						reactionEdit.possibleFunctionExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
 							reactionEdit.possibleFunctionExecutionsChanges.Length * tempUpperBound))].functionExecutions;
 				}
-				if (reactionEdit.possibleRepeatBufferChanges.Length > 0)
+				if (reactionEdit.possibleEventExecutionsChanges != null && reactionEdit.possibleEventExecutionsChanges.Length > 0)
+				{
+					if (reactionEdit.balancesChanges)
+					{
+						tempLowerBound = Mathf.Clamp(currentDangerLevel - reactionEdit.eventExecutionsLowerBoundDangerRange, 0, 100) / 100;
+						tempUpperBound = Mathf.Clamp(currentDangerLevel + reactionEdit.eventExecutionsUpperBoundDangerRange, 0, 100) / 100;
+					}
+
+					chosenThought.eventExecutions = reactionEdit.possibleEventExecutionsChanges[Random.Range((int)(
+						reactionEdit.possibleEventExecutionsChanges.Length * tempLowerBound), Mathf.CeilToInt(
+							reactionEdit.possibleEventExecutionsChanges.Length * tempUpperBound))].eventExecutions;
+				}
+				if (reactionEdit.possibleRepeatBufferChanges != null && reactionEdit.possibleRepeatBufferChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1031,7 +1661,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.repeatBuffer = reactionEdit.possibleRepeatBufferChanges[Random.Range((int)(reactionEdit.possibleRepeatBufferChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleRepeatBufferChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleForceBufferChanges.Length > 0)
+				if (reactionEdit.possibleForceBufferChanges != null && reactionEdit.possibleForceBufferChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1042,7 +1672,7 @@ public class AttractorAI : MonoBehaviour
 					chosenThought.forceBuffer = reactionEdit.possibleForceBufferChanges[Random.Range((int)(reactionEdit.possibleForceBufferChanges.Length *
 						tempLowerBound), Mathf.CeilToInt(reactionEdit.possibleForceBufferChanges.Length * tempUpperBound))];
 				}
-				if (reactionEdit.possibleTimerChanges.Length > 0)
+				if (reactionEdit.possibleTimerChanges != null && reactionEdit.possibleTimerChanges.Length > 0)
 				{
 					if (reactionEdit.balancesChanges)
 					{
@@ -1063,9 +1693,11 @@ public class AttractorAI : MonoBehaviour
 		public float detectionRadius = 10f;
 		public float detectionAngle = 360f;
 		public LayerMask targetLayer;
+		[Tooltip("If the Target Layer includes CustomAttractor, you must specify which Custom Attractor IDs you wish to target")]
+		public string[] customAttractorIDs;
 		public LayerMask obstacleLayer;
 		public Transform[] senseOrgans;
-		public bool addPlayerCameraAsSenseOrgan = false;
+		//public bool addPlayerCameraAsSenseOrgan = false;
 		[Tooltip("Attractors detected by this sense will instead be clasified as not detected, " +
 			"while every Attractor in the targetLayer NOT detected by this sense is considered detected (as of right now, this does nothing)")]
 		public bool invertDetection = false;  // finish this later
@@ -1079,6 +1711,8 @@ public class AttractorAI : MonoBehaviour
 
 	[Header("Animation Setup")]
 	[SerializeField] private Animator animator;
+	[Tooltip("These animators will not be considered if the animator variable is not assigned.")]
+	[SerializeField] private Animator[] additionalAnimators;
 	[Tooltip("How fast is navmesh speed per walk animation speed, for syncing up animations")]
 	[SerializeField] private float walkSpdAnimMult;
 	[SerializeField] private float screamTime = 1;
@@ -1092,6 +1726,7 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float minPatrolTimer;
 	[Tooltip("The longest amount of time before the enemy decides to move to a new location")]
 	[SerializeField] private float maxPatrolTimer;
+	[SerializeField] private Transform optionalPatrolPoint;
 
 	private float patrolTimer;
 
@@ -1158,6 +1793,8 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float hideRadius;
 	[SerializeField] private bool avoidHideTarget = false;
 	[SerializeField] private float hideTargetAvoidanceRange;
+	[SerializeField] private bool lookAround = false;
+	[SerializeField] private bool waitAtSpots = false;
 
 	private float searchTimer;
 	private int searchAmount;
@@ -1174,6 +1811,7 @@ public class AttractorAI : MonoBehaviour
 	[SerializeField] private float minFleeTime;
 	[SerializeField] private float maxFleeTime;
 	[SerializeField] private bool avoidTarget = false;
+	[SerializeField] private bool fleeInAnyDirection = false;
 	[SerializeField] private float fleeTargetAvoidanceRange;
 
 	private float fleeTime;
@@ -1182,31 +1820,24 @@ public class AttractorAI : MonoBehaviour
 
 	#endregion
 
-	public void AddCameraSenses()
-	{
-		foreach (EnemySense sense in senses)
-		{
-			if (sense.addPlayerCameraAsSenseOrgan)
-			{
-				sense.senseOrgans.Append(Flashlight.Instance.GetComponentInParent<Transform>());
-			}
-		}
-	}
-
 	void Start()
 	{
 		if (defaultFocus == null)
 			defaultFocus = Player.PlayerManager.Instance.GetPlayer().transform;
+		if (animator != null)
+			hasAnimator = true;
+		if (additionalAnimators == null)
+			additionalAnimators = new Animator[0];
 		currentFocus = defaultFocus;
 		currentState = defaultState;
 		nextState = defaultState;
 		nextFunctions.Clear();
+		nextEvents.Clear();
 		lowestPriority = behaviourHierarchy.Count;
 		currentStatePriority = lowestPriority;
-		agent = GetComponent<NavMeshAgent>();
+		if (gameObject.TryGetComponent(out agent))
+			hasAgent = true;
 		patrolTimer = Random.Range(minPatrolTimer, maxPatrolTimer);
-
-		AddCameraSenses();
 	}
 
 	Dictionary<AttractorType, List<Attractor>> DetectedAttractors()
@@ -1240,15 +1871,23 @@ public class AttractorAI : MonoBehaviour
 	{
 		List<Attractor> tempAttractorList = new List<Attractor>();
 		// For efficiency, check for all targets in range before fireing any raycasts
-		hitColliders = Physics.OverlapSphere(transform.position, currentSense.detectionRadius, currentSense.targetLayer);
-
-		foreach (var hitCollider in hitColliders)
+		foreach (Transform senseOrgan in currentSense.senseOrgans)
 		{
-			Transform target = hitCollider.transform;
+			hitColliders = Physics.OverlapSphere(senseOrgan.position, currentSense.detectionRadius, currentSense.targetLayer);
 
-			if (CheckConeVisibility(target.position, currentSense))
+			foreach (var hitCollider in hitColliders)
 			{
-				tempAttractorList.Add(target.GetComponent<Attractor>());
+				Transform target = hitCollider.transform;
+				Attractor targetAttractor = target.GetComponent<Attractor>();
+
+				if ((targetAttractor.attractorType != AttractorType.self || target.IsChildOf(transform)) && (targetAttractor.attractorType != AttractorType.custom
+					|| currentSense.customAttractorIDs.Contains(targetAttractor.customAttractorID)))
+				{
+					if (CheckConeVisibility(target.position, currentSense))
+					{
+						tempAttractorList.Add(target.GetComponent<Attractor>());
+					}
+				}
 			}
 		}
 		return tempAttractorList;
@@ -1268,6 +1907,7 @@ public class AttractorAI : MonoBehaviour
 				if (Physics.Raycast(organ.position, directionToTarget, out hit, distanceToTarget, currentSense.obstacleLayer | currentSense.targetLayer))
 				{
 					// Check if the hit object is the target itself (ignoring obstacles)
+
 					if (((1 << hit.collider.gameObject.layer) & currentSense.targetLayer) != 0)
 					{
 						return true;
@@ -1281,9 +1921,13 @@ public class AttractorAI : MonoBehaviour
 	void OnDrawGizmosSelected()
 	{
 		Gizmos.color = Color.red;
-		foreach (EnemySense sense in senses)
-			foreach (Transform senseOrgan in sense.senseOrgans)
-				DrawCone(senseOrgan, sense);
+		if (senses.Length > 0)
+		{
+			foreach (EnemySense sense in senses)
+				foreach (Transform senseOrgan in sense.senseOrgans)
+					if (senseOrgan != null)
+						DrawCone(senseOrgan, sense);
+		}
 	}
 
 	void DrawCone(Transform organ, EnemySense sense) // Just for viewing in the inspector
@@ -1323,7 +1967,7 @@ public class AttractorAI : MonoBehaviour
 			case FunctionType.AddStatuses_LISTstringStatuses_boolRemove:
 				AddStatuses(function.arguments);
 				break;
-			case FunctionType.Teleport_floatX_floatY_floatZ:
+			case FunctionType.Teleport_OPTIONAL_floatX_floatY_floatZ:
 				Teleport(function.arguments);
 				break;
 			case FunctionType.TeleportCycle:
@@ -1345,6 +1989,197 @@ public class AttractorAI : MonoBehaviour
 				AddThought(function.arguments, function.addThoughts, function.addThoughtsLowerBoundDangerRange, function.addThoughtsUpperBoundDangerRange);
 				break;
 		}
+
+		if (function.changeDefaultState)
+			defaultState = function.newDefaultState;
+		if (function.alsoChangeDefaultFocus != null)
+		{
+			defaultFocus = function.alsoChangeDefaultFocus;
+		}
+	}
+
+	public float EvaluateConsideration(Consideration consideration, Dictionary<AttractorType, List<Attractor>> detectedAttractors, UtilityBehavior behavior = null)
+	{
+		// Attractors
+		if (consideration.considerationType == ConsiderationType.attractorIntensity || consideration.considerationType == ConsiderationType.attractorDistance)
+		{
+			Transform consideredTarget = defaultFocus;
+			float tempValue = -1;
+			if (consideration.attractorTypeConsidered != AttractorType.NONE && detectedAttractors.ContainsKey(consideration.attractorTypeConsidered))
+			{
+				foreach (Attractor attractor in detectedAttractors[consideration.attractorTypeConsidered])
+				{
+					if (consideration.minIntensityConsidered <= attractor.intensity && attractor.intensity < consideration.maxIntensityConsidered &&
+						(consideration.attractorTypeConsidered != AttractorType.custom || consideration.customAttractorIDConsidered ==
+						attractor.customAttractorID))
+					{
+						if (behavior != null)
+						{
+							if (behavior.considerAttractorsForFocus && (behavior.targetDetectedObject && (behavior.myTempValue < 0 ||
+								(behavior.prioritizeDistanceInsteadOfIntensity && ((behavior.invertPriority && Vector3.Distance(transform.position,
+								attractor.transform.position) > behavior.myTempValue) || (!behavior.invertPriority && Vector3.Distance(transform.position,
+								attractor.transform.position) < behavior.myTempValue))) || (!behavior.prioritizeDistanceInsteadOfIntensity &&
+								((behavior.invertPriority && attractor.intensity < behavior.myTempValue) || (!behavior.invertPriority && attractor.intensity >
+								behavior.myTempValue))))))
+							{
+								behavior.myTempFocus = attractor.transform;
+								if (!behavior.prioritizeDistanceInsteadOfIntensity)
+									behavior.myTempValue = attractor.intensity;
+								else
+									behavior.myTempValue = Vector3.Distance(behavior.myTempFocus.position, transform.position);
+							}
+						}
+
+						if (tempValue < 0 || (consideration.considerClosestInsteadOfMostIntense && ((consideration.invertConsideredAttractorPriority &&
+							Vector3.Distance(transform.position, attractor.transform.position) > tempValue) || (!consideration.invertConsideredAttractorPriority &&
+							Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) ||
+							(!consideration.considerClosestInsteadOfMostIntense && ((consideration.invertConsideredAttractorPriority && attractor.intensity <
+							tempValue) || (!consideration.invertConsideredAttractorPriority && attractor.intensity > tempValue))))
+						{
+							consideredTarget = attractor.transform;
+							if (!consideration.considerClosestInsteadOfMostIntense)
+								tempValue = attractor.intensity;
+							else
+								tempValue = Vector3.Distance(consideredTarget.position, transform.position);
+						}
+					}
+				}
+
+				if (consideredTarget.gameObject.TryGetComponent(out Attractor consideredAttractor))
+				{
+					if (consideration.considerationType == ConsiderationType.attractorIntensity)
+					{
+						float utilityInput = Mathf.Clamp01((Mathf.Clamp(consideredAttractor.intensity, consideration.minIntensityClamp,
+							consideration.maxIntensityClamp) - consideration.minIntensityClamp) / (consideration.maxIntensityClamp -
+							consideration.minIntensityClamp));
+
+						return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
+					}
+
+					else if (consideration.considerationType == ConsiderationType.attractorDistance)
+					{
+						float utilityInput = Mathf.Clamp01((Mathf.Clamp(Vector3.Distance(consideredTarget.position, transform.position),
+							consideration.minDistanceClamp, consideration.maxDistanceClamp) - consideration.minDistanceClamp) / (consideration.maxDistanceClamp -
+							consideration.minDistanceClamp));
+
+						return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
+					}
+				}
+				else
+				{
+					return 0f;
+				}
+			}
+			else
+			{
+				return 0f;
+			}
+		}
+
+		// Bool Condition
+		else if (consideration.considerationType == ConsiderationType.boolCondition)
+		{
+			Dictionary<string, bool> tempBoolDict = currentConditions.boolConditions.ToDictionary(x => x.boolName, x => x.boolValue);
+
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(tempBoolDict.ContainsKey(consideration.boolID) && tempBoolDict[consideration.boolID] ? 1 :
+				0));
+		}
+
+		// Float Condition
+		else if (consideration.considerationType == ConsiderationType.floatCondition)
+		{
+			Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+			if (tempFloatDict.ContainsKey(consideration.floatID))
+			{
+				float foundFloat = tempFloatDict[consideration.floatID];
+				float utilityInput = Mathf.Clamp01((Mathf.Clamp(foundFloat, consideration.minFloatClamp, consideration.maxFloatClamp) -
+					consideration.minFloatClamp) / (consideration.maxFloatClamp - consideration.minFloatClamp));
+
+				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
+			}
+			else
+				return 0f;
+		}
+
+		// Int Condition
+		else if (consideration.considerationType == ConsiderationType.intCondition)
+		{
+			Dictionary<string, int> tempIntDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+			if (tempIntDict.ContainsKey(consideration.intID))
+			{
+				int foundInt = tempIntDict[consideration.intID];
+				float utilityInput = Mathf.Clamp01((Mathf.Clamp(foundInt, consideration.minIntClamp, consideration.maxIntClamp) -
+					consideration.minIntClamp) / (consideration.maxIntClamp - consideration.minIntClamp));
+
+				return Mathf.Clamp01(consideration.utilityCurve.Evaluate(utilityInput));
+			}
+			else
+				return 0f;
+		}
+
+		// Status
+		else if (consideration.considerationType == ConsiderationType.status)
+		{
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(currentStatuses.Contains(consideration.statusName) ? 1 : 0));
+		}
+
+		// State
+		else if (consideration.considerationType == ConsiderationType.state)
+		{
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(currentState == consideration.state ? 1 : 0));
+		}
+
+		else if (consideration.considerationType == ConsiderationType.compositeConsideration)
+		{
+			if (consideration.compositeConsiderations == null || consideration.compositeConsiderations.Count() == 0) return 0f;
+
+			float result = EvaluateConsideration(consideration.compositeConsiderations[0], detectedAttractors);
+			if (result == 0f && consideration.allMustBeNonZero) return 0f;
+
+			for (int i = 1; i < consideration.compositeConsiderations.Count(); i++)
+			{
+				float value = EvaluateConsideration(consideration.compositeConsiderations[i], detectedAttractors);
+
+				if (value == 0f && consideration.allMustBeNonZero) return 0f;
+
+				switch (consideration.operationToPerform)
+				{
+					case OperationType.Average:
+						result = (result + value) / 2;
+						break;
+					case OperationType.Multiply:
+						result *= value;
+						break;
+					case OperationType.Add:
+						result += value;
+						break;
+					case OperationType.Subtract:
+						result -= value;
+						break;
+					case OperationType.Divide:
+						result = value != 0 ? result / value : result; // Prevent division by zero
+						break;
+					case OperationType.Max:
+						result = Mathf.Max(result, value);
+						break;
+					case OperationType.Min:
+						result = Mathf.Min(result, value);
+						break;
+				}
+			}
+
+			return Mathf.Clamp01(consideration.utilityCurve.Evaluate(result));
+		}
+
+		// Comstant
+		else if (consideration.considerationType == ConsiderationType.constant)
+		{
+			return Mathf.Clamp01(consideration.constantUtility);
+		}
+
+		return 0f;
 	}
 
 	void Update()
@@ -1352,9 +2187,21 @@ public class AttractorAI : MonoBehaviour
 		if (tracksDrawingCount)
 		{
 			currentConditions.intConditions[0].intValue = Player.PlayerInventory.Instance.GetDrawingCount();
+			if (drawingsIncreaseDanger)
+			{
+				currentDangerLevel = dangerPerDrawing * currentConditions.intConditions[0].intValue;
+			}
 		}
 
-		animator.SetFloat("Speed", agent.velocity.magnitude / walkSpdAnimMult);  // this keeps the animation in sync with the enemy speed
+		if (hasAnimator)
+		{
+			animator.SetFloat("Speed", (hasAgent ? agent.velocity.magnitude : hasNonAgentDestination ? nonAgentSpeed : 0) / walkSpdAnimMult);
+			foreach (Animator anim in additionalAnimators)
+			{
+				anim.SetFloat("Speed", (hasAgent ? agent.velocity.magnitude : hasNonAgentDestination ? nonAgentSpeed : 0) / walkSpdAnimMult);
+			}
+		}
+			// this keeps the animation in sync with the enemy speed
 
 		if (!(currentState == EnemyState.RushOver))
 		{
@@ -1366,12 +2213,22 @@ public class AttractorAI : MonoBehaviour
 		}
 		if (!(currentState == EnemyState.Inspect))
 		{
-			animator.SetBool("Inspecting", false);
+			if (hasAnimator)
+			{
+				animator.SetBool("Inspecting", false);
+				foreach (Animator anim in additionalAnimators)
+					anim.SetBool("Inspecting", false);
+			}
 			currentInspect = 0;
 		}
 		if (!(currentState == EnemyState.Search))
 		{
-			animator.SetBool("LookingAround", false);
+			if (hasAnimator)
+			{
+				animator.SetBool("LookingAround", false);
+				foreach (Animator anim in additionalAnimators)
+					animator.SetBool("LookingAround", false);
+			}
 			searchTimer = 0;
 			if (searchLocations.Count > 1)
 				searchLocations.Clear();
@@ -1395,7 +2252,9 @@ public class AttractorAI : MonoBehaviour
 		bool tempCheck = false;
 		int tempPriority = 0;
 
-		foreach (ThoughtProcess thought in thoughts)
+		List<ThoughtProcess> safeThoughts = new List<ThoughtProcess>(thoughts);
+
+		foreach (ThoughtProcess thought in safeThoughts)
 		{
 			if ((thought.stateRestriction.Count < 1 || thought.stateRestriction.Contains(currentState)) && (thought.statusRestrictions.Count < 1 ||
 				(thought.allStatusesRequired ? currentStatuses.Intersect(thought.statusRestrictions).Count() == thought.statusRestrictions.Count() :
@@ -1406,7 +2265,8 @@ public class AttractorAI : MonoBehaviour
 				{
 					foreach (Attractor attractor in tempDetectedAttractors[thought.attractorType])
 					{
-						if (thought.minIntensity <= attractor.intensity && attractor.intensity < thought.maxIntensity)
+						if (thought.minIntensity <= attractor.intensity && attractor.intensity < thought.maxIntensity && (thought.attractorType !=
+							AttractorType.custom || thought.customAttractorID == attractor.customAttractorID))
 						{
 							tempAttractors.Add(attractor);
 						}
@@ -1521,14 +2381,244 @@ public class AttractorAI : MonoBehaviour
 
 					if (conditionsMet)
 					{
-						thought.timer -= Time.deltaTime;
-
-						if (thought.timer <= 0)
+						if (thought.thoughtType == DecisionType.finiteState)
 						{
-							thought.timer = thought.repeatBuffer;
-							foreach (FunctionPicker function in thought.functionExecutions)
+							thought.timer -= Time.deltaTime;
+
+							if (thought.timer <= 0)
 							{
-								HandleFunctionCalling(function);
+								thought.timer = thought.repeatBuffer;
+								foreach (FunctionPicker function in thought.functionExecutions)
+								{
+									HandleFunctionCalling(function);
+								}
+								foreach (UnityEvent unityEvent in thought.eventExecutions)
+								{
+									unityEvent.Invoke();
+								}
+							}
+						}
+						else if (thought.thoughtType == DecisionType.utilityFunction)
+						{
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
+							float highestUtility = -1;
+
+							foreach (UtilityThought utility in thought.utilityThoughts)
+							{
+								if (!utility.useStrictConditions || ((utility.stateRestriction.Count < 1 || utility.stateRestriction.Contains(currentState)) &&
+									(utility.statusRestrictions.Count < 1 || (utility.allStatusesRequired ?
+									currentStatuses.Intersect(utility.statusRestrictions).Count() == utility.statusRestrictions.Count() :
+									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
+								{
+									tempAttractors.Clear();
+									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+										tempDetectedAttractors.ContainsKey(utility.attractorType)))
+									{
+										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
+										{
+											if (utility.minIntensity <= attractor.intensity && attractor.intensity < utility.maxIntensity &&
+												(utility.attractorType
+												!= AttractorType.custom || utility.customAttractorID == attractor.customAttractorID))
+											{
+												tempAttractors.Add(attractor);
+											}
+										}
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType == AttractorType.NONE || tempAttractors.Count > 0))
+									{
+										bool utilityStrictConditionsMet = true;
+										if (utility.useStrictConditions && utility.allConditionsRequired)
+										{
+											if (utility.thoughtConditions.boolConditions.Count > 0 &&
+												!(currentConditions.boolConditions.Intersect(utility.thoughtConditions.boolConditions).Count() ==
+												utility.thoughtConditions.boolConditions.Count()))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.equals &&
+												(utility.thoughtConditions.floatConditions.Count > 0 &&
+												!(currentConditions.floatConditions.Intersect(utility.thoughtConditions.floatConditions).Count() ==
+												utility.thoughtConditions.floatConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.greaterThan)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.lesserThan)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.lesserOrEqualTo)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.equals && (utility.thoughtConditions.intConditions.Count >
+												0 && !(currentConditions.intConditions.Intersect(utility.thoughtConditions.intConditions).Count() ==
+												utility.thoughtConditions.intConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.greaterThan)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.greaterOrEqualTo)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.lesserThan)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.lesserOrEqualTo)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+										}
+
+										if (utilityStrictConditionsMet)
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+									else if (!utility.allConditionsRequired)
+									{
+										Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+										x.floatValue);
+										Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+										if ((utility.thoughtConditions.boolConditions.Count > 0 &&
+											utility.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((utility.thoughtConditions.floatCompare
+											== Comparison.equals || utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											(utility.thoughtConditions.floatConditions.Count > 0 &&
+											utility.thoughtConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) || ((utility.thoughtConditions.floatCompare
+											== Comparison.greaterThan || utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											utility.thoughtConditions.floatConditions.Where(item1 => tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] >
+											item1.floatValue).ToList().Count > 0) || ((utility.thoughtConditions.intCompare == Comparison.equals ||
+											utility.thoughtConditions.intCompare == Comparison.lesserOrEqualTo) && (utility.thoughtConditions.intConditions.Count > 0 &&
+											utility.thoughtConditions.intConditions.Intersect(currentConditions.intConditions).Any())) || ((utility.thoughtConditions.intCompare ==
+											Comparison.greaterThan || utility.thoughtConditions.intCompare == Comparison.greaterOrEqualTo) &&
+											utility.thoughtConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
+											item1.intValue).ToList().Count > 0))
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+								}
+								currentUtilityIndex++;
+							}
+
+							if (highestUtility >= thought.minRequiredUtility)
+							{
+								currentUtilityIndex = 0;
+								foreach (UtilityThought utility in thought.utilityThoughts)
+								{
+									if (currentUtilityIndex == bestUtilityIndex)
+									{
+										utility.timer -= Time.deltaTime;
+
+										if (utility.timer <= 0)
+										{
+											utility.timer = utility.repeatBuffer;
+											foreach (FunctionPicker function in utility.functionExecutions)
+											{
+												HandleFunctionCalling(function);
+											}
+											foreach (UnityEvent unityEvent in utility.eventExecutions)
+											{
+												unityEvent.Invoke();
+											}
+										}
+									}
+									else if (!utility.forceBuffer)
+									{
+										utility.timer = 0;
+									}
+
+									currentUtilityIndex++;
+								}
+							}
+							else
+							{
+								foreach (UtilityThought utility in thought.utilityThoughts)
+									if (!utility.forceBuffer)
+										utility.timer = 0;
 							}
 						}
 					}
@@ -1543,7 +2633,7 @@ public class AttractorAI : MonoBehaviour
 					Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
 
 					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!   wait I think?? I fixed this
 					if ((thought.thoughtConditions.boolConditions.Count > 0 &&
 						thought.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((thought.thoughtConditions.floatCompare
 						== Comparison.equals || thought.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
@@ -1558,14 +2648,242 @@ public class AttractorAI : MonoBehaviour
 						thought.thoughtConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
 						item1.intValue).ToList().Count > 0))
 					{
-						thought.timer -= Time.deltaTime;
-
-						if (thought.timer <= 0)
+						if (thought.thoughtType == DecisionType.finiteState)
 						{
-							thought.timer = thought.repeatBuffer;
-							foreach (FunctionPicker function in thought.functionExecutions)
+							thought.timer -= Time.deltaTime;
+
+							if (thought.timer <= 0)
 							{
-								HandleFunctionCalling(function);
+								thought.timer = thought.repeatBuffer;
+								foreach (FunctionPicker function in thought.functionExecutions)
+								{
+									HandleFunctionCalling(function);
+								}
+								foreach (UnityEvent unityEvent in thought.eventExecutions)
+								{
+									unityEvent.Invoke();
+								}
+							}
+						}
+						else if (thought.thoughtType == DecisionType.utilityFunction)
+						{
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
+							float highestUtility = float.MinValue;
+
+							foreach (UtilityThought utility in thought.utilityThoughts)
+							{
+								if (!utility.useStrictConditions || ((utility.stateRestriction.Count < 1 || utility.stateRestriction.Contains(currentState)) &&
+									(utility.statusRestrictions.Count < 1 || (utility.allStatusesRequired ?
+									currentStatuses.Intersect(utility.statusRestrictions).Count() == utility.statusRestrictions.Count() :
+									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
+								{
+									tempAttractors.Clear();
+									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+										tempDetectedAttractors.ContainsKey(utility.attractorType)))
+									{
+										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
+										{
+											if (utility.minIntensity <= attractor.intensity && attractor.intensity < utility.maxIntensity &&
+												(utility.attractorType
+												!= AttractorType.custom || utility.customAttractorID == attractor.customAttractorID))
+											{
+												tempAttractors.Add(attractor);
+											}
+										}
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType == AttractorType.NONE || tempAttractors.Count > 0))
+									{
+										bool utilityStrictConditionsMet = true;
+										if (utility.useStrictConditions && utility.allConditionsRequired)
+										{
+											if (utility.thoughtConditions.boolConditions.Count > 0 &&
+												!(currentConditions.boolConditions.Intersect(utility.thoughtConditions.boolConditions).Count() ==
+												utility.thoughtConditions.boolConditions.Count()))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.equals &&
+												(utility.thoughtConditions.floatConditions.Count > 0 &&
+												!(currentConditions.floatConditions.Intersect(utility.thoughtConditions.floatConditions).Count() ==
+												utility.thoughtConditions.floatConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.greaterThan)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.lesserThan)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.floatCompare == Comparison.lesserOrEqualTo)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.thoughtConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.equals && (utility.thoughtConditions.intConditions.Count >
+												0 && !(currentConditions.intConditions.Intersect(utility.thoughtConditions.intConditions).Count() ==
+												utility.thoughtConditions.intConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.greaterThan)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.greaterOrEqualTo)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.lesserThan)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.thoughtConditions.intCompare == Comparison.lesserOrEqualTo)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.thoughtConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+										}
+
+										if (utilityStrictConditionsMet)
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+									else if (!utility.allConditionsRequired)
+									{
+										tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+										x.floatValue);
+										tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+										if ((utility.thoughtConditions.boolConditions.Count > 0 &&
+											utility.thoughtConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((utility.thoughtConditions.floatCompare
+											== Comparison.equals || utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											(utility.thoughtConditions.floatConditions.Count > 0 &&
+											utility.thoughtConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) || ((utility.thoughtConditions.floatCompare
+											== Comparison.greaterThan || utility.thoughtConditions.floatCompare == Comparison.greaterOrEqualTo) &&
+											utility.thoughtConditions.floatConditions.Where(item1 => tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] >
+											item1.floatValue).ToList().Count > 0) || ((utility.thoughtConditions.intCompare == Comparison.equals ||
+											utility.thoughtConditions.intCompare == Comparison.lesserOrEqualTo) && (utility.thoughtConditions.intConditions.Count > 0 &&
+											utility.thoughtConditions.intConditions.Intersect(currentConditions.intConditions).Any())) || ((utility.thoughtConditions.intCompare ==
+											Comparison.greaterThan || utility.thoughtConditions.intCompare == Comparison.greaterOrEqualTo) &&
+											utility.thoughtConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
+											item1.intValue).ToList().Count > 0))
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors);
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+								}
+								currentUtilityIndex++;
+							}
+
+							if (highestUtility >= thought.minRequiredUtility)
+							{
+								currentUtilityIndex = 0;
+								foreach (UtilityThought utility in thought.utilityThoughts)
+								{
+									if (currentUtilityIndex == bestUtilityIndex)
+									{
+										utility.timer -= Time.deltaTime;
+
+										if (utility.timer <= 0)
+										{
+											utility.timer = utility.repeatBuffer;
+											foreach (FunctionPicker function in utility.functionExecutions)
+											{
+												HandleFunctionCalling(function);
+											}
+											foreach (UnityEvent unityEvent in utility.eventExecutions)
+											{
+												unityEvent.Invoke();
+											}
+										}
+									}
+									else if (!utility.forceBuffer)
+									{
+										utility.timer = 0;
+									}
+
+									currentUtilityIndex++;
+								}
+							}
+							else
+							{
+								foreach (UtilityThought utility in thought.utilityThoughts)
+									if (!utility.forceBuffer)
+										utility.timer = 0;
 							}
 						}
 					}
@@ -1577,7 +2895,9 @@ public class AttractorAI : MonoBehaviour
 			}
 		}
 
-		foreach (EnemyReactions reaction in behaviourHierarchy)
+		List<EnemyReactions> safeBehaviourHierarchy = new List<EnemyReactions>(behaviourHierarchy);
+
+		foreach (EnemyReactions reaction in safeBehaviourHierarchy)
 		{
 			if ((reaction.stateRestriction.Count < 1 || reaction.stateRestriction.Contains(currentState)) && (reaction.statusRestrictions.Count < 1 ||
 				reaction.allStatusesRequired ? currentStatuses.Intersect(reaction.statusRestrictions).Count() == reaction.statusRestrictions.Count() :
@@ -1590,14 +2910,21 @@ public class AttractorAI : MonoBehaviour
 				{
 					foreach (Attractor attractor in tempDetectedAttractors[reaction.attractorType])
 					{
-						if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity)
+						if (reaction.minIntensity <= attractor.intensity && attractor.intensity < reaction.maxIntensity && (reaction.attractorType !=
+							AttractorType.custom || reaction.customAttractorID == attractor.customAttractorID))
 						{
-							if (reaction.targetDetectedObject && (tempValue < 0 || (reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority &&
+							if (!(reaction.behaviorType == DecisionType.utilityFunction && !reaction.considerAttractorsForUtilityFocus) &&
+								(reaction.targetDetectedObject && (tempValue < 0 || (reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority &&
 								Vector3.Distance(transform.position, attractor.transform.position) > tempValue) || (!reaction.invertPriority &&
-								Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) || (!reaction.prioritizeDistanceInsteadOfIntensity
-								&& ((reaction.invertPriority && attractor.intensity < tempValue) || (!reaction.invertPriority && attractor.intensity > tempValue)))))
+								Vector3.Distance(transform.position, attractor.transform.position) < tempValue))) ||
+								(!reaction.prioritizeDistanceInsteadOfIntensity && ((reaction.invertPriority && attractor.intensity < tempValue) ||
+								(!reaction.invertPriority && attractor.intensity > tempValue))))))
 							{
 								tempFocus = attractor.transform;
+								if (!reaction.prioritizeDistanceInsteadOfIntensity)
+									tempValue = attractor.intensity;
+								else
+									tempValue = Vector3.Distance(tempFocus.position, transform.position);
 							}
 
 							tempAttractors.Add(attractor);
@@ -1713,35 +3040,307 @@ public class AttractorAI : MonoBehaviour
 
 					if (conditionsMet)
 					{
-						nextStatePriority = tempPriority;
-						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
-						if (nextStatePriority < currentStatePriority)
+						if (reaction.behaviorType == DecisionType.finiteState)
 						{
-							foreach (FunctionPicker function in nextFunctions)
+							nextStatePriority = tempPriority;
+							nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
+							nextEvents = new List<UnityEvent>(reaction.eventExecutions);
+							if (nextStatePriority < currentStatePriority)
 							{
-								HandleFunctionCalling(function);
+								foreach (FunctionPicker function in nextFunctions)
+								{
+									HandleFunctionCalling(function);
+								}
+								foreach (UnityEvent unityEvent in nextEvents)
+								{
+									unityEvent.Invoke();
+								}
+							}
+
+							if (!reaction.targetDetectedObject)
+							{
+								nextFocus = defaultFocus;
+							}
+							else
+							{
+								nextFocus = tempFocus;
+							}
+
+							nextState = reaction.stateChange;
+							if (nextStatePriority < currentStatePriority)
+							{
+								currentFocus = nextFocus;
+								currentState = nextState;
+								currentStatePriority = nextStatePriority;
+							}
+
+							tempCheck = true;
+							break;
+						}
+						else if (reaction.behaviorType == DecisionType.utilityFunction)
+						{
+							string tellMe = "";
+
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
+							float highestUtility = float.MinValue;
+
+							foreach (UtilityBehavior utility in reaction.utilityBehaviors)
+							{
+								if (!utility.useStrictConditions || ((utility.stateRestriction.Count < 1 || utility.stateRestriction.Contains(currentState)) &&
+									(utility.statusRestrictions.Count < 1 || (utility.allStatusesRequired ?
+									currentStatuses.Intersect(utility.statusRestrictions).Count() == utility.statusRestrictions.Count() :
+									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
+								{
+									tempAttractors.Clear();
+									if (reaction.considerAttractorsForUtilityFocus)
+									{
+										utility.myTempFocus = tempFocus;
+										utility.myTempValue = tempValue;
+									}
+									else
+									{
+										utility.myTempFocus = defaultFocus;
+										utility.myTempValue = -1;
+									}
+
+									if (utility.useStrictConditions && (utility.attractorType != AttractorType.NONE &&
+										tempDetectedAttractors.ContainsKey(utility.attractorType)))
+									{
+										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
+										{
+											if (utility.minIntensity <= attractor.intensity && attractor.intensity < utility.maxIntensity &&
+												(utility.attractorType != AttractorType.custom || utility.customAttractorID == attractor.customAttractorID))
+											{
+												if (utility.considerAttractorsForFocus && (utility.targetDetectedObject && (utility.myTempValue < 0 ||
+													(utility.prioritizeDistanceInsteadOfIntensity && ((utility.invertPriority &&
+													Vector3.Distance(transform.position, attractor.transform.position) > utility.myTempValue) ||
+													(!utility.invertPriority && Vector3.Distance(transform.position, attractor.transform.position) <
+													utility.myTempValue))) || (!utility.prioritizeDistanceInsteadOfIntensity && ((utility.invertPriority &&
+													attractor.intensity < utility.myTempValue) || (!utility.invertPriority && attractor.intensity >
+													utility.myTempValue))))))
+												{
+													utility.myTempFocus = attractor.transform;
+													if (!utility.prioritizeDistanceInsteadOfIntensity)
+														utility.myTempValue = attractor.intensity;
+													else
+														utility.myTempValue = Vector3.Distance(tempFocus.position, transform.position);
+												}
+
+												tempAttractors.Add(attractor);
+											}
+										}
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType == AttractorType.NONE || tempAttractors.Count > 0))
+									{
+										bool utilityStrictConditionsMet = true;
+										if (utility.useStrictConditions && utility.allConditionsRequired)
+										{
+											if (utility.reactionConditions.boolConditions.Count > 0 &&
+												!(currentConditions.boolConditions.Intersect(utility.reactionConditions.boolConditions).Count() ==
+												utility.reactionConditions.boolConditions.Count()))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.equals &&
+												(utility.reactionConditions.floatConditions.Count > 0 &&
+												!(currentConditions.floatConditions.Intersect(utility.reactionConditions.floatConditions).Count() ==
+												utility.reactionConditions.floatConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.greaterThan)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.lesserThan)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.lesserOrEqualTo)
+											{
+												Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.equals && (utility.reactionConditions.intConditions.Count >
+												0 && !(currentConditions.intConditions.Intersect(utility.reactionConditions.intConditions).Count() ==
+												utility.reactionConditions.intConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.greaterThan)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.greaterOrEqualTo)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.lesserThan)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.lesserOrEqualTo)
+											{
+												Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+										}
+
+										if (utilityStrictConditionsMet)
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
+
+											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+									else if (!utility.allConditionsRequired)
+									{
+										Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+										x.floatValue);
+										Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+										if ((utility.reactionConditions.boolConditions.Count > 0 &&
+											utility.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
+											((utility.reactionConditions.floatCompare == Comparison.equals || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && (utility.reactionConditions.floatConditions.Count > 0 &&
+											utility.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) ||
+											((utility.reactionConditions.floatCompare == Comparison.greaterThan || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.floatConditions.Where(item1 =>
+											tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0) ||
+											((utility.reactionConditions.intCompare == Comparison.equals || utility.reactionConditions.intCompare ==
+											Comparison.lesserOrEqualTo) && (utility.reactionConditions.intConditions.Count > 0 &&
+											utility.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any())) ||
+											((utility.reactionConditions.intCompare == Comparison.greaterThan || utility.reactionConditions.intCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.intConditions.Where(item1 =>
+											tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] > item1.intValue).ToList().Count > 0))
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
+
+											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+								}
+								currentUtilityIndex++;
+							}
+
+							if (highestUtility >= reaction.minRequiredUtility)
+							{
+								//Debug.Log(tellMe);
+
+								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
+
+								nextStatePriority = tempPriority;
+								nextUtilityPriority = bestUtilityIndex;
+								nextFunctions = new List<FunctionPicker>(chosenUtility.functionExecutions);
+								nextEvents = new List<UnityEvent>(chosenUtility.eventExecutions);
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
+								{
+									foreach (FunctionPicker function in nextFunctions)
+									{
+										HandleFunctionCalling(function);
+									}
+									foreach (UnityEvent unityEvent in nextEvents)
+									{
+										unityEvent.Invoke();
+									}
+								}
+
+								if (!chosenUtility.targetDetectedObject)
+								{
+									nextFocus = defaultFocus;
+								}
+								else
+								{
+									nextFocus = chosenUtility.myTempFocus;
+								}
+
+								nextState = chosenUtility.stateChange;
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
+								{
+									currentFocus = nextFocus;
+									currentState = nextState;
+									currentStatePriority = nextStatePriority;
+									currentUtilityPriority = nextUtilityPriority;
+								}
+
+								tempCheck = true;
+								break;
 							}
 						}
-
-						if (!reaction.targetDetectedObject)
-						{
-							nextFocus = defaultFocus;
-						}
-						else
-						{
-							nextFocus = tempFocus;
-						}
-
-						nextState = reaction.stateChange;
-						if (nextStatePriority < currentStatePriority)
-						{
-							currentFocus = nextFocus;
-							currentState = nextState;
-							currentStatePriority = nextStatePriority;
-						}
-
-						tempCheck = true;
-						break;
 					}
 				}
 				else if (!reaction.allConditionsRequired)
@@ -1749,7 +3348,7 @@ public class AttractorAI : MonoBehaviour
 					Dictionary<string, float> tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x => x.floatValue);
 					Dictionary<string, int> tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
 					//YOU NEED TO FIX THIS!!!!!!!!!!!!!!!!! RIGHT NOW IT ONLY CHECKS IF THE FLOAT AND INT VALUES ARE EXACTLY THE SAME!! MAKE IT SO GREATER THAN
-					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!
+					//AND LESS THAN STATEMENTS ARE POSSIBLE!!!!!!!!!!      fixed???
 
 					if ((reaction.reactionConditions.boolConditions.Count > 0 &&
 						reaction.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) || ((reaction.reactionConditions.floatCompare
@@ -1765,28 +3364,301 @@ public class AttractorAI : MonoBehaviour
 						reaction.reactionConditions.intConditions.Where(item1 => tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] >
 						item1.intValue).ToList().Count > 0))
 					{
-						nextStatePriority = tempPriority;
-						nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
-						if (nextStatePriority < currentStatePriority)
+						if (reaction.behaviorType == DecisionType.finiteState)
 						{
-							foreach (FunctionPicker function in nextFunctions)
+							nextStatePriority = tempPriority;
+							nextFunctions = new List<FunctionPicker>(reaction.functionExecutions);
+							nextEvents = new List<UnityEvent>(reaction.eventExecutions);
+							if (nextStatePriority < currentStatePriority)
 							{
-								HandleFunctionCalling(function);
+								foreach (FunctionPicker function in nextFunctions)
+								{
+									HandleFunctionCalling(function);
+								}
+								foreach (UnityEvent unityEvent in nextEvents)
+								{
+									unityEvent.Invoke();
+								}
+							}
+
+							nextFocus = defaultFocus;
+							nextState = reaction.stateChange;
+							if (nextStatePriority < currentStatePriority)
+							{
+								currentFocus = nextFocus;
+								currentState = nextState;
+								currentStatePriority = nextStatePriority;
+							}
+
+							tempCheck = true;
+							break;
+						}
+						else if (reaction.behaviorType == DecisionType.utilityFunction)
+						{
+							string tellMe = "";
+
+							int bestUtilityIndex = -1;
+							int currentUtilityIndex = 0;
+							float highestUtility = float.MinValue;
+
+							foreach (UtilityBehavior utility in reaction.utilityBehaviors)
+							{
+								if (!utility.useStrictConditions || ((utility.stateRestriction.Count < 1 || utility.stateRestriction.Contains(currentState)) &&
+									(utility.statusRestrictions.Count < 1 || (utility.allStatusesRequired ?
+									currentStatuses.Intersect(utility.statusRestrictions).Count() == utility.statusRestrictions.Count() :
+									utility.statusRestrictions.Intersect(currentStatuses).Any()))))
+								{
+									tempAttractors.Clear();
+									if (reaction.considerAttractorsForUtilityFocus)
+									{
+										utility.myTempFocus = tempFocus;
+										utility.myTempValue = tempValue;
+									}
+									else
+									{
+										utility.myTempFocus = defaultFocus;
+										utility.myTempValue = -1;
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType != AttractorType.NONE &&
+										tempDetectedAttractors.ContainsKey(utility.attractorType)))
+									{
+										foreach (Attractor attractor in tempDetectedAttractors[utility.attractorType])
+										{
+											if (utility.minIntensity <= attractor.intensity && attractor.intensity < utility.maxIntensity &&
+												(utility.attractorType != AttractorType.custom || utility.customAttractorID == attractor.customAttractorID))
+											{
+												if (utility.considerAttractorsForFocus && (utility.targetDetectedObject && (utility.myTempValue < 0 ||
+													(utility.prioritizeDistanceInsteadOfIntensity && ((utility.invertPriority &&
+													Vector3.Distance(transform.position, attractor.transform.position) > utility.myTempValue) ||
+													(!utility.invertPriority && Vector3.Distance(transform.position, attractor.transform.position) <
+													utility.myTempValue))) || (!utility.prioritizeDistanceInsteadOfIntensity && ((utility.invertPriority &&
+													attractor.intensity < utility.myTempValue) || (!utility.invertPriority && attractor.intensity >
+													utility.myTempValue))))))
+												{
+													utility.myTempFocus = attractor.transform;
+													if (!utility.prioritizeDistanceInsteadOfIntensity)
+														utility.myTempValue = attractor.intensity;
+													else
+														utility.myTempValue = Vector3.Distance(tempFocus.position, transform.position);
+												}
+
+												tempAttractors.Add(attractor);
+											}
+										}
+									}
+
+									if (!utility.useStrictConditions || (utility.attractorType == AttractorType.NONE || tempAttractors.Count > 0))
+									{
+										bool utilityStrictConditionsMet = true;
+										if (utility.useStrictConditions && utility.allConditionsRequired)
+										{
+											if (utility.reactionConditions.boolConditions.Count > 0 &&
+												!(currentConditions.boolConditions.Intersect(utility.reactionConditions.boolConditions).Count() ==
+												utility.reactionConditions.boolConditions.Count()))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.equals &&
+												(utility.reactionConditions.floatConditions.Count > 0 &&
+												!(currentConditions.floatConditions.Intersect(utility.reactionConditions.floatConditions).Count() ==
+												utility.reactionConditions.floatConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.greaterThan)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] <= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.greaterOrEqualTo)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] < item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.lesserThan)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] >= item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.floatCompare == Comparison.lesserOrEqualTo)
+											{
+												tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+												x.floatValue);
+
+												if (utility.reactionConditions.floatConditions.Where(item1 => !tempFloatDict.ContainsKey(item1.floatName) ||
+												tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.equals && (utility.reactionConditions.intConditions.Count >
+												0 && !(currentConditions.intConditions.Intersect(utility.reactionConditions.intConditions).Count() ==
+												utility.reactionConditions.intConditions.Count())))
+											{
+												utilityStrictConditionsMet = false;
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.greaterThan)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] <= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.greaterOrEqualTo)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] < item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.lesserThan)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] >= item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+											else if (utility.reactionConditions.intCompare == Comparison.lesserOrEqualTo)
+											{
+												tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x =>
+												x.intValue);
+
+												if (utility.reactionConditions.intConditions.Where(item1 => !tempintDict.ContainsKey(item1.intName) ||
+												tempintDict[item1.intName] > item1.intValue).ToList().Count > 0)
+												{
+													utilityStrictConditionsMet = false;
+												}
+											}
+										}
+
+										if (utilityStrictConditionsMet)
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
+
+											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+									else if (!utility.allConditionsRequired)
+									{
+										tempFloatDict = currentConditions.floatConditions.ToDictionary(x => x.floatName, x =>
+										x.floatValue);
+										tempintDict = currentConditions.intConditions.ToDictionary(x => x.intName, x => x.intValue);
+
+										if ((utility.reactionConditions.boolConditions.Count > 0 &&
+											utility.reactionConditions.boolConditions.Intersect(currentConditions.boolConditions).Any()) ||
+											((utility.reactionConditions.floatCompare == Comparison.equals || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && (utility.reactionConditions.floatConditions.Count > 0 &&
+											utility.reactionConditions.floatConditions.Intersect(currentConditions.floatConditions).Any())) ||
+											((utility.reactionConditions.floatCompare == Comparison.greaterThan || utility.reactionConditions.floatCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.floatConditions.Where(item1 =>
+											tempFloatDict.ContainsKey(item1.floatName) && tempFloatDict[item1.floatName] > item1.floatValue).ToList().Count > 0) ||
+											((utility.reactionConditions.intCompare == Comparison.equals || utility.reactionConditions.intCompare ==
+											Comparison.lesserOrEqualTo) && (utility.reactionConditions.intConditions.Count > 0 &&
+											utility.reactionConditions.intConditions.Intersect(currentConditions.intConditions).Any())) ||
+											((utility.reactionConditions.intCompare == Comparison.greaterThan || utility.reactionConditions.intCompare ==
+											Comparison.greaterOrEqualTo) && utility.reactionConditions.intConditions.Where(item1 =>
+											tempintDict.ContainsKey(item1.intName) && tempintDict[item1.intName] > item1.intValue).ToList().Count > 0))
+										{
+											float utilityScore = EvaluateConsideration(utility.considerations, tempDetectedAttractors, utility);
+
+
+											tellMe += currentUtilityIndex + ": " + utilityScore + ",  ";
+
+											if (utilityScore > highestUtility)
+											{
+												highestUtility = utilityScore;
+												bestUtilityIndex = currentUtilityIndex;
+											}
+										}
+									}
+								}
+								currentUtilityIndex++;
+							}
+
+							if (highestUtility >= reaction.minRequiredUtility)
+							{
+
+								Debug.Log(tellMe);
+
+								UtilityBehavior chosenUtility = reaction.utilityBehaviors[bestUtilityIndex];
+
+								nextStatePriority = tempPriority;
+								nextUtilityPriority = bestUtilityIndex;
+								nextFunctions = new List<FunctionPicker>(chosenUtility.functionExecutions);
+								nextEvents = new List<UnityEvent>(chosenUtility.eventExecutions);
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
+								{
+									foreach (FunctionPicker function in nextFunctions)
+									{
+										HandleFunctionCalling(function);
+									}
+									foreach (UnityEvent unityEvent in nextEvents)
+									{
+										unityEvent.Invoke();
+									}
+								}
+
+								if (!chosenUtility.targetDetectedObject)
+								{
+									nextFocus = defaultFocus;
+								}
+								else
+								{
+									nextFocus = chosenUtility.myTempFocus;
+								}
+
+								nextState = chosenUtility.stateChange;
+								if (nextStatePriority < currentStatePriority || (nextStatePriority == currentStatePriority && nextUtilityPriority !=
+									currentUtilityPriority))
+								{
+									currentFocus = nextFocus;
+									currentState = nextState;
+									currentStatePriority = nextStatePriority;
+									currentUtilityPriority = nextUtilityPriority;
+								}
+
+								tempCheck = true;
+								break;
 							}
 						}
-
-						nextFocus = defaultFocus;
-						nextState = reaction.stateChange;
-
-						if (nextStatePriority < currentStatePriority)
-						{
-							currentFocus = nextFocus;
-							currentState = nextState;
-							currentStatePriority = nextStatePriority;
-						}
-
-						tempCheck = true;
-						break;
 					}
 				}
 			}
@@ -1799,6 +3671,7 @@ public class AttractorAI : MonoBehaviour
 			nextStatePriority = lowestPriority;
 			nextState = defaultState;
 			nextFunctions.Clear();
+			nextEvents.Clear();
 		}
 
 		// Check if the agent has reached its destination and is not calculating a new path
@@ -1812,11 +3685,18 @@ public class AttractorAI : MonoBehaviour
 				{
 					HandleFunctionCalling(function);
 				}
+				foreach (UnityEvent unityEvent in nextEvents)
+				{
+					unityEvent.Invoke();
+				}
 			}
 			currentStatePriority = nextStatePriority;
-			agent.speed = wanderSpeed;
+			if (hasAgent)
+				agent.speed = wanderSpeed;
+			else
+				nonAgentSpeed = wanderSpeed;
 			patrolTimer -= Time.deltaTime;
-			if (!agent.pathPending && agent.remainingDistance < 0.5f)
+			if (hasAgent ? !agent.pathPending && agent.remainingDistance < 0.5f : Vector3.Distance(transform.position, nonAgentDestination) < 0.5f)
 				patrolTimer -= Time.deltaTime;
 			if (patrolTimer <= 0)
 			{
@@ -1834,9 +3714,16 @@ public class AttractorAI : MonoBehaviour
 				{
 					HandleFunctionCalling(function);
 				}
+				foreach (UnityEvent unityEvent in nextEvents)
+				{
+					unityEvent.Invoke();
+				}
 			}
 			currentStatePriority = nextStatePriority;
-			agent.speed = 0;
+			if (hasAgent)
+				agent.speed = 0;
+			else
+				nonAgentSpeed = 0;
 		}
 		else if (currentState == EnemyState.Investigate)
 		{
@@ -1859,6 +3746,10 @@ public class AttractorAI : MonoBehaviour
 					{
 						HandleFunctionCalling(function);
 					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
+					}
 				}
 				currentStatePriority = nextStatePriority;
 			}
@@ -1868,10 +3759,21 @@ public class AttractorAI : MonoBehaviour
 				ghostPosition = currentFocus.position;
 			}
 
-			
-			agent.speed = investigateSpeed;
+
+			if (hasAgent)
+				agent.speed = investigateSpeed;
+			else
+				nonAgentSpeed = investigateSpeed;
 			if (Vector3.Distance(transform.position, ghostPosition) > 1)
-				agent.SetDestination(ghostPosition);
+			{
+				if (hasAgent)
+					agent.SetDestination(ghostPosition);
+				else
+				{
+					nonAgentDestination = ghostPosition;
+					hasNonAgentDestination = true;
+				}
+			}
 		}
 		else if (currentState == EnemyState.RushOver)
 		{
@@ -1901,6 +3803,10 @@ public class AttractorAI : MonoBehaviour
 					{
 						HandleFunctionCalling(function);
 					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
+					}
 				}
 				currentStatePriority = nextStatePriority;
 			}
@@ -1912,9 +3818,20 @@ public class AttractorAI : MonoBehaviour
 
 			if (finishedScream)
 			{
-				agent.speed = rushOverSpeed;
+				if (hasAgent)
+					agent.speed = rushOverSpeed;
+				else
+					nonAgentSpeed = rushOverSpeed;
 				if (Vector3.Distance(transform.position, ghostPosition) > 1)
-					agent.SetDestination(ghostPosition);
+				{
+					if (hasAgent)
+						agent.SetDestination(ghostPosition);
+					else
+					{
+						nonAgentDestination = ghostPosition;
+						hasNonAgentDestination = true;
+					}
+				}
 			}
 		}
 		else if (currentState == EnemyState.Chase)
@@ -1945,6 +3862,10 @@ public class AttractorAI : MonoBehaviour
 					{
 						HandleFunctionCalling(function);
 					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
+					}
 				}
 				currentStatePriority = nextStatePriority;
 			}
@@ -1956,9 +3877,20 @@ public class AttractorAI : MonoBehaviour
 
 			if (finishedScream)
 			{
-				agent.speed = chaseSpeed;
+				if (hasAgent)
+					agent.speed = chaseSpeed;
+				else
+					nonAgentSpeed = chaseSpeed;
 				if (Vector3.Distance(transform.position, ghostPosition) > 1)
-					agent.SetDestination(ghostPosition);
+				{
+					if (hasAgent)
+						agent.SetDestination(ghostPosition);
+					else
+					{
+						nonAgentDestination = ghostPosition;
+						hasNonAgentDestination = true;
+					}
+				}
 			}
 		}
 		else if (currentState == EnemyState.Attack)
@@ -1980,6 +3912,7 @@ public class AttractorAI : MonoBehaviour
 					nextState = attackRevertState;
 					nextStatePriority = attackRevertPriority;
 					nextFunctions = new List<FunctionPicker>(behaviourHierarchy[nextStatePriority].functionExecutions);
+					nextEvents = new List<UnityEvent>(behaviourHierarchy[nextStatePriority].eventExecutions);
 				}
 				currentFocus = nextFocus;
 				currentState = nextState;
@@ -1988,6 +3921,10 @@ public class AttractorAI : MonoBehaviour
 					foreach (FunctionPicker function in nextFunctions)
 					{
 						HandleFunctionCalling(function);
+					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
 					}
 				}
 				currentStatePriority = nextStatePriority;
@@ -1995,13 +3932,26 @@ public class AttractorAI : MonoBehaviour
 		}
 		else if (currentState == EnemyState.Inspect)
 		{
-			agent.speed = 0;
-			animator.SetBool("Inspecting", true);
+			if (hasAgent)
+				agent.speed = 0;
+			else
+				nonAgentSpeed = 0;
+			if (hasAnimator)
+			{
+				animator.SetBool("Inspecting", true);
+				foreach (Animator anim in additionalAnimators)
+					anim.SetBool("Inspecting", true);
+			}
 			currentInspect += Time.deltaTime;
 			if (currentInspect >= inspectTime)
 			{
 				currentInspect = 0;
-				animator.SetBool("Inspecting", false);
+				if (hasAnimator)
+				{
+					animator.SetBool("Inspecting", false);
+					foreach (Animator anim in additionalAnimators)
+						anim.SetBool("Inspecting", false);
+				}
 				currentFocus = nextFocus;
 				currentState = nextState;
 				if (nextStatePriority != currentStatePriority)
@@ -2010,13 +3960,20 @@ public class AttractorAI : MonoBehaviour
 					{
 						HandleFunctionCalling(function);
 					}
+					foreach (UnityEvent unityEvent in nextEvents)
+					{
+						unityEvent.Invoke();
+					}
 				}
 				currentStatePriority = nextStatePriority;
 			}
 		}
 		else if (currentState == EnemyState.Search)
 		{
-			agent.speed = searchSpeed;
+			if (hasAgent)
+				agent.speed = searchSpeed;
+			else
+				nonAgentSpeed = searchSpeed;
 
 			if (!searching)
 			{
@@ -2058,13 +4015,24 @@ public class AttractorAI : MonoBehaviour
 					if (searchLocations.Count > 0)
 					{
 						int lastIndex = searchLocations.Count - 1;
-						agent.SetDestination(searchLocations[lastIndex]);
+						if (hasAgent)
+							agent.SetDestination(searchLocations[lastIndex]);
+						else
+						{
+							nonAgentDestination = searchLocations[lastIndex];
+							hasNonAgentDestination = true;
+						}
 						searchLocations.RemoveAt(lastIndex);
 						searchingSpot = true;
 					}
 					else
 					{
-						animator.SetBool("LookingAround", false);
+						if (hasAnimator && lookAround)
+						{
+							animator.SetBool("LookingAround", false);
+							foreach (Animator anim in additionalAnimators)
+								anim.SetBool("LookingAround", false);
+						}
 						searchTimer = 0;
 						searching = false;
 						if (currentAvoidedTarget != null)
@@ -2079,13 +4047,21 @@ public class AttractorAI : MonoBehaviour
 							{
 								HandleFunctionCalling(function);
 							}
+							foreach (UnityEvent unityEvent in nextEvents)
+							{
+								unityEvent.Invoke();
+							}
 						}
 						currentStatePriority = nextStatePriority;
 					}
 				}
-				else if (hiddenStationary || agent.remainingDistance < agent.stoppingDistance)
+				else if (hiddenStationary || hasAgent ? agent.remainingDistance < agent.stoppingDistance : Vector3.Distance(transform.position,
+					nonAgentDestination) < 0.5f)
 				{
-					agent.ResetPath();
+					if (hasAgent)
+						agent.ResetPath();
+					else
+						hasNonAgentDestination = false;
 					if (hide)
 					{
 						hiddenStationary = true;
@@ -2095,7 +4071,13 @@ public class AttractorAI : MonoBehaviour
 							Vector3 searchSpot = FindSearchSpot(hideRadius);
 							if (searchSpot != Vector3.zero)
 							{
-								agent.SetDestination(searchSpot);
+								if (hasAgent)
+									agent.SetDestination(searchSpot);
+								else
+								{
+									nonAgentDestination = searchSpot;
+									hasNonAgentDestination = true;
+								}
 							}
 							else
 							{
@@ -2109,39 +4091,64 @@ public class AttractorAI : MonoBehaviour
 						}
 					}
 					else
-						searchingSpot = false;
+					{
+						if (waitAtSpots)
+							searchTimer -= Time.deltaTime;
+						else
+							searchingSpot = false;
+					}
 				}
 				
 				if (searchTimer <= 0)
 				{
-					animator.SetBool("LookingAround", false);
-					searchTimer = 0;
-					searching = false;
-					hiddenStationary = false;
-					hiding = false;
-					if (currentAvoidedTarget != null)
-						currentAvoidedTarget.enabled = false;
-					currentFocus = nextFocus;
-					currentState = nextState;
-					if (nextStatePriority != currentStatePriority)
+					if (hasAnimator && lookAround)
 					{
-						foreach (FunctionPicker function in nextFunctions)
-						{
-							HandleFunctionCalling(function);
-						}
+						animator.SetBool("LookingAround", false);
+						foreach (Animator anim in additionalAnimators)
+							anim.SetBool("LookingAround", false);
 					}
-					currentStatePriority = nextStatePriority;
+					if (waitAtSpots)
+					{
+						searchingSpot = false;
+						searchTimer = Random.Range(minSearchTimer, maxSearchTimer);
+					}
+					else
+					{
+						searchTimer = 0;
+						searching = false;
+						hiddenStationary = false;
+						hiding = false;
+						if (currentAvoidedTarget != null)
+							currentAvoidedTarget.enabled = false;
+						currentFocus = nextFocus;
+						currentState = nextState;
+						if (nextStatePriority != currentStatePriority)
+						{
+							foreach (FunctionPicker function in nextFunctions)
+							{
+								HandleFunctionCalling(function);
+							}
+							foreach (UnityEvent unityEvent in nextEvents)
+							{
+								unityEvent.Invoke();
+							}
+						}
+						currentStatePriority = nextStatePriority;
+					}
 				}
 			}
 		}
 		else if (currentState == EnemyState.Flee)
 		{
-			agent.speed = fleeSpeed;
+			if (hasAgent)
+				agent.speed = fleeSpeed;
+			else
+				nonAgentSpeed = fleeSpeed;
 
 			if (!fleeing)
 			{
 				fleeTime = Random.Range(minFleeTime, maxFleeTime);
-				Vector3 directionToFocus = transform.position - currentFocus.position;
+				Vector3 directionToFocus = fleeInAnyDirection ? (Random.onUnitSphere) : transform.position - currentFocus.position;
 
 				// Normalize the direction to ensure consistent movement speed
 				Vector3 fleeDirection = directionToFocus.normalized;
@@ -2157,14 +4164,21 @@ public class AttractorAI : MonoBehaviour
 					currentAvoidedTarget = obstacle;
 				}
 
-				agent.SetDestination(targetDestination);
+				if (hasAgent)
+					agent.SetDestination(targetDestination);
+				else
+				{
+					nonAgentDestination = targetDestination;
+					hasNonAgentDestination = true;
+				}
 				fleeing = true;
 			}
 			else
 			{
 				fleeTime -= Time.deltaTime;
 
-				if (fleeTime <= 0 || agent.remainingDistance < 0.5f)
+				if (fleeTime <= 0 || hasAgent ? agent.remainingDistance < agent.stoppingDistance + 0.5f : Vector3.Distance(transform.position, nonAgentDestination)
+					< agent.stoppingDistance + 0.5f)
 				{
 					fleeTime = 0;
 					fleeing = false;
@@ -2178,6 +4192,10 @@ public class AttractorAI : MonoBehaviour
 						{
 							HandleFunctionCalling(function);
 						}
+						foreach (UnityEvent unityEvent in nextEvents)
+						{
+							unityEvent.Invoke();
+						}
 					}
 					currentStatePriority = nextStatePriority;
 				}
@@ -2187,36 +4205,78 @@ public class AttractorAI : MonoBehaviour
 
 	IEnumerator ScreamRoutine()
 	{
-		animator.SetBool("Screaming", true);
-		agent.speed = 0;
+		if (hasAnimator)
+		{
+			animator.SetBool("Screaming", true);
+			foreach (Animator anim in additionalAnimators)
+				anim.SetBool("Screaming", true);
+		}
+		if (hasAgent)
+			agent.speed = 0;
+		else
+			nonAgentSpeed = 0;
 		yield return new WaitForSeconds(screamTime);
-		animator.SetBool("Screaming", false);
+		if (hasAnimator)
+		{
+			animator.SetBool("Screaming", false);
+			foreach (Animator anim in additionalAnimators)
+				anim.SetBool("Screaming", false);
+		}
 		finishedScream = true;
 	}
 
 	IEnumerator AttackRoutine()
 	{
-		attackBox.enabled = true;
-		animator.SetBool("Attacking", true);
-		agent.speed = 0;
+		if (attackBox != null)
+			attackBox.enabled = true;
+		if (hasAnimator)
+		{
+			animator.SetBool("Attacking", true);
+			foreach (Animator anim in additionalAnimators)
+				anim.SetBool("Attacking", true);
+		}
+		if (hasAgent)
+			agent.speed = 0;
+		else
+			nonAgentSpeed = 0;
 		yield return new WaitForSeconds(attackBufferTime);
-		agent.speed = attackSpeed;
+		if (hasAgent)
+			agent.speed = attackSpeed;
+		else
+			nonAgentSpeed = attackSpeed;
 		yield return new WaitForSeconds(attackTime);
-		agent.speed = 0;
+		if (hasAgent)
+			agent.speed = 0;
+		else
+			nonAgentSpeed = 0;
 		yield return new WaitForSeconds(attackCooldownTime);
-		animator.SetBool("Attacking", false);
+		if (hasAnimator)
+		{
+			animator.SetBool("Attacking", false);
+			foreach (Animator anim in additionalAnimators)
+				anim.SetBool("Attacking", false);
+		}
 		finishedAttack = true;
 	}
 
 	private void SetNewRandomDestination()
 	{
-		Vector3 randomPoint = FindFirstObjectByType<NavMeshSurface>().transform.position + Random.insideUnitSphere * patrolRadius;
-		NavMeshHit hit;
+		Vector3 randomPoint = (optionalPatrolPoint != null ? optionalPatrolPoint.position : transform.position) + Random.insideUnitSphere * patrolRadius;
 
-		// Sample the NavMesh to find the closest valid point within the specified range
-		if (NavMesh.SamplePosition(randomPoint, out hit, patrolRadius, NavMesh.AllAreas))
+		if (hasAgent)
 		{
-			agent.SetDestination(hit.position);
+			NavMeshHit hit;
+
+			// Sample the NavMesh to find the closest valid point within the specified range
+			if (NavMesh.SamplePosition(randomPoint, out hit, patrolRadius, NavMesh.AllAreas))
+			{
+				agent.SetDestination(hit.position);
+			}
+		}
+		else
+		{
+			nonAgentDestination = randomPoint;
+			hasNonAgentDestination = true;
 		}
 	}
 

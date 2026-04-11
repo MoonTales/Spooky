@@ -12,6 +12,10 @@ namespace Player.Camera
     
     public class CameraMentalStateEffects : Singleton<CameraMentalStateEffects>
     {
+        [Range(-1.0f, 1.0f)]
+
+        public float gameBrightness;
+
         // Setting up structs (these can be private, since I know no other class will need these)
         [Serializable]
         private struct TiredSwaySettings
@@ -29,6 +33,7 @@ namespace Player.Camera
         private List<Volume> _postProcessVolumes = new List<Volume>();
         private List<DepthOfField> _depthOfFields = new List<DepthOfField>();
         private List<ChromaticAberration> _chromaticAberrations = new List<ChromaticAberration>();
+        private List<ColorAdjustments> _colorAdjustments = new List<ColorAdjustments>();
 
         // Track current mental state and active coroutine
         private Types.PlayerMentalState _currentMentalState;
@@ -164,6 +169,18 @@ namespace Player.Camera
                     if (ca != null){ ca.intensity.Override(0f);}
                 }
             }
+
+            if (gameBrightness != 0)
+			{
+                SetGameBrightnessAmount(0.25f + gameBrightness * 1.25f);
+			}
+            else
+			{
+                foreach (ColorAdjustments ca in _colorAdjustments)
+                {
+                    if (ca != null) { ca.postExposure.Override(0.25f); }
+                }
+            }
         }
 
         private void OnPlayerMentalStateChanged(Types.PlayerMentalState newMentalState)
@@ -229,7 +246,6 @@ namespace Player.Camera
             {
                 if (ca != null){ ca.intensity.Override(0f);}
             }
-
             transitionSpeed = 2f;
         }
 
@@ -237,7 +253,6 @@ namespace Player.Camera
         {
             // unique effects
             SetCustomVisualEffects(blurIntensity:0f, focusDistance:10f, chromaticAberration:1f, newTransitionSpeed:5f);
-            
         }
 
         private void HandleModeratelyAnxiousEffects()
@@ -262,35 +277,37 @@ namespace Player.Camera
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(mildlyTiredSwaySettings));
             // Add blur effect
-            SetCustomVisualEffects(blurIntensity: 10f, focusDistance: 3f, chromaticAberration: 1f, newTransitionSpeed: 0.5f);
+            SetCustomVisualEffects(blurIntensity: 10f, focusDistance: 3f, chromaticAberration: 0.5f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleModeratelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(moderatelyTiredSwaySettings));
-            SetCustomVisualEffects(blurIntensity: 15f, focusDistance: 2f, chromaticAberration: 2f, newTransitionSpeed: 0.5f);
+            SetCustomVisualEffects(blurIntensity: 15f, focusDistance: 2f, chromaticAberration: 1f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleSeverelySleepDeprivedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(severelyTiredSwaySettings));
-            SetCustomVisualEffects(blurIntensity: 20f, focusDistance: 1f, chromaticAberration: 3f, newTransitionSpeed: 0.5f);
+            SetCustomVisualEffects(blurIntensity: 20f, focusDistance: 1f, chromaticAberration: 1.5f, newTransitionSpeed: 0.5f);
         }
 
 
         private void HandleExhaustedEffects()
         {
             _activeSwayCoroutine = StartCoroutine(TiredSwayCoroutine(exhaustedTiredSwaySettings));
-            SetCustomVisualEffects(blurIntensity: 25f, focusDistance: 0.5f, chromaticAberration: 4f, newTransitionSpeed: 0.5f);
+            SetCustomVisualEffects(blurIntensity: 25f, focusDistance: 0.5f, chromaticAberration: 2f, newTransitionSpeed: 0.5f);
         }
 
         private void HandleBreakdownEffects()
         {
+            
         }
 
         private IEnumerator TiredSwayCoroutine(TiredSwaySettings settings)
         {
             
+            Debug.Log($"Starting tired sway with intensity {settings.intensity} and speed {settings.speed}");
             float time = 0f;
 
             while (_currentMentalState != Types.PlayerMentalState.Normal)
@@ -363,7 +380,23 @@ namespace Player.Camera
                 ca.intensity.Override(amount);
             }
         }
-        
+
+        private void SetGameBrightnessAmount(float amount)
+        {
+            if (_postProcessVolumes.Count == 0 || _colorAdjustments.Count == 0)
+            {
+                Debug.LogWarning("awaawawawawa");
+                return;
+            }
+
+
+            foreach (ColorAdjustments ca in _colorAdjustments)
+            {
+                if (ca == null) continue;
+                ca.postExposure.Override(amount);
+            }
+        }
+
         #region Utility Functions
 
         private void TrySetPostProcessing()
@@ -418,6 +451,21 @@ namespace Player.Camera
                 _depthOfFields.Add(dof);
             }
         }
+        private void TrySetColorAdjustments()
+        {
+            _colorAdjustments.Clear();
+
+            foreach (Volume volume in _postProcessVolumes)
+            {
+                if (volume?.profile == null) continue;
+
+                if (!volume.profile.TryGet(out ColorAdjustments ca))
+                {
+                    ca = volume.profile.Add<ColorAdjustments>(true);
+                }
+                _colorAdjustments.Add(ca);
+            }
+        }
 
         private void InitializePostProcessing()
         {
@@ -427,6 +475,9 @@ namespace Player.Camera
             TrySetChromaticAberration();
             // tries to set the depth of field effect from the post processing volume
             TrySetFieldOfDepth();
+
+            // brightness timee
+            TrySetColorAdjustments();
         }
 
         #endregion

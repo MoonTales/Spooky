@@ -117,6 +117,22 @@ MonoBehaviour:
         Data3: 662171791
         Data4: -1114051719
       Path: event:/sfx/interactable/tutorial/door-slide
+  - id: 11
+    eventRef:
+      Guid:
+        Data1: 1262808161
+        Data2: 1076129755
+        Data3: -1091160937
+        Data4: -2125241584
+      Path: event:/sfx/interactable/clock
+  - id: 7
+    eventRef:
+      Guid:
+        Data1: -822384661
+        Data2: 1156077623
+        Data3: -2107237700
+        Data4: 632049303
+      Path: event:/sfx/interactable/door-locked
   debugAudioLogs: 0
   footstepPlayer:
     Guid:
@@ -150,8 +166,6 @@ MonoBehaviour:
   tutorialOrbAudioSceneName: Tutorial
   tutorialOrbRootName: TheBuilding
   tutorialOrbNamePrefix: Orb
-  tutorialOrbPinnedName: 
-  tutorialOrbPinnedEventPathToken: orb-peace
   tutorialOrbEvents:
   - Guid:
       Data1: 879235584
@@ -201,21 +215,50 @@ MonoBehaviour:
       Data3: -1418913891
       Data4: 1908068273
     Path: event:/amb/env/tutorial/ORB/orb-sadness
+  autoAttachSpiderAudioOnSceneLoad: 1
+  spiderAudioSceneNames:
+  - Tutorial
+  - Nightmare1
+  spiderAnchorName: TheThingy
+  spiderLoopEvent:
+    Guid:
+      Data1: 979041027
+      Data2: 1221985961
+      Data3: 806022809
+      Data4: 761343448
+    Path: event:/sfx/npcs/spider-scuttle
+  spiderIntensityParameter: Intensity
+  spiderIntensityMax: 100
+  spiderDangerParameter: Danger
+  spiderDangerMax: 100
+  spiderStateParameter: State
+  autoAttachNightmareRoofAudioOnSceneLoad: 1
+  nightmareRoofAudioSceneName: Nightmare1
+  nightmareRoofRootName: MysteriousNeighbor
+  nightmareRoofParentName: Roofs
+  nightmareRoofLoopEvent:
+    Guid:
+      Data1: 2064594433
+      Data2: 1253550319
+      Data3: 1760976056
+      Data4: -941077781
+    Path: event:/amb/env/nightmare/scratching
+  nightmareRoofEmitterTargetCount: 5
+  nightmareRoofMinimumSpacing: 8
   tutorialHallwayStretchEvent:
     Guid:
       Data1: 351463793
       Data2: 1250743252
       Data3: 1475581866
       Data4: 373874254
-    Path: event:/amb/env/tutorial/hallway-stretch
+    Path: event:/amb/env/tutorial/hall/hallway-stretch
   tutorialHallwayStretchStateParameter: StretchState
   tutorialHallwayStretchProgressParameter: StretchProgress
   tutorialHallwayRunPressureParameter: RunPressure
   tutorialHallwayPlayerSpeedParameter: PlayerSpeed
   tutorialHallwayPlayerSpeedMax: 8
+  tutorialHallwayPlayerSpeedFloor: 0.2
   tutorialHallwaySweepDurationSeconds: 12
-  debugTutorialHallwayParameters: 0
-  debugTutorialHallwayPlayerSpeed: 1
   tutorialHallwayStateStretchingLabel: Stretching
   tutorialHallwayStateContractedLabel: Contracted
   tutorialDrawingAudioSceneName: Tutorial
@@ -226,6 +269,8 @@ MonoBehaviour:
       Data3: 1456920727
       Data4: 2144522301
     Path: event:/amb/env/tutorial/general/drawing-end
+  bedroomWallClockActiveParameter: ClockActive
+  bedroomWallClockInspectingParameter: IsInspecting
   terrorDistortionParameter: Terror
   mentalHealthDistortionParameter: MentalHealth
   terrorParameterIsGlobal: 1
@@ -237,19 +282,12 @@ MonoBehaviour:
       Data3: 555803024
       Data4: 1634982556
     Path: event:/amb/nightmare/mental-terror-loop
-  nightmareAmbLoopEvent:
-    Guid:
-      Data1: -198520460
-      Data2: 1165664335
-      Data3: 580708496
-      Data4: -533915791
-    Path: event:/amb/nightmare/mental-amb-loop
   heartbeatLoopEvent:
     Guid:
-      Data1: 1493692059
-      Data2: 1300314028
-      Data3: -807272307
-      Data4: 673174759
+      Data1: 1405176995
+      Data2: 1242528515
+      Data3: 672105892
+      Data4: -902285344
     Path: event:/sfx/player/hearbeat/heartbeat
   heartbeatTerrorParameter: Terror
   heartbeatMentalHealthParameter: MentalHealth
@@ -284,6 +322,22 @@ MonoBehaviour:
       Data4: 1881523798
     Path: event:/amb/bg/indoors-nm
   tutorialAmbienceRequiresGameplay: 1
+  nightmareAmbLoopEvent:
+    Guid:
+      Data1: -198520460
+      Data2: 1165664335
+      Data3: 580708496
+      Data4: -533915791
+    Path: event:/amb/nightmare/mental-amb-loop
+  nightmareAmbWorldClockParameter: WorldClock
+  nightmareInteriorExteriorAmbLoopEvent:
+    Guid:
+      Data1: -332973383
+      Data2: 1251811974
+      Data3: -1888238460
+      Data4: 1621704129
+    Path: event:/amb/env/nightmare/nm-exterior
+  nightmareInteriorAmountParameter: InteriorAmount
   mainMenuMusicEvent:
     Guid:
       Data1: -578515550

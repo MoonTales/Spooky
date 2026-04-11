@@ -201,11 +201,14 @@ public class Flashlight : Singleton<Flashlight>, ISaveSystemInterface<Flashlight
     
         // draw a debug ray
     }
-    
+
+
+
     private void OnFlashlightToggled(bool isOn, bool playSfx = true)
     {
         if (!_doWePossessTheFlashlight){return;}
-        
+
+        UI.PlayerHUDController.Instance.SetCrosshairVisibility(!isOn);
         // Handle flashlight toggle event
         if (isOn)
         {
@@ -417,6 +420,12 @@ public class Flashlight : Singleton<Flashlight>, ISaveSystemInterface<Flashlight
     protected override void OnGameRestarted()
     {
         _doWePossessTheFlashlight = false;
+        // if the flashlight is on, turn it off
+        if (_isOn)
+        {
+            HandleFlashlightOff(playSfx: false);
+            _isOn = false;
+        }
     }
 
     // ------------------------------------

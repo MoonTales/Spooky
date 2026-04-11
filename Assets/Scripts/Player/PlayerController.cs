@@ -77,7 +77,7 @@ namespace Player
         private bool _isInspecting = false;
         private bool _crouchInputActive = false;
         
-        private bool _toggleCrouchMode = false; public void SetToggleCrouchMode(bool toggle) { _toggleCrouchMode = toggle; }
+        private bool _toggleCrouchMode = false; public void SetToggleCrouchMode(bool toggle) { _toggleCrouchMode = toggle; } public bool GetToggleCrouchMode() { return _toggleCrouchMode; }
         private float _crouchHeldTime = 0f;
         private const float MinCrouchTime = 0.10f;
         
@@ -99,14 +99,6 @@ namespace Player
         private Types.PlayerMovementState _playerMovementState;
         private void FixedUpdate()
         {
-            
-            // set U to toggle between toggle crouch and hold crouch modes for testing
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                SetToggleCrouchMode(!_toggleCrouchMode);
-                Debug.Log("Toggled crouch mode. Now toggle crouch mode is: " + _toggleCrouchMode);
-            }
-            
             // debug print if input is locked
             if(_lockedInput){
 
@@ -305,7 +297,7 @@ namespace Player
         {
             if(_lockedInput){ return; }
 
-            if (GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Nightmare && GameStateManager.Instance.GetCurrentWorldLocation() != Types.WorldLocation.Tutorial) { return;}
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom) { return;}
             // Logic to toggle flashlight
             // we can just do a check here, to make sure we are not in the pause meny gamestate
             // there is other places this can go, but this works and its easy
@@ -373,6 +365,16 @@ namespace Player
                 
             }
             _isCrouching = !_isCrouching;
+            
+            // if we uncrouch, check our cached sprint state to see if we should be sprinting again
+            if (!_isCrouching && _cachedSprintState)
+            {
+                _isSprinting = true;
+            }
+            else if (!_isCrouching && !_cachedSprintState)
+            {
+                _isSprinting = false;
+            }
         }
         
         private void HandleCrouchInput()
@@ -402,6 +404,9 @@ namespace Player
                     {
                         _isCrouching = false;
                         _targetHeight = standHeight;
+                        
+                        _isSprinting = _cachedSprintState && sprintAction.action.IsPressed();
+                        _cachedSprintState = _isSprinting;
                     }
                 }
                 _crouchHeldTime = 0f;
@@ -504,6 +509,12 @@ namespace Player
                 QueryTriggerInteraction.Ignore
             );
 
+            // if we can stand up, lets check the cached sprint, so that if we are no longer holding sprint when we stand up,
+            // we wont just randomly be sprinting
+            if (!hit)
+            {
+                _isSprinting = _cachedSprintState;
+            }
             return !hit;
         }
         private void OnMovePerformed(InputAction.CallbackContext obj)
@@ -548,6 +559,11 @@ namespace Player
                 // keep whatever speed we had when we left the ground (this fixes the drop in speed in the air)
                 targetSpeed = _currentSpeed;
             }
+            
+            if (_surfaceType == "water")
+            {
+                targetSpeed *= 0.5f; // slow down in water :)
+            }
 
             // Smoothly interpolate speed
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, targetSpeed, speedChangeRate * Time.fixedDeltaTime);
@@ -583,6 +599,10 @@ namespace Player
                 "wood" => "wood",
                 _ => "Unknown",
             };
+            
+            // debug visualize the raycast
+            Debug.DrawRay(transform.position, Vector3.down * hit.distance, Color.red);
+            // drop a debug text of the surface type at the hit point
         }
         private IEnumerator PlayFootstepSounds()
         {
@@ -682,7 +702,7 @@ namespace Player
                 if (_hasGameplayAirborneToken && hadMeaningfulAirborneTime && hadMeaningfulDropDistance)
                 {
                     float impactDownwardSpeed = Mathf.Max(0f, -_verticalVelocity);
-                    AudioManager.Instance.PlayPlayerLanding(impactDownwardSpeed, _gameplayAirborneTime, transform);
+                    AudioManager.Instance.PlayPlayerLanding(impactDownwardSpeed, _gameplayAirborneTime, _surfaceType, transform);
                 }
 
                 // Landing edge consumed; reset airborne tracking for the next jump/fall cycle.
@@ -742,7 +762,7 @@ namespace Player
             // Valid gameplay jump: apply velocity, mark airborne token for landing validation, and emit jump SFX once.
             BeginGameplayAirborneToken();
             _verticalVelocity = jumpForce;
-            Debug.Log("PlayerAudio: Jump SFX");
+            //Debug.Log("PlayerAudio: Jump SFX");
             AudioManager.Instance.PlayPlayerJumping(fromTransform: transform);
             _jumpSfxArmed = false;
         }

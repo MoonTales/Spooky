@@ -15,7 +15,7 @@ namespace Interaction
     /// </summary>
     public class NightmareAwakenInteraction : MonoBehaviour, IInteractable
     {
-        [SerializeField] private SceneField sceneName;
+        [SerializeField] private string sceneName = "Bedroom";
     
         [Header("Text Keys (CSV row pointers)")]
         [SerializeField] private TextKey promptTextKey;
@@ -38,6 +38,11 @@ namespace Interaction
             obj.transform.localPosition = Vector3.zero;
             if(drawingSpawnLocationThree){obj = Instantiate(placeholderPrefab, drawingSpawnLocationThree.transform);}
             obj.transform.localPosition = Vector3.zero;
+            if (sceneName == "")
+            {
+                sceneName = "Bedroom";
+            }
+            
         }
         
         public bool CanInteract(Interactor interactor)
@@ -75,8 +80,9 @@ namespace Interaction
             SleepTrackerManager.Instance.SetIsGoodWakeup(true);
             AudioManager.Instance.BeginGoodWakeupAlarmTransition();
             SleepTrackerManager.Instance.TurnSleepTrackerOn();
-            Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
-            data.Send();
+            //Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
+            Types.ScreenFadeSceneTransitionData sceneTransitionData = new Types.ScreenFadeSceneTransitionData(fadeOutDuration:timeToFadeOut, fadeInDuration:1.5f, sceneName, null, FadeOutCompleted);
+            sceneTransitionData.Send();
             
             // EDGE CASE, if we are currently in the tutorial, we will want to Remove the index 0 drawing from the inventory
             if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial)
@@ -93,12 +99,20 @@ namespace Interaction
             bool hasSpawnedDrawingOne = false;
             bool hasSpawnedDrawingTwo = false;
             bool hasSpawnedDrawingThree = false;
-            HashSet<int> collectedDrawingIds = PlayerInventory.Instance.GetCollectedDrawingIDs();
+            HashSet<int> collectedDrawingIds = PlayerInventory.Instance.GetCollectedDrawingsThisNight();
             foreach (int drawingID in collectedDrawingIds)
             {
-                // tutorial drawing, skip it
-                if (drawingID == 0) { continue; }
-                string prefabName = $"Prefabs/Drawings/Nightmare/N_Drawing_{drawingID}";
+                string prefabName = "";
+                if (drawingID == 0)
+                {
+                    prefabName = $"Prefabs/Drawings/Tutorial/T_Drawing";
+                    
+                }
+                else
+                {
+                    prefabName = $"Prefabs/Drawings/Nightmare/N_Drawing_{drawingID}";
+                }
+                
                 GameObject prefabToSpawn = Resources.Load<GameObject>(prefabName);
                 if (prefabToSpawn == null) { Debug.LogError($"Unable to find prefab for drawing ID {drawingID} at path {prefabName}"); continue; }
                 
@@ -149,7 +163,7 @@ namespace Interaction
         private void FadeOutCompleted()
         {
             SleepTrackerManager.Instance.SetIsGoodWakeup(true);
-            SceneSwapper.Instance.SwapScene(sceneName);
+            //SceneSwapper.Instance.SwapScene(sceneName);
             GameStateManager.Instance.SetCurrentZoneId(-1);
         }
     }

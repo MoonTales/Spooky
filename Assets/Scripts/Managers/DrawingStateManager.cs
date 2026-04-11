@@ -105,28 +105,37 @@ namespace Managers
             {
                 if (drawing == null){ continue;}
                 UpdateOrAddDrawingTransform(drawing);
+                drawing.UpdateIfIsInCorrectPosition();
                 // Check if the drawing is in the "correct" position (this is just a placeholder condition, replace with actual logic)
                 if (drawing.IsInCorrectPosition())
                 {
+                    // We will update the material and visuals of this drawing to indicate its in the correct position
+                    
                     count++;
                 }
             }
+            
+            Debug.Log($"Number of drawings in correct position: {count}");
             if (count >= totalNumberOfDrawings)
             {
-                Types.NotificationData data = new(
-                    duration: 3.0f, 
-                    messageKey: new TextKey { place = "Notifications", id = "AllDrawingsCorrect"},
-                    messageOverride: $"All drawings are in the correct position! YOU WIN!!"
-                );
-                data.Send();
-                
-                // Now we will play credits
-                SceneSwapper.Instance.SwapScene("Credits");
+                // updated, this now spawns in our Final letter
+
+                HandleAllDrawingOrdered();
+                //HandleFinaleTransfer();
             }
             
             return count;
             
         }
+
+        private void HandleAllDrawingOrdered()
+        {
+            // broadcast locks
+            EventBroadcaster.Broadcast_OnAllDrawingsOrdered();
+            LetterManager.Instance.SpawnFinaleLetter();
+        }
+        
+
 
         private void RestoreDrawingsToTransform()
         {
@@ -180,6 +189,12 @@ namespace Managers
             }else if (currentHour == 2)
             {
                 if (numberOfCorrectDrawings >= numberOfDrawingsToAdvanceClock * 2)
+                {
+                    GameStateManager.Instance.SetWorldClockHour(currentHour + 1);
+                }
+            } else if (currentHour == 3)
+            {
+                if (numberOfCorrectDrawings >= numberOfDrawingsToAdvanceClock * 3)
                 {
                     GameStateManager.Instance.SetWorldClockHour(currentHour + 1);
                 }

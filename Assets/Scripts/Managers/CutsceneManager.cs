@@ -1,5 +1,6 @@
 using System;
 using Cutscenes;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Playables;
 using Types = System.Types;
@@ -36,10 +37,25 @@ namespace Managers
             // Subscribe to events relating to the cutscene
             _playableDirector.stopped += OnCutsceneEnd;
             
+            // FORCE SNAP for bedroom cutscene
+            var brain = Camera.main.GetComponent<CinemachineBrain>();
+            brain.DefaultBlend = new CinemachineBlendDefinition(
+                CinemachineBlendDefinition.Styles.Cut, 0f
+            );
+            
             // we can start the cutscene now,
             _playableDirector.gameObject.SetActive(true);
             _playableDirector.Play();
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
+            // Edge case for the credits Scene
+            if (_currentCutscene.UseGameStateOverride)
+            {
+                EventBroadcaster.Broadcast_GameStateChanged(_currentCutscene.GameStateOverride);
+            }
+            else
+            {
+                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Cutscene);
+            }
+            
         }
         
         public void OnRequestSkipCutscene()
@@ -52,6 +68,13 @@ namespace Managers
         {
             // un-subscribe from this
             _playableDirector.stopped -= OnCutsceneEnd;
+            
+            // Restore the blend settings to default
+            var brain = Camera.main.GetComponent<CinemachineBrain>();
+            brain.DefaultBlend = new CinemachineBlendDefinition(
+                CinemachineBlendDefinition.Styles.EaseInOut, 1f
+            );
+            
             // ensure that the current GameState isnt main menu, otherwise this is a false trigger
             if (GameStateManager.Instance && GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu) { return; }
             _currentCutscene.CutsceneEnded();

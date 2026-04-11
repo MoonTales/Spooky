@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
@@ -58,9 +59,12 @@ namespace Player.Camera
 
         private void LateUpdate()
         {
-            if (!_shouldUpdate) return;
+            if (!_shouldUpdate){ return;}
+            
+            // we dont wanna do this while in the bedroom (else we lose the camera sway)
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom) { return; }
 
-            float lag = Flashlight.Instance.IsFlashlightOn() ? panLag : snapLag;
+            float lag = Flashlight.Instance.IsFlashlightOn() && Flashlight.Instance.DoWePossessTheFlashlight() ? panLag : snapLag;
 
             _currentPan = Mathf.LerpAngle(_currentPan, TargetPan, Time.deltaTime * lag);
             _currentTilt = Mathf.LerpAngle(_currentTilt, TargetTilt, Time.deltaTime * lag);

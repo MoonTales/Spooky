@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Managers;
+using Player;
 using UI.PauseMenu;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,12 +16,35 @@ namespace UI.Main_Menu
         [SerializeField] private GameObject mainMenuCanvas;
     
         // Internal variables to link to all of the buttons on the main menu
-        private Button _playButton;
+        private Button _newgameButton;
+        private Button _continueButton;
         private Button _settingsButton;
+        private Button _controlsButton;
         private Button _quitButton;
+        
+        // Internal Variables for polish
+        private int savedAct;
+        private List<int> savedDrawingIDs;
+        private string savedSceneName;
+
+        // Drawings
+        public Image Scribble1;
+        public Image Scribble2;
+        public Image Scribble3;
+        public Image Scribble4;
+        public Image Scribble5;
+        
+        
         private void Start()
         {
             mainMenuCanvas.SetActive(true);
+            //SceneCache.Instance.RequestSceneCache("Nightmare1");
+            //set all scribbles to false initially 
+            Scribble1.enabled = false;
+            Scribble2.enabled = false;
+            Scribble3.enabled = false;
+            Scribble4.enabled = false;
+            Scribble5.enabled = false;
             // at the start of the game, get access to our buttons, and add listeners to them
             // the children may be in the children
             Button[] allButtons = GetComponentsInChildren<Button>();
@@ -27,17 +52,35 @@ namespace UI.Main_Menu
             { 
                 UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
 
-                if (button.name == "Play")
+                if (button.name == "NewGame")
                 {
-                    _playButton = button;
-                    _playButton.onClick.AddListener(OnPlayButtonClicked);
-                    _playButton.enabled = true;
+                    _newgameButton = button;
+                    _newgameButton.onClick.AddListener(OnNewGameButtonClicked);
+                    _newgameButton.enabled = true;
+                } 
+                else if (button.name == "Continue")
+                {
+                    _continueButton = button;
+                    if (SaveSystem.Instance.DoesSaveGameExist()){
+                        _continueButton.enabled = true;
+                        _continueButton.interactable = true; 
+                        _continueButton.onClick.AddListener(OnContinueButtonClicked);
+                    } else {
+                        _continueButton.enabled = false;
+                        _continueButton.interactable = false;  
+                    }
                 }
                 else if (button.name == "Settings")
                 {
                     _settingsButton = button;
                     _settingsButton.onClick.AddListener(OnSettingsButtonClicked);
                     _settingsButton.enabled = true;
+                }
+                else if (button.name == "Controls")
+                {
+                    _controlsButton = button;
+                    _controlsButton.onClick.AddListener(OnControlsButtonClicked);
+                    _controlsButton.enabled = true;
                 }
                 else if (button.name == "Quit")
                 {
@@ -46,15 +89,99 @@ namespace UI.Main_Menu
                     _quitButton.enabled = true;
                 }
             }
+            
+            // CHANGES ALLOW TO LOAD SAVE DATA
+            if (SaveSystem.Instance.DoesSaveGameExist())
+            {
+                SaveSystem.Instance.ReadSaveFromDisk();
+
+                var sceneData = SaveSystem.Instance.GetData("SceneSwapper");
+                var gameStateData = SaveSystem.Instance.GetData("GameState");
+                var inventoryData = SaveSystem.Instance.GetData("PlayerInventory");
+
+                if (sceneData.HasValue)
+                    savedSceneName = JsonUtility.FromJson<SceneSwapper.SceneSwapSaveData>(sceneData.Value.Data).CurrentSceneName;
+
+                if (gameStateData.HasValue)
+                    savedAct = JsonUtility.FromJson<GameStateManager.GameStateSaveData>(gameStateData.Value.Data).worldClockHour;
+
+                if (inventoryData.HasValue)
+                    savedDrawingIDs = JsonUtility.FromJson<PlayerInventory.PlayerInventorySaveData>(inventoryData.Value.Data).collectedDrawingIDs;
+            }
+            
+            if(savedSceneName != ""){ Debug.Log("Saved scene name: " + savedSceneName);} else {Debug.Log("No saved scene name found.");}
+            if(savedAct != 0){ Debug.Log("Saved act: " + savedAct);} else {Debug.Log("No saved act found.");}
+            if(savedDrawingIDs != null){ 
+                Debug.Log("Saved drawing IDs: " + string.Join(", ", savedDrawingIDs));
+                foreach(int drawing in savedDrawingIDs)
+                {
+                    if (drawing == 1)
+                    {
+                        Scribble1.enabled = true;
+                    } 
+                    
+                    if (drawing == 2)
+                    {
+                        Scribble2.enabled = true;
+                    }
+                    
+                    if (drawing == 3)
+                    {
+                        Scribble3.enabled = true;
+                    }
+                    if (drawing == 4)
+                    {
+                        Scribble4.enabled = true;
+                    } 
+                    if (drawing == 5)
+                    {
+                        Scribble5.enabled = true;
+                    }
+                }
+            } else {
+                Debug.Log("No saved drawing IDs found.");
+                Scribble1.enabled = false;
+                Scribble2.enabled = false;
+                Scribble3.enabled = false;
+                Scribble4.enabled = false;
+                Scribble5.enabled = false;
+            }
+            
         }
         // Button connections
-        private void OnPlayButtonClicked()
+        private void OnContinueButtonClicked()
+        {
+            DisableButtons();
+            //new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToExistGame).Send();
+            SaveSystem.Instance.LoadGame(); // load the game before we swap, so that we load the new scene with the correct data (this does return a bool if we wanna hook that somewhere)
+            new Types.ScreenFadeSceneTransitionData(3f, 1f, savedSceneName, null , null, SwapToExistGame).Send();
+        }
+
+        private void OnNewGameButtonClicked()
+        {
+             if (SaveSystem.Instance.DoesSaveGameExist())
+            {
+                UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("popup", "newgame"), DeleteSave);
+            }
+            else
+            {
+                DisableButtons();
+                //new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToNewGame).Send();
+                new Types.ScreenFadeSceneTransitionData(3f, 1f, "Tutorial", null , null, SwapToNewGame).Send();
+            }
+        }
+
+        private void DisableButtons()
         {
             // we will just disable all of the buttons, so that nothing can be clicked while we fade in
-            _playButton.enabled = false;
-            _playButton.interactable = false;
+            _newgameButton.enabled = false;
+            _newgameButton.interactable = false;
+            _continueButton.enabled = false;
+            _continueButton.interactable = false;
             _settingsButton.enabled = false;
             _settingsButton.interactable = false;
+            _controlsButton.enabled = false;
+            _controlsButton.interactable = false;
             _quitButton.enabled = false;
             _quitButton.interactable = false;
 
@@ -62,35 +189,31 @@ namespace UI.Main_Menu
             {
                 AudioManager.Instance.TriggerMainMenuMusicTransition();
             }
-            new Types.ScreenFadeData(3f, 1f, 3f, () => Debug.Log(""),SwapToGame).Send();
-            
         }
 
         
         
-        private void SwapToGame()
+        private void SwapToNewGame()
         {
-            // close the main menu canvas
-            mainMenuCanvas.SetActive(false);
-            
-            if (SaveSystem.Instance.DoesSaveGameExist())
+            if (mainMenuCanvas){ mainMenuCanvas.SetActive(false); }
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+            //SceneSwapper.Instance.SwapScene("Tutorial"); 
+        }
+
+        private void SwapToExistGame()
+        {
+            if (mainMenuCanvas)
             {
-                SaveSystem.Instance.LoadGame();
-            }
-            else
-            {
-                //No save data, start like normal!
-                EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
-                SceneSwapper.Instance.SwapScene("Tutorial");
+                mainMenuCanvas.SetActive(false);
             }
         }
-        
-        // this will be called when the player presses the new game button
-        private void NewGameButtonPressed()
+
+        private void DeleteSave()
         {
-            
             SaveSystem.Instance.DeleteSaveData();
-            SwapToGame();
+            DisableButtons();
+            //new Types.ScreenFadeData(3f, 1f, 3f, null,SwapToNewGame).Send();
+            new Types.ScreenFadeSceneTransitionData(3f, 1f, "Tutorial", null , null, SwapToNewGame).Send();
         }
 
         private void OnSettingsButtonClicked()
@@ -99,14 +222,27 @@ namespace UI.Main_Menu
             SettingsController.Instance.OpenMainMenuSettings();
         }
 
+        private void OnControlsButtonClicked()
+        {
+            mainMenuCanvas.SetActive(false);
+            SettingsController.Instance.OpenMainMenuControls();
+        }
+
         private void OnQuitButtonClicked()
         {
-            Application.Quit();
+            UiPopupConfirmation.Instance.RequestPopupConfirmation(TextDB.GetText("popup", "quit"), CloseGame);
         }
     
         public void MainMenuVisible()
         {
             mainMenuCanvas.SetActive(true);
+        }
+
+        private void CloseGame()
+        {
+            // small fade to make the quit feel a bit smoother
+            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1f, 1f, fadeOutDuration:0.75f, null, Application.Quit);
+            fadeData.Send();
         }
 
     }

@@ -36,7 +36,7 @@ namespace System
             foreach (GameObject go in all)
             {
                 if (go == null){ continue;}
-                if (!go.name.Contains(_targetMeshName)){ continue;}
+                if (go.name != _targetMeshName){ continue;}
                 if (PrefabUtility.GetCorrespondingObjectFromSource(go) == _prefab){ continue;}
                 toReplace.Add(go);
             }

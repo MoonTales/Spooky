@@ -38,6 +38,7 @@ namespace Player
         
         // Internal field used for the Sanity draining
         private Coroutine _sanityDrainCoroutine;
+        private bool _debugMentalHealthInvincible;
         
         protected override void OnGameStateChanged(Types.GameState newGameState)
         {
@@ -85,11 +86,11 @@ namespace Player
                 
                 if (coreState == Types.PlayerMentalCoreState.SleepDeprived)
                 {
-                    drainAmount = 1f; // Drain 1 mental health per interval
+                    drainAmount = 0f; // Drain 1 mental health per interval
                 }
                 else if (coreState == Types.PlayerMentalCoreState.Anxious)
                 {
-                    drainAmount = 1.5f; // Drain 2 mental health per interval
+                    drainAmount = 0f; // Drain 2 mental health per interval
                 }
 
                 bool isInTutorialOrMainMenu = GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Tutorial || GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu;
@@ -155,6 +156,8 @@ namespace Player
         
         private void OnPlayerDamaged(float damageAmount)
         {
+            // if the player is in Zone 0, they cannot be damaged
+            if (GameStateManager.Instance.GetCurrentZoneId() == 0) { return; }
             UpdateCurrentMentalHealth(-damageAmount);
         }
         
@@ -180,15 +183,32 @@ namespace Player
         {
             _playerStats.SetPlayerMentalState(mentalState);
         }
+
+        public bool GetDebugMentalHealthInvincible()
+        {
+            return _debugMentalHealthInvincible;
+        }
+
+        public void SetDebugMentalHealthInvincible(bool enabled)
+        {
+            _debugMentalHealthInvincible = enabled;
+            if (enabled)
+            {
+                UpdateCurrentMentalHealth(0f);
+            }
+        }
         
         
         // this is whats called from the FPlayerStats struct to update health
         public void UpdateCurrentMentalHealth(float delta)
         {
             // Update the current health
+            float maxMentalHealth = _playerStats.GetMaxMentalHealth();
             float currentMentalHealth = _playerStats.GetCurrentMentalHealth();
             // clamp the health between 0 and max health
-            currentMentalHealth = Mathf.Clamp(currentMentalHealth + delta, 0, _playerStats.GetMaxMentalHealth());
+            currentMentalHealth = _debugMentalHealthInvincible
+                ? maxMentalHealth
+                : Mathf.Clamp(currentMentalHealth + delta, 0, maxMentalHealth);
             _playerStats.SetCurrentMentalHealth(currentMentalHealth);
             
             
@@ -203,19 +223,19 @@ namespace Player
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.Breakdown);
                 }
-                else if (currentMentalHealth <= PanicMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= PanicMentalHealthCutoff * maxMentalHealth)
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.Panic);
                 }
-                else if (currentMentalHealth <= SeverlyAnxiousMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= SeverlyAnxiousMentalHealthCutoff * maxMentalHealth)
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.SeverelyAnxious);
                 }
-                else if (currentMentalHealth <= ModeratlyAnxiousMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= ModeratlyAnxiousMentalHealthCutoff * maxMentalHealth)
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.ModeratelyAnxious);
                 }
-                else if (currentMentalHealth <= MildlyAnxiousMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= MildlyAnxiousMentalHealthCutoff * maxMentalHealth)
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.MildlyAnxious);
                 }
@@ -230,19 +250,19 @@ namespace Player
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.Breakdown);
                 }
-                else if (currentMentalHealth <= ExhaustedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= ExhaustedMentalHealthCutoff * maxMentalHealth)
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.Exhausted);
                 }
-                else if (currentMentalHealth <= SeverlySleepDeprivedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= SeverlySleepDeprivedMentalHealthCutoff * maxMentalHealth)
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.SeverelySleepDeprived);
                 }
-                else if (currentMentalHealth <= ModeratlySleepDeprivedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= ModeratlySleepDeprivedMentalHealthCutoff * maxMentalHealth)
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.ModeratelySleepDeprived);
                 }
-                else if (currentMentalHealth <= MildlySleepDeprivedMentalHealthCutoff * _playerStats.GetMaxMentalHealth())
+                else if (currentMentalHealth <= MildlySleepDeprivedMentalHealthCutoff * maxMentalHealth)
                 {
                     _playerStats.SetPlayerMentalState(Types.PlayerMentalState.MildlySleepDeprived);
                 }

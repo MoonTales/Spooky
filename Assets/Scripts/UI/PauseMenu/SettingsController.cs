@@ -1,15 +1,19 @@
 using System;
 using Managers;
+using Player;
+using Player.Camera;
 using UI.Main_Menu;
 using UnityEngine;
 using UnityEngine.UI;
 using Types = System.Types;
+using UnityEngine.Audio;
 
 namespace UI.PauseMenu
 {
     public class SettingsController : Singleton<SettingsController> 
     {
         private const float DefaultVolume = 1f;
+        private const float DefaultBrightness = 0f;
         private const string MasterVolumeKey = "audio.master";
         private const string MusicVolumeKey = "audio.music";
         private const string SfxVolumeKey = "audio.sfx";
@@ -21,16 +25,33 @@ namespace UI.PauseMenu
         [SerializeField] private Slider masterSlider;
         [SerializeField] private Slider musicSlider;
         [SerializeField] private Slider sfxSlider;
+        public AudioMixer musicMixer;
+        public AudioMixer sfxMixer;
         // TODO: If ambience gets its own slider later, split ambience control from music.
-    
+
+        // Brightness and crouch 
+        [SerializeField] private Slider brightSlider;
+        [SerializeField] private Toggle crouchToggle;
+
         // both of the Pause Menus are going to have back buttons on them somewhere
         private Button _mainMenuBackButton;
         private Button _pauseMenuBackButton;
         private bool _audioSlidersInitialized;
 
+        // CONTROLS CODE move later probably
+        [Header("Controls screen")]
+        [SerializeField] private GameObject PauseControls;
+        [SerializeField] private GameObject MainMenuControls;
+        private Button _mainMenuBackControls;
+        private Button _pauseMenuBackControls;
+        [SerializeField] private GameObject ControlsCanvas;
+
         public void Start()
         {
+            
+            
             InitializeAudioSliders();
+            
 
             // loop through all children of the main menu settings, and find the back button, and add a listener to it
             Button[] mainMenuButtons = MainMenuSettings.GetComponentsInChildren<Button>();
@@ -56,7 +77,66 @@ namespace UI.PauseMenu
                     _pauseMenuBackButton.onClick.AddListener(OnPauseMenuBackButtonClicked);
                 }
             }
+
+            // CONTROLS CODE
+            Button[] mainMenuButtonControl = MainMenuControls.GetComponentsInChildren<Button>();
+            foreach (Button button in mainMenuButtonControl)
+            {
+                UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
+
+                if (button.name == "Back")
+                {
+                    _mainMenuBackControls = button;
+                    _mainMenuBackControls.onClick.AddListener(OnMainMenuControlsBackButtonClicked);
+                }
+            }
+            Button[] pauseMenuButtonControl = PauseControls.GetComponentsInChildren<Button>();
+            foreach (Button button in pauseMenuButtonControl)
+            {
+                UI.UIButtonSfx.Ensure(button, enableHover: true, enableClick: true);
+
+                if (button.name == "Back")
+                {
+                    _pauseMenuBackControls = button;
+                    _pauseMenuBackControls.onClick.AddListener(OnPauseMenuControlsBackButtonClicked);
+                }
+            }
+            
+            // we will hook up a listner to the crouchToggle button now
+            if (crouchToggle != null)
+            {
+                crouchToggle.onValueChanged.AddListener(SetToggleCrouchMode);
+            }
+            
+            if (brightSlider != null)
+            {
+                brightSlider.onValueChanged.AddListener(SetBrightness);
+            }
+            LoadSavedBrightness("brightness");
+            LoadToggleCrouchMode();
+        }
+        private void SetBrightness(float brightness)
+        {
+            CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
+            if (effects == null){ return;}
+            effects.gameBrightness = Mathf.Clamp(brightness, 0f, 1f);
+            SaveBrightness("brightness", brightness);
+        }
+
+        private void SetToggleCrouchMode(bool isToggle)
+        {
+            PlayerController.Instance.SetToggleCrouchMode(isToggle);
+            PlayerPrefs.SetInt("crouch.toggle", isToggle ? 1 : 0);
+        }
         
+        private void LoadToggleCrouchMode()
+        {
+            bool isToggle = PlayerPrefs.GetInt("crouch.toggle", 0) == 1;
+            PlayerController.Instance.SetToggleCrouchMode(isToggle);
+            if (crouchToggle != null)
+            {
+                crouchToggle.SetIsOnWithoutNotify(isToggle);
+            }
         }
 
         private void InitializeAudioSliders()
@@ -77,6 +157,7 @@ namespace UI.PauseMenu
             float masterVolume = LoadSavedVolume(MasterVolumeKey);
             float musicVolume = LoadSavedVolume(MusicVolumeKey);
             float sfxVolume = LoadSavedVolume(SfxVolumeKey);
+            //LogLoadedAudioVolumes("InitializeAudioSliders", masterVolume, musicVolume, sfxVolume);
 
             SetAudioSliderValues(masterVolume, musicVolume, sfxVolume);
             BindAudioSliderCallbacks();
@@ -132,6 +213,15 @@ namespace UI.PauseMenu
             return Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultVolume));
         }
 
+        private static void LogLoadedAudioVolumes(string source, float masterVolume, float musicVolume, float sfxVolume)
+        {
+            Debug.Log(
+                $"SettingsController: Loaded audio PlayerPrefs ({source}) -> " +
+                $"{MasterVolumeKey}={masterVolume:0.###} (hasKey={PlayerPrefs.HasKey(MasterVolumeKey)}), " +
+                $"{MusicVolumeKey}={musicVolume:0.###} (hasKey={PlayerPrefs.HasKey(MusicVolumeKey)}), " +
+                $"{SfxVolumeKey}={sfxVolume:0.###} (hasKey={PlayerPrefs.HasKey(SfxVolumeKey)})");
+        }
+
         private static void ApplyAudioVolumes(float masterVolume, float musicVolume, float sfxVolume)
         {
             if (AudioManager.Instance == null)
@@ -143,6 +233,9 @@ namespace UI.PauseMenu
             AudioManager.Instance.SetMusicVolume(musicVolume);
             AudioManager.Instance.SetSfxVolume(sfxVolume);
             AudioManager.Instance.SetAmbienceVolume(musicVolume);
+
+            Instance.musicMixer.SetFloat("MusicVolume", Mathf.Log10(Mathf.Clamp(musicVolume * masterVolume, 0.0001f, 1)) * 20);
+            Instance.sfxMixer.SetFloat("SoundVolume", Mathf.Log10(Mathf.Clamp(sfxVolume * masterVolume, 0.0001f, 1)) * 20);
             // TODO: Split ambience from music when a dedicated ambience slider is added.
         }
 
@@ -157,6 +250,7 @@ namespace UI.PauseMenu
             float masterVolume = LoadSavedVolume(MasterVolumeKey);
             float musicVolume = LoadSavedVolume(MusicVolumeKey);
             float sfxVolume = LoadSavedVolume(SfxVolumeKey);
+            LogLoadedAudioVolumes("RefreshAudioSlidersFromSavedValues", masterVolume, musicVolume, sfxVolume);
             SetAudioSliderValues(masterVolume, musicVolume, sfxVolume);
         }
 
@@ -180,6 +274,28 @@ namespace UI.PauseMenu
             PlayerPrefs.SetFloat(key, Mathf.Clamp01(value));
             PlayerPrefs.Save();
         }
+        private static void SaveBrightness(string key, float value)
+        {
+            PlayerPrefs.SetFloat(key, Mathf.Clamp01(value));
+            PlayerPrefs.Save();
+        }
+        private void LoadSavedBrightness(string key)
+        {
+            float value = PlayerPrefs.HasKey(key)
+                ? Mathf.Clamp01(PlayerPrefs.GetFloat(key, DefaultBrightness))
+                : DefaultBrightness;
+
+            CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
+            if (effects != null)
+            {
+                effects.gameBrightness = value;
+            }
+
+            if (brightSlider != null)
+            {
+                brightSlider.SetValueWithoutNotify(value);
+            }
+        }
 
         private void OnMasterVolumeChanged(float value)
         {
@@ -188,6 +304,12 @@ namespace UI.PauseMenu
             {
                 AudioManager.Instance.SetMasterVolume(clamped);
             }
+
+            float musicVolume = LoadSavedVolume(MusicVolumeKey);
+            float sfxVolume = LoadSavedVolume(SfxVolumeKey);
+
+            Instance.musicMixer.SetFloat("MusicVolume", Mathf.Log10(Mathf.Clamp(musicVolume * clamped, 0.0001f, 1)) * 20);
+            Instance.sfxMixer.SetFloat("SoundVolume", Mathf.Log10(Mathf.Clamp(sfxVolume * clamped, 0.0001f, 1)) * 20);
 
             SaveVolume(MasterVolumeKey, clamped);
         }
@@ -202,6 +324,9 @@ namespace UI.PauseMenu
                 // TODO: Split ambience from music when a dedicated ambience slider is added.
             }
 
+            float masterVolume = LoadSavedVolume(MasterVolumeKey);
+            Instance.musicMixer.SetFloat("MusicVolume", Mathf.Log10(Mathf.Clamp(clamped * masterVolume, 0.0001f, 1)) * 20);
+
             SaveVolume(MusicVolumeKey, clamped);
         }
 
@@ -212,6 +337,9 @@ namespace UI.PauseMenu
             {
                 AudioManager.Instance.SetSfxVolume(clamped);
             }
+
+            float masterVolume = LoadSavedVolume(MasterVolumeKey);
+            Instance.sfxMixer.SetFloat("SoundVolume", Mathf.Log10(Mathf.Clamp(clamped * masterVolume, 0.0001f, 1)) * 20);
 
             SaveVolume(SfxVolumeKey, clamped);
         }
@@ -266,6 +394,74 @@ namespace UI.PauseMenu
         private void OnPauseMenuBackButtonClicked()
         {
             ReturnToPauseMenu();
+        }
+
+        // CONTROL MENU
+        // probably should move this to another script D: laterrrrrr
+
+        public void CloseControlSettings()
+        {
+            PauseControls.SetActive(false);
+            MainMenuControls.SetActive(false);
+            ControlsCanvas.SetActive(false);
+        
+            // if we are in the main menu, we want to make sure the main menu is visible again
+            if (GameStateManager.Instance.GetCurrentGameState() == Types.GameState.MainMenu)
+            {
+                // Look for the main menu in the scene can make this a broadcast if we want)
+                MainMenu mainMenu = FindFirstObjectByType<MainMenu>();
+                if (mainMenu != null) { mainMenu.MainMenuVisible(); }
+            }
+        }
+
+        public void OpenMainMenuControls()
+        {
+            MainMenuControls.SetActive(true);
+
+            foreach (Transform child in MainMenuControls.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+
+            ControlsCanvas.SetActive(true);
+
+            foreach (Transform child in ControlsCanvas.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
+
+        public void OpenPauseControls()
+        {
+            PauseControls.SetActive(true);
+
+            foreach (Transform child in PauseControls.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+
+            ControlsCanvas.SetActive(true);
+
+            foreach (Transform child in ControlsCanvas.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
+
+        private void ReturnToPauseMenuFromControls()
+        {
+            CloseControlSettings();
+            PauseMenuController.Instance.ShowMenu(true);
+        }
+
+        private void OnMainMenuControlsBackButtonClicked()
+        {
+            CloseControlSettings();
+        }
+
+        private void OnPauseMenuControlsBackButtonClicked()
+        {
+            ReturnToPauseMenuFromControls();
         }
 
     }

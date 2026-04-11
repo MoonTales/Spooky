@@ -15,7 +15,10 @@ namespace UI.PauseMenu
         // pause menu buttons
         private Button _continueButton;
         private Button _settingsButton;
+        private Button _controlsButton;
         private Button _mainMenuButton;
+
+        private GameObject _popup;
 
     
         // Internal variables
@@ -40,6 +43,11 @@ namespace UI.PauseMenu
                     _settingsButton = button;
                     _settingsButton.onClick.AddListener(OnSettingsButtonClicked);
                 }
+                else if (button.name == "Controls")
+                {
+                    _controlsButton = button;
+                    _controlsButton.onClick.AddListener(OnControlsButtonClicked);
+                }
                 else if (button.name == "MainMenu")
                 {
                     _mainMenuButton = button;
@@ -58,8 +66,25 @@ namespace UI.PauseMenu
             PauseMenuCanvas.SetActive(false);
             SettingsController.Instance.OpenPauseSettings();
         }
+
+        private void OnControlsButtonClicked()
+        {
+            PauseMenuCanvas.SetActive(false);
+            SettingsController.Instance.OpenPauseControls();
+        }
+
         private void OnMainMenuButtonClicked()
         {
+            _popup = UiPopupConfirmation.Instance.RequestPopupConfirmation(
+                TextDB.GetText("popup", "mainmenu"),
+                ConfirmReturnToMainMenu
+            );
+        }
+
+        private void ConfirmReturnToMainMenu()
+        {
+            // save the game when we return to
+
             // since we are returning to the main menu, we need to adjust time scale back to normal
             // this should probably becoem a function since we need to reuse it
             Time.timeScale = 1f;
@@ -68,11 +93,16 @@ namespace UI.PauseMenu
             SettingsController.Instance.CloseSettings();
             // we also need to "reset" the cached paused state, and set it to cutscene, cause we know the game will always
             _previousGameState = Types.GameState.Cutscene;
-            // resume into a cutscene from the main menu
-            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
-            SceneSwapper.Instance.SwapScene("MainMenu");
+            new Types.ScreenFadeSceneTransitionData(1f, 1f, "MainMenu", null , null, ReturnToMainMenu).Send();
 
         }
+
+        private void ReturnToMainMenu()
+        {
+            // resume into a cutscene from the main menu
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.MainMenu);
+        }
+
         // Update is called once per frame
         void Update()
         {
@@ -83,14 +113,19 @@ namespace UI.PauseMenu
             // Added TAB as an option, cause sometimes ESC has weird behaviors
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
             {
+                // these audio SFX are on the UAudio Singleton in persistant Objects
                 if (paused)
                 {
+                    UAudio.Instance.PlayPauseMenuClosedSfx();
                     Play();
                 }
                 else
                 {
+                    UAudio.Instance.PlayPauseMenuOpenedSfx();
                     Stop();
                 }
+                // Regardless, we wanna play an sfx when we open or close the menu
+                
             }
         }
 
@@ -123,6 +158,8 @@ namespace UI.PauseMenu
             paused = false;
             ShowMenu(false);
             SettingsController.Instance.CloseSettings();
+            SettingsController.Instance.CloseControlSettings();
+            UiPopupConfirmation.Instance.DestroyActivePopup(_popup);
             NotificationController.Instance.ShowNotificationText();
         }
 

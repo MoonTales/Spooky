@@ -15,7 +15,7 @@ namespace Managers
             // save the world clock hour
             public int worldClockHour;
             public int currentZoneId;
-            
+            public bool isPhotoInRoom;
         }
         
         
@@ -30,6 +30,19 @@ namespace Managers
         private int _currentZoneId = 0; public int GetCurrentZoneId() { return _currentZoneId; } public void SetCurrentZoneId(int zoneId) { _currentZoneId = zoneId; }
         
         private int _currentWorldClockHour = 1; public int GetCurrentWorldClockHour() { return _currentWorldClockHour; }
+
+        private bool _IsPhotoInRoom = false; public bool GetIsPhotoInRoom() { return _IsPhotoInRoom; }
+
+        public void SetIsPhotoInRoom(bool value)
+        {
+            _IsPhotoInRoom = value;
+            // find the only gameobject in the scene with the class "ShowOnCondition"
+            ShowOnCondition[] showOnConditions = FindObjectsOfType<ShowOnCondition>(true);
+            foreach (ShowOnCondition showOnCondition in showOnConditions)
+            {
+                showOnCondition.gameObject.SetActive(_IsPhotoInRoom);
+            }
+        }
         public void Start()
         {
             // Initialize the game state
@@ -77,12 +90,12 @@ namespace Managers
 
         private void OnPlayerHealthStateChanged(Types.PlayerMentalState newhealthstate)
         {
+            
+            // EDGE CASE - Clock buffer
+            
             // check for a player death
             if (newhealthstate == Types.PlayerMentalState.Breakdown)
             {
-                
-                PlayerStats.Instance.ResetAllStatsToDefault();
-                
                 // check the core state of the player
                 Types.PlayerMentalCoreState coreState = PlayerStats.Instance.GetPlayerStats().GetPlayerMentalCoreState();
                 if (coreState == Types.PlayerMentalCoreState.Anxious)
@@ -94,20 +107,26 @@ namespace Managers
 
                     HandleBadSleep();
                 }
+                PlayerStats.Instance.ResetAllStatsToDefault();
+                InspectionSystem.Instance.ForceEndInspection();
             }
         }
 
         private void HandleBadSleep()
         {
-            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1f, 1f, fadeOutDuration:0.25f, null, HandleBadSleepPostFadeOut);
-            fadeData.Send();
+            
+            // Switching to the new screen fade swap
+            Types.ScreenFadeSceneTransitionData transitionData = new Types.ScreenFadeSceneTransitionData(0.25f, 1f, "Nightmare1", HandleBadSleepPostFadeOut);
+            transitionData.Send();
+            //Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1f, 1f, fadeOutDuration:0.25f, null, HandleBadSleepPostFadeOut);
+            //fadeData.Send();
         }
 
         private void HandleBadSleepPostFadeOut()
         {
             // this means the player fell asleep while in the bedroom, and should be sent to the nightmare
 
-            SceneSwapper.Instance.SwapScene("Nightmare1");
+            //SceneSwapper.Instance.SwapScene("Nightmare1");
             // swap the core state to anxious
             PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.Anxious);
             EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
@@ -118,15 +137,18 @@ namespace Managers
         {
             // this means the player was anxious death (they were in the nightmare, and need to reset to bedroom)
             
+            Types.ScreenFadeSceneTransitionData transitionData = new Types.ScreenFadeSceneTransitionData(0.25f, 1f, "Bedroom", HandleBadWakeupPostFadeOut);
+            transitionData.Send();
             // we are gonna wanna play a character forced cutscene here, but for now we will just do a VERY fast fade out.
-            Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1.5f, 1f, fadeOutDuration:0.25f, null, HandleBadWakeupPostFadeOut);
-            fadeData.Send();
+            //Types.ScreenFadeData fadeData = new Types.ScreenFadeData(fadeInDuration:1.5f, 1f, fadeOutDuration:0.25f, null, HandleBadWakeupPostFadeOut);
+            //fadeData.Send();
         }
 
         private void HandleBadWakeupPostFadeOut()
         {
             SleepTrackerManager.Instance.SetIsGoodWakeup(false);
-            SceneSwapper.Instance.SwapScene("Bedroom");
+            SleepTrackerManager.Instance.TurnSleepTrackerOn();
+            //SceneSwapper.Instance.SwapScene("Bedroom");
             // swap the core state to sleep deprived
             PlayerStats.Instance.SetMentalCoreState(Types.PlayerMentalCoreState.SleepDeprived);
             EventBroadcaster.Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState.Normal);
@@ -173,7 +195,8 @@ namespace Managers
             return new GameStateSaveData
             {
                 worldClockHour = _currentWorldClockHour,
-                currentZoneId = _currentZoneId
+                currentZoneId = _currentZoneId,
+                isPhotoInRoom = _IsPhotoInRoom
             };
         }
 
@@ -183,6 +206,7 @@ namespace Managers
             // we will alwaysw start in gameplay
             EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
             _currentZoneId = data.currentZoneId;
+            _IsPhotoInRoom = data.isPhotoInRoom;
         }
         
         

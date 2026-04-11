@@ -104,9 +104,12 @@ namespace System
         public static event OnPlayerHealthStateChangedHandler OnPlayerHealthStateChanged;
         public static void Broadcast_OnPlayerHealthStateChanged(Types.PlayerMentalState newMentalState) { OnPlayerHealthStateChanged?.Invoke(newMentalState); }
 
-        public delegate void OnTerrorIntensityChangedHandler(float normalizedIntensity, Transform terrorSourceTransform);
+        public delegate void OnTerrorIntensityChangedHandler(float normalizedIntensity, Transform terrorSourceTransform, bool isTerrorRadiusActive);
         public static event OnTerrorIntensityChangedHandler OnTerrorIntensityChanged;
-        public static void Broadcast_OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform) { OnTerrorIntensityChanged?.Invoke(normalizedIntensity, terrorSourceTransform); }
+        public static void Broadcast_OnTerrorIntensityChanged(float normalizedIntensity, Transform terrorSourceTransform, bool isTerrorRadiusActive)
+        {
+            OnTerrorIntensityChanged?.Invoke(normalizedIntensity, terrorSourceTransform, isTerrorRadiusActive);
+        }
 
         public delegate void OnSleepTrackerAudioStateChangedHandler(bool isActive, bool isGoodWakeup, Transform sourceTransform);
         public static event OnSleepTrackerAudioStateChangedHandler OnSleepTrackerAudioStateChanged;
@@ -187,5 +190,21 @@ namespace System
         public delegate void OnRequestScreenFadeHandler(Types.ScreenFadeData screenFadeData);
         public static void Broadcast_OnRequestScreenFade(Types.ScreenFadeData screenFadeData) { OnRequestScreenFade?.Invoke(screenFadeData); }
         
+        public static event OnRequestScreenFadeScreenSwapHandler OnRequestScreenFadeScreenSwap;
+        public delegate void OnRequestScreenFadeScreenSwapHandler(Types.ScreenFadeSceneTransitionData screenFadeData);
+        public static void Broadcast_OnRequestScreenFadeScreenSwap(Types.ScreenFadeSceneTransitionData screenFadeData) { OnRequestScreenFadeScreenSwap?.Invoke(screenFadeData); }
+        
+        
+        public static event OnAllDrawingsOrderedHandler OnAllDrawingsOrdered;
+        public delegate void OnAllDrawingsOrderedHandler();
+        public static void Broadcast_OnAllDrawingsOrdered() { OnAllDrawingsOrdered?.Invoke(); }
+        
+        public static event OnDrawingCollectedHandler OnDrawingCollected;
+        public delegate void OnDrawingCollectedHandler(int drawingID);
+        public static void Broadcast_OnDrawingCollected(int drawingID) { OnDrawingCollected?.Invoke(drawingID); }
+        
+        public static event OnAllAllowedDrawingsForNightCollectedHandler OnAllAllowedDrawingsForNightCollected;
+        public delegate void OnAllAllowedDrawingsForNightCollectedHandler();
+        public static void Broadcast_OnAllAllowedDrawingsForNightCollected() { OnAllAllowedDrawingsForNightCollected?.Invoke(); }
     }
 }

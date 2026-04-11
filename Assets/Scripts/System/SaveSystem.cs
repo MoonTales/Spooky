@@ -79,10 +79,12 @@ namespace System
             PlayerPrefs.Save();
             
             DebugUtils.LogSuccess("Game has been saved!");
-            
+            // I DONT LIKE HOW THIS IS CONNECTED HERE... BUT OH WELL
+            ScreenFadeManager.Instance.DisplaySaveIconForDuration(4f);
+            // Displays the save icon for 2 seconds after a save is requested
         }
 
-        public void LoadGame()
+        public bool LoadGame()
         {
             // read from this file and populate our save data struct
             if (PlayerPrefs.HasKey("SaveData"))
@@ -98,6 +100,7 @@ namespace System
                 saveInterface.LoadData();
             }
             DebugUtils.LogSuccess("Game has been loaded!");
+            return true;
         }
         
         
@@ -131,6 +134,19 @@ namespace System
         public bool DoesSaveGameExist()
         {
             return PlayerPrefs.HasKey("SaveData");
+        }
+        
+        public SaveData GetCurrentSaveData()
+        {
+            return _currentSaveData;
+        }
+        public void ReadSaveFromDisk()
+        {
+            if (PlayerPrefs.HasKey("SaveData"))
+            {
+                string json = PlayerPrefs.GetString("SaveData");
+                _currentSaveData = JsonUtility.FromJson<SaveData>(json);
+            }
         }
     }
 

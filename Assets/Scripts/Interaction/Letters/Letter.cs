@@ -15,6 +15,16 @@ namespace Interaction.Letters
         
         private Types.LetterType _letterType; public void SetLetterType(Types.LetterType letterType) { _letterType = letterType; } public Types.LetterType GetLetterType() { return _letterType; }
         private bool _hasBeenWrittenOn = false; public void SetHasBeenWrittenOn(bool value) { _hasBeenWrittenOn = value; } public bool GetHasBeenWrittenOn() { return _hasBeenWrittenOn; }
+
+        [SerializeField] private AudioClip researcherPickupSfx;
+        [SerializeField] private AudioClip researcherDropSfx;
+        [SerializeField] private AudioClip frenPickupSfx;
+        [SerializeField] private AudioClip frenDropSfx;
+        [SerializeField] private float researcherSfxVolume = 1f;
+        [SerializeField] private float researcherSfxDeviation = 0.05f;
+
+        // Referenc
+        [SerializeField] private GameObject Elias_Photo;
         
         // Expose the material to be set for the fade script
         public Material[] materialArray;
@@ -32,6 +42,11 @@ namespace Interaction.Letters
             {
                 promptKey = new TextKey { place = "prompt", id = "fren_letter" };
                 rowKey = new TextKey { place = "bedroom", id = "fren_letter" };
+
+                if (GameStateManager.Instance.GetCurrentWorldClockHour() == 1)
+                {
+                    Elias_Photo.SetActive(true);
+                }
             }
         }
         
@@ -43,10 +58,20 @@ namespace Interaction.Letters
         
         public new void Interact(Interactor interactor)
         {
-            InspectionSystem.Instance.StartInspection(gameObject);
+            if (_letterType == Types.LetterType.Researcher)
+            {
+                PlayPickupSfx();
+            }
+            else {
+                PlayFrenPickupSfx();
+            }
+                InspectionSystem.Instance.StartInspection(gameObject);
             // Tell the letter system that we have been read
             var id = (_letterType == Types.LetterType.Researcher ? "res_letter_" : "fren_letter_") + GameStateManager.Instance.GetCurrentWorldClockHour();            
             LetterManager.Instance.HandleLetterRead(id);
+            
+            if(!SleepTrackerManager.Instance.GetIsSleepTrackerActive()) { AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true); }
+            
         }
         
         public override void OnReturnedToOriginalPosition()
@@ -66,19 +91,46 @@ namespace Interaction.Letters
             // this will actually be the opposite effect, where it will slide back to the original position it slid in from, and then destroy itself
             // disable the collider so we cant interact again
             GetComponent<Collider>().enabled = false;
+            PlayDropSfx();
             StartCoroutine(LetterManager.Instance.ReverseSlideNote(gameObject));
         }
 
 
 
-        private void HandleFinishedFriendLetter()
+    private void HandleFinishedFriendLetter()
+    {
+        // due to this being a "fake" letter, we want to have it "vanish"
+        int currentAct = GameStateManager.Instance.GetCurrentWorldClockHour();
+        if (currentAct == 4)
         {
-            // due to this being a "fake" letter, we want to have it "vanish"
+
+            // CALL THE END OF GAME TRANSITION
             GetComponent<Collider>().enabled = false;
-            StartCoroutine(FadeOut());
+            HandleFinaleTransfer();
+            return;
         }
+        // otherwise, we just do the standard fade out and destroy
+        GetComponent<Collider>().enabled = false;
+        StartCoroutine(FadeOut());
+        // there is an edge case we need to account for (if its act 4), since we will treat that one differently
+        GameStateManager.Instance.SetIsPhotoInRoom(true);
+    }
 
 
+
+    private void HandleFinaleTransfer()
+    {
+        // Disable the collider so that we cant interact with this again while the fadeout is happening
+        const int timeToFadeOut = 5;
+        Types.ScreenFadeData data = new Types.ScreenFadeData(fadeInDuration:1, 2, fadeOutDuration:timeToFadeOut, null, FadeOutCompleted);
+        data.Send();
+    }
+    private void FadeOutCompleted()
+    {
+        SceneSwapper.Instance.SwapScene("FinaleNightmare");
+        GameStateManager.Instance.SetCurrentZoneId(-1);
+    }
+    
     private IEnumerator FadeOut()
     {
         // Get ALL mesh renderers (this object + all children)
@@ -131,6 +183,30 @@ namespace Interaction.Letters
 
         // Finally, destroy the whole object
         Destroy(gameObject);
+    }
+
+    private void PlayPickupSfx()    
+    {
+           if (researcherPickupSfx != null)
+           {
+               UAudio.Instance.PlayClip(researcherPickupSfx, gameObject, researcherSfxVolume, researcherSfxDeviation);
+           } 
+    }    
+
+    private void PlayDropSfx()
+    { 
+          if (researcherDropSfx != null)
+          {
+              UAudio.Instance.PlayClip(researcherDropSfx, gameObject, researcherSfxVolume, researcherSfxVolume);
+          }
+    }
+
+    private void PlayFrenPickupSfx()
+    {
+            if (frenPickupSfx != null)
+            {
+                UAudio.Instance.PlayClip(frenPickupSfx, gameObject, researcherSfxVolume, researcherSfxDeviation);
+            }
     }
 
     }

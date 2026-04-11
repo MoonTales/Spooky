@@ -19,8 +19,12 @@ namespace Cutscenes
         public TextKey PromptKey => default;
         
         
+        
         [SerializeField] private GameObject cutsceneToPlay;
         [SerializeField] private CutsceneType cutsceneType;
+        
+        [SerializeField] private bool useGameStateOverride = false; public bool UseGameStateOverride => useGameStateOverride;
+        [SerializeField] private Types.GameState gameStateOverride = Types.GameState.MainMenu; public Types.GameState GameStateOverride => gameStateOverride;
         //[SerializeField] private bool  playOnlyOnce = true;
         
         private PlayableDirector _playableDirector;

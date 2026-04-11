@@ -1,5 +1,11 @@
 using System;
+using System.Collections;
+using Managers;
+using Player;
+using Unity.Cinemachine;
 using UnityEngine;
+using Types = System.Types;
+using Interaction;
 
 namespace Inspection
 {
@@ -26,18 +32,85 @@ namespace Inspection
         private MeshRenderer[] _meshRenderers;
         private Collider[] _objColliders;
 
+        // audio stuff
+        [Header("Audio for Inspect / Un-inspect")]
+        [SerializeField] private AudioClip pickupSfx;
+        [SerializeField] private AudioClip putDownSfx;
+        [SerializeField] private float sfxVolume = 1f;
+        [SerializeField] private float sfxPitchVariation = 0.05f;
+
         // Getters
         public TextKey RowKey => rowKey;
         public TextKey PromptKey => promptKey;
 
+        // Time Lock
+        protected bool timeLock = false;
+
         // Interface Implementation
         public bool CanInteract(Interactor interactor)
         {
+            // Handle the clock being at 6pm without player having read the letters.
+            if (GameStateManager.Instance.GetCurrentWorldLocation() == Types.WorldLocation.Bedroom && 
+            PlayerStats.Instance.GetPlayerStats().GetCurrentMentalHealth() <= 25)  // This correlates to 6pm exactly
+            {
+                if(GameStateManager.Instance.GetCurrentWorldClockHour() == 1 && 
+                (!LetterManager.Instance.GetHasReadAct1ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct1FriendLetter()))
+                {
+                    timeLock = true;
+                    return true;
+                }
+                if(GameStateManager.Instance.GetCurrentWorldClockHour() == 2 && 
+                (!LetterManager.Instance.GetHasReadAct2ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct2FriendLetter()))
+                {
+                    timeLock = true;
+                    return true;
+                }
+                if(GameStateManager.Instance.GetCurrentWorldClockHour() == 3 && 
+                (!LetterManager.Instance.GetHasReadAct3ResearcherLetter() ||
+                !LetterManager.Instance.GetHasReadAct3FriendLetter()))
+                {
+                    timeLock = true;
+                    return true;
+                }
+            }
+            // Default case in the situation where nothing is wrong
+            timeLock = false;
             return true;
         }
 
         public void Interact(Interactor interactor)
         {
+
+            //if (timeLock & gameObject.GetComponent)
+            if (timeLock)
+            {
+                
+                // Play notification if player has not read letters by 6pm
+                Types.NotificationData data = new(
+                    duration: 2.0f, 
+                    messageKey: new TextKey { place = "prompt", id = "letters_not_read_inspect" },
+                    messageOverride: "",
+                    shouldOnlyShowOnce: false
+                );
+                data.Send();
+                return;
+                /*
+                Types.NotificationData data = new(
+                    duration: 1, 
+                    messageKey: new TextKey { place = "prompt", id = "letters_not_read_inspect" },
+                    messageOverride: "",
+                    shouldOnlyShowOnce:false
+                );
+                data.Send();
+                return;
+                */
+            }
+            // Default inspect case if nothing is wrong
+            if (pickupSfx != null)
+                UAudio.Instance.PlayClip(pickupSfx, gameObject, sfxVolume, sfxPitchVariation);
+
             InspectionSystem.Instance.StartInspection(gameObject);
         }
 
@@ -82,7 +155,10 @@ namespace Inspection
         public virtual void OnReturnedToOriginalPosition()
         {
             // Custom logic that can run once the inspected object has been returned to its original position
-            // this is the VERY end of the inspection
+            // this is the VERY end of the inspection{
+            if (putDownSfx != null)
+                UAudio.Instance.PlayClip(putDownSfx, gameObject, sfxVolume, sfxPitchVariation);
         }
+
     }
 }

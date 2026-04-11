@@ -57,7 +57,7 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
     }
 
 
-    public void Interact(Interactor interactor)
+    public virtual void Interact(Interactor interactor)
     {
         if (!CanInteract(interactor)) return;
 
@@ -128,11 +128,22 @@ public class ToggleInteractable : MonoBehaviour, IInteractable
                 {
                     if (targetAudio.isPlaying) targetAudio.Stop();
                 }
+
                 break;
 
             // appearance / disappearance of game objects
-            case ToggleMode.GameObjectActive:
+            case ToggleMode.GameObjectActive: 
                 targetObject.SetActive(on);
+                //TODO: Replace this with actual logic to play a notification (and swap from nightmare to finale)
+                if (GameStateManager.Instance.GetCurrentWorldClockHour() == 4 && GameStateManager.Instance.GetCurrentWorldLocation() == System.Types.WorldLocation.Nightmare){
+                    System.Types.NotificationData data = new(
+                        duration: 4, 
+                        messageKey: new TextKey { place = "prompt", id = "finale" },
+                        messageOverride: "",
+                        shouldOnlyShowOnce:false
+                    );
+                    data.Send();
+                }
                 break;
 
             // for animators

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Managers;
 using Player;
+using Player.Camera;
 using TMPro;
 using UnityEngine;
 
@@ -38,6 +39,8 @@ namespace System
         private bool _developerModeEnabled = true;
         private KeyCode _developerModeToggleKey = KeyCode.Backslash;
         private KeyCode _holdDeveloperModeKey = KeyCode.LeftControl;
+        private const float BrightnessStep = 0.1f;
+        private const KeyCode ToggleMentalInvincibilityKey = KeyCode.Quote;
 
         private GameObject _developerCanvas;
         private List<DeveloperCommand> _developerCommands = new List<DeveloperCommand>();
@@ -190,6 +193,10 @@ namespace System
             RegisterCommand(KeyCode.Alpha6, ()=>SetFrameRate(60), "Set High FPS", "Sets the target frame rate to 60");
             // Set Frame Rate to 120
             RegisterCommand(KeyCode.Alpha7, ()=>SetFrameRate(120), "Set Ultra FPS", "Sets the target frame rate to 120");
+            RegisterCommand(KeyCode.Alpha8, () => AdjustBrightness(BrightnessStep), "Increase Brightness", "Raises debug brightness by 0.1");
+            RegisterCommand(KeyCode.Alpha9, () => AdjustBrightness(-BrightnessStep), "Decrease Brightness", "Lowers debug brightness by 0.1");
+            RegisterCommand(KeyCode.Slash, ResetBrightness, "Reset Brightness", "Resets debug brightness to the default exposure");
+            RegisterCommand(ToggleMentalInvincibilityKey, ToggleMentalHealthInvincibility, "Toggle Mental Invincibility", "Toggles debug invincibility so mental health is always clamped to max.");
             // Delete save gme
             RegisterCommand(KeyCode.Backslash, () => SaveSystem.Instance.DeleteSaveData(), "Delete Save Game", "Deletes the current save game data from the persistent data path");
         }
@@ -203,6 +210,40 @@ namespace System
         {
             QualitySettings.vSyncCount = 0; // Disable VSync
             Application.targetFrameRate = fps;
+        }
+
+        private void AdjustBrightness(float delta)
+        {
+            CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
+            if (effects == null)
+            {
+                return;
+            }
+
+            effects.gameBrightness = Mathf.Clamp(effects.gameBrightness + delta, -1f, 1f);
+        }
+
+        private void ResetBrightness()
+        {
+            CameraMentalStateEffects effects = CameraMentalStateEffects.Instance;
+            if (effects == null)
+            {
+                return;
+            }
+
+            effects.gameBrightness = 0f;
+        }
+
+        private void ToggleMentalHealthInvincibility()
+        {
+            if (PlayerStats.Instance == null)
+            {
+                return;
+            }
+
+            bool nextEnabled = !PlayerStats.Instance.GetDebugMentalHealthInvincible();
+            PlayerStats.Instance.SetDebugMentalHealthInvincible(nextEnabled);
+            Debug.Log($"DeveloperCommands: Mental health invincibility {(nextEnabled ? "enabled" : "disabled")}.");
         }
 
         /// <summary>

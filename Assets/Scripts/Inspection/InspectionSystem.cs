@@ -4,6 +4,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Types = System.Types;
 using Inspection;
+using Interaction.drawings;
 using Interaction.Letters;
 using Managers;
 using UI;
@@ -40,12 +41,17 @@ public class InspectionSystem : Singleton<InspectionSystem>
     private LayerMask _cachedLayerMask;
     
     private bool _isFirstInspection = true; // Flag to track if it's the first inspection
+
+    private bool _isUniqueLogicHappening = false;
     
     // fix:
     // you need to be inspecting an object for atleast 0.5 seconds before you can exit
     // this is to stop the low fsp issue of it returning to the og position
     float inspectionStartTime = 0f;
     bool canExitInspection => inspectionStartTime >= 0.5f;
+
+    // This is a custom return location when we finish an inspection
+    [SerializeField] private GameObject _returnlocation = null; public void SetReturnLocation(GameObject returnLocation) { _returnlocation = returnLocation; }
     
     
     void Start()
@@ -61,7 +67,12 @@ public class InspectionSystem : Singleton<InspectionSystem>
             GameObject inspectionObj = new GameObject("InspectionPoint");
             inspectionPoint = inspectionObj.transform;
             inspectionPoint.SetParent(cameraTransform);
-            inspectionPoint.localPosition = new Vector3(0, 0, inspectionDistance);
+
+            // TODO: [POLISH] think of a way to have this object sit at a position that doesn't clip into the inspection text
+            // -- IF HAS TEXT, potentially designate an area for the item, have it be at the center of that
+            // ----- [if HAS TEXT is basically that you'd need to check if a valid TextKey exists, because the component exists on it anyway]
+            // -- ELSE, just do 0, 0 (this would be for drawings)
+            inspectionPoint.localPosition = new Vector3(-0.1f, 0, inspectionDistance);
             inspectionPoint.localRotation = Quaternion.identity;
         }
     }
@@ -87,14 +98,36 @@ public class InspectionSystem : Singleton<InspectionSystem>
             inspectionStartTime += Time.deltaTime;
         }
     }
+
+
+    public void ForceEndInspection()
+    {
+        /*
+         * This is called externally if something is happening that will
+         * is gonna force change our scene, so we need to ensure that we
+         * clean up all our UI and the rest of the stuff (since we will be instntly changing scenes)
+         * 
+         */
+        if (_isInspecting)
+        {
+            // Force end all the inspection stuff without the transition (since we are gonna be changing scenes and dont want to have to worry about it)
+            _currentInspectedObject.transform.SetParent(_originalParent);
+            _currentInspectedObject.transform.position = _originalPosition;
+            _currentInspectedObject.transform.rotation = _originalRotation;
+            
+            // reset game state to gameplay (in case we were in the middle of an inspection and got sent to the main menu or something)
+            EventBroadcaster.Broadcast_GameStateChanged(Types.GameState.Gameplay);
+        }
+    }
     
     
     
     // Public function which can be called from any other script to start inspecting an object (itself or another)
-    public void StartInspection(GameObject objectToInspect)
+    public void StartInspection(GameObject objectToInspect, GameObject returnLocation = null)
     {
         // Prevent starting a new inspection if already inspecting an object, or if we have no object
         if (_isInspecting || objectToInspect == null){ return;}
+        _returnlocation = returnLocation;
         _isExitingInspection = false;
         // Set current inspected object
         _currentInspectedObject = objectToInspect;
@@ -143,7 +176,6 @@ public class InspectionSystem : Singleton<InspectionSystem>
             Types.NotificationData data = new(
                 duration: 3, 
                 messageKey: new TextKey { place = "tutorial", id = "inspect" },
-                messageOverride: "Click and drag to view object. F or right click to exit.",
                 shouldOnlyShowOnce: true
             );
             data.Send();
@@ -173,112 +205,148 @@ public class InspectionSystem : Singleton<InspectionSystem>
         {
             inspectable.OnInspectionFinished();
         }
+        // edge case cause im lasy
+        Drawing drawing = _currentInspectedObject.GetComponent<Drawing>();
+        if (drawing != null)
+        {
+            drawing.OnInspectionFinished();
+        }
         
         // reset the inspection start time for the next inspection
         inspectionStartTime = 0f; 
     }
-    
+
     private void HandleInspection()
-    {   
+    {
+        bool cursorInScrollView = false;
+
+        if (PlayerHUDController.Instance != null)
+        {
+            if (PlayerHUDController.Instance.scrollViewChecker != null)
+            {
+                cursorInScrollView = PlayerHUDController.Instance.scrollViewChecker.IsCursorInScrollView();
+            }
+        }
+
         // Smooth move to inspection point
         // we need to ensure we are not actively zooming though
         if (!isZooming)
         {
-            _currentInspectedObject.transform.localPosition = Vector3.Lerp(_currentInspectedObject.transform.localPosition, targetZoomPosition, Time.deltaTime * transitionSpeed);
+            _currentInspectedObject.transform.localPosition = Vector3.Lerp(
+                _currentInspectedObject.transform.localPosition,
+                targetZoomPosition,
+                Time.deltaTime * transitionSpeed
+            );
         }
-        
-        // MOUSE DRAG
-        if (Input.GetMouseButtonDown(0))
+
+        if (!cursorInScrollView)
         {
-            _prevMousePosition = Input.mousePosition;
-        }
-        else if (Input.GetMouseButton(0))
-        {
-            Vector3 delta = Input.mousePosition - _prevMousePosition;
-        
-            
-            // you may notice that the stuff is inverted... yeah I dont even know, this is what managed to make it work LOL
-            // Horizontal drag = left/right rotation
-            float horizontalRotation = -delta.x * rotationStrength;
-            _currentInspectedObject.transform.Rotate(cameraTransform.up, horizontalRotation, Space.World);
-        
-            // Vertical drag = up/down rotation
-            float verticalRotation = delta.y * rotationStrength;
-            _currentInspectedObject.transform.Rotate(cameraTransform.right, verticalRotation, Space.World);
-        
-            _prevMousePosition = Input.mousePosition;
-        }
-        
-        
-        // ZOOM IN - OUT
-        // get the value of the scroll wheel (which is between -1 and 1 ish)
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll != 0f)
-        {
-            isZooming = true;
-            
-            // Adjust the local Z position (distance from camera in local space)
-            Vector3 newPos = targetZoomPosition;
-            newPos.z -= scroll * 2f; // Zoom speed factor
-            newPos.z = Mathf.Clamp(newPos.z, minZoomDistance, maxZoomDistance);
-            
-            targetZoomPosition = newPos;
+            // MOUSE DRAG
+            if (Input.GetMouseButtonDown(0))
+            {
+                _prevMousePosition = Input.mousePosition;
+            }
+            else if (Input.GetMouseButton(0))
+            {
+                Vector3 delta = Input.mousePosition - _prevMousePosition;
+
+
+                // you may notice that the stuff is inverted... yeah I dont even know, this is what managed to make it work LOL
+                // Horizontal drag = left/right rotation
+                float horizontalRotation = -delta.x * rotationStrength;
+                _currentInspectedObject.transform.Rotate(cameraTransform.up, horizontalRotation, Space.World);
+
+                // Vertical drag = up/down rotation
+                float verticalRotation = delta.y * rotationStrength;
+                _currentInspectedObject.transform.Rotate(cameraTransform.right, verticalRotation, Space.World);
+
+                _prevMousePosition = Input.mousePosition;
+            }
+
+
+            // ZOOM IN - OUT
+            // get the value of the scroll wheel (which is between -1 and 1 ish)
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (scroll != 0f)
+            {
+                isZooming = true;
+
+                // Adjust the local Z position (distance from camera in local space)
+                Vector3 newPos = targetZoomPosition;
+                newPos.z -= scroll * 2f; // Zoom speed factor
+                newPos.z = Mathf.Clamp(newPos.z, minZoomDistance, maxZoomDistance);
+
+                targetZoomPosition = newPos;
+            }
+            else
+            {
+                isZooming = false;
+            }
+
+
+            // Exit inspection with right click or ESC
+            //TODO: fix this so that we can use F
+            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
+            {
+                if(!SleepTrackerManager.Instance.GetIsSleepTrackerActive()) { AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true); }
+
+                // ensure enough time has pass
+                if (!canExitInspection) { return; }
+
+                // only allow exit once the object is close enough to the inspection point (so we dont have weird snapping)
+                if (Vector3.Distance(_currentInspectedObject.transform.localPosition, targetZoomPosition) < 0.05f)
+                {
+                    // determine if the object we are currently inspecting is:
+                    // a) a research letter AND has not been written on yet
+                    if (_currentInspectedObject.GetComponent<Letter>() != null && !_currentInspectedObject.GetComponent<Letter>().GetHasBeenWrittenOn())
+                    {
+                        // if its a friend letter
+                        if (_currentInspectedObject.GetComponent<Letter>().GetLetterType() == Types.LetterType.Friend)
+                        {
+                            // if so, we want to do some unique logic for that (like showing the writing UI)
+                            EndInspection();
+                            return;
+                        }
+                        // if so, we want to do some unique logic for that (like showing the writing UI)
+                        if (!_isUniqueLogicHappening)
+                        {
+                            // only allow it to happen once
+                            HandleUniqueInspectionLogic();
+                        }
+                        
+                        return;
+                    }
+                    else
+                    {
+                        EndInspection();
+                    }
+
+                    // handles anything other than a letter
+                    if (!_currentInspectedObject.GetComponent<Letter>())
+                    {
+                        // if not, just end the inspection normally
+                        EndInspection();
+                    }
+
+                }
+            }
         }
         else
         {
             isZooming = false;
         }
-        
-
-        // Exit inspection with right click or ESC
-        //TODO: fix this so that we can use F
-        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.F))
-        {
-            
-            // ensure enough time has pass
-            if (!canExitInspection) { return; }
-            
-            // only allow exit once the object is close enough to the inspection point (so we dont have weird snapping)
-            if (Vector3.Distance(_currentInspectedObject.transform.localPosition, targetZoomPosition) < 0.05f)
-            {
-                // determine if the object we are currently inspecting is:
-                // a) a research letter AND has not been written on yet
-                if (_currentInspectedObject.GetComponent<Letter>() != null && !_currentInspectedObject.GetComponent<Letter>().GetHasBeenWrittenOn())
-                {
-                    // if its a friend letter
-                    if (_currentInspectedObject.GetComponent<Letter>().GetLetterType() == Types.LetterType.Friend)
-                    {
-                        // if so, we want to do some unique logic for that (like showing the writing UI)
-                        EndInspection();
-                        return;
-                    }
-                    // if so, we want to do some unique logic for that (like showing the writing UI)
-                    HandleUniqueInspectionLogic();
-                    return;
-                }
-                else
-                {
-                    EndInspection();
-                }
-                
-                // handles anything other than a letter
-                if (!_currentInspectedObject.GetComponent<Letter>())
-                {
-                    // if not, just end the inspection normally
-                    EndInspection();
-                }
-                
-            }
-        }
     }
 
     private void HandleUniqueInspectionLogic()
     {
+        
+        _isUniqueLogicHappening = true;
         // step 2) fade to black
-        new Types.ScreenFadeData(3f, 3f, 3f,
+        new Types.ScreenFadeData(2f, 3f, 2f,
             HandleFadeFinished,
             HandleScribbleNote
         ).Send();
+        if(!SleepTrackerManager.Instance.GetIsSleepTrackerActive()) { AudioManager.Instance.StopAndReleaseSleepTrackerAlarm(true); }
 
     }
 
@@ -314,10 +382,18 @@ public class InspectionSystem : Singleton<InspectionSystem>
     {
         Letter letter = _currentInspectedObject.GetComponent<Letter>();
         letter.SetHasBeenWrittenOn(true);
+        _isUniqueLogicHappening = false;
     }
     
     private void HandleExitTransition()
     {
+
+        if (_returnlocation != null)
+        {
+            _originalPosition = _returnlocation.transform.position;
+            _originalRotation = _returnlocation.transform.rotation;
+        }
+
         // Smoothly move back to original position
         _currentInspectedObject.transform.position = Vector3.Lerp(
             _currentInspectedObject.transform.position, 
@@ -403,6 +479,14 @@ public class InspectionSystem : Singleton<InspectionSystem>
         if (_currentInspectedObject != null)
         {
             return _currentInspectedObject.GetComponent<InspectableObject>();
+        }
+        return null;
+    }
+    public GameObject GetInspectedObject()
+    {
+        if (_currentInspectedObject != null)
+        {
+            return _currentInspectedObject;
         }
         return null;
     }

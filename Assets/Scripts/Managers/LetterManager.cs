@@ -29,7 +29,7 @@ namespace Managers
         private GameObject _currentNoteFriend;
         
         [Header("Note Slide Settings")]
-        [SerializeField] private float slideDistance = 1.5f; // Base distance the note slides
+        [SerializeField] private float slideDistance = 2.25f; // Base distance the note slides
         [SerializeField] private float slideDistanceVariation = 0.5f; // Random variation in slide distance (+/-)
         [SerializeField] private float slideDuration = 0.5f; // How long the slide takes
         [SerializeField] private AnimationCurve slideCurve = AnimationCurve.EaseInOut(0, 0, 1, 1); // Smooth movement
@@ -39,6 +39,8 @@ namespace Managers
         
         [Header("Rotation Settings")]
         [SerializeField] private float maxRotationAngle = 15f; // Max degrees to rotate left or right (Y-axis)
+        
+        private bool _hasSpawnedFinaleLetter = false; public bool GetHasSpawnedFinaleLetter() { return _hasSpawnedFinaleLetter; }
 
         
         // we will hold a little reference of what letters the player has read, and only spawn ones they havent read yet.
@@ -49,12 +51,12 @@ namespace Managers
         // Act2: Friend Letter
         // Act3: Researcher Letter
         // Act3: Friend Letter
-        private bool _hasReadAct1ResearcherLetter = false;
-        private bool _hasReadAct1FriendLetter = false;
-        private bool _hasReadAct2ResearcherLetter = false;
-        private bool _hasReadAct2FriendLetter = false;
-        private bool _hasReadAct3ResearcherLetter = false;
-        private bool _hasReadAct3FriendLetter = false;
+        private bool _hasReadAct1ResearcherLetter = false; public bool GetHasReadAct1ResearcherLetter() { return _hasReadAct1ResearcherLetter; }
+        private bool _hasReadAct1FriendLetter = false; public bool GetHasReadAct1FriendLetter() { return _hasReadAct1FriendLetter; }
+        private bool _hasReadAct2ResearcherLetter = false; public bool GetHasReadAct2ResearcherLetter() { return _hasReadAct2ResearcherLetter; }
+        private bool _hasReadAct2FriendLetter = false; public bool GetHasReadAct2FriendLetter() { return _hasReadAct2FriendLetter; }
+        private bool _hasReadAct3ResearcherLetter = false; public bool GetHasReadAct3ResearcherLetter() { return _hasReadAct3ResearcherLetter; }
+        private bool _hasReadAct3FriendLetter = false; public bool GetHasReadAct3FriendLetter() { return _hasReadAct3FriendLetter; }
         
         
         
@@ -89,8 +91,6 @@ namespace Managers
             else if(id == "res_letter_2"){ _hasReadAct2ResearcherLetter = true;}
             else if(id == "fren_letter_3"){ _hasReadAct3FriendLetter = true;}
             else if(id == "res_letter_3"){ _hasReadAct3ResearcherLetter = true;}
-            
-            //SaveSystem.Instance.RequestSave(this);
         }
 
 
@@ -110,49 +110,82 @@ namespace Managers
                 // spawn the note prefab at the location of the "NoteSpawnLocation" object
                 if (!spawnLocation) { return;}
 
+                // these stack, making it impossible to miss letters
                 if (currentAct == 1)
                 {
-                    if (!_hasReadAct1ResearcherLetter)
-                    {
-                        // spawn the researcher letter for act 1
-                        SpawnResearcherLetter(spawnLocation);
-                    }
-                    if (!_hasReadAct1FriendLetter)
-                    {
-                        SpawnFriendLetter(spawnLocation);
-                    }
+                    SpawnActOne(spawnLocation);
                 }
                 if (currentAct == 2)
                 {
-                    if (!_hasReadAct2ResearcherLetter)
-                    {
-                        // spawn the researcher letter for act 2
-                        SpawnResearcherLetter(spawnLocation);
-                    }
-                    if (!_hasReadAct2FriendLetter)
-                    {
-                        SpawnFriendLetter(spawnLocation);
-                    }
+                    //SpawnActOne(spawnLocation);
+                    SpawnActTwo(spawnLocation);
                 }
 
                 if (currentAct == 3)
                 {
-                    if (!_hasReadAct3ResearcherLetter)
-                    {
-                        // spawn the researcher letter for act 3
-                        SpawnResearcherLetter(spawnLocation);
-                    }
-
-                    if (!_hasReadAct3FriendLetter)
-                    {
-                        SpawnFriendLetter(spawnLocation);
-                    }
+                    //SpawnActOne(spawnLocation);
+                    //SpawnActTwo(spawnLocation);
+                    SpawnActThree(spawnLocation);
                 }
 
             }
             
         }
 
+        public void SpawnFinaleLetter()
+        {
+            if (_hasSpawnedFinaleLetter) { return;}
+            // this will only ever be called in Act 4
+            GameObject spawnLocation = GameObject.Find("NoteSpawnLocation");
+            SpawnFriendLetter(spawnLocation);
+            _hasSpawnedFinaleLetter = true;
+            // once this letter is read, we will transition to the finale nightmare
+        }
+        
+        
+
+        private void SpawnActThree(GameObject spawnLocation)
+        {
+            if (!_hasReadAct3ResearcherLetter)
+            {
+                // spawn the researcher letter for act 3
+                SpawnResearcherLetter(spawnLocation);
+            }
+
+            if (!_hasReadAct3FriendLetter)
+            {
+                SpawnFriendLetter(spawnLocation);
+            }
+        }
+
+        private void SpawnActTwo(GameObject spawnLocation)
+        {
+            if (!_hasReadAct2ResearcherLetter)
+            {
+                // spawn the researcher letter for act 2
+                SpawnResearcherLetter(spawnLocation);
+            }
+
+            if (!_hasReadAct2FriendLetter)
+            {
+                SpawnFriendLetter(spawnLocation);
+            }
+        }
+
+        private void SpawnActOne(GameObject spawnLocation)
+        {
+            if (!_hasReadAct1ResearcherLetter)
+            {
+                // spawn the researcher letter for act 1
+                SpawnResearcherLetter(spawnLocation);
+            }
+
+            if (!_hasReadAct1FriendLetter)
+            {
+                SpawnFriendLetter(spawnLocation);
+            }
+        }
+        
         private void SpawnFriendLetter(GameObject spawnLocation)
         {
             // now we will also send a friend letter, but we will delay it by a few seconds and have it slide in after the researcher letter
@@ -186,7 +219,7 @@ namespace Managers
             // Calculate random offset destination with varied distance
             float randomXOffset = UnityEngine.Random.Range(-horizontalOffsetRange, horizontalOffsetRange);
             float randomDistance = slideDistance + UnityEngine.Random.Range(-slideDistanceVariation, slideDistanceVariation);
-            Vector3 endPosition = startPosition + new Vector3(randomXOffset, 0, randomDistance);
+            Vector3 endPosition = startPosition + new Vector3(randomXOffset, 0, -randomDistance);
             
             // Start with no rotation
             Quaternion startRotation = Quaternion.Euler(-90f, 0f, -90f);

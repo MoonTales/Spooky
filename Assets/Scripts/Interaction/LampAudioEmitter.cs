@@ -43,15 +43,17 @@ public class LampAudioEmitter : MonoBehaviour
         }
 
         TryStartHumLoop();
-        if (!_humLoopInstance.isValid())
+        Transform emitterTransform = GetEmitterTransform();
+        bool isOn = IsLampOn();
+        bool hasValidHumLoop = _humLoopInstance.isValid();
+
+        if (!hasValidHumLoop)
         {
             return;
         }
 
-        Transform emitterTransform = GetEmitterTransform();
         audioManager.UpdateEventInstanceTransform(_humLoopInstance, emitterTransform);
 
-        bool isOn = IsLampOn();
         if (!_hasInitializedState)
         {
             _previousIsOn = isOn;
@@ -112,7 +114,7 @@ public class LampAudioEmitter : MonoBehaviour
     private void StopHumLoopImmediate()
     {
         // Avoid Singleton.Instance here: during scene teardown AudioManager may already be destroyed.
-        AudioManager audioManager = Object.FindAnyObjectByType<AudioManager>();
+        AudioManager audioManager = UnityEngine.Object.FindAnyObjectByType<AudioManager>();
         if (audioManager != null)
         {
             audioManager.StopAndReleaseEventInstance(ref _humLoopInstance, immediate: true);
