@@ -144,6 +144,15 @@ public class Clock : EventSubscriberBase
                 {
                     continue;
                 }
+                // get the name of the object we are inspecting, and if its "T_Drawing" / "Elias_Photo" / "Monster_Drawing"
+                // we will also continue
+                //TODO: Make this not hard coded later
+                if (InspectionSystem.Instance.GetInspectedObject().name == "T_Drawing" ||
+                    InspectionSystem.Instance.GetInspectedObject().name == "Elias_Photo" ||
+                    InspectionSystem.Instance.GetInspectedObject().name == "Monster_Drawing")
+                {
+                    continue;
+                }
             }
 
             // Increment timer. If inspecting, increment * fast forward speed
