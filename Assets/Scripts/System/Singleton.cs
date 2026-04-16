@@ -22,12 +22,11 @@ namespace System
     /// 
     /// 3. Ensure there is exactly one GameObject in your scene with the Singleton-derived component.
     ///    If multiple instances exist, duplicates will be automatically destroyed.
-    /// 
-    /// Notes:
-    /// - This class only works with MonoBehaviour-derived classes.
-    /// - Use `DontDestroyOnLoad(gameObject)` to make the singleton persistent across scenes.
     ///
-    /// Created by: MoonTales
+    /// This class will now dynamically create itself the first time its instanced within the game,
+    /// so there is no need to instantiate it, unless it requires some prior setup
+    ///
+    /// Created by: MoonTalesStudio
     ///  </summary>
     public class Singleton<T> : EventSubscriberBase where T : MonoBehaviour
     {
@@ -53,7 +52,11 @@ namespace System
                     // If no instance is found, log an error message
                     if (!_instance)
                     {
-                        DebugUtils.LogError($"[Singleton] An instance of {typeof(T)} is needed in the scene but none was found.");
+                        GameObject go = new GameObject(typeof(T).Name);
+                        _instance = go.AddComponent<T>();
+                        DebugUtils.LogWarning($"[Singleton] No instance of {typeof(T)} found. Auto-creating one.");
+                        
+                        
                     }
                 }
                 return _instance;

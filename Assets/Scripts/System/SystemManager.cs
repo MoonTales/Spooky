@@ -41,8 +41,7 @@ namespace System
             gameObject.AddComponent<UiPopupConfirmation>();
             gameObject.AddComponent<SceneCache>();
             gameObject.AddComponent<SecretCodeManager>();
-
-
+            gameObject.AddComponent<HorrorEventManager>();
         }
     }
 }

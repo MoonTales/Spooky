@@ -1,4 +1,5 @@
 using Cutscenes;
+using Horror_Event;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -206,5 +207,10 @@ namespace System
         public static event OnAllAllowedDrawingsForNightCollectedHandler OnAllAllowedDrawingsForNightCollected;
         public delegate void OnAllAllowedDrawingsForNightCollectedHandler();
         public static void Broadcast_OnAllAllowedDrawingsForNightCollected() { OnAllAllowedDrawingsForNightCollected?.Invoke(); }
+        
+        public static event OnHorrorEventTriggeredHandler OnHorrorEventTriggered;
+        public delegate void OnHorrorEventTriggeredHandler(HorrorEvent data);
+        public static void Broadcast_OnHorrorEventTriggered(HorrorEvent data) { OnHorrorEventTriggered?.Invoke(data); }
+        
     }
 }
