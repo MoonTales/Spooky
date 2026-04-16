@@ -28,7 +28,7 @@ namespace Horror_Event
         [SerializeField] private Color editorGizmoColor = new Color(1f, 0f, 1f, 0.15f);
         [SerializeField] private string eventName = "Horror Event"; // the name of this event, used for debugging and notifications
         [SerializeField] private List<HorrorEventData> eventEffects = new List<HorrorEventData>(); // the effects that will play when this event is triggered, such as sounds, particles, and gameobject activations
-        
+        [SerializeField] private bool maintainEffectsAfterTrigger = false; 
         
         //Internal variables
         private BoxCollider _boxCollider; // the box collider component attached to this game object
@@ -41,6 +41,12 @@ namespace Horror_Event
 
             _horrorEventId = eventName + editorGizmoColor + eventEffects; // creates a unique ID that SHOULD be different for each
             DebugUtils.Log($"[HorrorEvent] Initialized Horror Event with ID: {_horrorEventId}");
+            
+            // We need to check if we have already been activated in a previous playthrough
+            if (maintainEffectsAfterTrigger && HorrorEventManager.Instance.CheckIfHorrorEventTriggered(this))
+            {
+                // we prolly need to do something here
+            }
         }
         
         private void OnTriggerEnter(Collider other)
