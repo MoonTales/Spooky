@@ -1,4 +1,13 @@
+//————————————————————————————————————————————————————————————————
+// The following code is written and maintained by MoonTales Studio,
+// under the creative direction of Cohen Calvert. 
+// You are not allowed to use, alter, modify, or re-distribute this
+// code without explicit permission from MoonTales Studio.
+//————————————————————————————————————————————————————————————————
+
+//—————— Includes ——————//
 using UnityEngine;
+//——————————————————————//
 
 namespace System
 {
@@ -55,8 +64,6 @@ namespace System
                         GameObject go = new GameObject(typeof(T).Name);
                         _instance = go.AddComponent<T>();
                         DebugUtils.LogWarning($"[Singleton] No instance of {typeof(T)} found. Auto-creating one.");
-                        
-                        
                     }
                 }
                 return _instance;

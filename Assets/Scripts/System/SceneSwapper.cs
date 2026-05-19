@@ -1,15 +1,19 @@
-using System;
+//————————————————————————————————————————————————————————————————
+// The following code is written and maintained by MoonTales Studio,
+// under the creative direction of Cohen Calvert. 
+// You are not allowed to use, alter, modify, or re-distribute this
+// code without explicit permission from MoonTales Studio.
+//————————————————————————————————————————————————————————————————
+
+//—————— Includes ——————//
 using System.Collections;
 using Managers;
-using Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+//——————————————————————//
 
 namespace System
 {
-    
-
-    
     public class SceneSwapper : Singleton<SceneSwapper>, ISaveSystemInterface<SceneSwapper.SceneSwapSaveData>
     {
         private string _oldSceneName = "";

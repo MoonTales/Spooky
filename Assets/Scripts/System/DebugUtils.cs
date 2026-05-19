@@ -1,5 +1,14 @@
+//————————————————————————————————————————————————————————————————
+// The following code is written and maintained by MoonTales Studio,
+// under the creative direction of Cohen Calvert. 
+// You are not allowed to use, alter, modify, or re-distribute this
+// code without explicit permission from MoonTales Studio.
+//————————————————————————————————————————————————————————————————
+
+//—————— Includes ——————//
 using UnityEngine;
 using System.Runtime.CompilerServices;
+//——————————————————————//
 
 namespace System
 {
@@ -101,12 +110,12 @@ namespace System
         /// </summary>
         public static void ClearConsole()
         {
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             var assembly = global::System.Reflection.Assembly.GetAssembly(typeof(UnityEditor.Editor));
             var logEntries = assembly.GetType("UnityEditor.LogEntries");
             var clearMethod = logEntries.GetMethod("Clear", global::System.Reflection.BindingFlags.Static | global::System.Reflection.BindingFlags.Public);
             if (clearMethod != null) clearMethod.Invoke(null, null);
-#endif
+            #endif
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
@@ -120,8 +129,7 @@ namespace System
         {
             return $"<color={color}>{message}</color>";
         }
-
-        // ReSharper disable Unity.PerformanceAnalysis
+        
         /// <summary>
         /// Adds contextual information (class name and method name) to a log message.
         /// Example: [DungeonGeneratorManager.Start] Message here
